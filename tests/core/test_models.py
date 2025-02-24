@@ -1,21 +1,20 @@
 # %% IMPORTS
 import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import MagicMock, patch
 import pandas as pd
 import typing as T
 
-from autogen_agentchat.base import TaskResult
 from autogen_team.core.models import BaselineAutogenModel, Model
 from autogen_team.core import schemas
 
 
 @pytest.fixture
-def baseline_model():
+def baseline_model() -> BaselineAutogenModel:
     """Fixture to create an instance of BaselineAutogenModel."""
     return BaselineAutogenModel()
 
 
-def test_get_params(baseline_model):
+def test_get_params(baseline_model: BaselineAutogenModel) -> None:
     """Test the get_params method."""
     # Setup
     baseline_model.model_config_path = "Newpath"
@@ -28,7 +27,7 @@ def test_get_params(baseline_model):
     assert params["model_config_path"] == "Newpath"
 
 
-def test_set_params(baseline_model):
+def test_set_params(baseline_model: BaselineAutogenModel) -> None:
     """Test the set_params method."""
     # Setup
     new_params = {"model_config_path": "Newpath"}
@@ -41,11 +40,11 @@ def test_set_params(baseline_model):
 
 
 @pytest.fixture
-def async_response_stream():
+def async_response_stream() -> MagicMock:
     return MagicMock(content="Result 1")
 
 
-def test_predict(baseline_model, async_response_stream):
+def test_predict(baseline_model: BaselineAutogenModel, async_response_stream: MagicMock) -> None:
     """Test the predict method of BaselineAutogenModel."""
     # Setup
     input_data = pd.DataFrame({"input": ["Some large input string"]})
@@ -68,7 +67,7 @@ def test_predict(baseline_model, async_response_stream):
         assert "model_version" in outputs["metadata"][0], "Metadata model_version is missing"
 
 
-def test_get_internal_model(baseline_model):
+def test_get_internal_model(baseline_model: BaselineAutogenModel) -> None:
     """Test get_internal_model returns the team."""
     # Setup
     mock_team = MagicMock()
@@ -81,21 +80,20 @@ def test_get_internal_model(baseline_model):
     assert internal_model == mock_team, "get_internal_model should return the team attribute"
 
 
-def test_model_class_config():
+def test_model_class_config() -> None:
     """Test the Config settings for the Model class."""
 
     class CustomModel(Model):
         KIND: T.Literal["CustomModel"] = "CustomModel"
 
-        @T.override
-        def load_context(self, model_config):
+        def load_context(self, model_config: dict[str, T.Any]) -> None:
             pass
 
     # Verify Config
     assert CustomModel.Config.arbitrary_types_allowed is True
 
 
-def test_load_context(baseline_model):
+def test_load_context(baseline_model: BaselineAutogenModel) -> None:
     # Setup
     model_config = {
         "provider": "openai_chat_completion_client",  # Use LiteLLM-compatible client
