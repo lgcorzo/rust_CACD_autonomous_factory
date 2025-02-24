@@ -303,7 +303,6 @@ class MlflowRegister(Register):
 
     KIND: T.Literal["MlflowRegister"] = "MlflowRegister"
 
-    @T.override
     def register(self, name: str, model_uri: str) -> Version:
         return mlflow.register_model(name=name, model_uri=model_uri, tags=self.tags)
 
