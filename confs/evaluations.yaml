@@ -3,6 +3,8 @@ job:
   inputs:
     KIND: ParquetReader
     path: data/inputs_train.parquet
+    limit: 4
   targets:
     KIND: ParquetReader
     path: data/targets_train.parquet
+    limit: 4

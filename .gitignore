@@ -4,6 +4,8 @@
 /dist/
 /build/
 /data/
+*.parquet
+*.csv
 
 # Cache
 .cache/

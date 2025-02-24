@@ -41,7 +41,11 @@ class TrainingJob(base.Job):
     # Model
     model: models.ModelKind = pdt.Field(models.BaselineAutogenModel(), discriminator="KIND")
     # Metrics
-    metrics: metrics_.MetricsKind = [metrics_.AutogenMetric(name="AutogenMetric", metric_type="exact_match", greater_is_better=True)]
+    metrics: metrics_.MetricsKind = [
+        metrics_.AutogenMetric(
+            name="AutogenMetric", metric_type="exact_match", greater_is_better=True
+        )
+    ]
     # Splitter
     splitter: splitters.SplitterKind = pdt.Field(
         splitters.TrainTestSplitter(), discriminator="KIND"
@@ -85,7 +89,7 @@ class TrainingJob(base.Job):
             # - targets
             logger.info("Log lineage: targets")
             targets_lineage = self.targets.lineage(
-                data=targets, name="targets", targets=schemas.TargetsSchema.cnt
+                data=targets, name="targets", targets=schemas.TargetsSchema.response
             )
             mlflow.log_input(dataset=targets_lineage, context=self.run_config.name)
             logger.debug("- Targets lineage: {}", targets_lineage.to_dict())
@@ -105,6 +109,7 @@ class TrainingJob(base.Job):
             logger.debug("- Targets test shape: {}", targets_test.shape)
             # model
             logger.info("Fit model: {}", self.model)
+            self.model.load_context_path(model_config_path=self.model.model_config_path)
             self.model.fit(inputs=inputs_train, targets=targets_train)
             # outputs
             logger.info("Predict outputs: {}", len(inputs_test))

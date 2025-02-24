@@ -3,6 +3,7 @@ job:
   inputs:
     KIND: ParquetReader
     path: data/inputs_test.parquet
+    limit: 4
   outputs:
     KIND: ParquetWriter
     path: outputs/predictions_test.parquet

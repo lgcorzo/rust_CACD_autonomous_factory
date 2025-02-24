@@ -41,6 +41,8 @@ def test_main(scenario: str, confs_path: str, extra_config: str) -> None:
     confs = list(sorted(os.listdir(folder)))
     # when
     for conf in confs:  # one job per config
+        if (conf == "model_config.json") and (scenario == "valid"):
+            continue
         config = os.path.join(folder, conf)
         argv = [config, "-e", extra_config]
         status = scripts.main(argv=argv)

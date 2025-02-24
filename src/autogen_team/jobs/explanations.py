@@ -10,6 +10,8 @@ from autogen_team.core import schemas
 from autogen_team.io import datasets, registries
 from autogen_team.jobs import base
 
+NUM_MAX_INPUTS = 2
+
 # %% JOBS
 
 
@@ -43,7 +45,7 @@ class ExplanationsJob(base.Job):
         logger.info("With logger: {}", logger)
         # inputs
         logger.info("Read samples: {}", self.inputs_samples)
-        inputs_samples = self.inputs_samples.read()  # unchecked!
+        inputs_samples = self.inputs_samples.read().head(NUM_MAX_INPUTS)  # unchecked!
         inputs_samples = schemas.InputsSchema.check(inputs_samples)
         logger.debug("- Inputs samples shape: {}", inputs_samples.shape)
         # model

@@ -3,14 +3,17 @@
 # %% IMPORTS
 
 import abc
+import json
+import os
 import typing as T
 
 import mlflow
+import pandas as pd
 import pydantic as pdt
+from typing import Any, Dict
 
 from autogen_team.core import models, schemas
 from autogen_team.utils import signers
-import pandas as pd
 
 # %% TYPES
 
@@ -80,6 +83,7 @@ class Saver(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
     KIND: str
 
     path: str = "model"
+    config_file: str = "model_config.json"
 
     @abc.abstractmethod
     def save(
@@ -101,6 +105,8 @@ class CustomSaver(Saver):
     """Saver for project models using the Mlflow PyFunc module.
 
     https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html
+    https://mlflow.org/blog/autogen-image-agent
+    https://mlflow.org/blog/custom-pyfunc
     """
 
     KIND: T.Literal["CustomSaver"] = "CustomSaver"
@@ -110,7 +116,8 @@ class CustomSaver(Saver):
 
         https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html?#mlflow.pyfunc.PythonModel
         """
-        # TBD load context: 
+
+        # TBD load context:
         def __init__(self, model: models.Model):
             """Initialize the custom saver adapter.
 
@@ -118,12 +125,29 @@ class CustomSaver(Saver):
                 model (models.Model): project model.
             """
             self.model = model
+            self.model_config = {
+                "provider": "openai_chat_completion_client",  # Use LiteLLM-compatible client
+                "config": {
+                    "model": "azure-gpt",  # LiteLLM model
+                    "api_base": "http://litellm:4000/v1",  # LiteLLM Gateway URL
+                    "api_key": "sk-12345",
+                    "temperature": 0.7,  # Optional
+                    "max_tokens": 512,  # Optional
+                },
+            }
+
+        def load_context(self, context: mlflow.pyfunc.PythonModelContext):
+            """
+            Load the model from the specified artifacts directory.
+            """
+            model_file_path = context.artifacts["config_file"]
+            # Define the configuration
+            model_config = json.load(open(model_file_path, "r", encoding="utf-8"))
+            # Load the model
+            self.model.load_context(model_config)
 
         def predict(
-            self,
-            context: mlflow.pyfunc.PythonModelContext,
-            model_input: schemas.Inputs,
-            params: dict[str, T.Any] | None = None,
+            self, context: mlflow.pyfunc.PythonModelContext, inputs: schemas.Inputs
         ) -> schemas.Outputs:
             """Generate predictions with a custom model for the given inputs.
 
@@ -135,8 +159,8 @@ class CustomSaver(Saver):
             Returns:
                 schemas.Outputs: validated outputs of the project model.
             """
-            output = self.model.predict(inputs=model_input)
-            return T.cast(schemas.Outputs, output.prediction)
+            output = self.model.predict(inputs=inputs)
+            return output
 
     @T.override
     def save(
@@ -147,38 +171,12 @@ class CustomSaver(Saver):
             python_model=adapter,
             signature=signature,
             artifact_path=self.path,
+            artifacts={"config_file": os.path.join(self.path, self.config_file)},
             input_example=input_example,
         )
 
 
-class BuiltinSaver(Saver):
-    """Saver for built-in models using an Mlflow flavor module.
-
-    https://mlflow.org/docs/latest/models.html#built-in-model-flavors
-
-    Parameters:
-        flavor (str): Mlflow flavor module to use for the serialization.
-    """
-
-    KIND: T.Literal["BuiltinSaver"] = "BuiltinSaver"
-
-    flavor: str
-
-    @T.override
-    def save(
-        self,
-        model: models.Model,
-        signature: signers.Signature,
-        input_example: schemas.Inputs | None = None,
-    ) -> mlflow.entities.model_registry.ModelVersion:
-        builtin_model = model.get_internal_model()
-        module = getattr(mlflow, self.flavor)
-        return module.log_model(
-            builtin_model, artifact_path=self.path, signature=signature, input_example=input_example
-        )
-
-
-SaverKind = CustomSaver | BuiltinSaver
+SaverKind = CustomSaver
 
 # %% LOADERS
 
@@ -194,6 +192,12 @@ class Loader(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
 
     class Adapter(abc.ABC):
         """Adapt any model for the project inference."""
+
+        @abc.abstractmethod
+        def load_context(self, model_config: Dict[str, Any]):
+            """
+            Load the model from the specified artifacts directory.
+            """
 
         @abc.abstractmethod
         def predict(self, inputs: schemas.Inputs) -> schemas.Outputs:
@@ -238,10 +242,29 @@ class CustomLoader(Loader):
             self.model = model
 
         @T.override
+        def load_context(self, model_config: Dict[str, Any]):
+            """
+            Load the model from the specified artifacts directory.
+            """
+            self.model.load_context(model_config)
+
+        @T.override
         def predict(self, inputs: schemas.Inputs) -> schemas.Outputs:
             # model validation is already done in predict
-            outputs = self.model.predict(data=inputs)
-            return T.cast(schemas.Outputs, outputs)
+            prediction = self.model.predict(data=inputs)
+
+            # Return the outputs schema
+            outputs = schemas.Outputs(
+                pd.DataFrame(
+                    {
+                        "response": [prediction],
+                        "metadata": [
+                            {"timestamp": "2025-01-15T12:00:00Z", "model_version": "v1.0.0"}
+                        ],
+                    }
+                )
+            )
+            return outputs
 
     @T.override
     def load(self, uri: str) -> "CustomLoader.Adapter":
@@ -250,41 +273,7 @@ class CustomLoader(Loader):
         return adapter
 
 
-class BuiltinLoader(Loader):
-    """Loader for built-in models using the Mlflow PyFunc module.
-
-    Note: use Mlflow PyFunc instead of flavors to use standard API.
-
-    https://mlflow.org/docs/latest/models.html#built-in-model-flavors
-    """
-
-    KIND: T.Literal["BuiltinLoader"] = "BuiltinLoader"
-
-    class Adapter(Loader.Adapter):
-        """Adapt a builtin model for the project inference."""
-
-        def __init__(self, model: mlflow.pyfunc.PyFuncModel) -> None:
-            """Initialize the adapter from an mlflow pyfunc model.
-
-            Args:
-                model (mlflow.pyfunc.PyFuncModel): mlflow pyfunc model.
-            """
-            self.model = model
-
-        @T.override
-        def predict(self, inputs: schemas.Inputs) -> schemas.Outputs:
-            columns = list(schemas.OutputsSchema.to_schema().columns)
-            outputs = self.model.predict(data=inputs)  # unchecked data!
-            return schemas.Outputs(outputs, columns=columns, index=inputs.index)
-
-    @T.override
-    def load(self, uri: str) -> "BuiltinLoader.Adapter":
-        model = mlflow.pyfunc.load_model(model_uri=uri)
-        adapter = BuiltinLoader.Adapter(model=model)
-        return adapter
-
-
-LoaderKind = CustomLoader | BuiltinLoader
+LoaderKind = CustomLoader
 
 # %% REGISTERS
 

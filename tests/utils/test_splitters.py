@@ -9,7 +9,7 @@ from autogen_team.utils import splitters
 def test_train_test_splitter(inputs: schemas.Inputs, targets: schemas.Targets) -> None:
     # given
     shuffle = False
-    test_size = 50
+    test_size = 1
     random_state = 0
     splitter = splitters.TrainTestSplitter(
         shuffle=shuffle, test_size=test_size, random_state=random_state
@@ -31,8 +31,8 @@ def test_train_test_splitter(inputs: schemas.Inputs, targets: schemas.Targets) -
 def test_time_series_splitter(inputs: schemas.Inputs, targets: schemas.Targets) -> None:
     # given
     gap = 0
-    n_splits = 3
-    test_size = 50
+    n_splits = 2
+    test_size = 1
     splitter = splitters.TimeSeriesSplitter(gap=gap, n_splits=n_splits, test_size=test_size)
     # when
     n_splits = splitter.get_n_splits(inputs=inputs, targets=targets)

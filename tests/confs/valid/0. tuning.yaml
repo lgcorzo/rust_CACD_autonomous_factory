@@ -3,12 +3,15 @@ job:
   inputs:
     KIND: ParquetReader
     path: "${tests_path:}/data/inputs_sample.parquet"
-    limit: 1500
+    limit: 4
   targets:
     KIND: ParquetReader
     path: "${tests_path:}/data/targets_sample.parquet"
-    limit: 1500
+    limit: 4
   splitter:
     KIND: TimeSeriesSplitter
-    n_splits: 3
-    test_size: 167 # 1 week
+    n_splits: 2
+    test_size: 1 
+  model:
+    KIND: BaselineAutogenModel
+    model_config_path: "${tests_path:}/confs/valid/model_config.json"

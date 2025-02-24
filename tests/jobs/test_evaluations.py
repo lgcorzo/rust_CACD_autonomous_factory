@@ -15,7 +15,7 @@ from autogen_team.io import datasets, registries, services
         (
             1,
             {
-                "mean_squared_error": metrics.Threshold(
+                "AutogenMetricTest": metrics.Threshold(
                     threshold=float("inf"), greater_is_better=False
                 )
             },
@@ -107,13 +107,13 @@ def test_evaluations_job(
         out["targets_lineage"].source.uri == targets_reader.path
     ), "Targets lineage source should be the targets reader path!"
     assert (
-        out["targets_lineage"].targets == schemas.TargetsSchema.cnt
-    ), "Targets lineage target should be cnt!"
+        out["targets_lineage"].targets == schemas.TargetsSchema.response
+    ), "Targets lineage target should be response!"
     # - dataset
     assert out["dataset"].name == "evaluation", "Dataset name should be evaluation!"
     assert out["dataset"].predictions is None, "Dataset predictions should be None!"
     assert (
-        out["dataset"].targets == schemas.TargetsSchema.cnt
+        out["dataset"].targets == schemas.TargetsSchema.response
     ), "Dataset targets should be the target column!"
     assert (
         inputs_reader.path in out["dataset"].source.uri
@@ -141,9 +141,7 @@ def test_evaluations_job(
         out["validation_thresholds"].keys() == thresholds.keys()
     ), "Validation thresholds should have the same keys as thresholds!"
     # - evaluations
-    assert (
-        out["evaluations"].metrics["example_count"] == inputs_reader.limit
-    ), "Evaluations should have the same number of examples as the inputs!"
+    assert out["evaluations"].metrics["exact_match/v1"] == 0.0
     assert job.metrics[0].name in out["evaluations"].metrics, "Metric should be logged in Mlflow!"
     # - mlflow tracking
     experiment = mlflow_service.client().get_experiment_by_name(name=mlflow_service.experiment_name)

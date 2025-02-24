@@ -78,8 +78,8 @@ def test_tuning_job(
         out["targets_lineage"].source.uri == targets_reader.path
     ), "Targets lineage source should be the targets reader path!"
     assert (
-        out["targets_lineage"].targets == schemas.TargetsSchema.cnt
-    ), "Targets lineage target should be cnt!"
+        out["targets_lineage"].targets == schemas.TargetsSchema.response
+    ), "Targets lineage target should be response!"
     # - results
     assert out["results"].ndim == 2, "Results should be a dataframe!"
     # - best score

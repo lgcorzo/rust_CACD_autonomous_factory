@@ -18,7 +18,9 @@ from autogen_team.core import models, schemas
 
 MlflowMetric: T.TypeAlias = mlflow.metrics.MetricValue
 MlflowThreshold: T.TypeAlias = mlflow.models.MetricThreshold
-MlflowModelValidationFailedException: T.TypeAlias = mlflow.models.evaluation.validation.ModelValidationFailedException
+MlflowModelValidationFailedException: T.TypeAlias = (
+    mlflow.models.evaluation.validation.ModelValidationFailedException
+)
 
 # %% METRICS
 
@@ -40,7 +42,7 @@ class Metric(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
     greater_is_better: bool
 
     @abc.abstractmethod
-    def score(self, targets: schemas.Targets, outputs: schemas.Outputs) -> float:
+    def score(self, targets: schemas.input, outputs: schemas.input) -> float:
         """Score the outputs against the targets.
 
         Args:
@@ -51,7 +53,9 @@ class Metric(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
             float: single result from the metric computation.
         """
 
-    def scorer(self, model: models.Model, inputs: schemas.Inputs, targets: schemas.Targets) -> float:
+    def scorer(
+        self, model: models.Model, inputs: schemas.Inputs, targets: schemas.Targets
+    ) -> float:
         """Score model outputs against targets.
 
         Args:
@@ -73,9 +77,9 @@ class Metric(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
             MlflowMetric: the Mlflow metric.
         """
 
-        def eval_fn(predictions: pd.Series[int], targets: pd.Series[int]) -> MlflowMetric:
+        def eval_fn(predictions: pd.Series[str], targets: pd.Series[str]) -> MlflowMetric:
             """Evaluation function associated with the mlflow metric.
-
+            https://mlflow.org/docs/latest/llms/llm-evaluate/index.html
             Args:
                 predictions (pd.Series): model predictions.
                 targets (pd.Series | None): model targets.
@@ -83,13 +87,20 @@ class Metric(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
             Returns:
                 MlflowMetric: the mlflow metric.
             """
-            score_targets = schemas.Targets({schemas.TargetsSchema.cnt: targets}, index=targets.index)
-            score_outputs = schemas.Outputs({schemas.OutputsSchema.prediction: predictions}, index=predictions.index)
+            score_outputs = pd.DataFrame(
+                {schemas.OutputsSchema.response: predictions}, index=predictions.index
+            )
+            score_targets = pd.DataFrame(
+                {schemas.TargetsSchema.response: targets}, index=targets.index
+            )
+
             sign = 1 if self.greater_is_better else -1  # reverse the effect
             score = self.score(targets=score_targets, outputs=score_outputs)
             return MlflowMetric(aggregate_results={self.name: score * sign})
 
-        return mlflow.metrics.make_metric(eval_fn=eval_fn, name=self.name, greater_is_better=self.greater_is_better)
+        return mlflow.metrics.make_metric(
+            eval_fn=eval_fn, name=self.name, greater_is_better=self.greater_is_better
+        )
 
 
 class AutogenMetric(Metric):
@@ -107,8 +118,8 @@ class AutogenMetric(Metric):
     @T.override
     def score(self, targets: schemas.Targets, outputs: schemas.Outputs) -> float:
         # Extract text responses from targets and outputs
-        y_true = targets[schemas.TargetsSchema.response].astype(str)
-        y_pred = outputs[schemas.OutputsSchema.response].astype(str)
+        y_true = targets.response
+        y_pred = outputs.response
 
         if self.metric_type == "exact_match":
             return self._exact_match_score(y_true, y_pred)
@@ -120,6 +131,9 @@ class AutogenMetric(Metric):
             raise ValueError(f"Unknown metric type: {self.metric_type}")
 
     def _exact_match_score(self, y_true: pd.Series, y_pred: pd.Series) -> float:
+        # Reset index to align the series
+        y_true = y_true.reset_index(drop=True)
+        y_pred = y_pred.reset_index(drop=True)
         return (y_true == y_pred).mean()
 
     def _similarity_score(self, y_true: pd.Series, y_pred: pd.Series) -> float:

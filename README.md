@@ -140,6 +140,7 @@ You can use this package as part of your MLOps toolkit or platform (e.g., Model 
     - [Ejemplo en Python](#ejemplo-en-python)
     - [Representación en Mermaid para UML](#representación-en-mermaid-para-uml)
     - [Explicación:](#explicación)
+  - [openai with mlflow example:](#openai-with-mlflow-example)
 
 # Install
 
@@ -433,6 +434,8 @@ Integrations with the Command-Line Interface (CLI) of your system.
 Edition, validation, and versioning of your project source code.
 
 ### Coverage: [Coverage](https://coverage.readthedocs.io/en/latest/)
+
+https://krijnvanderburg.medium.com/automatically-generate-and-visualize-python-code-coverage-308e65627925
 
 - **Motivations**:
   - Report code covered by tests
@@ -1453,3 +1456,7 @@ classDiagram
 - La relación de herencia indica que las subclases heredan los atributos y métodos de la clase base, pero pueden sobrescribirlos (como `hacer_sonido` en este caso).
 
 
+
+## openai with mlflow example: 
+https://mlflow.org/docs/latest/llms/openai/notebooks/openai-code-helper.html
+https://mlflow.org/docs/latest/llms/openai/index.html#introduction

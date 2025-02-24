@@ -17,6 +17,8 @@ from autogen_team.utils import searchers, splitters
 
 class TuningJob(base.Job):
     """Find the best hyperparameters for a model.
+    https://microsoft.github.io/FLAML/docs/Examples/AutoGen-OpenAI/
+    https://github.com/microsoft/FLAML/blob/main/notebook/autogen_openai_completion.ipynb
 
     Parameters:
         run_config (services.MlflowService.RunConfig): mlflow run config.
@@ -38,18 +40,19 @@ class TuningJob(base.Job):
     # Model
     model: models.ModelKind = pdt.Field(models.BaselineAutogenModel(), discriminator="KIND")
     # Metric
-    metric: metrics.MetricKind = pdt.Field(metrics.AutogenMetric(name="AutogenMetric", metric_type="exact_match", greater_is_better=True), discriminator="KIND")
+    metric: metrics.MetricKind = pdt.Field(
+        metrics.AutogenMetric(
+            name="AutogenMetric", metric_type="exact_match", greater_is_better=True
+        ),
+        discriminator="KIND",
+    )
     # splitter
     splitter: splitters.SplitterKind = pdt.Field(
         splitters.TimeSeriesSplitter(), discriminator="KIND"
     )
     # Searcher
     searcher: searchers.SearcherKind = pdt.Field(
-        searchers.GridCVSearcher(
-            param_grid={
-                "max_depth": [3, 5, 7],
-            }
-        ),
+        searchers.GridCVSearcher(param_grid={"max_tokens": [10000, 128000], "temperature": [3.0]}),
         discriminator="KIND",
     )
 
@@ -82,11 +85,12 @@ class TuningJob(base.Job):
             # - targets
             logger.info("Log lineage: targets")
             targets_lineage = self.targets.lineage(
-                data=targets, name="targets", targets=schemas.TargetsSchema.cnt
+                data=targets, name="targets", targets=schemas.TargetsSchema.response
             )
             mlflow.log_input(dataset=targets_lineage, context=self.run_config.name)
             logger.debug("- Targets lineage: {}", targets_lineage.to_dict())
             # model
+            self.model.load_context_path(model_config_path=self.model.model_config_path)
             logger.info("With model: {}", self.model)
             # metric
             logger.info("With metric: {}", self.metric)

@@ -14,7 +14,7 @@ def test_grid_cv_searcher(
     train_test_splitter: splitters.Splitter,
 ) -> None:
     # given
-    param_grid = {"max_depth": [3, 5, 7]}
+    param_grid = {"max_tokens": [30000, 50000, 70000]}
     searcher = searchers.GridCVSearcher(param_grid=param_grid)
     # when
     result, best_score, best_params = searcher.search(

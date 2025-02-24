@@ -63,7 +63,6 @@ def test_training_job(
         "test_index",
         "inputs_test",
         "inputs_train",
-        "inputs_test",
         "targets_train",
         "targets_test",
         "outputs_test",
@@ -94,8 +93,8 @@ def test_training_job(
         out["targets_lineage"].source.uri == targets_reader.path
     ), "Targets lineage source should be the targets reader path!"
     assert (
-        out["targets_lineage"].targets == schemas.TargetsSchema.cnt
-    ), "Targets lineage target should be cnt!"
+        out["targets_lineage"].targets == schemas.TargetsSchema.response
+    ), "Targets lineage target should be response!"
     # - splitter
     assert len(out["inputs_train"]) + len(out["inputs_test"]) == len(
         out["inputs"]

@@ -160,7 +160,7 @@ class MlflowService(Service):
     tracking_uri: str = env.mlflow_tracking_uri
     registry_uri: str = env.mlflow_registry_uri
     experiment_name: str = env.mlflow_experiment_name
-    registry_name: str = env.mlflow_registered_autogen_team
+    registry_name: str = env.mlflow_registered_model_name
     # autolog
     autolog_disable: bool = False
     autolog_disable_for_unsupported_versions: bool = False

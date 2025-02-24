@@ -3,7 +3,7 @@ job:
   inputs_samples:
     KIND: ParquetReader
     path: data/inputs_test.parquet
-    limit: 100
+    limit: 4
   models_explanations:
     KIND: ParquetWriter
     path: outputs/models_explanations.parquet

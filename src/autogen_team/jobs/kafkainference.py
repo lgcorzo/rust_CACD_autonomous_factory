@@ -11,6 +11,7 @@ import pandas as pd
 
 # %% JOBS
 
+
 class KafkaInferenceJob(base.Job):
     """Generate batch predictions using Kafka streams for inputs and outputs.
 
@@ -47,7 +48,9 @@ class KafkaInferenceJob(base.Job):
         logger.info("Connecting to Kafka...")
         consumer = kafka.create_consumer(self.input_topic, self.kafka_config)
         producer = kafka.create_producer(self.kafka_config)
-        logger.info("Kafka connected: input_topic={}, output_topic={}", self.input_topic, self.output_topic)
+        logger.info(
+            "Kafka connected: input_topic={}, output_topic={}", self.input_topic, self.output_topic
+        )
 
         # model
         logger.info("With model: {}", self.mlflow_service.registry_name)
@@ -79,8 +82,8 @@ class KafkaInferenceJob(base.Job):
             # Log and notify
             logger.info("Processed message successfully.")
             self.alerts_service.notify(
-                title="Kafka Inference Job Processed Message", 
-                message=f"Input Topic: {self.input_topic}, Output Topic: {self.output_topic}"
+                title="Kafka Inference Job Processed Message",
+                message=f"Input Topic: {self.input_topic}, Output Topic: {self.output_topic}",
             )
 
         return locals()

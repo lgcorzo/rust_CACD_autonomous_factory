@@ -69,15 +69,18 @@ class OutputsSchema(Schema):
 class TargetsSchema(Schema):
     """Schema for the project target."""
 
-    input: papd.Series[padt.String] = pa.Field()
+    input_target: papd.Series[padt.String] = pa.Field()
     response: papd.Series[padt.String] = pa.Field()
 
 
 class SHAPValuesSchema(Schema):
     """Schema for SHAP values."""
 
+    sample: papd.Series[padt.String] = pa.Field()
+    explanation: papd.Series[padt.String] = pa.Field()
+    shap_value: papd.Series[padt.Float32] = pa.Field()
+
     class Config:
-        dtype: str = "float32"
         strict: bool = False
 
 

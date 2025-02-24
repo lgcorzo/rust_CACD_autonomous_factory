@@ -28,6 +28,8 @@
 ------------
 
 ## classes relations
+ejemplo de  autogen para mlflow
+https://mlflow.org/blog/custom-pyfunc
 
 ```mermaid
 classDiagram

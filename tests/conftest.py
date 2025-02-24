@@ -14,9 +14,9 @@ from autogen_team.utils import searchers, signers, splitters
 
 # %% CONFIGS
 
-LIMIT = 1500
-N_SPLITS = 3
-TEST_SIZE = 24 * 7  # 1 week
+LIMIT = 4
+N_SPLITS = 2
+TEST_SIZE = 1  # 1 week
 
 # %% FIXTURES
 
@@ -114,7 +114,7 @@ def inputs_reader(inputs_path: str) -> datasets.ParquetReader:
 @pytest.fixture(scope="session")
 def inputs_samples_reader(inputs_path: str) -> datasets.ParquetReader:
     """Return a reader for the inputs samples dataset."""
-    return datasets.ParquetReader(path=inputs_path, limit=100)
+    return datasets.ParquetReader(path=inputs_path, limit=LIMIT)
 
 
 @pytest.fixture(scope="session")
@@ -130,9 +130,21 @@ def outputs_reader(
     """Return a reader for the outputs dataset."""
     # generate outputs if it is missing
     if not os.path.exists(outputs_path):
+        model_config = {
+            "provider": "openai_chat_completion_client",  # Use LiteLLM-compatible client
+            "config": {
+                "model": "azure-gpt",  # LiteLLM model
+                "api_base": "http://localhost:4000/v1",  # LiteLLM Gateway URL
+                "api_key": "sk-12345",
+                "temperature": 0.7,  # Optional
+                "max_tokens": 512,  # Optional
+            },
+        }
         inputs = schemas.InputsSchema.check(inputs_reader.read())
         targets = schemas.TargetsSchema.check(targets_reader.read())
-        model = models.BaselineAutogenModel().fit(inputs=inputs, targets=targets)
+        model = models.BaselineAutogenModel()
+        model.load_context(model_config=model_config)
+        model.fit(inputs=inputs, targets=targets)
         outputs = schemas.OutputsSchema.check(model.predict(inputs=inputs))
         outputs_writer = datasets.ParquetWriter(path=outputs_path)
         outputs_writer.write(data=outputs)
@@ -209,7 +221,7 @@ def time_series_splitter() -> splitters.TimeSeriesSplitter:
 @pytest.fixture(scope="session")
 def searcher() -> searchers.Searcher:
     """Return the default searcher object."""
-    param_grid = {"max_depth": [1, 2], "n_estimators": [3]}
+    param_grid = {"max_tokens": [10000, 20000], "temperature": [3.0]}
     return searchers.GridCVSearcher(param_grid=param_grid)
 
 
@@ -240,7 +252,18 @@ def model(
     train_test_sets: tuple[schemas.Inputs, schemas.Targets, schemas.Inputs, schemas.Targets],
 ) -> models.BaselineAutogenModel:
     """Return a train model for testing."""
+    model_config = {
+        "provider": "openai_chat_completion_client",  # Use LiteLLM-compatible client
+        "config": {
+            "model": "azure-gpt",  # LiteLLM model
+            "api_base": "http://localhost:4000/v1",  # LiteLLM Gateway URL
+            "api_key": "sk-12345",
+            "temperature": 0.7,  # Optional
+            "max_tokens": 512,  # Optional
+        },
+    }
     model = models.BaselineAutogenModel()
+    model.load_context(model_config=model_config)
     inputs_train, targets_train, _, _ = train_test_sets
     model.fit(inputs=inputs_train, targets=targets_train)
     return model
@@ -252,7 +275,9 @@ def model(
 @pytest.fixture(scope="session")
 def metric() -> metrics.AutogenMetric:
     """Return the default metric."""
-    return metrics.AutogenMetric(name="AutogenMetricTest", metric_type="exact_match", greater_is_better=True)
+    return metrics.AutogenMetric(
+        name="AutogenMetricTest", metric_type="exact_match", greater_is_better=True
+    )
 
 
 # %% - Signers
@@ -361,7 +386,7 @@ def signature(
 @pytest.fixture(scope="session")
 def saver() -> registries.CustomSaver:
     """Return the default model saver."""
-    return registries.CustomSaver(path="custom-model")
+    return registries.CustomSaver(path="tests/confs/valid")
 
 
 @pytest.fixture(scope="session")

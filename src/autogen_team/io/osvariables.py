@@ -14,7 +14,7 @@ class Env(Singleton, BaseSettings):
     mlflow_tracking_uri: str = "./mlruns"
     mlflow_registry_uri: str = "./mlruns"
     mlflow_experiment_name: str = "autogen_team"
-    mlflow_registered_autogen_team: str = "autogen_team"
+    mlflow_registered_model_name: str = "autogen_team"
 
     class Config:
         case_sensitive = False  # Optional: make env var lookup case-insensitive

@@ -3,8 +3,17 @@ job:
   inputs:
     KIND: ParquetReader
     path: "${tests_path:}/data/inputs_sample.parquet"
-    limit: 1500
+    limit: 8
   targets:
     KIND: ParquetReader
     path: "${tests_path:}/data/targets_sample.parquet"
-    limit: 1500
+    limit: 8
+  splitter:
+    KIND: TrainTestSplitter
+    test_size: 2
+  model:
+    KIND: BaselineAutogenModel
+    model_config_path: "${tests_path:}/confs/valid/model_config.json"
+  saver:
+    KIND: CustomSaver
+    path: "tests/confs/valid"

@@ -3,6 +3,17 @@ job:
   inputs:
     KIND: ParquetReader
     path: data/inputs_train.parquet
+    limit: 8
   targets:
     KIND: ParquetReader
     path: data/targets_train.parquet
+    limit: 8
+  splitter:
+    KIND: TrainTestSplitter
+    test_size: 2
+  model:
+    KIND: BaselineAutogenModel
+    model_config_path: "confs/model_config.json"
+  saver:
+    KIND: CustomSaver
+    path: "confs"

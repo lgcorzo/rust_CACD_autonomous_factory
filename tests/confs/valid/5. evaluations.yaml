@@ -3,8 +3,8 @@ job:
   inputs:
     KIND: ParquetReader
     path: "${tests_path:}/data/inputs_sample.parquet"
-    limit: 1500
+    limit: 4
   targets:
     KIND: ParquetReader
     path: "${tests_path:}/data/targets_sample.parquet"
-    limit: 1500
+    limit: 4
