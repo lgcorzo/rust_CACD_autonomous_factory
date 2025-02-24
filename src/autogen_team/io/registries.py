@@ -8,6 +8,10 @@ import os
 import typing as T
 
 import mlflow
+import mlflow.entities
+import mlflow.entities.model_registry
+import mlflow.models.model
+from mlflow.pyfunc.model import PythonModel, PythonModelContext
 import pandas as pd
 import pydantic as pdt
 from typing import Any, Dict
@@ -111,7 +115,7 @@ class CustomSaver(Saver):
 
     KIND: T.Literal["CustomSaver"] = "CustomSaver"
 
-    class Adapter(mlflow.pyfunc.PythonModel):  # type: ignore[misc]
+    class Adapter(PythonModel):
         """Adapt a custom model to the Mlflow PyFunc flavor for saving operations.
 
         https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html?#mlflow.pyfunc.PythonModel
@@ -136,7 +140,7 @@ class CustomSaver(Saver):
                 },
             }
 
-        def load_context(self, context: mlflow.pyfunc.PythonModelContext):
+        def load_context(self, context: PythonModelContext) -> None:
             """
             Load the model from the specified artifacts directory.
             """
@@ -146,34 +150,23 @@ class CustomSaver(Saver):
             # Load the model
             self.model.load_context(model_config)
 
-        def predict(
-            self, context: mlflow.pyfunc.PythonModelContext, inputs: schemas.Inputs
-        ) -> schemas.Outputs:
-            """Generate predictions with a custom model for the given inputs.
-
-            Args:
-                context (mlflow.pyfunc.PythonModelContext): mlflow context.
-                model_input (schemas.Inputs): inputs for the mlflow model.
-                params (dict[str, T.Any] | None): additional parameters.
-
-            Returns:
-                schemas.Outputs: validated outputs of the project model.
-            """
+        def predict(self, context: PythonModelContext, inputs: schemas.Inputs) -> schemas.Outputs:
+            """Generate predictions with a custom model for the given inputs."""
             output = self.model.predict(inputs=inputs)
             return output
 
-    @T.override
     def save(
         self, model: models.Model, signature: signers.Signature, input_example: schemas.Inputs
     ) -> Info:
         adapter = CustomSaver.Adapter(model=model)
-        return mlflow.pyfunc.log_model(
+        model_info: Info = mlflow.pyfunc.log_model(
             python_model=adapter,
             signature=signature,
             artifact_path=self.path,
             artifacts={"config_file": os.path.join(self.path, self.config_file)},
             input_example=input_example,
         )
+        return model_info
 
 
 SaverKind = CustomSaver
@@ -194,7 +187,7 @@ class Loader(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
         """Adapt any model for the project inference."""
 
         @abc.abstractmethod
-        def load_context(self, model_config: Dict[str, Any]):
+        def load_context(self, model_config: Dict[str, Any]) -> None:
             """
             Load the model from the specified artifacts directory.
             """
@@ -241,14 +234,12 @@ class CustomLoader(Loader):
             """
             self.model = model
 
-        @T.override
-        def load_context(self, model_config: Dict[str, Any]):
+        def load_context(self, model_config: Dict[str, Any]) -> None:
             """
             Load the model from the specified artifacts directory.
             """
             self.model.load_context(model_config)
 
-        @T.override
         def predict(self, inputs: schemas.Inputs) -> schemas.Outputs:
             # model validation is already done in predict
             prediction = self.model.predict(data=inputs)
@@ -266,7 +257,6 @@ class CustomLoader(Loader):
             )
             return outputs
 
-    @T.override
     def load(self, uri: str) -> "CustomLoader.Adapter":
         model = mlflow.pyfunc.load_model(model_uri=uri)
         adapter = CustomLoader.Adapter(model=model)
