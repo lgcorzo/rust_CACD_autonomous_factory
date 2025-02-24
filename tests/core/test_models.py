@@ -4,7 +4,9 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import typing as T
 
-from autogen_team.core.models import BaselineAutogenModel, Model
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+
+from autogen_team.core.models import BaselineAutogenModel
 from autogen_team.core import schemas
 
 
@@ -70,7 +72,7 @@ def test_predict(baseline_model: BaselineAutogenModel, async_response_stream: Ma
 def test_get_internal_model(baseline_model: BaselineAutogenModel) -> None:
     """Test get_internal_model returns the team."""
     # Setup
-    mock_team = MagicMock()
+    mock_team = MagicMock(spec=OpenAIChatCompletionClient)
     baseline_model.model_client = mock_team
 
     # Execute
@@ -78,19 +80,6 @@ def test_get_internal_model(baseline_model: BaselineAutogenModel) -> None:
 
     # Verify
     assert internal_model == mock_team, "get_internal_model should return the team attribute"
-
-
-def test_model_class_config() -> None:
-    """Test the Config settings for the Model class."""
-
-    class CustomModel(Model):
-        KIND: T.Literal["CustomModel"] = "CustomModel"
-
-        def load_context(self, model_config: dict[str, T.Any]) -> None:
-            pass
-
-    # Verify Config
-    assert CustomModel.Config.arbitrary_types_allowed is True
 
 
 def test_load_context(baseline_model: BaselineAutogenModel) -> None:

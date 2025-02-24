@@ -78,7 +78,6 @@ class TrainTestSplitter(Splitter):
     test_size: int | float = 2
     random_state: int = 42
 
-    @T.override
     def split(
         self, inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None = None
     ) -> TrainTestSplits:
@@ -88,7 +87,6 @@ class TrainTestSplitter(Splitter):
         )
         yield train_index, test_index
 
-    @T.override
     def get_n_splits(
         self, inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None = None
     ) -> int:
@@ -110,14 +108,12 @@ class TimeSeriesSplitter(Splitter):
     n_splits: int = 4
     test_size: int | float = 24 * 30 * 2  # 2 months
 
-    @T.override
     def split(
         self, inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None = None
     ) -> TrainTestSplits:
         splitter = model_selection.TimeSeriesSplit(n_splits=self.n_splits, test_size=self.test_size)
         yield from splitter.split(inputs)
 
-    @T.override
     def get_n_splits(
         self, inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None = None
     ) -> int:

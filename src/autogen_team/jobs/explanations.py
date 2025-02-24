@@ -38,7 +38,6 @@ class ExplanationsJob(base.Job):
     # Loader
     loader: registries.LoaderKind = pdt.Field(registries.CustomLoader(), discriminator="KIND")
 
-    @T.override
     def run(self) -> base.Locals:
         # services
         logger = self.logger_service.logger()

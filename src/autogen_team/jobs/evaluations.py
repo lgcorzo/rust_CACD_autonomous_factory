@@ -3,6 +3,7 @@
 # %% IMPORTS
 
 import typing as T
+from typing import Dict, List
 
 import mlflow
 import pandas as pd
@@ -42,22 +43,21 @@ class EvaluationsJob(base.Job):
     targets: datasets.ReaderKind = pdt.Field(..., discriminator="KIND")
     # Model
     model_type: str = "question-answering"
-    alias_or_version: str | int = "Champion"
+    alias_or_version: T.Union[str, int] = "Champion"
     # Metrics
-    metrics: metrics_.MetricsKind = [
+    metrics: List[metrics_.AutogenMetric] = [  # Assuming MetricsKind is List[AutogenMetric]
         metrics_.AutogenMetric(
             name="AutogenMetric", metric_type="exact_match", greater_is_better=True
         )
     ]
     # Evaluators
-    evaluators: list[str] = ["default"]
+    evaluators: List[str] = ["default"]
     # Thresholds
-    thresholds: dict[str, metrics_.Threshold] = {
+    thresholds: Dict[str, metrics_.Threshold] = {  # Assuming metrics_.Threshold is the correct type
         "exact_match": metrics_.Threshold(threshold=0.5, greater_is_better=True)
     }
 
-    @T.override
-    def run(self) -> base.Locals:
+    def run(self) -> base.Locals:  # Assuming base.Locals is dict[str, Any]
         # services
         # - logger
         logger = self.logger_service.logger()
@@ -71,24 +71,26 @@ class EvaluationsJob(base.Job):
             # - inputs
             logger.info("Read inputs: {}", self.inputs)
             inputs_ = self.inputs.read()  # unchecked!
-            inputs = schemas.InputsSchema.check(inputs_)
+            inputs = schemas.InputsSchema.check(inputs_)  # Assuming check returns DataFrame
             logger.debug("- Inputs shape: {}", inputs.shape)
             # - targets
             logger.info("Read targets: {}", self.targets)
             targets_ = self.targets.read()  # unchecked!
-            targets = schemas.TargetsSchema.check(targets_)
+            targets = schemas.TargetsSchema.check(targets_)  # Assuming check returns DataFrame
             logger.debug("- Targets shape: {}", targets.shape)
             # lineage
             # - inputs
             logger.info("Log lineage: inputs")
-            inputs_lineage = self.inputs.lineage(data=inputs, name="inputs")
+            inputs_lineage = self.inputs.lineage(
+                data=inputs, name="inputs"
+            )  # Assuming lineage returns mlflow.data.Dataset
             mlflow.log_input(dataset=inputs_lineage, context=self.run_config.name)
             logger.debug("- Inputs lineage: {}", inputs_lineage.to_dict())
             # - targets
             logger.info("Log lineage: targets")
             targets_lineage = self.targets.lineage(
                 data=targets, name="targets", targets=schemas.TargetsSchema.response
-            )
+            )  # Assuming lineage returns mlflow.data.Dataset
             mlflow.log_input(dataset=targets_lineage, context=self.run_config.name)
             logger.debug("- Targets lineage: {}", targets_lineage.to_dict())
             # dataset
@@ -98,22 +100,25 @@ class EvaluationsJob(base.Job):
                 name="evaluation",
                 source=f"{inputs_lineage.source.uri} & {targets_lineage.source.uri}",
                 targets=schemas.TargetsSchema.response,
-            )
+            )  # Assuming from_pandas returns mlflow.data.Dataset
             logger.debug("- Dataset: {}", dataset.to_dict())
             # model
             logger.info("With model: {}", self.mlflow_service.registry_name)
             model_uri = registries.uri_for_model_alias_or_version(
                 name=self.mlflow_service.registry_name, alias_or_version=self.alias_or_version
-            )
+            )  # Assuming this returns str model_uri
             logger.debug("- Model URI: {}", model_uri)
             # metrics
             logger.debug("Convert metrics: {}", self.metrics)
-            extra_metrics = [metric.to_mlflow() for metric in self.metrics]
+            extra_metrics = [
+                metric.to_mlflow() for metric in self.metrics
+            ]  # Assuming to_mlflow returns mlflow metric object
             logger.debug("- Extra metrics: {}", extra_metrics)
             # thresholds
             logger.info("Convert thresholds: {}", self.thresholds)
             validation_thresholds = {
-                name: threshold.to_mlflow() for name, threshold in self.thresholds.items()
+                name: threshold.to_mlflow()
+                for name, threshold in self.thresholds.items()  # Assuming to_mlflow returns mlflow threshold object
             }
             logger.debug("- Validation thresholds: {}", validation_thresholds)
             # evaluations
@@ -126,7 +131,7 @@ class EvaluationsJob(base.Job):
                 extra_metrics=extra_metrics,
                 validation_thresholds=validation_thresholds,
                 predictions=schemas.OutputsSchema.response,
-            )
+            )  # Assuming evaluate returns mlflow.EvaluationResult
             logger.debug("- Evaluations metrics: {}", evaluations.metrics)
             # notify
             self.alerts_service.notify(
