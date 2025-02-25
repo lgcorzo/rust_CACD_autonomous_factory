@@ -115,7 +115,6 @@ class AutogenMetric(Metric):
     metric_type: T.Literal["exact_match", "similarity", "length_ratio"] = "similarity"
     similarity_threshold: Optional[float] = 0.7
 
-    @T.override
     def score(self, targets: schemas.Targets, outputs: schemas.Outputs) -> float:
         # Extract text responses from targets and outputs
         y_true = targets.response
@@ -161,7 +160,6 @@ class AutogenConversationMetric(Metric):
     check_termination: bool = True
     check_error_messages: bool = True
 
-    @T.override
     def score(self, targets: schemas.Targets, outputs: schemas.Outputs) -> float:
         metadata = outputs[schemas.OutputsSchema.metadata]
 

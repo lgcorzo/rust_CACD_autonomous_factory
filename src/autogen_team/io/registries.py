@@ -150,9 +150,11 @@ class CustomSaver(Saver):
             # Load the model
             self.model.load_context(model_config)
 
-        def predict(self, context: PythonModelContext, inputs: schemas.Inputs) -> schemas.Outputs:
+        def predict(
+            self, context: PythonModelContext, model_input: schemas.Inputs
+        ) -> schemas.Outputs:
             """Generate predictions with a custom model for the given inputs."""
-            output = self.model.predict(inputs=inputs)
+            output = self.model.predict(inputs=model_input)
             return output
 
     def save(
