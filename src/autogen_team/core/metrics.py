@@ -129,20 +129,20 @@ class AutogenMetric(Metric):
         else:
             raise ValueError(f"Unknown metric type: {self.metric_type}")
 
-    def _exact_match_score(self, y_true: pd.Series, y_pred: pd.Series) -> float:
+    def _exact_match_score(self, y_true: pd.Series[str], y_pred: pd.Series[str]) -> float:
         # Reset index to align the series
         y_true = y_true.reset_index(drop=True)
         y_pred = y_pred.reset_index(drop=True)
         return (y_true == y_pred).mean()
 
     def _similarity_score(self, y_true: pd.Series, y_pred: pd.Series) -> float:
-        def calculate_similarity(true_text, pred_text):
+        def calculate_similarity(true_text: str, pred_text: str) -> float:
             return SequenceMatcher(None, true_text, pred_text).ratio()
 
         similarities = y_true.combine(y_pred, calculate_similarity)
         return (similarities >= self.similarity_threshold).mean()
 
-    def _length_ratio(self, y_true: pd.Series, y_pred: pd.Series) -> float:
+    def _length_ratio(self, y_true: pd.Series[str], y_pred: pd.Series[str]) -> float:
         length_ratios = y_pred.str.len() / y_true.str.len().replace(0, 1)
         return length_ratios.mean()
 

@@ -1,9 +1,11 @@
 # test_metrics.py
 
 import pytest
+
+from typing import Literal
 from unittest.mock import MagicMock, patch
 import pandas as pd
-
+from typing import Iterator, List, Dict, Any, Optional
 
 # Assuming the metrics are in a module named 'metrics.py'
 from autogen_team.core.metrics import (
@@ -15,7 +17,7 @@ from autogen_team.core.metrics import (
 
 # Mock schemas to avoid dependencies
 @pytest.fixture(autouse=True)
-def mock_schemas():
+def mock_schemas() -> Iterator[MagicMock]:
     with patch("autogen_team.core.metrics.schemas") as mock_schemas:
         mock_schemas.TargetsSchema.response = "response"
         mock_schemas.OutputsSchema.response = "response"
@@ -68,7 +70,14 @@ class TestAutogenTextMetric:
             ),
         ],
     )
-    def test_score(self, metric_type, y_true, y_pred, expected, threshold):
+    def test_score(
+        self,
+        metric_type: Literal["exact_match", "similarity", "length_ratio"],  # Key change
+        y_true: List[str],
+        y_pred: List[str],
+        expected: float,
+        threshold: Optional[float],
+    ) -> None:
         # Mock targets and outputs
         targets = MagicMock()
         targets.response = pd.Series(y_true)
@@ -88,8 +97,6 @@ class TestAutogenTextMetric:
 
 
 # Test AutogenConversationMetric
-
-
 class TestAutogenConversationMetric:
     @pytest.mark.parametrize(
         "metadata, check_term, check_err, expected",
@@ -110,9 +117,7 @@ class TestAutogenConversationMetric:
                 ],
                 True,
                 True,
-                pytest.approx(
-                    (2 / 3) * (1 - 2 / 3), rel=0.01
-                ),  # corrected to pytest.approx for float comparison
+                pytest.approx((2 / 3) * (1 - 2 / 3), rel=0.01),
             ),
             # Only check termination
             (
@@ -123,7 +128,13 @@ class TestAutogenConversationMetric:
             ),
         ],
     )
-    def test_score(self, metadata, check_term, check_err, expected):
+    def test_score(
+        self,
+        metadata: List[Dict[str, Any]],
+        check_term: bool,
+        check_err: bool,
+        expected: float,
+    ) -> None:
         # Mock outputs
         outputs = MagicMock()
         outputs.__getitem__.return_value = pd.Series(metadata)
@@ -138,9 +149,7 @@ class TestAutogenConversationMetric:
         # Mock targets (not used)
         targets = MagicMock()
 
-        assert (
-            metric.score(targets, outputs) == expected
-        )  # removed pytest.approx here as it is already in expected values
+        assert metric.score(targets, outputs) == expected
 
 
 # Test Threshold
@@ -152,7 +161,7 @@ class TestThreshold:
             (10.0, False),
         ],
     )
-    def test_to_mlflow(self, threshold, greater_is_better):
+    def test_to_mlflow(self, threshold: float, greater_is_better: bool) -> None:
         thresh = Threshold(
             threshold=threshold,
             greater_is_better=greater_is_better,
@@ -165,7 +174,7 @@ class TestThreshold:
 
 # Test Metric Integration
 class TestMetricIntegration:
-    def test_scorer_flow(self):
+    def test_scorer_flow(self) -> None:
         # Mock dependencies
         mock_model = MagicMock()
         mock_inputs = MagicMock()

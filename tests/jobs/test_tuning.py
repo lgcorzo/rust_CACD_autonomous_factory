@@ -1,6 +1,8 @@
 # %% IMPORTS
 
 import _pytest.capture as pc
+from mlflow.entities import Experiment
+
 from autogen_team import jobs
 from autogen_team.core import metrics, models, schemas
 from autogen_team.io import datasets, services
@@ -15,10 +17,10 @@ def test_tuning_job(
     logger_service: services.LoggerService,
     inputs_reader: datasets.ParquetReader,
     targets_reader: datasets.ParquetReader,
-    model: models.Model,
-    metric: metrics.Metric,
-    time_series_splitter: splitters.Splitter,
-    searcher: searchers.Searcher,
+    model: models.BaselineAutogenModel,
+    metric: metrics.AutogenMetric,
+    time_series_splitter: splitters.TrainTestSplitter,
+    searcher: searchers.GridCVSearcher,
     capsys: pc.CaptureFixture[str],
 ) -> None:
     # given
@@ -91,10 +93,15 @@ def test_tuning_job(
         out["best_params"].keys() == searcher.param_grid.keys()
     ), "Best params should have the same keys!"
     # - mlflow tracking
-    experiment = client.get_experiment_by_name(name=mlflow_service.experiment_name)
+    experiment: Experiment | None = client.get_experiment_by_name(
+        name=mlflow_service.experiment_name
+    )
+    if experiment is None:
+        raise ValueError("Experiment not found")
     assert (
         experiment.name == mlflow_service.experiment_name
     ), "Mlflow experiment name should be the same!"
+
     runs = client.search_runs(experiment_ids=experiment.experiment_id)
     assert len(runs) == len(out["results"]) + 1, "Mlflow should have 1 run per result + parent!"
     # - alerting service
