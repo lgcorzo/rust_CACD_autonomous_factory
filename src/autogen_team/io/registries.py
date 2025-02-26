@@ -1,4 +1,5 @@
 """Savers, loaders, and registers for model registries."""
+# mypy: disable-error-code=override
 
 # %% IMPORTS
 
@@ -228,7 +229,7 @@ class CustomLoader(Loader):
     class Adapter(Loader.Adapter):
         """Adapt a custom model for the project inference."""
 
-        def __init__(self, model: mlflow.pyfunc.PyFuncModel) -> None:
+        def __init__(self, model: mlflow.pyfunc.PyFuncModel) -> None:  # type: ignore[name-defined]
             """Initialize the adapter from an mlflow pyfunc model.
 
             Args:

@@ -2,7 +2,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
 import pandas as pd
-import typing as T
 
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 

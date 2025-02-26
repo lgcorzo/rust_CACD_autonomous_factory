@@ -1,10 +1,9 @@
 # %% IMPORTS
+# mypy: disable-error-code=attr-defined
 
 import os
 
 import pytest
-
-import mlflow.data.pandas_dataset.PandasDataset as Lineage
 
 from autogen_team.core import schemas
 from autogen_team.io import datasets
@@ -19,7 +18,7 @@ def test_parquet_reader(limit: int | None, inputs_path: str) -> None:
     reader = datasets.ParquetReader(path=inputs_path, limit=limit)
     # when
     data = reader.read()
-    lineage: Lineage = reader.lineage(name="inputs", data=data)
+    lineage: datasets.Lineage = reader.lineage(name="inputs", data=data)
     # then
     # - data
     assert data.ndim == 2, "Data should be a dataframe!"
