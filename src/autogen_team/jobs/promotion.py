@@ -24,7 +24,6 @@ class PromotionJob(base.Job):
     alias: str = "Champion"
     version: int | None = None
 
-    @T.override
     def run(self) -> base.Locals:
         # services
         # - logger

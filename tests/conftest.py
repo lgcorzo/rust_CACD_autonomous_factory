@@ -4,6 +4,7 @@
 
 import os
 import typing as T
+from typing import cast, Any
 
 import omegaconf
 import pytest
@@ -222,7 +223,7 @@ def time_series_splitter() -> splitters.TimeSeriesSplitter:
 def searcher() -> searchers.Searcher:
     """Return the default searcher object."""
     param_grid = {"max_tokens": [10000, 20000], "temperature": [3.0]}
-    return searchers.GridCVSearcher(param_grid=param_grid)
+    return searchers.GridCVSearcher(param_grid=cast(dict[str, list[Any]], param_grid))
 
 
 # %% - Subsets

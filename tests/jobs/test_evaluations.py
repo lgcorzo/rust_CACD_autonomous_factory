@@ -2,9 +2,13 @@
 
 import _pytest.capture as pc
 import pytest
+
+from mlflow.entities import Experiment
+
 from autogen_team import jobs
 from autogen_team.core import metrics, schemas
 from autogen_team.io import datasets, registries, services
+
 
 # %% JOBS
 
@@ -43,7 +47,7 @@ def test_evaluations_job(
     inputs_reader: datasets.ParquetReader,
     targets_reader: datasets.ParquetReader,
     model_alias: registries.Version,
-    metric: metrics.Metric,
+    metric: metrics.AutogenMetric,
     capsys: pc.CaptureFixture[str],
 ) -> None:
     # given
@@ -144,7 +148,11 @@ def test_evaluations_job(
     assert out["evaluations"].metrics["exact_match/v1"] == 0.0
     assert job.metrics[0].name in out["evaluations"].metrics, "Metric should be logged in Mlflow!"
     # - mlflow tracking
-    experiment = mlflow_service.client().get_experiment_by_name(name=mlflow_service.experiment_name)
+    experiment: Experiment | None = mlflow_service.client().get_experiment_by_name(
+        name=mlflow_service.experiment_name
+    )
+    if experiment is None:
+        raise ValueError("Experiment not found")
     assert (
         experiment.name == mlflow_service.experiment_name
     ), "Mlflow Experiment name should be the same!"

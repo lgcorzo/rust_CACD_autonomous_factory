@@ -1,12 +1,13 @@
 from pydantic_settings import BaseSettings
+from typing import Dict, Type
 
 
 class Singleton(object):
-    _instances = {}
+    _instances: Dict[Type["Singleton"], "Singleton"] = {}
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls: Type["Singleton"], *args: object, **kwargs: object) -> "Singleton":
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__new__(cls, *args, **kwargs)
+            cls._instances[cls] = super().__new__(cls, *args, **kwargs)  # Corrected super() call
         return cls._instances[cls]
 
 

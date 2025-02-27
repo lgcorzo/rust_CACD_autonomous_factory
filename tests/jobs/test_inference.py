@@ -14,10 +14,10 @@ def test_inference_job(
     mlflow_service: services.MlflowService,
     alerts_service: services.AlertsService,
     logger_service: services.LoggerService,
-    inputs_reader: datasets.Reader,
-    tmp_outputs_writer: datasets.Writer,
+    inputs_reader: datasets.ParquetReader,
+    tmp_outputs_writer: datasets.ParquetWriter,
     model_alias: registries.Version,
-    loader: registries.Loader,
+    loader: registries.CustomLoader,
     capsys: pc.CaptureFixture[str],
 ) -> None:
     # given

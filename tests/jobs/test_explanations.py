@@ -15,11 +15,11 @@ def test_explanations_job(
     mlflow_service: services.MlflowService,
     alerts_service: services.AlertsService,
     logger_service: services.LoggerService,
-    inputs_samples_reader: datasets.Reader,
-    tmp_models_explanations_writer: datasets.Writer,
-    tmp_samples_explanations_writer: datasets.Writer,
+    inputs_samples_reader: datasets.ParquetReader,
+    tmp_models_explanations_writer: datasets.ParquetWriter,
+    tmp_samples_explanations_writer: datasets.ParquetWriter,
     model_alias: registries.Version,
-    loader: registries.Loader,
+    loader: registries.CustomLoader,
     capsys: pc.CaptureFixture[str],
 ) -> None:
     # given

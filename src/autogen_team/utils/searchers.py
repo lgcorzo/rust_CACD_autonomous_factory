@@ -88,7 +88,6 @@ class GridCVSearcher(Searcher):
     error_score: str | float = "raise"
     return_train_score: bool = False
 
-    @T.override
     def search(
         self,
         model: models.Model,

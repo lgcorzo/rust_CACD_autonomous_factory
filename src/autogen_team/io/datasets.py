@@ -70,7 +70,6 @@ class ParquetReader(Reader):
 
     path: str
 
-    @T.override
     def read(self) -> pd.DataFrame:
         # can't limit rows at read time
         data = pd.read_parquet(self.path)
@@ -78,7 +77,6 @@ class ParquetReader(Reader):
             data = data.head(self.limit)
         return data
 
-    @T.override
     def lineage(
         self,
         name: str,
@@ -125,7 +123,6 @@ class ParquetWriter(Writer):
 
     path: str
 
-    @T.override
     def write(self, data: pd.DataFrame) -> None:
         pd.DataFrame.to_parquet(data, self.path)
 

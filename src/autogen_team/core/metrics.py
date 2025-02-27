@@ -1,4 +1,6 @@
 """Evaluate model performances with metrics."""
+# mypy: disable-error-code=name-defined
+# mypy: disable-error-code=operator
 
 # %% IMPORTS
 
@@ -6,21 +8,24 @@ from __future__ import annotations
 
 import abc
 import typing as T
+from typing import Optional, cast
 
 import mlflow
 import pandas as pd
 import pydantic as pdt
-from typing import Optional
 from difflib import SequenceMatcher
 from autogen_team.core import models, schemas
 
-# %% TYPINGS
+from mlflow.metrics import MetricValue
 
-MlflowMetric: T.TypeAlias = mlflow.metrics.MetricValue
+
+# %% TYPINGS
+MlflowMetric: T.TypeAlias = MetricValue
 MlflowThreshold: T.TypeAlias = mlflow.models.MetricThreshold
 MlflowModelValidationFailedException: T.TypeAlias = (
     mlflow.models.evaluation.validation.ModelValidationFailedException
 )
+
 
 # %% METRICS
 
@@ -42,20 +47,18 @@ class Metric(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
     greater_is_better: bool
 
     @abc.abstractmethod
-    def score(self, targets: schemas.input, outputs: schemas.input) -> float:
+    def score(self, targets: pd.DataFrame, outputs: pd.DataFrame) -> float:
         """Score the outputs against the targets.
 
         Args:
-            targets (schemas.Targets): expected values.
-            outputs (schemas.Outputs): predicted values.
+            targets (pd.DataFrame): expected values.
+            outputs (pd.DataFrame): predicted values.
 
         Returns:
             float: single result from the metric computation.
         """
 
-    def scorer(
-        self, model: models.Model, inputs: schemas.Inputs, targets: schemas.Targets
-    ) -> float:
+    def scorer(self, model: models.Model, inputs: schemas.Inputs, targets: pd.DataFrame) -> float:
         """Score model outputs against targets.
 
         Args:
@@ -98,8 +101,11 @@ class Metric(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
             score = self.score(targets=score_targets, outputs=score_outputs)
             return MlflowMetric(aggregate_results={self.name: score * sign})
 
-        return mlflow.metrics.make_metric(
-            eval_fn=eval_fn, name=self.name, greater_is_better=self.greater_is_better
+        return cast(
+            MlflowMetric,
+            mlflow.metrics.make_metric(
+                eval_fn=eval_fn, name=self.name, greater_is_better=self.greater_is_better
+            ),
         )
 
 
@@ -115,11 +121,10 @@ class AutogenMetric(Metric):
     metric_type: T.Literal["exact_match", "similarity", "length_ratio"] = "similarity"
     similarity_threshold: Optional[float] = 0.7
 
-    @T.override
-    def score(self, targets: schemas.Targets, outputs: schemas.Outputs) -> float:
+    def score(self, targets: pd.DataFrame, outputs: pd.DataFrame) -> float:
         # Extract text responses from targets and outputs
-        y_true = targets.response
-        y_pred = outputs.response
+        y_true: pd.Series[str] = targets.response
+        y_pred: pd.Series[str] = outputs.response
 
         if self.metric_type == "exact_match":
             return self._exact_match_score(y_true, y_pred)
@@ -130,20 +135,21 @@ class AutogenMetric(Metric):
         else:
             raise ValueError(f"Unknown metric type: {self.metric_type}")
 
-    def _exact_match_score(self, y_true: pd.Series, y_pred: pd.Series) -> float:
+    def _exact_match_score(self, y_true: pd.Series[str], y_pred: pd.Series[str]) -> float:
         # Reset index to align the series
         y_true = y_true.reset_index(drop=True)
         y_pred = y_pred.reset_index(drop=True)
         return (y_true == y_pred).mean()
 
-    def _similarity_score(self, y_true: pd.Series, y_pred: pd.Series) -> float:
-        def calculate_similarity(true_text, pred_text):
+    def _similarity_score(self, y_true: pd.Series[str], y_pred: pd.Series[str]) -> float:
+        def calculate_similarity(true_text: str, pred_text: str) -> float:
             return SequenceMatcher(None, true_text, pred_text).ratio()
 
+        ##TBD
         similarities = y_true.combine(y_pred, calculate_similarity)
         return (similarities >= self.similarity_threshold).mean()
 
-    def _length_ratio(self, y_true: pd.Series, y_pred: pd.Series) -> float:
+    def _length_ratio(self, y_true: pd.Series[str], y_pred: pd.Series[str]) -> float:
         length_ratios = y_pred.str.len() / y_true.str.len().replace(0, 1)
         return length_ratios.mean()
 
@@ -161,8 +167,7 @@ class AutogenConversationMetric(Metric):
     check_termination: bool = True
     check_error_messages: bool = True
 
-    @T.override
-    def score(self, targets: schemas.Targets, outputs: schemas.Outputs) -> float:
+    def score(self, targets: pd.DataFrame, outputs: pd.DataFrame) -> float:
         metadata = outputs[schemas.OutputsSchema.metadata]
 
         score = 1.0
@@ -178,9 +183,7 @@ class AutogenConversationMetric(Metric):
         return float(score)
 
 
-# Update MetricKind to include new Autogen metrics
-# MetricKind = AutogenMetric | AutogenConversationMetric
-MetricKind = AutogenMetric
+MetricKind = AutogenMetric | AutogenConversationMetric
 MetricsKind: T.TypeAlias = list[T.Annotated[MetricKind, pdt.Field(discriminator="KIND")]]
 
 
@@ -207,4 +210,6 @@ class Threshold(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"
         Returns:
             MlflowThreshold: the mlflow threshold.
         """
-        return MlflowThreshold(threshold=self.threshold, greater_is_better=self.greater_is_better)
+        return mlflow.models.MetricThreshold(
+            threshold=self.threshold, greater_is_better=self.greater_is_better
+        )  # type: ignore[no-untyped-call]

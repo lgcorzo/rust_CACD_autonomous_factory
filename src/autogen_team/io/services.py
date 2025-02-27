@@ -66,7 +66,6 @@ class LoggerService(Service):
     diagnose: bool = False
     catch: bool = True
 
-    @T.override
     def start(self) -> None:
         loguru.logger.remove()
         config = self.model_dump()
@@ -103,7 +102,6 @@ class AlertsService(Service):
     app_name: str = "autogen_team"
     timeout: int | None = None
 
-    @T.override
     def start(self) -> None:
         pass
 
@@ -171,7 +169,6 @@ class MlflowService(Service):
     autolog_log_datasets: bool = False
     autolog_silent: bool = False
 
-    @T.override
     def start(self) -> None:
         # server uri
         mlflow.set_tracking_uri(uri=self.tracking_uri)

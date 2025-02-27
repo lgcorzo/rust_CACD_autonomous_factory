@@ -58,7 +58,6 @@ class TrainingJob(base.Job):
     # - avoid shadowing pydantic `register` pydantic function
     registry: registries.RegisterKind = pdt.Field(registries.MlflowRegister(), discriminator="KIND")
 
-    @T.override
     def run(self) -> base.Locals:
         # services
         # - logger

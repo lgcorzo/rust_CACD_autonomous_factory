@@ -1,6 +1,8 @@
 # %% IMPORTS
 
 import _pytest.capture as pc
+from mlflow.entities import Experiment
+
 from autogen_team import jobs
 from autogen_team.core import metrics, models, schemas
 from autogen_team.io import datasets, registries, services
@@ -15,12 +17,12 @@ def test_training_job(
     logger_service: services.LoggerService,
     inputs_reader: datasets.ParquetReader,
     targets_reader: datasets.ParquetReader,
-    model: models.Model,
-    metric: metrics.Metric,
-    train_test_splitter: splitters.Splitter,
-    saver: registries.Saver,
-    signer: signers.Signer,
-    register: registries.Register,
+    model: models.BaselineAutogenModel,
+    metric: metrics.AutogenMetric,
+    train_test_splitter: splitters.TrainTestSplitter,
+    saver: registries.CustomSaver,
+    signer: signers.InferSigner,
+    register: registries.MlflowRegister,
     capsys: pc.CaptureFixture[str],
 ) -> None:
     # given
@@ -140,7 +142,11 @@ def test_training_job(
         out["model_version"].run_id == out["run"].info.run_id
     ), "Model version run id should be the same!"
     # - mlflow tracking
-    experiment = client.get_experiment_by_name(name=mlflow_service.experiment_name)
+    experiment: Experiment | None = mlflow_service.client().get_experiment_by_name(
+        name=mlflow_service.experiment_name
+    )
+    if experiment is None:
+        raise ValueError("Experiment not found")
     assert (
         experiment.name == mlflow_service.experiment_name
     ), "Mlflow Experiment name should be the same!"

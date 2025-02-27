@@ -15,7 +15,7 @@ from typing import Optional
 from typing import Any, Dict
 from datetime import datetime, timezone
 
-from autogen_core.models import UserMessage
+from autogen_core.models import UserMessage, CreateResult
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 
 from autogen_team.core import schemas
@@ -40,9 +40,6 @@ class Model(abc.ABC, pdt.BaseModel, strict=True, frozen=False, extra="forbid"):
     """
 
     KIND: str
-
-    class Config:
-        arbitrary_types_allowed = True
 
     def get_params(self, deep: bool = True) -> Params:
         """Get the model params.
@@ -70,7 +67,7 @@ class Model(abc.ABC, pdt.BaseModel, strict=True, frozen=False, extra="forbid"):
         return self
 
     @abc.abstractmethod
-    def load_context(self, model_config: Dict[str, Any]):
+    def load_context(self, model_config: Dict[str, Any]) -> None:
         """
         Load the model from the specified artifacts directory.
         """
@@ -146,7 +143,7 @@ class BaselineAutogenModel(Model):
     max_tokens: Optional[int] = Field(default=320000)
     temperature: Optional[float] = Field(default=0.5)
 
-    def load_context_path(self, model_config_path: str = None):
+    def load_context_path(self, model_config_path: Optional[str] = None) -> None:
         """
         Load the model from the specified artifacts directory.
         """
@@ -165,8 +162,7 @@ class BaselineAutogenModel(Model):
         # Load the model
         self.load_context(model_config)
 
-    @T.override
-    def load_context(self, model_config: Dict[str, Any]):
+    def load_context(self, model_config: Dict[str, Any]) -> None:
         """
         Load the model from the specified artifacts directory.
         https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/migration-guide.html#assistant-agent
@@ -186,17 +182,19 @@ class BaselineAutogenModel(Model):
             },
         )
 
-    @T.override
     def fit(self, inputs: schemas.Inputs, targets: schemas.Targets) -> "BaselineAutogenModel":
         # TBD LORA project Iñaki
         # self.load_context(model_config={})
         return self
 
-    async def _rungroupchat(self, content: str) -> str:
-        response = await self.model_client.create([UserMessage(content=content, source="user")])
+    async def _rungroupchat(self, content: str) -> CreateResult:
+        if self.model_client is None:
+            raise ValueError("Model client is not initialized.")
+        response: CreateResult = await self.model_client.create(
+            [UserMessage(content=content, source="user")]
+        )
         return response
 
-    @T.override
     def predict(self, inputs: schemas.Inputs) -> schemas.Outputs:
         """
         Predicts the output using the assistant team based on the given inputs.
@@ -207,7 +205,7 @@ class BaselineAutogenModel(Model):
 
         # Iterate over each input element
         for row in inputs.itertuples(index=False):
-            response = asyncio.run(self._rungroupchat(row.input))
+            response = asyncio.run(self._rungroupchat(str(row.input)))
 
             if response:  # Check if response is not empty
                 results.append(
@@ -229,11 +227,12 @@ class BaselineAutogenModel(Model):
         )
         return outputs
 
-    @T.override
     def get_internal_model(self) -> OpenAIChatCompletionClient:
-        return self.model_client
+        if isinstance(self.model_client, OpenAIChatCompletionClient):
+            return self.model_client
+        else:
+            raise ValueError("Model client is not initialized or is of incorrect type.")
 
-    @T.override
     def explain_model(self) -> schemas.FeatureImportances:
         """
         Provides a text-based explanation of the model's internal structure.
@@ -254,7 +253,6 @@ class BaselineAutogenModel(Model):
         explanation_df = pd.DataFrame([explanation])
         return schemas.FeatureImportances(explanation_df)
 
-    @T.override
     def explain_samples(self, inputs: schemas.Inputs) -> schemas.SHAPValues:
         """
         Explains model outputs for the given input samples by leveraging the predict function.
