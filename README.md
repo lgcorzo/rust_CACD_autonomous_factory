@@ -903,6 +903,9 @@ Select your programming environment.
 
 This sections gives some tips and tricks to enrich the develop experience.
 
+```bash
+pyreverse  -A -o plantuml -p autogen_team src/autogen_team
+```
 ## [AI/ML Practices](https://machinelearningmastery.com/)
 
 ### [Data Catalog](https://docs.kedro.org/en/stable/data/data_catalog.html)

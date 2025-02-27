@@ -1,165 +1,167 @@
-# US [High-Level Project Jobs](./backlog_mlops_regresion.md) : Manage the execution context for high-level project jobs with integrated services.
+# US [High-Level Project Jobs](./backlog_llmlops_regresion.md) : Manage the execution context for high-level project jobs with integrated services.
+
 
 - [US High-Level Project Jobs : Manage the execution context for high-level project jobs with integrated services.](#us-high-level-project-jobs--manage-the-execution-context-for-high-level-project-jobs-with-integrated-services)
   - [classes relations](#classes-relations)
-  - [**User Stories: Job Management**](#user-stories-job-management)
-    - [**1. User Story: Manage Job Execution Context**](#1-user-story-manage-job-execution-context)
-    - [**2. User Story: Facilitate Logging**](#2-user-story-facilitate-logging)
-    - [**3. User Story: Facilitate Alerts Management**](#3-user-story-facilitate-alerts-management)
-    - [**4. User Story: Facilitate MLflow Tracking Management**](#4-user-story-facilitate-mlflow-tracking-management)
+  - [**User Stories: Base Job Class**](#user-stories-base-job-class)
+    - [**1. User Story: Define Job Context**](#1-user-story-define-job-context)
+    - [**2. User Story: Initialize and Start Services**](#2-user-story-initialize-and-start-services)
+    - [**3. User Story: Stop and Cleanup Services**](#3-user-story-stop-and-cleanup-services)
+    - [**4. User Story: Abstract Run Method Implementation**](#4-user-story-abstract-run-method-implementation)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria)
     - [**Definition of Done (DoD):**](#definition-of-done-dod)
   - [Code location](#code-location)
   - [Test location](#test-location)
 
----
+------------
 
 ## classes relations
 
 ```mermaid
 classDiagram
     class Job {
+        <<abstract>>
         +KIND: str
-        +logger_service: services.LoggerService
-        +alerts_service: services.AlertsService
-        +mlflow_service: services.MlflowService
-        +__enter__() : T.Self
+        +logger_service: LoggerService
+        +alerts_service: AlertsService
+        +mlflow_service: MlflowService
+        +__enter__() : Self
         +__exit__(exc_type, exc_value, exc_traceback) : Literal[False]
         +run() : Locals
     }
-
+    
     class LoggerService {
-        +start() : None
-        +stop() : None
-        +logger() : Logger
+       <<external>>
+        +start()
+        +logger()
     }
 
     class AlertsService {
-        +start() : None
-        +stop() : None
+        <<external>>
+        +start()
     }
 
     class MlflowService {
-        +start() : None
-        +stop() : None
-    }
-
-    class Logger {
-        +debug(msg: str, *args) : None
+       <<external>>
+        +start()
     }
 
     class Locals {
+       <<external>>
         +Dict[str, Any]
     }
 
-    Job --> LoggerService : "uses"
-    Job --> AlertsService : "uses"
-    Job --> MlflowService : "uses"
-    LoggerService --> Logger : "provides"
-    Job --> Locals : "returns"
+    Job ..> LoggerService : "uses"
+    Job ..> AlertsService : "uses"
+    Job ..> MlflowService : "uses"
+    Job ..> Locals : "returns"
 
 ```
 
-## **User Stories: Job Management**
+## **User Stories: Base Job Class**
 
 ---
 
-### **1. User Story: Manage Job Execution Context**
+### **1. User Story: Define Job Context**
 
-**Title:**  
-As a **developer**, I want to define a context for executing high-level jobs, so that proper setup and teardown procedures for integrated services are followed.
+**Title:**
+As a **developer**, I want to define a context for executing high-level jobs so that setup and teardown procedures for integrated services are managed automatically.
 
-**Description:**  
-The `Job` class serves as a base for executing high-level project jobs while managing the lifecycle of various services, including logging, alerts, and MLflow tracking. By using context management, it ensures that services are correctly initialized and cleaned up.
+**Description:**
+The `Job` class provides a base implementation for managing the execution context of high-level project jobs. It handles the lifecycle of various services such as logging, alerts, and MLflow tracking.
 
 **Acceptance Criteria:**
-
-- The `__enter__` method initializes relevant services when entering the context.
-- The `__exit__` method cleans up and stops services when exiting the context.
-- Exceptions that occur during execution are properly propagated.
+- The `Job` class provides a base implementation for all job types in the system.
+- Attributes for `logger_service`, `alerts_service`, and `mlflow_service` are initialized with default service implementations.
 
 ---
 
-### **2. User Story: Facilitate Logging**
+### **2. User Story: Initialize and Start Services**
 
-**Title:**  
-As a **developer**, I want to integrate a logging service within my job context, so that I can monitor the job execution process through logs.
+**Title:**
+As a **developer**, I want the context to automatically initialize and start logging, alerting, and MLflow tracking services when a job begins, so that I can ensure that the services are available throughout the execution.
 
-**Description:**  
-The `logger_service` attribute of the `Job` class allows for logging messages during the execution of the job, enabling visibility into the processing stages.
+**Description:**
+The `__enter__` method initializes and starts the configured services (logger, alerts, and MLflow) at the beginning of the job execution context.
 
 **Acceptance Criteria:**
-
-- Logging is initialized as soon as a job context is entered.
-- Log messages provide insights into the status of services being used (logger service, alerts service, MLflow service).
-- Cleanup of the logging service occurs upon exit of the job context.
+- The `__enter__` method is called when the job context is entered.
+- The logging service is started and a debug message is logged.
+- The alerts service is started.
+- The MLflow service is started.
+- The method returns the current Job instance.
 
 ---
 
-### **3. User Story: Facilitate Alerts Management**
+### **3. User Story: Stop and Cleanup Services**
 
-**Title:**  
-As a **developer**, I want to manage an alerts service during job execution, so that important events or errors can be communicated as notifications.
+**Title:**
+As a **developer**, I want the context to automatically stop and cleanup the configured services when the job completes, so that I can ensure resources are properly managed and avoid any lingering processes.
 
-**Description:**  
-The `alerts_service` attribute allows the job to manage notifications regarding alerting mechanisms, keeping the user informed about crucial events.
+**Description:**
+The `__exit__` method stops and cleans up the logging, alerting, and MLflow tracking services upon exiting the job execution context.
 
 **Acceptance Criteria:**
-
-- The alerts service is started when entering the job context.
-- Notifications related to the job execution can be triggered through the alerts service.
-- The alerts service is stopped appropriately after job execution.
+- The `__exit__` method is called when the job context is exited.
+- The MLflow service is stopped and a debug message is logged.
+- The alerts service is stopped.
+- The logging service is stopped.
+- The method always returns `False` to propagate any exceptions that may have occurred.
 
 ---
 
-### **4. User Story: Facilitate MLflow Tracking Management**
+### **4. User Story: Abstract Run Method Implementation**
 
-**Title:**  
-As a **data scientist**, I want to integrate MLflow tracking during job execution, so I can automatically log models, parameters, and metrics to the MLflow server.
+**Title:**
+As a **developer**, I want the `Job` class to define an abstract `run` method, so that all subclasses are required to implement their specific execution logic.
 
-**Description:**  
-The `mlflow_service` attribute enables the job to track experiments and model metrics, making it easier to analyze the performance of various models.
+**Description:**
+The abstract `run` method defines the interface for executing the job-specific logic within the managed context, allowing for a consistent execution pattern across different job types.
 
 **Acceptance Criteria:**
-
-- The MLflow service should be started in the job context, allowing active tracking of the job.
-- All relevant information logged during job execution should be captured via MLflow.
-- The MLflow service should be stopped properly when exiting the context.
+- The `run` method is declared as abstract.
+- Subclasses must implement the `run` method.
+- The `run` method returns a dictionary of local job variables.
 
 ---
 
 ### **Common Acceptance Criteria**
 
-1. **Implementation Requirements:**
+1.  **Base Class Implementation**:
+    - The `Job` class is abstract and cannot be instantiated directly.
+    - All concrete job types must inherit from the `Job` class.
 
-   - The `Job` class is abstract and cannot be instantiated directly; all subclasses must implement the `run` method.
-   - The context management methods (`__enter__`, `__exit__`) must be properly implemented.
+2.  **Service Management**:
+    - The `__enter__` method starts all configured services.
+    - The `__exit__` method stops all configured services.
 
-2. **Error Handling:**
+3.  **Error Propagation**:
+    - The `__exit__` method always returns `False`, ensuring that any exceptions raised during job execution are propagated.
 
-   - Any exceptions triggered in the context must be captured and logged appropriately, ensuring they propagate upwards for further handling.
+4.  **Logging**:
+    - The `LoggerService` is used to log lifecycle events (start and stop) for each service.
 
-3. **Testing:**
+5.  **Flexibility**:
+    - The structure is flexible, allowing different types of services to be added or removed easily.
 
-   - Unit tests validate the context management behavior, ensuring services are started and stopped correctly without leaks or errors.
-   - Tests check the logging output and alert notifications during execution.
-
-4. **Documentation:**
-   - Each class and method should have clear docstrings explaining their purpose and usage.
-   - Examples of extending the Job class for specific job implementations should be included.
+6.  **Validation**:
+    - Pydantic's `BaseModel` handles validation of parameters.
+    - The `strict=True`, `frozen=True`, and `extra="forbid"` configuration options ensure that the class is immutable and that only defined fields are allowed.
 
 ---
 
 ### **Definition of Done (DoD):**
 
-- The `Job` class is fully implemented with the required methods.
-- Subclasses of `Job` are created and demonstrate expected behavior during execution.
-- All functionality has been tested and passes the relevant unit tests.
-- Documentation is comprehensive, with clear examples for users.
+- The `Job` class is implemented with all specified methods and attributes.
+- Abstract methods enforce implementation in derived classes.
+- The class integrates seamlessly with `LoggerService`, `AlertsService`, and `MlflowService`.
+- Unit tests validate the functionality and robustness of the class.
+- Documentation is complete, with examples and clear explanations.
+
 
 ## Code location
 
-[src/model_name/jobs/base.py](../src/model_name/jobs/base.py)
+[src/autogen_team/jobs/base.py](../src/autogen_team/jobs/base.py)
 
 ## Test location
 

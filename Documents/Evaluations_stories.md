@@ -1,9 +1,11 @@
 
-# US [Model Evaluation Job](./backlog_mlops_regresion.md) : Define a job for evaluating registered models with given datasets.
+# US [Model Evaluation Job](./backlog_llmlops_regresion.md) : Define a job for evaluating registered models with given datasets.
+I'll help create user stories for the provided code.
+
 
 - [US Model Evaluation Job : Define a job for evaluating registered models with given datasets.](#us-model-evaluation-job--define-a-job-for-evaluating-registered-models-with-given-datasets)
   - [classes relations](#classes-relations)
-  - [**User Stories: Evaluation Job Management**](#user-stories-evaluation-job-management)
+  - [**User Stories: Autogen Evaluation Job Management**](#user-stories-autogen-evaluation-job-management)
     - [**1. User Story: Configure Evaluation Job**](#1-user-story-configure-evaluation-job)
     - [**2. User Story: Read Input and Target Data**](#2-user-story-read-input-and-target-data)
     - [**3. User Story: Log Data Lineage**](#3-user-story-log-data-lineage)
@@ -21,158 +23,152 @@
 ```mermaid
 classDiagram
     class EvaluationsJob {
-        +KIND: Literal["EvaluationsJob"]
-        +run_config: services.MlflowService.RunConfig
-        +inputs: datasets.ReaderKind
-        +targets: datasets.ReaderKind
+        +KIND: str
+        +run_config: RunConfig
+        +inputs: ReaderKind
+        +targets: ReaderKind
         +model_type: str
         +alias_or_version: str | int
-        +metrics: metrics_.MetricsKind
+        +metrics: list[AutogenMetric]
         +evaluators: list[str]
-        +thresholds: dict[str, metrics_.Threshold]
-        +run(): base.Locals
+        +thresholds: dict[str, Threshold]
+        +run(): Locals
     }
 
-    class MlflowService {
-        +client() : MlflowClient
-        +run_context(run_config: RunConfig) : context
+    class RunConfig {
+        +name: str
     }
 
     class ReaderKind {
-        +read() : pd.DataFrame
-        +lineage(data: pd.DataFrame, name: str) : Lineage
-    }
-
-    class MetricsKind {
-        +to_mlflow() : dict
+        +read()
+        +lineage(data, name, targets)
     }
 
     class AutogenMetric {
-        +to_mlflow() : dict
+        +name: str
+        +metric_type: str
+        +greater_is_better: bool
+        +score(targets, outputs)
+        +_exact_match_score(y_true, y_pred)
+        +_similarity_score(y_true, y_pred)
+        +_length_ratio(y_true, y_pred)
+        +to_mlflow()
     }
 
     class Threshold {
-        +to_mlflow() : dict
+        +threshold: int | float
+        +greater_is_better: bool
+        +to_mlflow()
     }
 
-    class AlertsService {
-        +notify(title: str, message: str) : None
-    }
-
-    EvaluationsJob --> MlflowService : "uses"
-    EvaluationsJob --> ReaderKind : "inputs & targets"
-    EvaluationsJob --> MetricsKind : "metrics"
-    EvaluationsJob --> AutogenMetric : "metrics"
-    EvaluationsJob --> AlertsService : "notifies"
-    EvaluationsJob --> Threshold : "thresholds"
-    MlflowService --> MlflowClient : "provides client"
-    ReaderKind --> pd.DataFrame : "returns"
-    AutogenMetric --> dict : "to_mlflow"
-    Threshold --> dict : "to_mlflow"
+    EvaluationsJob --> RunConfig : "uses"
+    EvaluationsJob --> ReaderKind : "uses"
+    EvaluationsJob --> AutogenMetric : "uses"
+    EvaluationsJob --> Threshold : "uses"
 
 ```
 
-## **User Stories: Evaluation Job Management**
+## **User Stories: Autogen Evaluation Job Management**
 
 ---
 
 ### **1. User Story: Configure Evaluation Job**
 
-**Title:**  
-As a **data scientist**, I want to configure an evaluation job that sets up necessary parameters for evaluating a registered model against a dataset, so that I can assess model performance.
+**Title:**
+As a **data scientist**, I want to configure an evaluation job for an Autogen model, so that I can set specific parameters for evaluating its performance on question-answering tasks.
 
-**Description:**  
-The `EvaluationsJob` class allows for setting up parameters such as input data readers, target data readers, model type, model version, and evaluation metrics. 
+**Description:**
+The `EvaluationsJob` class allows users to configure an evaluation job, defining parameters such as the run configuration, data sources for inputs and targets, the model type, alias or version, metrics, evaluators, and performance thresholds. This class should support the specific needs of Autogen models, particularly for question-answering evaluations.
 
-**Acceptance Criteria:**  
-- The job can be initialized with necessary parameters (e.g., model type, input readers, metrics).
-- Default values are provided for optional parameters.
+**Acceptance Criteria:**
+
+- The job should be initializable, configurable via Python code, by setting input data, target data, and run configurations.
+- Default values are properly set for the evaluation metrics.
+- It should configure the `AutogenMetric` list using the proper  `metric_type`
 
 ---
 
 ### **2. User Story: Read Input and Target Data**
 
-**Title:**  
-As a **data engineer**, I want to read input and target datasets from specified sources, so that I can use them for model evaluation.
+**Title:**
+As a **data analyst**, I want to be able to read input data and expected target responses for my Autogen model from configured data sources, so I can feed it into the evaluation job and make sure it is working on real scenarios.
 
-**Description:**  
-The `run` method in the `EvaluationsJob` class reads input and target datasets using the designated data readers and checks them against predefined schemas to ensure data integrity.
+**Description:**
+The  `EvaluationsJob` must be able to read the input and target data from their sources.
 
-**Acceptance Criteria:**  
-- The job reads inputs and targets from their respective sources.
-- Data shape and integrity checks are performed before proceeding with evaluations.
+**Acceptance Criteria:**
 
+- The inputs from specified ReaderKind are properly reading data.
+- The targets for the model  to train or make searchs has to be properly configured.
 ---
 
 ### **3. User Story: Log Data Lineage**
 
-**Title:**  
-As a **data engineer**, I want to log the lineage for input and target datasets during evaluation, so that data provenance is tracked and maintainable.
+**Title:**
+As a **data engineer**, I want to log the lineage of input and target data used to evaluate Autogen models, so that there is traceability and auditing of the evaluation processes.
 
-**Description:**  
-The `EvaluationsJob` class logs lineage information for input and target datasets using MLflow, aiding in tracking the data's journey through the pipeline.
+**Description:**
+This story involves configuring the  `EvaluationsJob` to log the lineage of the used data.
 
-**Acceptance Criteria:**  
-- Input and target lineage is successfully logged using the MLflow tracking system.
-- Lineage information should be associated with the corresponding datasets clearly.
+**Acceptance Criteria:**
+
+- The MLflow tracking has to track each input with lineage tracking.
+- It should create lineage information in the right way, like the targets.
 
 ---
 
 ### **4. User Story: Evaluate Model Against Data**
 
-**Title:**  
-As a **data scientist**, I want to evaluate the registered model using the input and target datasets, so that I can obtain performance metrics.
+**Title:**
+As a **data scientist**, I want to evaluate Autogen responses to know the model performance for Q&A
+**Description:**
+The  `EvaluationsJob` has to evaluate and read if the model´s metrics reach the requierments for a Q&A.
 
-**Description:**  
-The `run` method leverages MLflow's evaluate function to compute metrics for the given model against the input data, utilizing specified evaluators and thresholds.
+**Acceptance Criteria:**
 
-**Acceptance Criteria:**  
-- The job evaluates the model using the provided datasets, model type, evaluators, and thresholds.
-- Evaluation metrics such as accuracy, precision, recall, or R2 scores are computed and stored appropriately.
+- Must has a default configuration for the metrics
+- The results from metrics can be viewed.
 
 ---
 
 ### **5. User Story: Notify Completion of Evaluations**
 
-**Title:**  
-As a **user**, I want to receive a notification upon the completion of the evaluation job, so that I am informed of the evaluation results.
+**Title:**
+As a **stakeholder**, I want to receive a notification to see if the performance evaluation finishes correctly.
 
-**Description:**  
-At the conclusion of the evaluation process, the `EvaluationsJob` class sends a notification to the relevant stakeholders with a summary of the evaluation metrics.
+**Description:**
+The  `EvaluationsJob` is able to send a message saying that the execution has finished.
 
-**Acceptance Criteria:**  
-- Notification includes the title and summary message, indicating the evaluation job has finished successfully along with key metrics.
-- The notification service correctly handles successful and erroneous situations.
+**Acceptance Criteria:**
 
+- A messaje in the alerts system saying that the execution has finished is raised
 ---
 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
-   - The `EvaluationsJob` class implements the abstract `run` method from `Job`.
-   - All necessary services (logging, MLflow, alerts) are initialized within the evaluation job context.
+   - The `EvaluationsJob` class inherits from a base Job and defines a method to configure.
+   - A Pydantic schema is available for configuration
+   - All job properties can be customizable.
 
 2. **Error Handling:**
-   - Informative error messages are logged when reading data, logging lineage, or computing evaluations fails.
+   - The job has to have error handling for each process.
 
 3. **Testing:**
-   - Unit tests validate job initialization, data reading, metric computation, and notification delivery.
+   - Implement unit tests to validate correct data reading and configuration
 
 4. **Documentation:**
-   - Clear docstrings and explanations are provided for all class methods and variables.
-   - Usage examples are included to demonstrate how to utilize the evaluation job.
+   - Include comprehensive docstrings describing its purpose and usage.
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
-- The `EvaluationsJob` class is fully implemented, including connection and interaction with required services.
-- All functionalities are tested and meet the acceptance criteria.
-- Documentation is clear, complete, and readily available for users.
+- All acceptance criterias are fulfilled and the pull request has been reviewed.
 
 ## Code location
 
-[src/model_name/jobs/evaluations.py](../src/model_name/jobs/evaluations.py)
+[src/autogen_team/jobs/evaluations.py](../src/autogen_team/jobs/evaluations.py)
 
 ## Test location
 

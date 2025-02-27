@@ -1,4 +1,4 @@
-# US [CLI Application for Running AI/ML Jobs](./backlog_mlops_regresion.md) : Scripts for the CLI application
+# US [CLI Application for Running AI/ML Jobs](./backlog_llmlops_regresion.md) : Scripts for the CLI application
 
 - [US CLI Application for Running AI/ML Jobs : Scripts for the CLI application](#us-cli-application-for-running-aiml-jobs--scripts-for-the-cli-application)
   - [classes relations](#classes-relations)
@@ -205,7 +205,7 @@ The application checks if any configurations have been provided and raises an er
 
 ## Code location
 
-[src/model_name/scripts.py](../src/model_name/scripts.py)
+[src/autogen_team/scripts.py](../src/autogen_team/scripts.py)
 
 ## Test location
 

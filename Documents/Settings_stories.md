@@ -1,4 +1,4 @@
-# US [Application Settings Management](./backlog_mlops_regresion.md) : Define settings for the application.
+# US [Application Settings Management](./backlog_llmlops_regresion.md) : Define settings for the application.
 
 - [US Application Settings Management : Define settings for the application.](#us-application-settings-management--define-settings-for-the-application)
   - [classes relations](#classes-relations)
@@ -136,6 +136,6 @@ By defining settings as a distinct class, the application can cleanly interface 
 
 ## Code location
 
-[src/model_name/settings.py](../src/model_name/settings.py)
+[src/autogen_team/settings.py](../src/autogen_team/settings.py)
 
 ```

@@ -159,8 +159,8 @@ The `Env` class provides default and customizable values for MLflow-related conf
 - 
 ## Code location
 
-[src/model_name/core/schemas.py](../src/model_name/io/osvariables.py)
+[src/autogen_team/core/osvariables.py](../src/autogen_team/io/osvariables.py)
 
 ## Test location
 
-[tests/core/test_schemas.py](../tests/io/osvariables.py)
+[tests/core/test_osvariables.py](../tests/io/test_osvariables.py)

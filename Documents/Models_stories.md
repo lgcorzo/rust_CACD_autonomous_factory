@@ -1,226 +1,248 @@
-# US [Models](./backlog_mlops_regresion.md) : Define the structure of machine learning models, including architectures and checkpoints, to standardize training and deployment
+# US [Models](./backlog_llmlops_regresion.md) : Define the structure of machine learning models, including architectures and checkpoints, to standardize training and deployment
+
 
 - [US Models : Define the structure of machine learning models, including architectures and checkpoints, to standardize training and deployment](#us-models--define-the-structure-of-machine-learning-models-including-architectures-and-checkpoints-to-standardize-training-and-deployment)
   - [classes relations](#classes-relations)
-  - [**User Story: Develop a Base Model Class for Machine Learning Frameworks**](#user-story-develop-a-base-model-class-for-machine-learning-frameworks)
-  - [User Stories: BaselineAutogenModel Class](#user-stories-baselineautogenmodel-class)
-    - [**1. User Story: Load Assistant Agent for Predictions**](#1-user-story-load-assistant-agent-for-predictions)
-    - [**2. User Story: Predict Outputs Using Inputs**](#2-user-story-predict-outputs-using-inputs)
+  - [**User Stories: BaselineAutogenModel**](#user-stories-baselineautogenmodel)
+    - [**1. User Story: Configure Baseline Autogen Model**](#1-user-story-configure-baseline-autogen-model)
+    - [**2. User Story: Load Model Context from a Specified Path**](#2-user-story-load-model-context-from-a-specified-path)
+    - [**3. User Story: Load Model Context from a Config Dictionary**](#3-user-story-load-model-context-from-a-config-dictionary)
+    - [**4. User Story: Train Model with Input and Target Data**](#4-user-story-train-model-with-input-and-target-data)
+    - [**5. User Story: Generate Predictions Using a Group Chat**](#5-user-story-generate-predictions-using-a-group-chat)
+    - [**6. User Story: Generate Textual Explanation of Model Structure**](#6-user-story-generate-textual-explanation-of-model-structure)
+    - [**7. User Story: Explain Predictions with Input Samples and Dummy SHAP Values**](#7-user-story-explain-predictions-with-input-samples-and-dummy-shap-values)
+    - [**8. User Story: Retrieve the Internal Model**](#8-user-story-retrieve-the-internal-model)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria)
     - [**Definition of Done (DoD):**](#definition-of-done-dod)
-  - [references:](#references)
   - [Code location](#code-location)
   - [Test location](#test-location)
 
----
+------------
 
 ## classes relations
 
 ```mermaid
 classDiagram
+    %% Abstract Base Class
     class Model {
-        <<Abstract>>
+        <<abstract>>
         +KIND: str
         +get_params(deep: bool = True): Params
         +set_params(**params: ParamValue): T.Self
-        +load_context(model_config: Dict[str, Any])*: void
+        +load_context(model_config: Dict[str, Any]): None
+        +fit(inputs: schemas.Inputs, targets: schemas.Targets): T.Self
+        +predict(inputs: schemas.Inputs): schemas.Outputs
         +explain_model(): schemas.FeatureImportances
         +explain_samples(inputs: schemas.Inputs): schemas.SHAPValues
         +get_internal_model(): T.Any
     }
 
+    %% BaselineAutogenModel Class
     class BaselineAutogenModel {
-        +KIND: T.Literal["BaselineAutogenModel"] = "BaselineAutogenModel"
-        +assistant_agent: Optional~AssistantAgent~
-        +team: Optional~RoundRobinGroupChat~
-        +load_context(model_config: Dict[str, Any]): void
+        +KIND: T.Literal["BaselineAutogenModel"]
+        +model_config_path: Optional[str]
+        +model_client: Optional[Any]
+        +max_tokens: Optional[int]
+        +temperature: Optional[float]
+        +load_context_path(model_config_path: Optional[str] = None) : None
+        +load_context(model_config: Dict[str, Any]) : None
+        +fit(inputs: schemas.Inputs, targets: schemas.Targets): BaselineAutogenModel
         +predict(inputs: schemas.Inputs): schemas.Outputs
-        +get_internal_model(): RoundRobinGroupChat
+        +_rungroupchat(content: str) : CreateResult
+        +explain_model(): schemas.FeatureImportances
+        +explain_samples(inputs: schemas.Inputs): schemas.SHAPValues
+        +get_internal_model(): OpenAIChatCompletionClient
     }
+    Model <|-- BaselineAutogenModel : "specializes"
 
-    class AssistantAgent {
-        +name: str
-        +tools: List~Any~
-        +model_client: OpenAIChatCompletionClient
-    }
-
-    class RoundRobinGroupChat {
-        +participants: List~AssistantAgent~
-        +termination_condition: Any
-        +run(task: Any): Any
-    }
-
+    %% OpenAIChatCompletionClient
     class OpenAIChatCompletionClient {
-        +model: str
+        <<external>>
+        +create(messages: List[UserMessage]) : CreateResult
     }
 
-   
+    %% Schemas and Autogen Data Models
     class schemas.Inputs {
-        <<DataClass>>
+        <<external>>
     }
-
     class schemas.Outputs {
-        <<DataClass>>
+        <<external>>
     }
-
-    class TaskResult {
-        +result: Any
+    class schemas.FeatureImportances {
+        <<external>>
     }
-
-    Model <|-- BaselineAutogenModel
-    BaselineAutogenModel --> AssistantAgent
-    BaselineAutogenModel --> RoundRobinGroupChat
-    RoundRobinGroupChat --> AssistantAgent
-    AssistantAgent --> OpenAIChatCompletionClient
-    BaselineAutogenModel --> schemas.Outputs
-    BaselineAutogenModel --> schemas.Inputs
-    RoundRobinGroupChat --> TaskResult
-
+   class schemas.SHAPValues {
+        <<external>>
+    }
+    class AutogenModels.UserMessage {
+        <<external>>
+    }
+     class AutogenModels.CreateResult {
+        <<external>>
+		+content: str
+    }
+    
+   BaselineAutogenModel ..> OpenAIChatCompletionClient : "uses"
+   BaselineAutogenModel ..> schemas.Inputs : "uses"
+   BaselineAutogenModel ..> schemas.Outputs : "returns"
+   BaselineAutogenModel ..> schemas.FeatureImportances : "returns"
+   BaselineAutogenModel ..> schemas.SHAPValues : "returns"
+   BaselineAutogenModel ..> AutogenModels.UserMessage : "uses"
+   BaselineAutogenModel ..> AutogenModels.CreateResult : "returns"
 ```
 
-
-https://github.com/microsoft/autogen/blob/main/python/samples/agentchat_chainlit/app.py
-
-
-## **User Story: Develop a Base Model Class for Machine Learning Frameworks**
+## **User Stories: BaselineAutogenModel**
 
 ---
+
+### **1. User Story: Configure Baseline Autogen Model**
 
 **Title:**  
-As a **machine learning engineer**, I want a **base `Model` class** to standardize the implementation of machine learning models, so that I can easily integrate different frameworks and ensure a consistent interface across the project.
-
----
+As a **machine learning engineer**, I want to configure the `BaselineAutogenModel` with settings like maximum tokens and temperature, so that I can control the generation of text by the Autogen agent.
 
 **Description:**  
-The `Model` class serves as an abstract base class for all machine learning models in the project. It defines a set of essential methods and attributes required for training, predicting, and explaining models. By implementing this base class, users can create custom models that adhere to the project's standards and integrate seamlessly into the pipeline.
-
----
+The `BaselineAutogenModel` class allows configuration of parameters such as `max_tokens` and `temperature`, influencing the text generation process of the Autogen agent.
 
 **Acceptance Criteria:**
-
-1. **Attributes**
-
-   - Define the `KIND` attribute to identify the type of model being implemented.
-   - Ensure `KIND` is unique for each subclass of the `Model` class.
-
-2. **Parameter Management**
-
-   - **Get Parameters:**
-     - Implement the `get_params` method to retrieve all model parameters.
-     - Exclude private (`_`) and uppercase attributes from the parameters list.
-   - **Set Parameters:**
-     - Implement the `set_params` method to update the model's parameters dynamically.
-     - Ensure that parameter updates are applied in place and return the updated model instance.
-   - **Load context**: Custom models often require external files such as model weights in order to perform inference. These files, or artifacts, must be handled carefully to avoid unnecessarily loading files into memory or errors during model serialization. When building custom pyfunc models in MLflow, you can use the load_context method to handle model artifacts correctly.
-
-3. **Core Methods**
-
-   - Define the following abstract methods:
-     - `fit(inputs: schemas.Inputs, targets: schemas.Targets)`
-       - Train the model on provided inputs and targets.
-       - Return the fitted model instance.
-     - `predict(inputs: schemas.Inputs)`
-       - Generate predictions using the trained model.
-       - Return outputs in the `schemas.Outputs` format.
-
-4. **Model Explainability**
-
-   - **Global Explainability:**
-     - Provide an `explain_model` method to return feature importances.
-     - Raise a `NotImplementedError` if not overridden by the subclass.
-   - **Local Explainability:**
-     - Provide an `explain_samples` method to return SHAP values for individual samples.
-     - Raise a `NotImplementedError` if not overridden by the subclass.
-
-5. **Internal Model Access**
-
-   - Implement the `get_internal_model` method to expose the internal model object (e.g., a autogen model).
-   - Raise a `NotImplementedError` if the method is not overridden by the subclass.
-
-6. **Validation and Enforcement**
-
-   - Use `pydantic.BaseModel` to enforce strict validation of model attributes and parameters.
-   - Set `strict=True`, `frozen=False`, and `extra="forbid"` to ensure data consistency while allowing parameter updates.
-
-7. **Testing**
-   - Validate the following scenarios:
-     - Successful instantiation of model subclasses.
-     - Proper parameter retrieval and updates using `get_params` and `set_params`.
-     - Enforcement of abstract method implementation in subclasses.
-   - Write unit tests for all methods, ensuring they behave as expected.
+- The `BaselineAutogenModel` class is configured to work with the Autogen framework.
+- The `max_tokens` attribute is configurable with an integer, defining the maximum length of the generated text.
+- The `temperature` attribute is configurable with a float, influencing the randomness of the generated text.
+- The `KIND` attribute should be set to `"BaselineAutogenModel"` for proper identification.
 
 ---
 
-**Definition of Done (DoD):**
+### **2. User Story: Load Model Context from a Specified Path**
 
-- The `Model` class is implemented with all specified methods and attributes.
-- Abstract methods enforce implementation in derived classes.
-- Subclass compatibility is verified with unit tests.
-- The class is well-documented, including detailed examples of usage.
-- The code passes all CI/CD validation checks and integrates seamlessly with existing project modules.
+**Title:**
+As a **machine learning engineer**, I want to load the model configuration from a specified file path, so that I can configure the Autogen client from an external JSON configuration file.
 
-## User Stories: BaselineAutogenModel Class
+**Description:**
+The `load_context_path` method allows loading configuration details, particularly the OpenAI Chat Completion client settings, from a JSON file, thus decoupling settings from the code.
 
-### **1. User Story: Load Assistant Agent for Predictions**
+**Acceptance Criteria:**
+- The `load_context_path` method loads configuration details from a JSON file specified by the `model_config_path`.
+- Raises a `ValueError` if no configuration file path is provided.
+- Raises a `FileNotFoundError` if the specified configuration file does not exist.
+- Loads a configuration from the specified path and uses it to initialize `OpenAIChatCompletionClient`.
 
-**Title:**  
-As a **data engineer**, I want to load an assistant agent into the baseline model to leverage external tools and AI capabilities for generating responses.
+---
 
-**Description:**  
-The `BaselineAutogenModel` class initializes an assistant agent that interacts with external resources (like weather information) to augment its predictions.
+### **3. User Story: Load Model Context from a Config Dictionary**
 
-**Acceptance Criteria:**  
-- The `load_context` method initializes the `assistant_agent` with the correct tools.
-- The team setup (e.g., `RoundRobinGroupChat`) is properly configured with the termination conditions.
+**Title:**
+As a **developer**, I want to load the model configuration directly from a dictionary, so that I can programmatically configure the Autogen client with settings.
 
-### **2. User Story: Predict Outputs Using Inputs**
+**Description:**
+The `load_context` method allows direct loading of configuration settings from a dictionary, providing a programmatic alternative to loading from a file.
 
-**Title:**  
-As a **data scientist**, I want to run predictions based on input data and obtain structured results so that I can analyze and use these outputs in my workflows.
+**Acceptance Criteria:**
+- The `load_context` method correctly initializes the `OpenAIChatCompletionClient` using the provided configuration dictionary.
+- The dictionary includes required keys such as `model`, `temperature`, and `api_base` that are essential to the client setup.
+- Raises an exception if the required settings are missing from the dictionary.
 
-**Description:**  
-The `predict` method generates outputs based on a set of inputs, using the initialized assistant team and returning results in a structured format.
+---
 
-**Acceptance Criteria:**  
-- The `predict` method processes the provided inputs and streams responses correctly.
-- Outputs are formatted into a defined schema including response content and metadata such as timestamps.
+### **4. User Story: Train Model with Input and Target Data**
+
+**Title:**
+As a **machine learning engineer**, I want to have a `fit` method in my Autogen model, so that I can support potential future training or fine-tuning, even if it is not immediately implemented.
+
+**Description:**
+The `fit` method, although currently a placeholder, maintains consistency with other model types by including an interface to support future fine-tuning or transfer learning approaches.
+
+**Acceptance Criteria:**
+- The `fit` method accepts input and target datasets.
+- The `fit` method returns the instance of `BaselineAutogenModel`.
+- Although no training occurs, the method provides a point for future implementation.
+
+---
+
+### **5. User Story: Generate Predictions Using a Group Chat**
+
+**Title:**
+As an **application developer**, I want to generate responses using a group chat setting in Autogen, so that I can facilitate complex, multi-agent interactions.
+
+**Description:**
+The `predict` method generates outputs by engaging the Autogen model in a group chat setting, processing each input and appending the generated responses to the output.
+
+**Acceptance Criteria:**
+- The `predict` method iterates through input data and generates responses using Autogen's group chat functionality.
+- If the model client is not initialized, a ValueError is raised to prevent incorrect usage.
+- Each generated response includes the response content and metadata, such as timestamp and model version.
+- The output is a Pandas DataFrame formatted according to the project's schema.
+
+---
+
+### **6. User Story: Generate Textual Explanation of Model Structure**
+
+**Title:**
+As a **machine learning engineer**, I want a textual explanation of the model's structure, so that I can understand the model's architecture and processes.
+
+**Description:**
+The `explain_model` method provides a high-level, text-based explanation of the model, particularly noting its reliance on the OpenAI Chat API rather than traditional numerical feature importances.
+
+**Acceptance Criteria:**
+- The method returns a textual explanation that describes the model's architecture and usage.
+- The explanation indicates that the model uses prompt-driven generation and context management instead of numerical feature importances.
+- Output should align with the project `FeatureImportances` schema format.
+
+---
+
+### **7. User Story: Explain Predictions with Input Samples and Dummy SHAP Values**
+
+**Title:**
+As a **machine learning engineer**, I want to provide explanations for predictions on input samples, so that I can enhance transparency and understanding of the model's decision-making process.
+
+**Description:**
+The `explain_samples` method provides explanations for individual predictions by providing textual descriptions alongside dummy SHAP values due to the model's architecture.
+
+**Acceptance Criteria:**
+- The method generates explanations for input samples, linking each input to its corresponding model response.
+- Textual explanations describe that the model uses prompt-driven generation and context management.
+- A dummy SHAP value of 1.0 is assigned to each explanation to maintain a consistent output format.
+- The output should follow the project's defined `SHAPValues` schema.
+
+---
+
+### **8. User Story: Retrieve the Internal Model**
+
+**Title:**
+As a **developer**, I need to access the internal Autogen model so that I can directly interact with its functionalities, enabling custom behaviors or advanced configurations.
+
+**Description:**
+The `get_internal_model` method exposes the underlying OpenAIChatCompletionClient, allowing direct interaction with the Autogen framework.
+
+**Acceptance Criteria:**
+- The method returns an instance of the `OpenAIChatCompletionClient`.
+- A `ValueError` is raised if the model client is not initialized or is of the incorrect type.
+
+---
 
 ### **Common Acceptance Criteria**
+
 1. **Implementation Requirements:**
-   - The `BaselineAutogenModel` extends the `Model` class and implements all abstract methods.
-   - The `KIND` attribute must be correctly set to `"BaselineAutogenModel"`.
+   - The `BaselineAutogenModel` class correctly implements the abstract methods from the base `Model` class.
+   - All configurations and initializations are handled properly within the methods.
 
 2. **Error Handling:**
-   - Both `load_context` and `predict` methods raise informative errors for invalid configurations and inputs.
-   - Predict method should handle any potential issues when streaming responses from the team.
+   - Specific exceptions are raised when configurations are missing or incorrect, guiding users in debugging issues.
 
 3. **Testing:**
-   - Unit tests validate the initialization of both the assistant agent and the response outputs.
-   - Edge cases are tested, including invalid inputs and behavior of external dependencies.
+   - Unit tests validate the configuration, loading, prediction generation, and explanation aspects of the model.
+   - Tests ensure proper interactions with the Autogen framework, as well as accurate adherence to project-defined schemas.
 
 4. **Documentation:**
-   - Comprehensive documentation exists for both `load_context` and `predict` methods.
-   - Provide examples of loading the model and executing predictions.
+   - Each method includes comprehensive docstrings explaining its purpose, parameters, and outputs.
+   - Examples are provided to demonstrate the model's usage and integration with various tools and frameworks.
+
+---
 
 ### **Definition of Done (DoD):**
-- The `BaselineAutogenModel` class is implemented with fully functional load and predict capabilities.
-- All methods in `BaselineAutogenModel` are covered by unit tests.
-- Documentation includes thorough explanations and practical examples of model usage.
 
--
-## references:
-
-<https://mlflow.org/blog/autogen-image-agent>
-<https://github.com/mlflow/mlflow/tree/master/examples/gateway/mlflow_models>
-<https://github.com/mlflow/mlflow/blob/master/examples/gateway/mlflow_models/README.md>
-
-RAG-Chroma
-
-<https://microsoft.github.io/autogen/0.2/docs/notebooks/agentchat_RetrieveChat>
-
-pyfunc mlflow
-
-<https://mlflow.org/blog/custom-pyfunc#:~:text=When%20building%20custom%20pyfunc%20models%20in%20MLflow%2C%20you,containing%20artifacts%20the%20model%20can%20use%20during%20inference>.
+- The `BaselineAutogenModel` class is fully implemented and tested.
+- All user stories are reflected in the code, and the acceptance criteria are met.
+- The documentation is thorough and provides clear guidance for all users.
+- Code adheres to project standards and passes all CI/CD checks.
 
 ## Code location
 

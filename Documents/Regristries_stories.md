@@ -1,4 +1,5 @@
-# US [Model Registry](./backlog_mlops_regresion.md) : Manage saving, loading, and registering machine learning models using MLflow.
+# US [Model Registry](./backlog_llmlops_regresion.md) : Manage saving, loading, and registering machine learning models using MLflow.
+
 
 - [US Model Registry : Manage saving, loading, and registering machine learning models using MLflow.](#us-model-registry--manage-saving-loading-and-registering-machine-learning-models-using-mlflow)
   - [classes relations](#classes-relations)
@@ -9,12 +10,14 @@
     - [**Definition of Done (DoD):**](#definition-of-done-dod)
   - [**User Stories: Custom and Built-in Savers**](#user-stories-custom-and-built-in-savers)
     - [**1. User Story: Saving Custom Models**](#1-user-story-saving-custom-models)
-    - [**2. User Story: Saving Built-in Models**](#2-user-story-saving-built-in-models)
+    - [**2. User Story: Using LiteLLM-compatible Client to Initialize CustomSaver Adapter**](#2-user-story-using-litellm-compatible-client-to-initialize-customsaver-adapter)
+    - [**3. User Story: Load Configurations from JSON file**](#3-user-story-load-configurations-from-json-file)
+    - [**4. User Story: Define prediction  method**](#4-user-story-define-prediction--method)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria-1)
     - [**Definition of Done (DoD):**](#definition-of-done-dod-1)
-  - [**User Stories: Custom and Built-in Loaders**](#user-stories-custom-and-built-in-loaders)
+  - [**User Stories: Custom Loaders**](#user-stories-custom-loaders)
     - [**1. User Story: Loading Custom Models**](#1-user-story-loading-custom-models)
-    - [**2. User Story: Loading Built-in Models**](#2-user-story-loading-built-in-models)
+    - [**2. User Story: Adapt Custom Loaders**](#2-user-story-adapt-custom-loaders)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria-2)
     - [**Definition of Done (DoD):**](#definition-of-done-dod-2)
   - [**User Stories: Model Registration**](#user-stories-model-registration)
@@ -24,12 +27,9 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-
 ------------
 
 ## classes relations
-ejemplo de  autogen para mlflow
-https://mlflow.org/blog/custom-pyfunc
 
 ```mermaid
 classDiagram
@@ -38,6 +38,7 @@ classDiagram
         <<abstract>>
         +KIND: str
         +path: str
+        +config_file: str
         +save(model: models.Model, signature: signers.Signature, input_example: schemas.Inputs): Info
     }
 
@@ -48,13 +49,19 @@ classDiagram
     }
     Saver <|-- CustomSaver : "specializes"
 
-    %% BuiltinSaver Class
-    class BuiltinSaver {
-        +KIND: T.Literal["BuiltinSaver"]
-        +flavor: str
-        +save(model: models.Model, signature: signers.Signature, input_example: schemas.Inputs | None): Version
+    class PythonModel{
+      load_context(context: PythonModelContext)
+      predict( context: PythonModelContext, model_input: schemas.Inputs, params: dict[str, T.Any] | None )
     }
-    Saver <|-- BuiltinSaver : "specializes"
+
+    class Adapter{
+      + __init__(model: Model)
+      + load_context(model_config: Dict[str, Any])
+      + predict(inputs: schemas.Inputs) -> schemas.Outputs
+    }
+
+    CustomSaver ..> Adapter: "uses"
+    Adapter ..> PythonModel: "inherits"
 
     %% Base Class: Loader
     class Loader {
@@ -70,17 +77,11 @@ classDiagram
     }
     Loader <|-- CustomLoader : "specializes"
 
-    %% BuiltinLoader Class
-    class BuiltinLoader {
-        +KIND: T.Literal["BuiltinLoader"]
-        +load(uri: str): "BuiltinLoader.Adapter"
-    }
-    Loader <|-- BuiltinLoader : "specializes"
-
     %% Base Class: Register
     class Register {
         <<abstract>>
         +KIND: str
+        +tags: dict[str, T.Any]
         +register(name: str, model_uri: str): Version
     }
 
@@ -95,6 +96,8 @@ classDiagram
     Saver ..> mlflow.models.model.ModelInfo : "returns"
     Loader ..> mlflow.pyfunc.PyFuncModel : "uses"
     Register ..> mlflow.entities.model_registry.ModelVersion : "returns"
+    CustomSaver ..> PythonModel : "uses"
+
 ```
 
 ## **User Stories: Model Saver and Loader**
@@ -103,14 +106,14 @@ classDiagram
 
 ### **1. User Story: Save Models to Registry**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to save machine learning models to an MLflow registry, so I can manage model versions and track their progression.
 
-**Description:**  
+**Description:**
 The `Saver` class serves as a base for saving models to the MLflow model registry. The `save` method allows for saving various types of models using either custom or built-in save methods.
 
-**Acceptance Criteria:**  
-- The `save` method is implemented by subclasses of `Saver` (CustomSaver and BuiltinSaver).
+**Acceptance Criteria:**
+- The `save` method is implemented by subclasses of `Saver` (CustomSaver).
 - Supports saving models with their signatures and input examples.
 - Provides metadata regarding the saved model through `ModelInfo`.
 
@@ -118,14 +121,14 @@ The `Saver` class serves as a base for saving models to the MLflow model registr
 
 ### **2. User Story: Load Models from Registry**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to load machine learning models from the MLflow registry, so I can easily make predictions with already registered models.
 
-**Description:**  
+**Description:**
 The `Loader` class serves as a base for loading models from the MLflow model registry. The `load` method allows for loading models which can then be used for inference.
 
-**Acceptance Criteria:**  
-- The `load` method is implemented by subclasses of `Loader` (CustomLoader and BuiltinLoader).
+**Acceptance Criteria:**
+- The `load` method is implemented by subclasses of `Loader` (CustomLoader).
 - Models can be loaded using a unique URI, providing flexibility in model retrieval.
 
 ---
@@ -134,7 +137,7 @@ The `Loader` class serves as a base for loading models from the MLflow model reg
 
 1. **Implementation Requirements:**
    - The `Saver` and `Loader` base classes cannot be instantiated directly.
-   - Subclass implementations (CustomSaver, BuiltinSaver, CustomLoader, BuiltinLoader) must clearly define `save` and `load` methods, respectively.
+   - Subclass implementations (CustomSaver, CustomLoader) must clearly define `save` and `load` methods, respectively.
 
 2. **Error Handling:**
    - Appropriate errors are raised for failed save or load operations, including invalid model URIs and unsupported formats.
@@ -151,8 +154,8 @@ The `Loader` class serves as a base for loading models from the MLflow model reg
 
 ### **Definition of Done (DoD):**
 
-- All required methods in `Saver` and `Loader` are implemented with clear documentation.
-- Subclasses (CustomSaver, BuiltinSaver, CustomLoader, BuiltinLoader) are tested for saving and loading various models.
+- The `Saver` and `Loader` classes and all required methods are implemented with clear documentation.
+- Subclasses (CustomSaver, CustomLoader) are tested for saving and loading various models.
 - Code adheres to the project's coding standards and passes peer review.
 - Unit tests have a wide coverage of scenarios and edge cases.
 
@@ -164,93 +167,124 @@ The `Loader` class serves as a base for loading models from the MLflow model reg
 
 ### **1. User Story: Saving Custom Models**
 
-**Title:**  
-As a **machine learning engineer**, I want to save my custom models using the MLflow PyFunc module so that I can leverage MLflow’s tracking and deployment features.
+**Title:**
+As a **machine learning engineer**, I want to save my custom models using the MLflow PyFunc module so that I can leverage MLflow's tracking and deployment features.
 
-**Description:**  
+**Description:**
 The `CustomSaver` class extends the `Saver` base class and implements the logic to save custom models that conform to the MLflow PyFunc flavor.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - Custom models can be saved using the `save` method from the `CustomSaver` class.
 - The saved model must retain its signature and input/output examples for later use.
 
 ---
 
-### **2. User Story: Saving Built-in Models**
+### **2. User Story: Using LiteLLM-compatible Client to Initialize CustomSaver Adapter**
 
-**Title:**  
-As a **data engineer**, I want to save built-in MLflow models using the appropriate flavor module to ensure compatibility with MLflow's ecosystem.
+**Title:**
+As a **machine learning engineer**, I want to use LiteLLM-compatible client for  `CustomSaver` Adapter, so I can leverage the features provided and easy deployment via the client .
 
-**Description:**  
-The `BuiltinSaver` class is designed to provide a straightforward way to save built-in models with minimal effort.
+**Description:**
+The  `__init__` on  `CustomSaver.Adapter`  should have the functionality  to setup a `LiteLLM`-compatible client ( `OpenAIChatCompletionClient` ) based on the provided configurations .
 
-**Acceptance Criteria:**  
-- Built-in models can be saved using the `save` method from the `BuiltinSaver` class.
-- The method handles flavor-specific serialization seamlessly.
+**Acceptance Criteria:**
+- The  `__init__`  initializes a LiteLLM-compatible client in `CustomSaver.Adapter`.
+- The config contains the fields model,api_key,base_url, temeperature and max_tokens.
+
+---
+
+### **3. User Story: Load Configurations from JSON file**
+
+**Title:**
+As a **machine learning engineer**, I want to load the model´s config from a specified path and use it later to load the model in the `CustomSaver.Adapter`class.
+
+**Description:**
+The  `load_context`  on `CustomSaver.Adapter` should load the context information from a json file and use it to initiate a new model
+
+**Acceptance Criteria:**
+- The load from the `config_file` property should be implemented correctly
+- If a  configuration is not provided should raise the exception Value Error
+- If a file doesn´t exists should raise the exception FileNotFoundError
+
+---
+
+### **4. User Story: Define prediction  method**
+
+**Title:**
+As a **machine learning engineer**, I want to define a method to  predict and validate the `CustomeSaver` model for a  `fastAPI` enpoint.
+
+**Description:**
+The   `predict` method, should use the method already implemented and the response should follow the data Schema of the project.
+
+**Acceptance Criteria:**
+- The predict method should be implemented correctly
+- The output  should be a valid `schemas.Outputs` object, containing both the prediction and metadata.
+- If something fails, the method should use the  method of the model to try and infer otherwise the exception is handled
 
 ---
 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
-   - The `CustomSaver` and `BuiltinSaver` classes extend the `Saver` class and implement required methods.
+   - The `CustomSaver` class extends the `Saver` base class and implements required methods.
    - All necessary parameters for saving models are correctly handled.
 
 2. **Error Handling:**
-   - The `save` methods raise informative errors for issues such as unprocessable model types or incorrect input schemas.
+   - The `save` method raises informative errors for issues such as unprocessable model types or incorrect input schemas.
 
 3. **Testing:**
-   - Unit tests verify successful model saving and correct handling of various error scenarios.
+   - Unit tests verify successful model saving and correct handling of error scenarios.
 
 4. **Documentation:**
-   - Comprehensive docstrings and usage examples for both the `CustomSaver` and `BuiltinSaver` classes.
+   - Clear docstrings and usage examples for the `CustomSaver` class and associated `Adapter`.
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
-- The `CustomSaver` and `BuiltinSaver` classes are fully implemented and pass all tests.
-- Documentation is complete, including instructions for model-saving processes.
-- Error handling is verified through unit tests. 
+- The `CustomSaver` class is implemented and adheres to the design principles.
+- The `save` method in `CustomSaver` successfully serializes and saves models.
+- All functionality is tested with unit tests, including error scenarios.
+- Documentation is complete, with clear instructions for usage and extensibility.
 
 ---
 
-## **User Stories: Custom and Built-in Loaders**
+## **User Stories: Custom Loaders**
 
 ---
 
 ### **1. User Story: Loading Custom Models**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to load custom models from the MLflow registry so that I can run inference on my custom ML models when needed.
 
-**Description:**  
+**Description:**
 The `CustomLoader` class is responsible for retrieving custom models stored in the MLflow registry and providing them for prediction purposes.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The `load` method retrieves the model and returns it wrapped in an adapter for inference.
 - Supports flexible model input as per the defined schema.
 
 ---
 
-### **2. User Story: Loading Built-in Models**
+### **2. User Story: Adapt Custom Loaders**
 
-**Title:**  
-As a **data scientist**, I want to load built-in MLflow models with minimal effort so that I can quickly utilize existing models in my workflow.
+**Title:**
+As a **Developer** ,I need to create a Custom adapter to load the context and  predict the model, so the fastAPI can make request to the model.
 
-**Description:**  
-The `BuiltinLoader` class allows easy retrieval of built-in MLflow models, ensuring compatible handling of input/output schemas.
+**Description:**
+The `Adapter` allows to adapt load the configurations and predict
 
-**Acceptance Criteria:**  
-- The `load` method successfully loads built-in models and returns them as a usable adapter for inference.
+**Acceptance Criteria:**
+- The `load_context`method must be created.
+- The `predict`method must return a `schemas.Outputs` objects.
 
 ---
 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
-   - The `CustomLoader` and `BuiltinLoader` classes extend the `Loader` class and implement required methods.
-   - The methods accept and correctly handle model URIs.
+   - The `CustomLoader` class must implement the abstract methods from the Loader.
 
 2. **Error Handling:**
    - Raised exceptions for issues encountered during model retrieval (e.g., non-existent models).
@@ -263,13 +297,11 @@ The `BuiltinLoader` class allows easy retrieval of built-in MLflow models, ensur
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
-- The `CustomLoader` and `BuiltinLoader` classes are implemented and passing unit tests.
-- Documentation includes complete usage instructions and examples.
-- Error handling processes validated through tests.
-
----
+- The `CustomLoader` classes are implemented and adhere to the design principles.
+- The loading process is verified in tests, including edge cases and error handling.
+- Documentation is complete, with clear instructions for usage and extensibility.
 
 ## **User Stories: Model Registration**
 
@@ -277,13 +309,13 @@ The `BuiltinLoader` class allows easy retrieval of built-in MLflow models, ensur
 
 ### **1. User Story: Register Models in MLflow**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to register models into the MLflow Model Registry, so I can keep track of different model versions over time.
 
-**Description:**  
+**Description:**
 The `MlflowRegister` class provides methods for registering models within the MLflow registry, allowing model management through versioning.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The `register` method can successfully save a model instance along with its URI.
 - Proper versioning is maintained and retrievable through the registry interface.
 
@@ -298,22 +330,21 @@ The `MlflowRegister` class provides methods for registering models within the ML
    - Informative errors are raised for registration issues, such as non-existent model URIs.
 
 3. **Testing:**
-   - Unit tests are developed to validate successful and error scenarios in model registration.
+   - Unit tests verify successful and error scenarios in model registration.
 
 4. **Documentation:**
    - Documentation includes clear instructions on model registration processes.
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
 - The `MlflowRegister` class is fully implemented, passing all unit tests.
-- Documentation regarding model registration is complete and intuitive for users.
-
+- Documentation is complete, with clear instructions for usage and extensibility.
 
 ## Code location
 
-[src/model_name/io/model_registries.py](../src/model_name/io/registries.py)
+[src/autogen_team/io/model_registries.py](../src/autogen_team/io/registries.py)
 
 ## Test location
 
