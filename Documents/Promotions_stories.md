@@ -1,5 +1,6 @@
 
-# US [Model Promotion Job](./backlog_mlops_regresion.md) : Define a job for promoting a registered model version with an alias.
+# US [Model Promotion Job](./backlog_llmlops_regresion.md) : Define a job for promoting a registered model version with an alias.
+
 
 - [US Model Promotion Job : Define a job for promoting a registered model version with an alias.](#us-model-promotion-job--define-a-job-for-promoting-a-registered-model-version-with-an-alias)
   - [classes relations](#classes-relations)
@@ -19,6 +20,8 @@
 
 ```mermaid
 classDiagram
+direction LR
+
     class PromotionJob {
         +KIND: str
         +alias: str
@@ -74,57 +77,61 @@ classDiagram
 
 ### **1. User Story: Configure Promotion Job**
 
-**Title:**  
+**Title:**
 As a **model manager**, I want to configure a promotion job with the required alias and version parameters, so that I can promote a specific model version in the registry.
 
-**Description:**  
+**Description:**
 The `PromotionJob` class allows for the setup of the job by specifying the alias to be used for the promoted model and the model version to be promoted.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The promotion job is initialized with the specified alias and model version.
-- Default values are correctly set, allowing for flexibility in promotion decisions.
+- The alias defaults to `"Champion"` if not specified.
+- The version defaults to `None`, indicating the latest version.
 
 ---
 
 ### **2. User Story: Determine Model Version to Promote**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want the job to determine which version of the model to promote based on the configuration, so that I can manage model versions effectively.
 
-**Description:**  
+**Description:**
 In the `run` method, the promotion job should check if a specific model version is provided; if not, it should default to the latest version in the model registry.
 
-**Acceptance Criteria:**  
-- If a version is not specified, the job retrieves the latest model version based on the model name.
+**Acceptance Criteria:**
+- If a version is not specified, the job retrieves the latest model version using `client.search_model_versions`.
+- The retrieval should order results to get the most recent version.
 - The selected version is logged for clarity.
 
 ---
 
 ### **3. User Story: Promote Model Version**
 
-**Title:**  
+**Title:**
 As a **model manager**, I want to promote the specified model version under the defined alias within the model registry, so that I can transition model versions as necessary in my deployment pipeline.
 
-**Description:**  
+**Description:**
 The job should use the MLflow client to set the specified alias to the chosen model version, making it easy to reference the promoted model in future operations.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The job correctly promotes the model version and sets the alias through the MLflow client.
 - Confirmation of the promotion action is logged with details of the model and version.
+- The function `set_registered_model_alias` is called with the right arguments
 
 ---
 
 ### **4. User Story: Notify Completion of Promotion**
 
-**Title:**  
+**Title:**
 As a **user**, I want to receive a notification upon completion of the promotion job, so that I can confirm the transition was successful.
 
-**Description:**  
+**Description:**
 At the conclusion of the job execution, the promotion job sends notifications to inform stakeholders of the results.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - Notifications include details about the promoted version and alias.
 - The alerts service successfully informs users of the job completion.
+- The correct information is passed to the message property
 
 ---
 
@@ -139,7 +146,6 @@ At the conclusion of the job execution, the promotion job sends notifications to
 
 3. **Testing:**
    - Unit tests validate job initialization, model version retrieval, promotion actions, and notification delivery.
-   - Tests ensure accurate exception handling scenarios are adequately assessed.
 
 4. **Documentation:**
    - Comprehensive docstrings explain the purpose of each class and method.
@@ -147,7 +153,7 @@ At the conclusion of the job execution, the promotion job sends notifications to
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
 - The `PromotionJob` class is fully implemented and functional.
 - All functionalities are tested and confirmed to meet the acceptance criteria.
@@ -155,7 +161,7 @@ At the conclusion of the job execution, the promotion job sends notifications to
 
 ## Code location
 
-[src/model_name/jobs/promotion.py](../src/model_name/jobs/promotion.py)
+[src/autogen_team/jobs/promotion.py](../src/autogen_team/jobs/promotion.py)
 
 ## Test location
 

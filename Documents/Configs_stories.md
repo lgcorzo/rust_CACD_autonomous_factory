@@ -142,8 +142,8 @@ The `to_object` function converts an `OmegaConf` configuration object into stand
 
 ## Code location
 
-[src/model_name/core/schemas.py](../src/model_name/io/configs.py)
+[src/autogen_team/io/configs.py](../src/autogen_team/io/configs.py)
 
 ## Test location
 
-[tests/core/test_schemas.py](../tests/io/configs.py)
+[tests/core/test_schemas.py](../tests/io/test_configs.py)

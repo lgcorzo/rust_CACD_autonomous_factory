@@ -1,4 +1,4 @@
-# US [Hyperparameter Searchers](./backlog_mlops_regresion.md) : Define functionalities for finding the best hyperparameters for a model.
+# US [Hyperparameter Searchers](./backlog_llmlops_regresion.md) : Define functionalities for finding the best hyperparameters for a model.
 
 - [US Hyperparameter Searchers : Define functionalities for finding the best hyperparameters for a model.](#us-hyperparameter-searchers--define-functionalities-for-finding-the-best-hyperparameters-for-a-model)
   - [classes relations](#classes-relations)
@@ -168,7 +168,7 @@ The searcher should return the best score and the corresponding hyperparameters 
 
 ## Code location
 
-[src/model_name/utils/searchers.py](../src/model_name/utils/searchers.py)
+[src/autogen_team/utils/searchers.py](../src/autogen_team/utils/searchers.py)
 
 ## Test location
 

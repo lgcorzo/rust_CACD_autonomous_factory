@@ -1,4 +1,5 @@
-# US [Model Inference Job](./backlog_mlops_regresion.md) : Define a job for generating batch predictions from a registered model.
+# US [Model Inference Job](./backlog_llmlops_regresion.md) : Define a job for generating batch predictions from a registered model.
+
 
 - [US Model Inference Job : Define a job for generating batch predictions from a registered model.](#us-model-inference-job--define-a-job-for-generating-batch-predictions-from-a-registered-model)
   - [classes relations](#classes-relations)
@@ -38,6 +39,7 @@ classDiagram
     class AlertsService {
         +start() : None
         +stop() : None
+        +notify(title, message) : None
     }
 
     class MlflowService {
@@ -83,27 +85,28 @@ classDiagram
 
 ### **1. User Story: Configure Inference Job**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to configure an inference job that specifies the necessary parameters for generating predictions, so that batch predictions can be effectively processed.
 
-**Description:**  
+**Description:**
 The `InferenceJob` class enables the setup of the job with parameters such as input data readers, output data writers, model details, and the loader for accessing the model.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The job is initialized with the necessary parameters.
 - Default values are properly handled for optional fields.
+- Has  `KIND` attribute  defined for the class.
 
 ---
 
 ### **2. User Story: Read Input Data**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to read input data from specified sources, so that the model can generate predictions based on these inputs.
 
-**Description:**  
+**Description:**
 In the `run` method, the input data is read using the designated data reader, which ensures data integrity and prepares it for prediction.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The job successfully reads input data using the configured reader.
 - Input data is validated and conforms to the expected schema.
 
@@ -111,41 +114,42 @@ In the `run` method, the input data is read using the designated data reader, wh
 
 ### **3. User Story: Load the Model**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to load the registered model from the model registry, so that I can use it to generate predictions on the input data.
 
-**Description:**  
+**Description:**
 The job uses the configured loader to access the specified version or alias of the model from the registry.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The model is loaded correctly from the registry using the provided loader.
-- The model instance must be ready for making predictions.
+- The model client has a valid URI.
 
 ---
 
 ### **4. User Story: Generate Predictions**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to generate predictions using the loaded model and the input data, so that I can evaluate the model's performance on new data points.
 
-**Description:**  
+**Description:**
 The job leverages the model's predict method to produce output predictions based on the input data.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - Predictions are generated using the loaded model and validated input data.
 - The output of the predictions is in a usable format for further processing.
+- Can check the number of generated outputs.
 
 ---
 
 ### **5. User Story: Write Predictions to Data Output**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to write the generated predictions to a specified data output, so that results can be stored and retrieved later.
 
-**Description:**  
+**Description:**
 The job takes the prediction outputs and writes them to the designated storage using the configured writer.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The predictions are successfully written to the specified output using the writer.
 - The method of storage should ensure data integrity.
 
@@ -153,13 +157,13 @@ The job takes the prediction outputs and writes them to the designated storage u
 
 ### **6. User Story: Notify Completion of Inference**
 
-**Title:**  
+**Title:**
 As a **user**, I want to be notified when the inference job is finished, along with the shape of the output data, so that I can review the results promptly.
 
-**Description:**  
+**Description:**
 At the end of the job execution, notifications are sent to relevant stakeholders summarizing the outcome, including predictions shape.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - Notifications include job completion details, specifically the shape of the outputs.
 - The alerts service successfully informs users about job completion status.
 
@@ -169,7 +173,7 @@ At the end of the job execution, notifications are sent to relevant stakeholders
 
 1. **Implementation Requirements:**
    - The `InferenceJob` class correctly implements the abstract `run` method from the base `Job` class.
-   - All necessary services (logging, model registry, alerts) are initialized at the start of the inference job.
+   - All necessary services (logging, MLflow, alerts) are initialized at the start of the inference job.
 
 2. **Error Handling:**
    - Clear error messages are logged for any issues encountered during the reading, loading, or writing processes.
@@ -184,7 +188,7 @@ At the end of the job execution, notifications are sent to relevant stakeholders
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
 - The `InferenceJob` class is fully implemented and tests pass all acceptance criteria.
 - The functionality includes reading inputs, loading models, generating predictions, writing outputs, and notifying users.
@@ -192,7 +196,7 @@ At the end of the job execution, notifications are sent to relevant stakeholders
 
 ## Code location
 
-[src/model_name/jobs/inference.py](../src/model_name/jobs/inference.py)
+[src/autogen_team/jobs/inference.py](../src/autogen_team/jobs/inference.py)
 
 ## Test location
 

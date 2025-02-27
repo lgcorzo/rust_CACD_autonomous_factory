@@ -1,4 +1,4 @@
-# US [Model Signature Generation](./backlog_mlops_regresion.md) : Generate signatures for AI/ML models.
+# US [Model Signature Generation](./backlog_llmlops_regresion.md) : Generate signatures for AI/ML models.
 
 - [US Model Signature Generation : Generate signatures for AI/ML models.](#us-model-signature-generation--generate-signatures-for-aiml-models)
   - [classes relations](#classes-relations)
@@ -129,7 +129,7 @@ The `InferSigner` class provides functionality that leverages the MLflow library
 
 ## Code location
 
-[src/model_name/utils/signers.py](../src/model_name/utils/signers.py)
+[src/autogen_team/utils/signers.py](../src/autogen_team/utils/signers.py)
 
 ## Test location
 

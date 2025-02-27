@@ -1,21 +1,21 @@
-# US [Model Performance Evaluation](./backlog_mlops_performance.md) : Evaluate model performances using various metrics and thresholds.
+# US [Model Performance Evaluation](./backlog_llmlops_performance.md) : Evaluate model performances using various metrics and thresholds.
+
 
 - [US Model Performance Evaluation : Evaluate model performances using various metrics and thresholds.](#us-model-performance-evaluation--evaluate-model-performances-using-various-metrics-and-thresholds)
   - [classes relations](#classes-relations)
-  - [**User Stories: Metric Evaluation**](#user-stories-metric-evaluation)
-    - [**1. User Story: Evaluate Model Performance Using Metrics**](#1-user-story-evaluate-model-performance-using-metrics)
-    - [**2. User Story: Convert Metrics to MLflow Format**](#2-user-story-convert-metrics-to-mlflow-format)
+  - [**User Stories: Model Evaluation**](#user-stories-model-evaluation)
+    - [**1. User Story: Standardize Metric Definition**](#1-user-story-standardize-metric-definition)
+    - [**2. User Story: Evaluate Model Performance with Base Metrics**](#2-user-story-evaluate-model-performance-with-base-metrics)
+    - [**3. User Story: Evaluate Autogen Specific Metrics**](#3-user-story-evaluate-autogen-specific-metrics)
+    - [**4. User Story: Exact Match Evaluation**](#4-user-story-exact-match-evaluation)
+    - [**5. User Story: Similarity Score Evaluation**](#5-user-story-similarity-score-evaluation)
+    - [**6. User Story: Length Ratio Evaluation**](#6-user-story-length-ratio-evaluation)
+    - [**7. User Story: Evaluate Conversation Quality**](#7-user-story-evaluate-conversation-quality)
+    - [**8. User Story: Define Performance Thresholds**](#8-user-story-define-performance-thresholds)
+    - [**9. User Story: Convert Threshold to MLflow Format**](#9-user-story-convert-threshold-to-mlflow-format)
+    - [**10. User Story: Integrate Metrics with MLflow**](#10-user-story-integrate-metrics-with-mlflow)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria)
     - [**Definition of Done (DoD):**](#definition-of-done-dod)
-  - [**User Stories: Autogen Metric Implementation**](#user-stories-autogen-metric-implementation)
-    - [**1. User Story: Evaluate Text-Based Responses**](#1-user-story-evaluate-text-based-responses)
-    - [**2. User Story: Calculate Similarity Score for Responses**](#2-user-story-calculate-similarity-score-for-responses)
-    - [**Common Acceptance Criteria**](#common-acceptance-criteria-1)
-    - [**Definition of Done (DoD):**](#definition-of-done-dod-1)
-  - [**User Stories: Conversation Metrics Implementation**](#user-stories-conversation-metrics-implementation)
-    - [**1. User Story: Assess Conversation Quality**](#1-user-story-assess-conversation-quality)
-    - [**Common Acceptance Criteria**](#common-acceptance-criteria-2)
-    - [**Definition of Done (DoD):**](#definition-of-done-dod-2)
   - [Code location](#code-location)
   - [Test location](#test-location)
 
@@ -25,207 +25,223 @@
 
 ```mermaid
 classDiagram
-    %% Base Class: Metric
     class Metric {
         <<abstract>>
         +KIND: str
         +name: str
         +greater_is_better: bool
-        +score(targets: schemas.Targets, outputs: schemas.Outputs): float
-        +scorer(model: models.Model, inputs: schemas.Inputs, targets: schemas.Targets): float
-        +to_mlflow(): MlflowMetric
+        +score(targets: pd.DataFrame, outputs: pd.DataFrame) : float
+        +scorer(model: Model, inputs: Inputs, targets: DataFrame) : float
+        +to_mlflow() : MlflowMetric
     }
-    Metric ..> pdt.BaseModel : "inherits"
 
-    %% AutogenMetric Class
     class AutogenMetric {
-        +KIND: T.Literal["AutogenMetric"]
-        +metric_type: T.Literal["exact_match", "similarity", "length_ratio"]
+        +KIND: Literal["AutogenMetric"]
+        +metric_type: Literal["exact_match", "similarity", "length_ratio"]
         +similarity_threshold: Optional[float]
-        +score(targets: schemas.Targets, outputs: schemas.Outputs): float
+        +score(targets: DataFrame, outputs: DataFrame) : float
+        -_exact_match_score(y_true: Series, y_pred: Series) : float
+        -_similarity_score(y_true: Series, y_pred: Series) : float
+        -_length_ratio(y_true: Series, y_pred: Series) : float
     }
-    Metric <|-- AutogenMetric : "specializes"
 
-    %% AutogenConversationMetric Class
     class AutogenConversationMetric {
-        +KIND: T.Literal["AutogenConversationMetric"]
+        +KIND: Literal["AutogenConversationMetric"]
         +check_termination: bool
         +check_error_messages: bool
-        +score(targets: schemas.Targets, outputs: schemas.Outputs): float
+        +score(targets: DataFrame, outputs: DataFrame) : float
     }
-    Metric <|-- AutogenConversationMetric : "specializes"
 
-    %% Base Class: Threshold
     class Threshold {
-        <<abstract>>
         +threshold: int | float
         +greater_is_better: bool
-        +to_mlflow(): MlflowThreshold
+        +to_mlflow() : MlflowThreshold
     }
-    Threshold ..> pdt.BaseModel : "inherits"
 
-    %% Relationships
-    Metric ..> schemas.Targets : "uses"
-    Metric ..> schemas.Outputs : "uses"
-    AutogenMetric ..> pd.Series : "uses"
-    AutogenConversationMetric ..> pd.Series : "uses"
+    Metric <|-- AutogenMetric
+    Metric <|-- AutogenConversationMetric
+    Metric "1" *-- "1" Threshold : has >
 ```
 
-## **User Stories: Metric Evaluation**
+## **User Stories: Model Evaluation**
 
 ---
 
-### **1. User Story: Evaluate Model Performance Using Metrics**
+### **1. User Story: Standardize Metric Definition**
 
-**Title:**  
-As a **data analyst**, I want to evaluate the performance of machine learning models using various metrics to determine their effectiveness.
+**Title:**
+As a **data scientist**, I want a **base `Metric` class** that defines a standardized interface for evaluating model performance, so that I can easily create and use different metrics across my projects.
 
-**Description:**  
-The `Metric` base class provides a standardized way to implement various performance evaluation metrics (e.g., accuracy, recall). This system allows for accurate model performance assessment.
+**Description:**
+The `Metric` class establishes a consistent structure for defining and calculating evaluation metrics. This standardization allows for easier integration of new metrics and promotes reusability across different models and datasets.
 
-**Acceptance Criteria:**  
-- The `score` method calculates the performance score based on targets and outputs.
-- The system supports various metrics such as accuracy, precision, etc.
-- Implementations must override the `score` method to provide specific scoring logic.
+**Acceptance Criteria:**
+- The `Metric` class must be an abstract base class (`abc.ABC`).
+- The `KIND` attribute should identify the specific type of metric.
+- The class includes `name` (string) and `greater_is_better` (boolean) attributes.
+- The `score` method is abstract and must be implemented by subclasses.
+- The `scorer` method calculates the metric given a model, inputs, and targets.
+- The `to_mlflow` method converts the metric to a format compatible with MLflow.
 
 ---
 
-### **2. User Story: Convert Metrics to MLflow Format**
+### **2. User Story: Evaluate Model Performance with Base Metrics**
 
-**Title:**  
-As a **machine learning engineer**, I want to convert model evaluation metrics to an MLflow-compatible format to facilitate tracking and visualization of performance metrics.
+**Title:**
+As a **data scientist**, I want to evaluate model performance using base metrics like F1 score and accuracy through a unified method, so that I can consistently assess the model’s effectiveness.
 
-**Description:**  
-The `to_mlflow` method in `Metric` allows for the automatic conversion of scoring results into a format compatible with MLflow, enabling easier integration into the MLflow tracking system.
+**Description:**
+The `Metric` base class defines an abstract method called `score` that child classes need to implement.
 
-**Acceptance Criteria:**  
-- The `to_mlflow` method must return a valid MLflow metric.
-- The conversion should correctly indicate whether higher metric values are better or worse, based on the `greater_is_better` attribute.
+**Acceptance Criteria:**
+- Be able to call `score` method on every metric object.
+- Return an float that represent the score.
+
+---
+
+### **3. User Story: Evaluate Autogen Specific Metrics**
+
+**Title:**
+As a **data scientist**, I want to evaluate performance using Autogen-specific metrics, including exact match, similarity, and length ratio, so that I can evaluate text based responses .
+
+**Description:**
+The `AutogenMetric` class enables calculating metrics specific to text generation models. It handles response comparison based on exact match, similarity, or length ratio.
+
+**Acceptance Criteria:**
+- Should return a similarity score.
+- Should return length ratio.
+- Should return a exact match score.
+
+---
+
+### **4. User Story: Exact Match Evaluation**
+
+**Title:**
+As a **data scientist**, I want a metric that evaluates the exact correspondence of textual outputs, so that I can quickly determine perfect matches for text-based responses.
+
+**Description:**
+The `_exact_match_score` function inside `AutogenMetric` provides a method for scoring exact matches between target and output texts.
+
+**Acceptance Criteria:**
+- Returns 1.0 when the output text exactly matches the target text.
+- Returns 0.0 when there is any difference between the texts.
+
+---
+
+### **5. User Story: Similarity Score Evaluation**
+
+**Title:**
+As a **data scientist**, I want a metric that evaluates the similarity between the generated output and target responses.
+
+**Description:**
+The `_similarity_score` function calculates a similarity score between the generated output and the target using `SequenceMatcher`.
+
+**Acceptance Criteria:**
+- Should return the mean value.
+- Values should be calculated between the text strings.
+
+---
+
+### **6. User Story: Length Ratio Evaluation**
+
+**Title:**
+As a **data scientist**, I want a metric that evaluates the appropriateness of response length for text, so that I can penalize too short or too verbose answers.
+
+**Description:**
+The `_length_ratio` function calculates the ratio between the length of the predicted and target responses.
+
+**Acceptance Criteria:**
+- Should return the realation between the strings.
+
+---
+
+### **7. User Story: Evaluate Conversation Quality**
+
+**Title:**
+As a **data scientist**, I want to evaluate the quality of conversations to measure how effective the flow went .
+
+**Description:**
+The `AutogenConversationMetric` class allows for checking if a conversation reached a termination and if any error messages occurred during the process.
+
+**Acceptance Criteria:**
+- Must check the terination is reached and the check termination is True.
+- Must check has messages and the check messages is True.
+
+---
+
+### **8. User Story: Define Performance Thresholds**
+
+**Title:**
+As a **machine learning engineer**, I want to define performance thresholds for metrics so that I can receive alerts when model performance falls outside acceptable limits.
+
+**Description:**
+The `Threshold` class is used to define threshold values and to ensure that if is greather or lower of them.
+
+**Acceptance Criteria:**
+- Class have to return value greather than the threshold when `greather_is_better` property is `True`
+- Class have to return value lower than the threshold when `greather_is_better` property is `False`
+
+---
+
+### **9. User Story: Convert Threshold to MLflow Format**
+
+**Title:**
+As a **machine learning platform engineer**, I want to be able to convert defined threshold to MLFlow format so that monitoring and alerting functions can understand them.
+
+**Description:**
+The to_mlflow method converts the threshold to an MLflow-compatible format.
+
+**Acceptance Criteria:**
+- It must be an object of type `MlflowThreshold`
+- The `threshold` has to be the same as the source `threshold`
+- The `greater_is_better` property has to be the same as the source.
+
+---
+
+### **10. User Story: Integrate Metrics with MLflow**
+
+**Title:**
+As a **MLOps Engineer**, I want to enable integration with MLflow, so that all metrics are logged automatically.
+
+**Description:**
+Each metric has a to_mlflow method and allow integration with MLFlow objects.
+
+**Acceptance Criteria:**
+- Check that the to_mlflow method exists.
+- Check that all attributes are passed to MLFlow properly.
 
 ---
 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
-   - The `Metric` class is abstract and cannot be instantiated directly.
-   - Subclasses must implement the `score` method.
+   - All classes are correctly implemented with required abstract methods overridden.
+   - Proper inheritance is used to share functionality and maintain consistency.
+   - Pydantic is used for validation of class attributes.
 
 2. **Error Handling:**
-   - If the `score` method is not implemented in a subclass, an appropriate error is raised.
+   - Custom exceptions are raised for specific issues, like unsupported metric types or invalid input data.
 
 3. **Testing:**
-   - Unit tests validate correct metric calculations and conversions to MLflow metrics.
+   - Implement unit tests to validate correct metrics calculations and handling of edge cases.
+   - Create integration tests to check interaction with MLflow.
 
 4. **Documentation:**
-   - Clear documentation is provided for the `score` and `to_mlflow` methods, including examples.
+   - Detailed documentation is provided for each class and method, including examples.
+   - Include links to relevant external resources like the MLflow documentation.
 
 ---
 
 ### **Definition of Done (DoD):**
 
-- The `Metric` class and associated methods are fully implemented, documented, and tested.
-- The conversion method successfully produces the correct format for MLflow.
-- Code passes peer review with adherence to established coding standards.
-
-## **User Stories: Autogen Metric Implementation**
-
----
-
-### **1. User Story: Evaluate Text-Based Responses**
-
-**Title:**  
-As a **data scientist**, I want to evaluate the text responses generated by the model using an autogen metric to ensure the quality of the model's output.
-
-**Description:**  
-The `AutogenMetric` class allows for scoring text-based outputs using different evaluation types (exact match, similarity). This enables a quantitative approach for assessing how well the model generates desired responses.
-
-**Acceptance Criteria:**  
-- The `score` method can compute scores for exact matches, similarity, or length ratios.
-- The metric type must be set correctly before scoring.
-
----
-
-### **2. User Story: Calculate Similarity Score for Responses**
-
-**Title:**  
-As a **data engineer**, I want to calculate the similarity between generated and target text responses to understand how closely the outputs resemble the expected results.
-
-**Description:**  
-The `similarity` metric type within `AutogenMetric` utilizes a scoring mechanism based on the SequenceMatcher to gauge text similarity.
-
-**Acceptance Criteria:**  
-- The similarity score calculation must use the `SequenceMatcher` class.
-- Responses must be processed as strings prior to scoring.
-
----
-
-### **Common Acceptance Criteria**
-
-1. **Implementation Requirements:**
-   - The `AutogenMetric` class properly inherits from the `Metric` class.
-   - All metrics are clearly defined with appropriate parameters.
-
-2. **Error Handling:**
-   - The implementation must handle unknown metric types gracefully.
-
-3. **Testing:**
-   - Unit tests cover various input scenarios for text-based scoring.
-
-4. **Documentation:**
-   - Each method contains clear docstrings explaining the logic and expected input/output.
-
----
-
-### **Definition of Done (DoD):**
-
-- The `AutogenMetric` class is implemented with valid scoring methods.
-- Code and unit tests pass, demonstrating correct functionality for various inputs.
-- Documentation and examples are clear for end users.
-
-## **User Stories: Conversation Metrics Implementation**
-
----
-
-### **1. User Story: Assess Conversation Quality**
-
-**Title:**  
-As a **machine learning specialist**, I want to evaluate the quality of conversations produced by the model to ensure satisfactory interactions.
-
-**Description:**  
-The `AutogenConversationMetric` class enables assessment of conversation quality based on specified conditions, such as termination and the presence of errors.
-
-**Acceptance Criteria:**  
-- The `score` method must check both termination status and error messages.
-- The metrics should provide a score representing the conversation quality.
-
----
-
-### **Common Acceptance Criteria**
-
-1. **Implementation Requirements:**
-   - The `AutogenConversationMetric` class must accurately inherit from `Metric`.
-   - Attributes for checking termination and error messages need to be implemented.
-
-2. **Error Handling:**
-   - Robust handling of any missing or malformed metadata.
-
-3. **Testing:**
-   - Unit tests validate scoring under different conversation circumstances.
-
-4. **Documentation:**
-   - Document all public methods and important parameters.
-
----
-
-### **Definition of Done (DoD):**
-
-- The `AutogenConversationMetric` is fully implemented and tested.
-- Scoring based on quality metrics is verified.
-- Documentation is available and easy to follow for usage and understanding.
+- All user stories are implemented and verified.
+- Unit tests provide a high level of code coverage.
+- Documentation is comprehensive and provides clear usage instructions.
+- The code adheres to established coding standards and passes all CI/CD checks.
 
 ## Code location
 
-[src/model_name/core/metrics.py](../src/model_name/core/metrics.py)
+[src/autogen_team/core/metrics.py](../src/autogen_team/core/metrics.py)
 
 ## Test location
 

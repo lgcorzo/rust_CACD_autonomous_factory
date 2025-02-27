@@ -1,4 +1,4 @@
-# US [Data Splitting Functionality](./backlog_mlops_regresion.md) : Split dataframes into subsets for model training and evaluation.
+# US [Data Splitting Functionality](./backlog_llmlops_regresion.md) : Split dataframes into subsets for model training and evaluation.
 
 - [US Data Splitting Functionality : Split dataframes into subsets for model training and evaluation.](#us-data-splitting-functionality--split-dataframes-into-subsets-for-model-training-and-evaluation)
   - [classes relations](#classes-relations)
@@ -173,7 +173,7 @@ Both the `TrainTestSplitter` and `TimeSeriesSplitter` should provide the number 
 
 ## Code location
 
-[src/model_name/utils/splitters.py](../src/model_name/utils/splitters.py)
+[src/autogen_team/utils/splitters.py](../src/autogen_team/utils/splitters.py)
 
 ## Test location
 

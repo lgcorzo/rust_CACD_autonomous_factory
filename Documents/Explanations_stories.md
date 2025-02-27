@@ -1,4 +1,5 @@
-# US [Model Explanations Job](./backlog_mlops_regresion.md) : Define a job for explaining the model structure and decisions.
+# US [Model Explanations Job](./backlog_llmlops_regresion.md) : Define a job for explaining the model structure and decisions.
+
 
 - [US Model Explanations Job : Define a job for explaining the model structure and decisions.](#us-model-explanations-job--define-a-job-for-explaining-the-model-structure-and-decisions)
   - [classes relations](#classes-relations)
@@ -40,6 +41,7 @@ classDiagram
     class AlertsService {
         +start() : None
         +stop() : None
+        +notify(title, message) : None
     }
 
     class MlflowService {
@@ -86,130 +88,127 @@ classDiagram
 
 ### **1. User Story: Configure Explanations Job**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to configure an explanations job that includes all the necessary parameters, so that I can generate insights into the model's decisions.
 
-**Description:**  
+**Description:**
 The `ExplanationsJob` class allows for setting up parameters such as input sample data readers, explanation writers, model references, and a loader for accessing the model from the registry.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The explanations job is initialized with required parameters.
+- The parameters for readers and writers use the `KIND` discriminator.
 - Default values are correctly handled for optional parameters.
 
 ---
 
 ### **2. User Story: Read Input Samples**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to read input samples from specified sources, so that I can utilize them for generating explanations from the model.
 
-**Description:**  
-In the `run` method, input samples are read using the configured data reader, ensuring that the data is checked for validity against predefined schemas.
+**Description:**
+In the `run` method, input samples are read using the configured data reader, ensuring that the data is prepared for explanation generation.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The job successfully reads input samples from the designated reader.
-- Input data is validated and checked for integrity before further processing.
+- Input data is validated using `schemas.InputsSchema.check`.
 
 ---
 
 ### **3. User Story: Load the Model**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to load the registered model using a loader, so that I can generate explanations based on its structure and decisions.
 
-**Description:**  
-The job utilizes the specified loader to load the appropriate version or alias of the model from the model registry for evaluation.
+**Description:**
+The job utilizes the specified loader to access the designated version/alias from the model registry, so that it can create the explanations.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The model is correctly loaded from the registry using the configured loader.
-- The model instance must be valid and ready for explanation generation.
+- The model has to use an alias or version name.
 
 ---
 
 ### **4. User Story: Generate Model Explanations**
 
-**Title:**  
-As a **data scientist**, I want to generate explanations for the model's structure and decisions, so that I can understand how predictions are made.
+**Title:**
+As a **data scientist**, I want to generate explanations for the model's structure and decisions, so that I can understand its functionament.
 
-**Description:**  
-The job calls the model's explanation generation methods to retrieve insights about its architecture and decision-making processes.
+**Description:**
+The `explain_model` method retrieves explanation from the model object.
 
-**Acceptance Criteria:**  
-- The model successfully generates structured explanations about its internal operations.
-- The explanations are in a format that captures the necessary details for future analysis.
+**Acceptance Criteria:**
+- The model can creates the explanations.
 
 ---
 
 ### **5. User Story: Generate Sample Explanations**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to generate explanations for specific input samples, so that I can interpret individual predictions made by the model.
 
-**Description:**  
+**Description:**
 Sample explanations are generated based on the provided input samples, aiding in understanding how the model processes and predicts data.
 
-**Acceptance Criteria:**  
-- The job should effectively generate explanations for each input sample.
-- Sample explanations should correlate appropriately with their respective input samples.
+**Acceptance Criteria:**
+- The generated Explanations has the propper shape.
 
 ---
 
 ### **6. User Story: Write Explanations to Data Sources**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to write the generated model and sample explanations to specified data outputs, so that I can store and retrieve them for later analysis.
 
-**Description:**  
+**Description:**
 The explanations generated for both the model and the input samples are saved to designated storage locations using the configured writers.
 
-**Acceptance Criteria:**  
-- Model explanations are successfully written to the specified outputs.
-- Sample explanations are stored correctly, ensuring data persistence for future reference.
+**Acceptance Criteria:**
+- The generated models are saved.
+- The generated samples are saved.
 
 ---
 
 ### **7. User Story: Notify Completion of Explanations**
 
-**Title:**  
+**Title:**
 As a **user**, I want to be notified once the explanation job is completed, so that I can review the outcome and any generated insights.
 
-**Description:**  
+**Description:**
 At the end of the job execution, notifications are sent to relevant stakeholders summarizing the particulars of the job completion.
 
-**Acceptance Criteria:**  
-- Notifications include details regarding the completed job and key metrics from the explanations.
-- The alerts service is correctly utilized to inform users about job completion.
+**Acceptance Criteria:**
+- The correct information has to be in the message.
 
 ---
 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
-   - The `ExplanationsJob` class overrides the `run` method defined in the base `Job` class.
-   - All services (logging, model registry, alerts) are properly initialized.
+   - The `ExplanationsJob` class correctly implements the abstract `run` method from the base `Job` class.
+   - All services (logging, model registry, alerts) are initialized at the start of the explanation job.
 
 2. **Error Handling:**
-   - Any failures during reading, loading, or writing processes must be logged with clear error messages.
+   - Clear error messages are logged for any issues encountered during the reading, loading, or writing processes.
 
 3. **Testing:**
-   - Unit tests validate the job’s configuration, data processing, model loading, and explanation writing correctly.
-   - Tests ensure proper error handling scenarios are also accounted for.
+   - The job has to pass all validation checks.
 
 4. **Documentation:**
-   - Comprehensive docstrings and examples are provided for clarity.
-   - Users should have sufficient guidance on configuring and utilizing the explanations job.
+   - Each class and method has to have clear docstrings and be easy to understand.
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
-- The `ExplanationsJob` class is fully implemented according to the outlined requirements.
-- All functionalities are tested and verified against the acceptance criteria.
-- Documentation is complete, making it easy for users to understand and use the job.
+- The `ExplanationsJob` class is fully implemented.
+- All functionalities have been tested and meets the acceptance criteria.
+- All checks has to pass.
+- The documentation has to be complete.
 
 ## Code location
 
-[src/model_name/jobs/explanations.py](../src/model_name/jobs/explanations.py)
+[src/autogen_team/jobs/explanations.py](../src/autogen_team/jobs/explanations.py)
 
 ## Test location
 
