@@ -46,6 +46,7 @@ autogen-ext = {extras = ["azure", "graphrag", "openai"], version = "^0.4.3"}
 litellm = "^1.60.8"
 transformers = "^4.48.3"
 pytest-asyncio = "^0.25.3"
+textstat = "^0.7.5"
 
 
 [tool.poetry.group.checks.dependencies]
