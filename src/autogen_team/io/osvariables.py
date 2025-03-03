@@ -21,3 +21,4 @@ class Env(Singleton, BaseSettings):
         case_sensitive = False  # Optional: make env var lookup case-insensitive
         env_file = ".env"  # Enable reading from .env file
         env_file_encoding = "utf-8"
+        extra = "allow"
