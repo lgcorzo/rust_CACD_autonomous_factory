@@ -179,6 +179,14 @@ It's up to you to adapt the package code to the solution you target. Good luck c
 
 This section explains how configure the project code and execute it on your system.
 
+to run the ui for autogen the command is;
+
+``` bash
+autogenstudio ui --port 8090
+```
+
+![1740767154031](image/README/1740767154031.png)
+
 ## Configuration
 
 You can add or edit config files in the `confs/` folder to change the program behavior.
