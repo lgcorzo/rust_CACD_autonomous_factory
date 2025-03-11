@@ -26,6 +26,7 @@ from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExport
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
+from opentelemetry.sdk.resources import Resource
 from autogen_team.io.osvariables import Env
 
 
@@ -82,13 +83,19 @@ class LoggerService(Service):
     catch: bool = True
 
     def start(self) -> None:
-        tracer_provider = TracerProvider()
+        # Define the service name
+        service_name = "Autogen Team"
+        # Define the resource with service.name
+        resource = Resource.create({"service.name": service_name})
+        # Tracing setup
+        tracer_provider = TracerProvider(resource=resource)
+
         trace.set_tracer_provider(tracer_provider)
         otlp_trace_exporter = OTLPSpanExporter()
         tracer_provider.add_span_processor(BatchSpanProcessor(otlp_trace_exporter))
 
         # Logging setup
-        logger_provider = LoggerProvider()
+        logger_provider = LoggerProvider(resource=resource)
         set_logger_provider(logger_provider)
         otlp_log_exporter = OTLPLogExporter()
         logger_provider.add_log_record_processor(BatchLogRecordProcessor(otlp_log_exporter))
@@ -99,7 +106,7 @@ class LoggerService(Service):
 
         # Root logger configuration
         logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-        logger = logging.getLogger("regression_model")
+        logger = logging.getLogger(service_name)
         logger.info("Logging started")
         loguru.logger.remove()
         config = self.model_dump()
