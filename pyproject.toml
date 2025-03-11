@@ -50,6 +50,9 @@ textstat = "^0.7.5"
 autogenstudio = "^0.4.1.11"
 mlserver = "^1.6.1"
 mlserver-mlflow = "^1.6.1"
+opentelemetry-instrumentation = "^0.51b0"
+opentelemetry-exporter-otlp-proto-http = "^1.30.0"
+opentelemetry-exporter-otlp = "^1.30.0"
 
 
 [tool.poetry.group.checks.dependencies]
