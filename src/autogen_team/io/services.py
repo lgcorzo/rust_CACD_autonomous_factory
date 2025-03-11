@@ -10,14 +10,29 @@ import sys
 import typing as T
 from typing import ClassVar
 import loguru
+import logging
 import mlflow
 import mlflow.tracking as mt
 import pydantic as pdt
-from plyer import notification
 
+from plyer import notification
+from opentelemetry import trace
+from opentelemetry._logs import set_logger_provider
+
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+
+from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
+from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 from autogen_team.io.osvariables import Env
 
+
 # %% SERVICES
+class PropagateHandler(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        logging.getLogger(record.name).handle(record)
 
 
 class Service(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
@@ -67,12 +82,32 @@ class LoggerService(Service):
     catch: bool = True
 
     def start(self) -> None:
+        tracer_provider = TracerProvider()
+        trace.set_tracer_provider(tracer_provider)
+        otlp_trace_exporter = OTLPSpanExporter()
+        tracer_provider.add_span_processor(BatchSpanProcessor(otlp_trace_exporter))
+
+        # Logging setup
+        logger_provider = LoggerProvider()
+        set_logger_provider(logger_provider)
+        otlp_log_exporter = OTLPLogExporter()
+        logger_provider.add_log_record_processor(BatchLogRecordProcessor(otlp_log_exporter))
+
+        # Attach OpenTelemetry handler to Python's logging
+        otel_handler = LoggingHandler(level=logging.INFO, logger_provider=logger_provider)
+        logging.getLogger().addHandler(otel_handler)
+
+        # Root logger configuration
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+        logger = logging.getLogger("regression_model")
+        logger.info("Logging started")
         loguru.logger.remove()
         config = self.model_dump()
         # use standard sinks or keep the original
         sinks = {"stderr": sys.stderr, "stdout": sys.stdout}
         config["sink"] = sinks.get(config["sink"], config["sink"])
         loguru.logger.add(**config)
+        loguru.logger.add(PropagateHandler(), format="{message}")
 
     def logger(self) -> loguru.Logger:
         """Return the main logger.
