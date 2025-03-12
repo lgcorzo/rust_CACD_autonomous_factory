@@ -5485,6 +5485,30 @@ mlflow = "*"
 mlserver = "*"
 
 [[package]]
+name = "mocogpt"
+version = "0.1.0"
+description = "Moco GPT is stub GPT server which allows you build and test your LLM application locally."
+optional = false
+python-versions = ">=3.10,<3.13"
+files = []
+develop = false
+
+[package.dependencies]
+aiohttp = "^3.9.5"
+click = {version = "^8.1.7", extras = ["cli"]}
+loguru = {version = "^0.7.2", extras = ["cli"]}
+tiktoken = "^0.8.0"
+
+[package.extras]
+cli = ["click[cli] (>=8.1.7,<9.0.0)", "loguru[cli] (>=0.7.2,<0.8.0)"]
+
+[package.source]
+type = "git"
+url = "https://github.com/lgcorzo/mocogpt.git"
+reference = "HEAD"
+resolved_reference = "b350df7306240bfde150554df0d6a8a8b5cd831e"
+
+[[package]]
 name = "msal"
 version = "1.31.1"
 description = "The Microsoft Authentication Library (MSAL) for Python library enables your app to access the Microsoft Cloud by supporting authentication of users with Microsoft Azure Active Directory accounts (AAD) and Microsoft Accounts (MSA) using industry standard OAuth2 and OpenID Connect."
@@ -10840,4 +10864,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "0cc0aee6b9be60028c64817c441d16e9520bea5ce4eca49f234fcc163a4e9c34"
+content-hash = "db7cfebd365685098b37631b3ea35ec38a9a39a7defbd9513c1c71f1d294ab06"
