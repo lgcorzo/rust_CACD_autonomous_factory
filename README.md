@@ -254,7 +254,7 @@ poetry build
 poetry publish # optional
 python -m pip install [package]
 [package] confs/inference.yaml
-
+## added mocogpt for integration test
 poetry add --group checks "mocogpt[cli]@git+https://github.com/lgcorzo/mocogpt.git"
 ```
 
