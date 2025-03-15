@@ -65,6 +65,7 @@ pytest-xdist = "^3.6.1"
 pandera = { extras = ["mypy"], version = "^0.20.1" }
 ruff = "^0.5.0"
 pytest-mock = "^3.14.0"
+mocogpt = {git = "https://github.com/lgcorzo/mocogpt.git", extras = ["cli"]}
 
 [tool.poetry.group.commits.dependencies]
 commitizen = "^3.27.0"

@@ -188,11 +188,20 @@ class BaselineAutogenModel(Model):
         return self
 
     async def _rungroupchat(self, content: str) -> CreateResult:
-        if self.model_client is None:
-            raise ValueError("Model client is not initialized.")
-        response: CreateResult = await self.model_client.create(
-            [UserMessage(content=content, source="user")]
-        )
+        """Executes a group chat request using the model client."""
+        if not self.model_client:
+            raise RuntimeError("Model client is not initialized.")
+
+        try:
+            response: CreateResult = await self.model_client.create(
+                [UserMessage(content=content, source="user")]
+            )
+
+        except Exception as e:
+            response = CreateResult(
+                content=f"Error: {e}", call_id="", finish_reason="error", usage={}, cached=False
+            )
+
         return response
 
     def predict(self, inputs: schemas.Inputs) -> schemas.Outputs:
@@ -205,7 +214,7 @@ class BaselineAutogenModel(Model):
 
         # Iterate over each input element
         for row in inputs.itertuples(index=False):
-            response = asyncio.run(self._rungroupchat(str(row.input)))
+            response: CreateResult = asyncio.run(self._rungroupchat(str(row.input)))
 
             if response:  # Check if response is not empty
                 results.append(

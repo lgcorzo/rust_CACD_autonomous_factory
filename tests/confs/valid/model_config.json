@@ -1,9 +1,9 @@
 {
     "provider": "openai_chat_completion_client", 
     "config": {
-        "model": "azure-gpt", 
-        "api_base": "http://localhost:4000/v1",  
-        "api_key": "sk-12345",
+        "model": "gpt-4", 
+        "api_base": "http://localhost:12306/v1",
+        "api_key": "sk-123456789",
         "temperature": 0.7,
         "max_tokens": 512
     }

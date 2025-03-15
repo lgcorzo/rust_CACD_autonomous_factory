@@ -5,6 +5,8 @@
 import os
 import typing as T
 from typing import cast, Any
+from openai import OpenAI
+from mocogpt import gpt_server, GptServer
 
 import omegaconf
 import pytest
@@ -134,9 +136,9 @@ def outputs_reader(
         model_config = {
             "provider": "openai_chat_completion_client",  # Use LiteLLM-compatible client
             "config": {
-                "model": "azure-gpt",  # LiteLLM model
-                "api_base": "http://localhost:4000/v1",  # LiteLLM Gateway URL
-                "api_key": "sk-12345",
+                "model": "gpt-4",  # LiteLLM model
+                "api_base": "http://localhost:12306/v1",  # LiteLLM Gateway URL
+                "api_key": "sk-123456789",
                 "temperature": 0.7,  # Optional
                 "max_tokens": 512,  # Optional
             },
@@ -256,9 +258,9 @@ def model(
     model_config = {
         "provider": "openai_chat_completion_client",  # Use LiteLLM-compatible client
         "config": {
-            "model": "azure-gpt",  # LiteLLM model
-            "api_base": "http://localhost:4000/v1",  # LiteLLM Gateway URL
-            "api_key": "sk-12345",
+            "model": "gpt-4",  # LiteLLM model
+            "api_base": "http://localhost:12306/v1",  # LiteLLM Gateway URL
+            "api_key": "sk-123456789",
             "temperature": 0.7,  # Optional
             "max_tokens": 512,  # Optional
         },
@@ -341,6 +343,26 @@ def mlflow_service(tmp_path: str) -> T.Generator[services.MlflowService, None, N
     service.start()
     yield service
     service.stop()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def chtgpt_service(targets: schemas.Targets, inputs_samples: schemas.Inputs) -> GptServer:
+    """Return and start the logger service."""
+    server = gpt_server(12306)
+    # Read the targets and configure the chat responses
+    for input_text, response_text in zip(inputs_samples.input, targets.response):
+        server.chat.completions.request(prompt=input_text).response(content=response_text)
+
+    server.chat.completions.request(prompt="Hola").response(content="Cómo puedo ayudarte?")
+    with server:
+        client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789")
+        response = client.chat.completions.create(
+            model="gpt-4", messages=[{"role": "user", "content": "Hola"}]
+        )
+
+        assert response.choices[0].message.content == "Cómo puedo ayudarte?"
+        yield server
+    del server
 
 
 # %% - Resolvers
