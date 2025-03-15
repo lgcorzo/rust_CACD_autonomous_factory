@@ -343,27 +343,25 @@ def mlflow_service(tmp_path: str) -> T.Generator[services.MlflowService, None, N
     service.start()
     yield service
     service.stop()
-    
-    
+
+
 @pytest.fixture(scope="session", autouse=True)
-def chtgpt_service(targets: schemas.Targets, inputs_samples:schemas.Inputs) -> GptServer:
+def chtgpt_service(targets: schemas.Targets, inputs_samples: schemas.Inputs) -> GptServer:
     """Return and start the logger service."""
     server = gpt_server(12306)
     # Read the targets and configure the chat responses
     for input_text, response_text in zip(inputs_samples.input, targets.response):
         server.chat.completions.request(prompt=input_text).response(content=response_text)
-        
+
     server.chat.completions.request(prompt="Hola").response(content="Cómo puedo ayudarte?")
     with server:
         client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789")
         response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": "Hola"}]
+            model="gpt-4", messages=[{"role": "user", "content": "Hola"}]
         )
 
         assert response.choices[0].message.content == "Cómo puedo ayudarte?"
         yield server
-
 
 
 # %% - Resolvers
