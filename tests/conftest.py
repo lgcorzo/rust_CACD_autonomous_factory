@@ -362,6 +362,7 @@ def chtgpt_service(targets: schemas.Targets, inputs_samples: schemas.Inputs) -> 
 
         assert response.choices[0].message.content == "Cómo puedo ayudarte?"
         yield server
+    del server
 
 
 # %% - Resolvers
