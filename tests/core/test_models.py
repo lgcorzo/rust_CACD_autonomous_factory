@@ -51,16 +51,14 @@ def test_predict(baseline_model: BaselineAutogenModel) -> None:
         MockModelrun.return_value = MagicMock(content="Result 1")
 
         # Execute the predict function (await is needed since predict must be async)
-        outputs = baseline_model.predict(inputs)
+        outputs_df: pd.DataFrame = baseline_model.predict(inputs)
 
         # Check the outputs
-        assert outputs is not None
-        assert "Result 1" in outputs["response"][0]
-
-        # Additional metadata validation (optional)
-        assert isinstance(outputs["metadata"][0], dict), "Metadata should be a dictionary"
-        assert "timestamp" in outputs["metadata"][0], "Metadata timestamp is missing"
-        assert "model_version" in outputs["metadata"][0], "Metadata model_version is missing"
+        assert outputs_df is not None
+        assert "Result 1" in outputs_df["response"][0]
+        assert isinstance(outputs_df["metadata"][0], dict), "Metadata should be a dictionary"
+        assert "timestamp" in outputs_df["metadata"][0], "Metadata timestamp is missing"
+        assert "model_version" in outputs_df["metadata"][0], "Metadata model_version is missing"
 
 
 def test_get_internal_model(baseline_model: BaselineAutogenModel) -> None:
