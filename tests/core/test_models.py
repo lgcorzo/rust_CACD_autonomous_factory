@@ -40,12 +40,7 @@ def test_set_params(baseline_model: BaselineAutogenModel) -> None:
     assert baseline_model.model_config_path == "Newpath"
 
 
-@pytest.fixture
-def async_response_stream() -> MagicMock:
-    return MagicMock(content="Result 1")
-
-
-def test_predict(baseline_model: BaselineAutogenModel, async_response_stream: MagicMock) -> None:
+def test_predict(baseline_model: BaselineAutogenModel) -> None:
     """Test the predict method of BaselineAutogenModel."""
     # Setup
     input_data = pd.DataFrame({"input": ["Some large input string"]})
@@ -53,7 +48,7 @@ def test_predict(baseline_model: BaselineAutogenModel, async_response_stream: Ma
 
     with patch("autogen_team.core.models.asyncio.run") as MockModelrun:
         # Mock the create method to return our async generator
-        MockModelrun.return_value = async_response_stream
+        MockModelrun.return_value = MagicMock(content="Result 1")
 
         # Execute the predict function (await is needed since predict must be async)
         outputs = baseline_model.predict(inputs)
