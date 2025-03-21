@@ -1,8 +1,8 @@
 {
     "provider": "openai_chat_completion_client",
     "config": {
-        "model": "azure-gpt",
-        "api_base": "http://localhost:4000/v1",
+        "model": "gemini-pro",
+        "api_base": "http://litellm:4000/v1",
         "api_key": "sk-12345",
         "temperature": 0.7,
         "max_tokens": 512

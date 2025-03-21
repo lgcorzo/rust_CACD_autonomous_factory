@@ -140,6 +140,8 @@ You can use this package as part of your MLOps toolkit or platform (e.g., Model 
     - [Ejemplo en Python](#ejemplo-en-python)
     - [Representación en Mermaid para UML](#representación-en-mermaid-para-uml)
     - [Explicación:](#explicación)
+  - [Monitoring](#monitoring)
+  - [docker compose example:](#docker-compose-example)
   - [openai with mlflow example:](#openai-with-mlflow-example)
 
 # Install
@@ -1468,7 +1470,40 @@ classDiagram
 - **Perro** y **Gato** son clases derivadas o subclases.
 - La relación de herencia indica que las subclases heredan los atributos y métodos de la clase base, pero pueden sobrescribirlos (como `hacer_sonido` en este caso).
 
+## Monitoring
+best option [Evidentlyai](https://www.evidentlyai.com/) 
 
+## docker compose example:
+
+```txt
+
+  kafka_inference:
+      image: autogen_team:latest
+      restart: unless-stopped
+      container_name: kafka_inference
+      networks:
+        - servnet
+        - minio_mlflow_mlflownet
+      environment:
+      - DEFAULT_KAFKA_SERVER=kafka_server:9092
+      - DEFAULT_GROUP_ID=llmops-regression
+      - DEFAULT_AUTO_OFFSET_RESET=earliest
+      - DEFAULT_INPUT_TOPIC=llm_input_topic
+      - DEFAULT_OUTPUT_TOPIC=llm_output_topic
+      - DEFAULT_FASTAPI_HOST=127.0.0.1
+      - DEFAULT_FASTAPI_PORT=8100
+      - MLFLOW_TRACKING_URI=http://mlflow_server:5000
+      - MLFLOW_REGISTRY_URI=http://mlflow_server:5000
+      - MLFLOW_EXPERIMENT_NAME=autogen_team_experiment
+      - MLFLOW_REGISTERED_MODEL_NAME=autogen_team
+      - MLFLOW_EXPERIMENT_NAME=autogen_team_experiment
+      - MLFLOW_REGISTERED_MODEL_NAME=autogen_team_model
+
+      ports:
+          - 8200:8100
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+```
 
 ## openai with mlflow example: 
 https://mlflow.org/docs/latest/llms/openai/notebooks/openai-code-helper.html
