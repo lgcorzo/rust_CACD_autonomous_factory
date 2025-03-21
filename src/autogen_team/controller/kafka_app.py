@@ -6,7 +6,8 @@ import threading
 import logging
 import time
 import json
-from typing import Any, Dict, Callable
+from typing import Any, Dict, Callable, TypeVar
+
 
 import uvicorn
 import pandas as pd
@@ -18,6 +19,7 @@ from confluent_kafka import Producer, Consumer, KafkaError
 from autogen_team.core.schemas import InputsSchema, Outputs
 from autogen_team.io import services, registries
 from autogen_team.io.registries import CustomLoader
+from pandera.typing.common import DataFrameBase
 
 
 # Constants
@@ -49,7 +51,7 @@ class PredictionRequest(BaseModel):
 
     input_data: Dict[str, Any] = {"input": ["text 1", "text 2"]}
 
-    def model_validate(self) -> Any:
+    def validate_model(self) -> DataFrameBase[InputsSchema]:
         """Validates the input data against InputsSchema."""
         return InputsSchema.validate(pd.DataFrame([self.input_data]))
 
@@ -147,7 +149,7 @@ class FastAPIKafkaService:
             logger.error("Kafka consumer is not initialized.")
             return None
 
-    def _handle_message_error(self, msg) -> bool:
+    def _handle_message_error(self, msg: Any) -> bool:
         """Handle errors in polled messages."""
         if msg.error().code() == KafkaError._PARTITION_EOF:
             logger.debug("Reached end of partition.")
@@ -156,15 +158,15 @@ class FastAPIKafkaService:
             logger.error(f"Consumer error: {msg.error()}")
             return False
 
-    def _process_message(self, msg) -> None:
+    def _process_message(self, msg: Any) -> None:
         """Process a valid Kafka message."""
         predictionresponse: PredictionResponse = PredictionResponse()
         try:
-            kafka_msg = json.loads(msg.value().decode("utf-8"))
+            kafka_msg: Dict[str, Any] = json.loads(msg.value().decode("utf-8"))
             input_obj: PredictionRequest = PredictionRequest()
             input_obj.input_data = kafka_msg["input_data"]
             logger.info(f"kafka Received input  {kafka_msg}")
-            prediction_result = self.prediction_callback(input_obj).result
+            prediction_result: Dict[str, Any] = self.prediction_callback(input_obj).result
         except json.JSONDecodeError as e:
             error = f"Failed to decode JSON message: {e}. Raw message: {msg.value()}"
             predictionresponse.result["error"] = error
@@ -240,7 +242,7 @@ async def health_check() -> Dict[str, str]:
     return {"status": "healthy"}
 
 
-def main():
+def main() -> None:
     global fastapi_kafka_service
     # Configuration
     alias_or_version: str | int = "Champion"
