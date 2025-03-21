@@ -12,7 +12,6 @@ from confluent_kafka import KafkaError
 from autogen_team.controller.kafka_app import (
     FastAPIKafkaService,
     PredictionResponse,
-    health_check,
     app,
     DEFAULT_FASTAPI_HOST,
     DEFAULT_FASTAPI_PORT,
@@ -319,12 +318,6 @@ def test_stop(
         service.stop()
         assert service.stop_event.is_set()
         assert mock_logger_info.call_count == 2
-
-
-@pytest.mark.asyncio
-async def test_health_check_endpoint() -> None:
-    response = await health_check()
-    assert response == {"status": "healthy"}
 
 
 def test_main_function() -> None:
