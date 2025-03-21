@@ -6,7 +6,7 @@ import threading
 import logging
 import time
 import json
-from typing import Any, Dict, Callable, TypeVar
+from typing import Any, Dict, Callable
 
 
 import uvicorn
