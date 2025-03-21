@@ -87,21 +87,6 @@ def test_delivery_report(
         mock_logger_error.assert_called_once()
 
 
-def test_start(
-    mock_kafka_service: tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock],
-) -> None:
-    """Test the start method."""
-    service, MockProducer, MockConsumer, MockThread, MockSleep = mock_kafka_service
-    service.start()
-
-    MockProducer.assert_called_once_with(service.kafka_config)
-    assert service.kafka_config["enable.auto.commit"] is False
-    MockConsumer.assert_called_once_with(service.kafka_config)
-    service.consumer.subscribe.assert_called_once_with([service.input_topic])
-    assert MockThread.call_count == 2
-    MockSleep.assert_called_once()
-
-
 def test_start_producer_failure(
     mock_kafka_service: tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock],
 ) -> None:

@@ -11,7 +11,7 @@ from typing import Any, Dict, Callable
 
 import uvicorn
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 from confluent_kafka import Producer, Consumer, KafkaError
@@ -94,11 +94,10 @@ class FastAPIKafkaService:
         self.stop_event.clear()
         self._initialize_kafka_producer()
         self._initialize_kafka_consumer()
-        self.server_thread = threading.Thread(target=self._run_server)
-        self.server_thread.start()
         time.sleep(2)  # Allow server to start
         threading.Thread(target=self._consume_messages, daemon=True).start()
         logger.info("FastAPI server and Kafka consumer threads started.")
+        self._run_server()
 
     def _initialize_kafka_producer(self) -> None:
         """Initialize Kafka producer."""
@@ -213,27 +212,6 @@ class FastAPIKafkaService:
 
 # Global Service Instance
 fastapi_kafka_service: FastAPIKafkaService
-
-
-# FastAPI Endpoints
-@app.post(
-    "/predict",
-    response_model=PredictionResponse,
-    summary="Make a Prediction",
-    description="This endpoint allows you to submit data for a prediction.",
-    tags=["Prediction"],
-)
-async def predict(request: PredictionRequest) -> PredictionResponse:  # Use global var
-    """Endpoint for making predictions via HTTP."""
-    global fastapi_kafka_service
-    try:
-        logger.info(f"Received HTTP prediction request: {request}")
-        prediction_result = fastapi_kafka_service.prediction_callback(request)
-        logger.info(f"HTTP prediction result: {prediction_result}")
-        return prediction_result  # Use the global class
-    except Exception as e:
-        logger.exception("Error processing HTTP prediction request:")
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/health", summary="Health Check", tags=["System"])
