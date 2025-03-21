@@ -53,6 +53,7 @@ mlserver-mlflow = "^1.6.1"
 opentelemetry-instrumentation = "^0.51b0"
 opentelemetry-exporter-otlp-proto-http = "^1.30.0"
 opentelemetry-exporter-otlp = "^1.30.0"
+confluent-kafka = "^2.8.2"
 
 
 [tool.poetry.group.checks.dependencies]

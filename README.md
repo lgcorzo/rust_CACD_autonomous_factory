@@ -140,6 +140,7 @@ You can use this package as part of your MLOps toolkit or platform (e.g., Model 
     - [Ejemplo en Python](#ejemplo-en-python)
     - [Representación en Mermaid para UML](#representación-en-mermaid-para-uml)
     - [Explicación:](#explicación)
+  - [Monitoring](#monitoring)
   - [openai with mlflow example:](#openai-with-mlflow-example)
 
 # Install
@@ -1467,6 +1468,9 @@ classDiagram
 - **Animal** es la clase base o superclase.
 - **Perro** y **Gato** son clases derivadas o subclases.
 - La relación de herencia indica que las subclases heredan los atributos y métodos de la clase base, pero pueden sobrescribirlos (como `hacer_sonido` en este caso).
+
+## Monitoring
+best option [Evidentlyai](https://www.evidentlyai.com/) 
 
 
 
