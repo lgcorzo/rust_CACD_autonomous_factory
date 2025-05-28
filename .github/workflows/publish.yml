@@ -4,6 +4,8 @@ on:
     types:
       - edited
       - published
+permissions:
+  contents: read
 env:
   DOCKER_IMAGE: ghcr.io/lgcorzo/llmops-python-package
 concurrency:
