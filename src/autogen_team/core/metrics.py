@@ -212,4 +212,4 @@ class Threshold(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"
         """
         return mlflow.models.MetricThreshold(
             threshold=self.threshold, greater_is_better=self.greater_is_better
-        )  # type: ignore[no-untyped-call]
+        )

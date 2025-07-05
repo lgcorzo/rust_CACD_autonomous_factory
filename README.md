@@ -142,6 +142,7 @@ You can use this package as part of your MLOps toolkit or platform (e.g., Model 
     - [Explicación:](#explicación)
   - [Monitoring](#monitoring)
   - [docker compose example:](#docker-compose-example)
+  - [autogen Studio.](#autogen-studio)
   - [openai with mlflow example:](#openai-with-mlflow-example)
 
 # Install
@@ -1504,6 +1505,9 @@ best option [Evidentlyai](https://www.evidentlyai.com/)
       extra_hosts:
         - "host.docker.internal:host-gateway"
 ```
+## autogen Studio.
+
+autogenstudio ui --port 8081
 
 ## openai with mlflow example: 
 https://mlflow.org/docs/latest/llms/openai/notebooks/openai-code-helper.html
