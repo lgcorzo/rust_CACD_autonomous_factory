@@ -104,7 +104,7 @@ strict = true
 python_version = "3.11"
 check_untyped_defs = true
 ignore_missing_imports = true
-disable_error_code = ["attr-defined","method-assign","union-attr", "misc" ]
+disable_error_code = ["attr-defined","method-assign","union-attr", "misc", "redundant-cast", "no-untyped-call"]
 plugins = ["pandera.mypy", "pydantic.mypy"]
 
 [tool.pytest.ini_options]

@@ -87,12 +87,10 @@ class EvaluationsJob(base.Job):
             logger.debug("- Targets lineage: {}", targets_lineage.to_dict())
             # dataset
             logger.info("Create dataset: inputs & targets")
-            dataset = mlflow.data.from_pandas(  # type: ignore[attr-defined]
+            dataset = mlflow.data.from_pandas(
                 df=pd.concat([inputs, targets], axis="columns"),
                 name="evaluation",
-                source=(
-                    f"{inputs_lineage.source.uri} & {targets_lineage.source.uri}"  # type: ignore[attr-defined]
-                ),
+                source=(f"{inputs_lineage.source.uri} & {targets_lineage.source.uri}"),
                 targets=schemas.TargetsSchema.response,
             )
             logger.debug("- Dataset: {}", dataset.to_dict())
@@ -114,7 +112,7 @@ class EvaluationsJob(base.Job):
             logger.debug("- Validation thresholds: {}", validation_thresholds)
             # evaluations
             logger.info("Compute evaluations: {}", self.model_type)
-            evaluations = mlflow.evaluate(  # type: ignore[no-untyped-call]
+            evaluations = mlflow.evaluate(
                 data=dataset,
                 model=model_uri,
                 model_type=self.model_type,
