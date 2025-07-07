@@ -22,7 +22,7 @@ class PromotionJob(base.Job):
     KIND: T.Literal["PromotionJob"] = "PromotionJob"
 
     alias: str = "Champion"
-    version: int | None = None
+    version: str | None = None
 
     def run(self) -> base.Locals:
         # services

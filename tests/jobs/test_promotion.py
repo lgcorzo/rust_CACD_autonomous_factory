@@ -38,7 +38,7 @@ def test_promotion_job(
         logger_service=logger_service,
         alerts_service=alerts_service,
         mlflow_service=mlflow_service,
-        version=version,
+        version=str(version) if version is not None else None,
         alias=alias,
     )
     with job as runner:
@@ -56,11 +56,11 @@ def test_promotion_job(
     # - name
     assert out["name"] == mlflow_service.registry_name, "Model name should be the same!"
     # - version
-    assert out["version"] == model_version.version, "Version number should be the same!"
+    assert str(out["version"]) == str(model_version.version), "Version number should be the same!"
     # - model version
     assert out["model_version"].name == out["name"], "Model version name should be the same!"
-    assert (
-        out["model_version"].version == out["version"]
+    assert str(out["model_version"].version) == str(
+        out["version"]
     ), "Model version number should be the same!"
     assert (
         out["model_version"].run_id == model_version.run_id

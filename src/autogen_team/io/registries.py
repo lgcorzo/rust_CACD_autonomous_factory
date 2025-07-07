@@ -43,7 +43,7 @@ def uri_for_model_alias(name: str, alias: str) -> str:
     return f"models:/{name}@{alias}"
 
 
-def uri_for_model_version(name: str, version: int) -> str:
+def uri_for_model_version(name: str, version: str) -> str:
     """Create a model URI from a model name and a version.
 
     Args:
@@ -67,7 +67,7 @@ def uri_for_model_alias_or_version(name: str, alias_or_version: str | int) -> st
         str: model URI as "models:/name@alias" or "models:/name/version" based on input.
     """
     if isinstance(alias_or_version, int):
-        return uri_for_model_version(name=name, version=alias_or_version)
+        return uri_for_model_version(name=name, version=str(alias_or_version))
     else:
         return uri_for_model_alias(name=name, alias=alias_or_version)
 

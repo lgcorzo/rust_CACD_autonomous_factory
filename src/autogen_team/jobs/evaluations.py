@@ -118,7 +118,6 @@ class EvaluationsJob(base.Job):
                 model_type=self.model_type,
                 evaluators=self.evaluators,
                 extra_metrics=extra_metrics,
-                validation_thresholds=validation_thresholds,
                 predictions=schemas.OutputsSchema.response,
             )
             logger.debug("- Evaluations metrics: {}", evaluations.metrics)

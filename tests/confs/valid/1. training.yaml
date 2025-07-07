@@ -16,4 +16,4 @@ job:
     model_config_path: "${tests_path:}/confs/valid/model_config.json"
   saver:
     KIND: CustomSaver
-    path: "tests/confs/valid"
+    path: "test_model_artifact"

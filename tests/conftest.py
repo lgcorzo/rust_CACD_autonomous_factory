@@ -409,7 +409,7 @@ def signature(
 @pytest.fixture(scope="session")
 def saver() -> registries.CustomSaver:
     """Return the default model saver."""
-    return registries.CustomSaver(path="tests/confs/valid")
+    return registries.CustomSaver(path="test_model_artifact")
 
 
 @pytest.fixture(scope="session")
