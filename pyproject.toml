@@ -25,7 +25,7 @@ autogen_team = 'autogen_team.scripts:main'
 python = ">=3.10,<3.13"
 loguru = "^0.7.2"
 matplotlib = "^3.9.0"
-mlflow = { version = "^2.20.1", extras = ["extras"] }
+mlflow = "3.1.1"
 numpy = "^1.26.4"
 omegaconf = "^2.3.0"
 pandas = "^2.2.2"

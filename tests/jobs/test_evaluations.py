@@ -20,7 +20,8 @@ from autogen_team.io import datasets, registries, services
             1,
             {
                 "AutogenMetricTest": metrics.Threshold(
-                    threshold=float("inf"), greater_is_better=False
+                    threshold=float("inf"),
+                    greater_is_better=False,
                 )
             },
         ),
@@ -52,7 +53,9 @@ def test_evaluations_job(
 ) -> None:
     # given
     if isinstance(alias_or_version, int):
-        assert alias_or_version == model_alias.version, "Model version should be the same!"
+        assert str(alias_or_version) == str(
+            model_alias.version
+        ), "Model version should be the same!"
     else:
         assert alias_or_version == model_alias.aliases[0], "Model alias should be the same!"
     run_config = mlflow_service.RunConfig(

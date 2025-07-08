@@ -24,7 +24,9 @@ def test_explanations_job(
 ) -> None:
     # given
     if isinstance(alias_or_version, int):
-        assert alias_or_version == model_alias.version, "Model version should be the same!"
+        assert str(alias_or_version) == str(
+            model_alias.version
+        ), "Model version should be the same!"
     else:
         assert alias_or_version == model_alias.aliases[0], "Model alias should be the same!"
     # when
