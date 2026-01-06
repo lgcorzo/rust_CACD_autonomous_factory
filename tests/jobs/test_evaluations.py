@@ -2,13 +2,10 @@
 
 import _pytest.capture as pc
 import pytest
-
-from mlflow.entities import Experiment
-
 from autogen_team import jobs
 from autogen_team.core import metrics, schemas
 from autogen_team.io import datasets, registries, services
-
+from mlflow.entities import Experiment
 
 # %% JOBS
 

@@ -6,27 +6,26 @@ from __future__ import annotations
 
 import abc
 import contextlib as ctx
+import logging
 import sys
 import typing as T
 from typing import ClassVar
+
 import loguru
-import logging
 import mlflow
 import mlflow.tracking as mt
 import pydantic as pdt
-
-from plyer import notification
 from opentelemetry import trace
 from opentelemetry._logs import set_logger_provider
-
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
-from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from plyer import notification
+
 from autogen_team.io.osvariables import Env
 
 

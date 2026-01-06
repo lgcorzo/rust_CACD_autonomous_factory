@@ -7,15 +7,15 @@ import abc
 import json
 import os
 import typing as T
+from typing import Any, Dict
 
 import mlflow
 import mlflow.entities
 import mlflow.entities.model_registry
 import mlflow.models.model
-from mlflow.pyfunc.model import PythonModel, PythonModelContext
 import pandas as pd
 import pydantic as pdt
-from typing import Any, Dict
+from mlflow.pyfunc.model import PythonModel, PythonModelContext
 
 from autogen_team.core import models, schemas
 from autogen_team.utils import signers

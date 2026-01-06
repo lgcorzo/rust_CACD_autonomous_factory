@@ -4,12 +4,12 @@
 
 import typing as T
 
+import pandas as pd
 import pydantic as pdt
 
 from autogen_team.core import schemas
 from autogen_team.io import datasets, registries
 from autogen_team.jobs import base
-import pandas as pd
 
 # %% JOBS
 

@@ -1,26 +1,23 @@
 """FastAPI and Kafka Service for Predictions with Logging."""
 
+import json
+import logging
 import os
 import signal
 import threading
-import logging
 import time
-import json
-from typing import Any, Dict, Callable
+from typing import Any, Callable, Dict, Optional
 
-
-import uvicorn
 import pandas as pd
+import uvicorn
+from confluent_kafka import Consumer, KafkaError, Producer
 from fastapi import FastAPI
+from pandera.typing.common import DataFrameBase
 from pydantic import BaseModel
 
-from confluent_kafka import Producer, Consumer, KafkaError
-
 from autogen_team.core.schemas import InputsSchema, Outputs
-from autogen_team.io import services, registries
+from autogen_team.io import registries, services
 from autogen_team.io.registries import CustomLoader
-from pandera.typing.common import DataFrameBase
-
 
 # Constants
 DEFAULT_KAFKA_SERVER = os.getenv("DEFAULT_KAFKA_SERVER", "kafka_server:9092")
@@ -82,7 +79,7 @@ class FastAPIKafkaService:
         self.producer: Producer | None = None
         self.consumer: Consumer | None = None
 
-    def delivery_report(self, err: KafkaError, msg: Any) -> None:
+    def delivery_report(self, err: Optional[KafkaError], msg: Any) -> None:
         """Called once for each message produced to indicate delivery result."""
         if err is not None:
             logger.error(f"Message delivery failed: {err}")
@@ -182,8 +179,8 @@ class FastAPIKafkaService:
             if self.producer:
                 self.producer.produce(
                     self.output_topic,
-                    key="prediction",
-                    value=json.dumps(prediction_result),
+                    key=b"prediction",
+                    value=json.dumps(prediction_result).encode("utf-8"),
                     callback=self.delivery_report,
                 )
                 self.producer.flush()

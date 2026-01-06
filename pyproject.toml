@@ -41,16 +41,15 @@ setuptools = "^78.1.1"
 scikit-learn = "1.4.2"
 shap = "^0.46.0"
 dvc = "^3.58.0"
-autogen-agentchat = ">=0.2,<1.0"
-autogen-ext = {extras = ["azure", "graphrag", "openai"], version = "^0.4.3"}
+agent-framework-core = { git = "https://github.com/microsoft/agent-framework.git", subdirectory = "python/packages/core" }
 litellm = "^1.60.8"
 transformers = "^4.48.3"
 pytest-asyncio = "^0.25.3"
 textstat = "^0.7.5"
 autogenstudio = "^0.4.1.11"
-opentelemetry-instrumentation = "^0.51b0"
-opentelemetry-exporter-otlp-proto-http = "^1.30.0"
-opentelemetry-exporter-otlp = "^1.30.0"
+opentelemetry-instrumentation = ">=0.51b0"
+opentelemetry-exporter-otlp-proto-http = ">=1.30.0"
+opentelemetry-exporter-otlp = ">=1.30.0"
 confluent-kafka = "^2.8.2"
 
 

@@ -1511,4 +1511,9 @@ autogenstudio ui --port 8081
 
 ## openai with mlflow example: 
 https://mlflow.org/docs/latest/llms/openai/notebooks/openai-code-helper.html
-https://mlflow.org/docs/latest/llms/openai/index.html#introduction
+https://mlflow.org/docs/latest/llms/openai/index.html#introductionNote
+
+
+Notebooks:
+
+https://github.com/microsoft/autogen/tree/main/python/docs/src/user-guide/core-user-guide/design-patterns
