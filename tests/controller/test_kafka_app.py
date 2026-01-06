@@ -1,21 +1,20 @@
-import pytest
-from unittest.mock import patch, MagicMock
 import json
-from typing import Generator
 import os
 import signal
+from typing import Generator
+from unittest.mock import MagicMock, patch
 
-from confluent_kafka import KafkaError
-
+import pytest
 
 # Assuming the code you provided is in a file named 'app.py'
 from autogen_team.controller.kafka_app import (
+    DEFAULT_FASTAPI_HOST,
+    DEFAULT_FASTAPI_PORT,
     FastAPIKafkaService,
     PredictionResponse,
     app,
-    DEFAULT_FASTAPI_HOST,
-    DEFAULT_FASTAPI_PORT,
 )
+from confluent_kafka import KafkaError
 
 
 @pytest.fixture()
@@ -80,7 +79,7 @@ def test_delivery_report(
         service.delivery_report(err, msg)
         mock_logger_info.assert_called_once()
 
-    err = "Delivery failed"
+    err = MagicMock(spec=KafkaError)
     with patch("autogen_team.controller.kafka_app.logger.error") as mock_logger_error:
         service.delivery_report(err, msg)
         mock_logger_error.assert_called_once()

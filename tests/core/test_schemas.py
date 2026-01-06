@@ -1,14 +1,14 @@
 # test_schemas.py
 
-import pytest
 import pandas as pd
 import pandera.errors as pa_errors
+import pytest
 from autogen_team.core.schemas import (
-    InputsSchema,
-    OutputsSchema,
-    MetadataSchema,
-    TargetsSchema,
     FeatureImportancesSchema,
+    InputsSchema,
+    MetadataSchema,
+    OutputsSchema,
+    TargetsSchema,
 )
 
 

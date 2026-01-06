@@ -9,12 +9,11 @@ import argparse
 import json
 import sys
 
+# %% WARNINGS
+import warnings
+
 from autogen_team import settings
 from autogen_team.io import configs
-
-# %% WARNINGS
-
-import warnings
 
 # disable annoying mlflow warnings
 warnings.filterwarnings(action="ignore", category=UserWarning)

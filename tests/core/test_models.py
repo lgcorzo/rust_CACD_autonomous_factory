@@ -1,12 +1,11 @@
 # %% IMPORTS
-import pytest
 from unittest.mock import MagicMock, patch
+
 import pandas as pd
-
-from autogen_ext.models.openai import OpenAIChatCompletionClient
-
-from autogen_team.core.models import BaselineAutogenModel
+import pytest
+from agent_framework.openai import OpenAIChatClient
 from autogen_team.core import schemas
+from autogen_team.core.models import BaselineAutogenModel
 
 
 @pytest.fixture
@@ -47,8 +46,14 @@ def test_predict(baseline_model: BaselineAutogenModel) -> None:
     inputs = schemas.Inputs(input_data)
 
     with patch("autogen_team.core.models.asyncio.run") as MockModelrun:
-        # Mock the create method to return our async generator
-        MockModelrun.return_value = MagicMock(content="Result 1")
+        # Mock the response
+        mock_msg = MagicMock()
+        mock_msg.text = "Result 1"
+        mock_response = MagicMock()
+        mock_response.messages = [mock_msg]
+        mock_response.text = "Result 1"
+        mock_response.finish_reason = "stop"
+        MockModelrun.return_value = mock_response
 
         # Execute the predict function (await is needed since predict must be async)
         outputs_df: pd.DataFrame = baseline_model.predict(inputs)
@@ -59,13 +64,17 @@ def test_predict(baseline_model: BaselineAutogenModel) -> None:
         assert isinstance(outputs_df["metadata"][0], dict), "Metadata should be a dictionary"
         assert "timestamp" in outputs_df["metadata"][0], "Metadata timestamp is missing"
         assert "model_version" in outputs_df["metadata"][0], "Metadata model_version is missing"
+        assert "terminated" in outputs_df["metadata"][0], "Metadata terminated is missing"
+        assert outputs_df["metadata"][0]["terminated"] is True
+        assert "messages" in outputs_df["metadata"][0], "Metadata messages is missing"
+        assert outputs_df["metadata"][0]["messages"] == ["Result 1"]
 
 
 def test_get_internal_model(baseline_model: BaselineAutogenModel) -> None:
     """Test get_internal_model returns the team."""
     # Setup
-    mock_team = MagicMock(spec=OpenAIChatCompletionClient)
-    baseline_model.model_client = mock_team
+    mock_team = MagicMock(spec=OpenAIChatClient)
+    baseline_model._model_client = mock_team
 
     # Execute
     internal_model = baseline_model.get_internal_model()
@@ -86,10 +95,8 @@ def test_load_context(baseline_model: BaselineAutogenModel) -> None:
             "max_tokens": 512,  # Optional
         },
     }  # Provide your model config as necessary
-    with patch(
-        "autogen_team.core.models.OpenAIChatCompletionClient"
-    ) as MockOpenAIChatCompletionClient:
+    with patch("autogen_team.core.models.OpenAIChatClient") as MockOpenAIChatClient:
         # Execute
         baseline_model.load_context(model_config)
         # Verify
-        MockOpenAIChatCompletionClient.assert_called_once()  # Verify AssistantAgent was called
+        MockOpenAIChatClient.assert_called_once()  # Verify AssistantAgent was called

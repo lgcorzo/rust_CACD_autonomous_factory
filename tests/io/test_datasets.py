@@ -4,10 +4,8 @@
 import os
 
 import pytest
-
 from autogen_team.core import schemas
 from autogen_team.io import datasets
-
 
 # %% READERS
 

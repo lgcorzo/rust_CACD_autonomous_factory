@@ -1,5 +1,6 @@
-from pydantic_settings import BaseSettings
 from typing import Dict, Type
+
+from pydantic_settings import BaseSettings
 
 
 class Singleton(object):

@@ -8,16 +8,15 @@ from __future__ import annotations
 
 import abc
 import typing as T
+from difflib import SequenceMatcher
 from typing import Optional, cast
 
 import mlflow
 import pandas as pd
 import pydantic as pdt
-from difflib import SequenceMatcher
-from autogen_team.core import models, schemas
-
 from mlflow.metrics import MetricValue
 
+from autogen_team.core import models, schemas
 
 # %% TYPINGS
 MlflowMetric: T.TypeAlias = MetricValue

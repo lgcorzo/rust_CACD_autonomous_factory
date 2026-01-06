@@ -1,12 +1,11 @@
 # %% IMPORTS
 
 import _pytest.capture as pc
-from mlflow.entities import Experiment
-
 from autogen_team import jobs
 from autogen_team.core import metrics, models, schemas
 from autogen_team.io import datasets, registries, services
 from autogen_team.utils import signers, splitters
+from mlflow.entities import Experiment
 
 # %% JOBS
 

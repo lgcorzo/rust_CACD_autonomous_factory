@@ -1,16 +1,15 @@
 # test_metrics.py
 
-import pytest
-
-from typing import Literal
+from typing import Any, Dict, Iterator, List, Literal, Optional
 from unittest.mock import MagicMock, patch
+
 import pandas as pd
-from typing import Iterator, List, Dict, Any, Optional
+import pytest
 
 # Assuming the metrics are in a module named 'metrics.py'
 from autogen_team.core.metrics import (
-    AutogenMetric,
     AutogenConversationMetric,
+    AutogenMetric,
     Threshold,
 )
 
