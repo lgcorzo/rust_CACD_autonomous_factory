@@ -67,13 +67,14 @@ class "BaseModel" as pydantic.main.BaseModel {
 class "BaselineAutogenModel" as autogen_team.core.models.BaselineAutogenModel {
   KIND : T.Literal['BaselineAutogenModel']
   max_tokens : Optional[int]
-  model_client : Optional[Any]
+  _model_client : Optional[Any]
+  model_config_data : Optional[Dict[str, Any]]
   model_config_path : Optional[str]
   temperature : Optional[float]
   explain_model() -> schemas.FeatureImportances
   explain_samples(inputs: schemas.Inputs) -> schemas.SHAPValues
   fit(inputs: schemas.Inputs, targets: schemas.Targets) -> 'BaselineAutogenModel'
-  get_internal_model() -> OpenAIChatCompletionClient
+  get_internal_model() -> OpenAIChatClient
   load_context(model_config: Dict[str, Any]) -> None
   load_context_path(model_config_path: Optional[str]) -> None
   predict(inputs: schemas.Inputs) -> schemas.Outputs
