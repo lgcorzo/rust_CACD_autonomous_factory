@@ -18,16 +18,15 @@
 
 https://github.com/mlflow/mlflow/blob/master/examples/gateway/mlflow_models/README.md
 
-   The foundational components of the system that ensure efficient functionality across various modules:
+The foundational components of the system that ensure efficient functionality across various modules:
 
 - **[US: Schemas](Schemas_stories.md)**: Define structured data formats for input, output, and intermediate processes, ensuring consistency and validation throughout the pipeline.
 - **[US: Models](Models_stories.md)**: Define the structure of machine learning models, including architectures and checkpoints, to standardize training and deployment.
 - **[US: Metrics](Metrics_stories.md)**: Provide standardized measurements for model performance, accuracy, and evaluation. Useful for tracking improvement and identifying bottlenecks.
 
-
 ### **FE: Input Outputs**
 
- Handle configuration, data ingestion, and external environment variables for seamless integration:
+Handle configuration, data ingestion, and external environment variables for seamless integration:
 
 - **[US: Config](Configs_stories.md)**: Store and manage configuration files to customize and control the behavior of different modules.
 - **[US: Dataset](Datasets_stories.md)**: Handle loading, preprocessing, and managing data sets for training, evaluation, and inference.
@@ -37,7 +36,7 @@ https://github.com/mlflow/mlflow/blob/master/examples/gateway/mlflow_models/READ
 
 ### **FE: Jobs**
 
-   Define and manage specific tasks and workflows for various stages in the machine learning lifecycle:
+Define and manage specific tasks and workflows for various stages in the machine learning lifecycle:
 
 - **[US: Base](Base_stories.md)**: The foundational job configurations and implementations shared across all job types.
 - **[US: Evaluations](Evaluations_stories.md)**: Execute performance tests and comparisons for models, ensuring they meet predefined criteria.
@@ -53,7 +52,7 @@ https://github.com/mlflow/mlflow/blob/master/examples/gateway/mlflow_models/READ
 Auxiliary tools and configurations that enhance functionality and streamline development
 
 - **[US: Searchers](Searchers_stories.md)**: Define functionalities for finding the best hyperparameters for a model.
-- **[US: Signers](Signers_stories.md)**:  Generate signatures for AI/ML models.
+- **[US: Signers](Signers_stories.md)**: Generate signatures for AI/ML models.
 - **[US: Splitters](Splitters_stories.md)**: Split dataframes into subsets for model training and evaluation.
 
 ### **FE: main**
@@ -226,3 +225,25 @@ graph LR
     model_name.utils.splitters --> model_name.core.schemas
 
 ```
+
+---
+
+## **Project History & Milestones**
+
+### **M1: Migration to Agent Framework (Completed)**
+
+Successfully migrated the `autogen_team` package from `autogen-agentchat` to `microsoft/agent-framework`.
+
+- **Key Changes:**
+  - Replaced `OpenAIChatCompletionClient` with `OpenAIChatClient`.
+  - Updated data models (`ChatMessage`, `ChatResponse`) to align with the new framework.
+  - Implemented custom `__getstate__` and `__setstate__` for robust MLflow serialization.
+  - Added `sklearn` cloning compatibility to `BaselineAutogenModel` for use in `TuningJob`.
+  - Resolved 500 errors and message formatting inconsistencies with `mocogpt`.
+
+---
+
+## Project Status
+
+- **Current Migration:** `Completed`
+- **Last Updated:** 2024-05-24
