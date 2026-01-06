@@ -1,0 +1,142 @@
+@startuml packages_autogen_team
+set namespaceSeparator none
+package "autogen_team" as autogen_team {
+}
+package "autogen_team.__main__" as autogen_team.__main__ {
+}
+package "autogen_team.core" as autogen_team.core {
+}
+package "autogen_team.core.metrics" as autogen_team.core.metrics {
+}
+package "autogen_team.core.models" as autogen_team.core.models {
+}
+package "autogen_team.core.schemas" as autogen_team.core.schemas {
+}
+package "autogen_team.io" as autogen_team.io {
+}
+package "autogen_team.io.configs" as autogen_team.io.configs {
+}
+package "autogen_team.io.datasets" as autogen_team.io.datasets {
+}
+package "autogen_team.io.osvariables" as autogen_team.io.osvariables {
+}
+package "autogen_team.io.registries" as autogen_team.io.registries {
+}
+package "autogen_team.io.services" as autogen_team.io.services {
+}
+package "autogen_team.jobs" as autogen_team.jobs {
+}
+package "autogen_team.jobs.base" as autogen_team.jobs.base {
+}
+package "autogen_team.jobs.evaluations" as autogen_team.jobs.evaluations {
+}
+package "autogen_team.jobs.explanations" as autogen_team.jobs.explanations {
+}
+package "autogen_team.jobs.inference" as autogen_team.jobs.inference {
+}
+package "autogen_team.jobs.promotion" as autogen_team.jobs.promotion {
+}
+package "autogen_team.jobs.training" as autogen_team.jobs.training {
+}
+package "autogen_team.jobs.tuning" as autogen_team.jobs.tuning {
+}
+package "autogen_team.scripts" as autogen_team.scripts {
+}
+package "autogen_team.settings" as autogen_team.settings {
+}
+package "autogen_team.utils" as autogen_team.utils {
+}
+package "autogen_team.utils.searchers" as autogen_team.utils.searchers {
+}
+package "autogen_team.utils.signers" as autogen_team.utils.signers {
+}
+package "autogen_team.utils.splitters" as autogen_team.utils.splitters {
+}
+autogen_team.__main__ --> autogen_team
+autogen_team.__main__ --> autogen_team.scripts
+autogen_team.core.metrics --> autogen_team.core
+autogen_team.core.metrics --> autogen_team.core.models
+autogen_team.core.metrics --> autogen_team.core.schemas
+autogen_team.core.models --> autogen_team.core
+autogen_team.core.models --> autogen_team.core.schemas
+autogen_team.io.registries --> autogen_team.core
+autogen_team.io.registries --> autogen_team.core.models
+autogen_team.io.registries --> autogen_team.core.schemas
+autogen_team.io.registries --> autogen_team.utils
+autogen_team.io.registries --> autogen_team.utils.signers
+autogen_team.io.services --> autogen_team.io.osvariables
+autogen_team.jobs --> autogen_team.jobs.evaluations
+autogen_team.jobs --> autogen_team.jobs.explanations
+autogen_team.jobs --> autogen_team.jobs.inference
+autogen_team.jobs --> autogen_team.jobs.promotion
+autogen_team.jobs --> autogen_team.jobs.training
+autogen_team.jobs --> autogen_team.jobs.tuning
+autogen_team.jobs.base --> autogen_team.io
+autogen_team.jobs.base --> autogen_team.io.services
+autogen_team.jobs.evaluations --> autogen_team.core
+autogen_team.jobs.evaluations --> autogen_team.core.metrics
+autogen_team.jobs.evaluations --> autogen_team.core.schemas
+autogen_team.jobs.evaluations --> autogen_team.io
+autogen_team.jobs.evaluations --> autogen_team.io.datasets
+autogen_team.jobs.evaluations --> autogen_team.io.registries
+autogen_team.jobs.evaluations --> autogen_team.io.services
+autogen_team.jobs.evaluations --> autogen_team.jobs
+autogen_team.jobs.evaluations --> autogen_team.jobs.base
+autogen_team.jobs.explanations --> autogen_team.core
+autogen_team.jobs.explanations --> autogen_team.core.schemas
+autogen_team.jobs.explanations --> autogen_team.io
+autogen_team.jobs.explanations --> autogen_team.io.datasets
+autogen_team.jobs.explanations --> autogen_team.io.registries
+autogen_team.jobs.explanations --> autogen_team.jobs
+autogen_team.jobs.explanations --> autogen_team.jobs.base
+autogen_team.jobs.inference --> autogen_team.core
+autogen_team.jobs.inference --> autogen_team.core.schemas
+autogen_team.jobs.inference --> autogen_team.io
+autogen_team.jobs.inference --> autogen_team.io.datasets
+autogen_team.jobs.inference --> autogen_team.io.registries
+autogen_team.jobs.inference --> autogen_team.jobs
+autogen_team.jobs.inference --> autogen_team.jobs.base
+autogen_team.jobs.promotion --> autogen_team.jobs
+autogen_team.jobs.promotion --> autogen_team.jobs.base
+autogen_team.jobs.training --> autogen_team.core
+autogen_team.jobs.training --> autogen_team.core.metrics
+autogen_team.jobs.training --> autogen_team.core.models
+autogen_team.jobs.training --> autogen_team.core.schemas
+autogen_team.jobs.training --> autogen_team.io
+autogen_team.jobs.training --> autogen_team.io.datasets
+autogen_team.jobs.training --> autogen_team.io.registries
+autogen_team.jobs.training --> autogen_team.io.services
+autogen_team.jobs.training --> autogen_team.jobs
+autogen_team.jobs.training --> autogen_team.jobs.base
+autogen_team.jobs.training --> autogen_team.utils
+autogen_team.jobs.training --> autogen_team.utils.signers
+autogen_team.jobs.training --> autogen_team.utils.splitters
+autogen_team.jobs.tuning --> autogen_team.core
+autogen_team.jobs.tuning --> autogen_team.core.metrics
+autogen_team.jobs.tuning --> autogen_team.core.models
+autogen_team.jobs.tuning --> autogen_team.core.schemas
+autogen_team.jobs.tuning --> autogen_team.io
+autogen_team.jobs.tuning --> autogen_team.io.datasets
+autogen_team.jobs.tuning --> autogen_team.io.services
+autogen_team.jobs.tuning --> autogen_team.jobs
+autogen_team.jobs.tuning --> autogen_team.jobs.base
+autogen_team.jobs.tuning --> autogen_team.utils
+autogen_team.jobs.tuning --> autogen_team.utils.searchers
+autogen_team.jobs.tuning --> autogen_team.utils.splitters
+autogen_team.scripts --> autogen_team
+autogen_team.scripts --> autogen_team.io
+autogen_team.scripts --> autogen_team.io.configs
+autogen_team.scripts --> autogen_team.settings
+autogen_team.settings --> autogen_team
+autogen_team.settings --> autogen_team.jobs
+autogen_team.utils.searchers --> autogen_team.core
+autogen_team.utils.searchers --> autogen_team.core.metrics
+autogen_team.utils.searchers --> autogen_team.core.models
+autogen_team.utils.searchers --> autogen_team.core.schemas
+autogen_team.utils.searchers --> autogen_team.utils
+autogen_team.utils.searchers --> autogen_team.utils.splitters
+autogen_team.utils.signers --> autogen_team.core
+autogen_team.utils.signers --> autogen_team.core.schemas
+autogen_team.utils.splitters --> autogen_team.core
+autogen_team.utils.splitters --> autogen_team.core.schemas
+@enduml
