@@ -14,28 +14,6 @@ concurrency:
   group: publish-workflow
 
 jobs:
-  pages:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write  # Required for JamesIves/github-pages-deploy-action
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Project
-        uses: ./.github/actions/setup
-        
-      - name: Install Dependencies
-        run: poetry install --with docs
-        
-      - name: Build Documentation
-        run: poetry run invoke docs
-        
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: docs/ # Ensure your built HTML files are actually in this folder
-          branch: gh-pages
-
   packages:
     runs-on: ubuntu-latest
     # Note: 'packages: write' removed because you are using Docker Hub secrets, 
