@@ -5,7 +5,7 @@ on:
       - edited
       - published
 permissions:
-  contents: read
+  contents: write
 env:
   DOCKER_IMAGE: lgcorzo/llmops-python-package
 concurrency:
