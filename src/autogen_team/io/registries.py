@@ -91,7 +91,9 @@ class Saver(abc.ABC, pdt.BaseModel, strict=True, frozen=True, extra="forbid"):
     config_file: str = "model_config.json"
 
     @abc.abstractmethod
-    def save(self, model: models.Model, signature: signers.Signature, input_example: schemas.Inputs) -> Info:
+    def save(
+        self, model: models.Model, signature: signers.Signature, input_example: schemas.Inputs
+    ) -> Info:
         """Save a model in the model registry.
 
         Args:
@@ -151,12 +153,16 @@ class CustomSaver(Saver):
             # Load the model
             self.model.load_context(model_config)
 
-        def predict(self, context: PythonModelContext, model_input: schemas.Inputs) -> schemas.Outputs:
+        def predict(
+            self, context: PythonModelContext, model_input: schemas.Inputs
+        ) -> schemas.Outputs:
             """Generate predictions with a custom model for the given inputs."""
             output = self.model.predict(inputs=model_input)
             return output
 
-    def save(self, model: models.Model, signature: signers.Signature, input_example: schemas.Inputs) -> Info:
+    def save(
+        self, model: models.Model, signature: signers.Signature, input_example: schemas.Inputs
+    ) -> Info:
         adapter = CustomSaver.Adapter(model=model)
 
         # Local save block
@@ -190,11 +196,14 @@ class CustomSaver(Saver):
             from mlflow.models.model import ModelInfo
 
             return ModelInfo(
-                artifact_uuid="dummy",
-                run_id="dummy",
+                artifact_path="dummy_path",
                 flavors={},
+                mlflow_version=mlflow.__version__,
                 model_uri=f"file://{os.path.abspath(local_path)}",
                 model_uuid="dummy",
+                run_id="dummy",
+                saved_input_example_info=None,
+                signature=signature,
                 utc_time_created=pd.Timestamp.now().isoformat(),
             )
 
@@ -279,7 +288,9 @@ class CustomLoader(Loader):
                 pd.DataFrame(
                     {
                         "response": [prediction],
-                        "metadata": [{"timestamp": "2025-01-15T12:00:00Z", "model_version": "v1.0.0"}],
+                        "metadata": [
+                            {"timestamp": "2025-01-15T12:00:00Z", "model_version": "v1.0.0"}
+                        ],
                     }
                 )
             )

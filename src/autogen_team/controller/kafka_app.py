@@ -16,7 +16,7 @@ from pandera.typing.common import DataFrameBase
 from pydantic import BaseModel
 
 from autogen_team.core.schemas import InputsSchema, Outputs
-from autogen_team.io import registries, services
+from autogen_team.io import services
 from autogen_team.io.registries import CustomLoader
 
 # Constants
@@ -220,7 +220,7 @@ async def health_check() -> Dict[str, str]:
 def main() -> None:
     global fastapi_kafka_service
     # Configuration
-    alias_or_version: str | int = "Champion"
+    # Configuration
     # Initialize Mlflow Service
     mlflow_service = services.MlflowService()
     mlflow_service.start()
@@ -237,7 +237,9 @@ def main() -> None:
     def my_prediction_function(input_data: PredictionRequest) -> PredictionResponse:
         predictionresponse: PredictionResponse = PredictionResponse()
         try:
-            outputs: Outputs = model.predict(inputs=InputsSchema.check(pd.DataFrame(input_data.input_data)))
+            outputs: Outputs = model.predict(
+                inputs=InputsSchema.check(pd.DataFrame(input_data.input_data))
+            )
             predictionresponse.result["inference"] = outputs.to_numpy().tolist()
             predictionresponse.result["quality"] = 1
             predictionresponse.result["error"] = None
