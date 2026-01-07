@@ -225,9 +225,11 @@ def main() -> None:
     mlflow_service = services.MlflowService()
     mlflow_service.start()
     # Load Model
-    model_uri = registries.uri_for_model_alias_or_version(
-        name=mlflow_service.registry_name, alias_or_version=alias_or_version
-    )
+    # model_uri = registries.uri_for_model_alias_or_version(
+    #     name=mlflow_service.registry_name, alias_or_version=alias_or_version
+    # )
+    model_uri = f"file://{os.path.abspath('outputs/champion_model')}"
+    logger.info(f"Using local model from: {model_uri}")
     loader = CustomLoader()
     model = loader.load(uri=model_uri)
 
@@ -235,9 +237,7 @@ def main() -> None:
     def my_prediction_function(input_data: PredictionRequest) -> PredictionResponse:
         predictionresponse: PredictionResponse = PredictionResponse()
         try:
-            outputs: Outputs = model.predict(
-                inputs=InputsSchema.check(pd.DataFrame(input_data.input_data))
-            )
+            outputs: Outputs = model.predict(inputs=InputsSchema.check(pd.DataFrame(input_data.input_data)))
             predictionresponse.result["inference"] = outputs.to_numpy().tolist()
             predictionresponse.result["quality"] = 1
             predictionresponse.result["error"] = None

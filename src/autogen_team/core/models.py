@@ -29,9 +29,7 @@ Params = dict[ParamKey, ParamValue]
 # %% MODELS
 
 
-class Model(
-    abc.ABC, pdt.BaseModel, strict=True, frozen=False, extra="forbid", arbitrary_types_allowed=True
-):
+class Model(abc.ABC, pdt.BaseModel, strict=True, frozen=False, extra="forbid", arbitrary_types_allowed=True):
     """Base class for a project model.
 
     Use a model to adapt AI/ML frameworks.
@@ -192,10 +190,18 @@ class BaselineAutogenModel(Model):
         """
         # Store config for lazy loading/cloning
         self.model_config_data = model_config
+
+        # Handle env var substitution for API key
+        api_key = model_config["config"]["api_key"]
+        if api_key == "${LITELLM_API_KEY}":
+            api_key = os.getenv("LITELLM_API_KEY")
+            if not api_key:
+                raise ValueError("LITELLM_API_KEY environment variable is not set")
+
         # Load the client
         self._model_client = OpenAIChatClient(
             model_id=model_config["config"]["model"],
-            api_key=model_config["config"]["api_key"],
+            api_key=api_key,
             base_url=model_config["config"]["api_base"],
         )
 
@@ -254,9 +260,7 @@ class BaselineAutogenModel(Model):
                     {
                         "response": content_str,  # Getting the response content
                         "metadata": {
-                            "timestamp": datetime.now(
-                                timezone.utc
-                            ).isoformat(),  # Current time in ISO-8601 format
+                            "timestamp": datetime.now(timezone.utc).isoformat(),  # Current time in ISO-8601 format
                             "model_version": "v1.0.0",
                             "terminated": response.finish_reason is not None,
                             "messages": [msg.text for msg in response.messages],
@@ -313,17 +317,13 @@ class BaselineAutogenModel(Model):
         output_df = outputs
 
         # Iterate over each input and its corresponding prediction to build explanations.
-        for input_row, output_row in zip(
-            inputs.itertuples(index=False), output_df.itertuples(index=False)
-        ):
+        for input_row, output_row in zip(inputs.itertuples(index=False), output_df.itertuples(index=False)):
             explanation_text = (
                 f"For input '{input_row.input}', the model generated response '{output_row.response}'. "
                 "This response is produced using prompt-driven generation and context management. "
                 "Since traditional SHAP values are not applicable for a chat-based model, a dummy attribution of 1.0 is used."
             )
-            explanations.append(
-                {"sample": input_row.input, "explanation": explanation_text, "shap_value": 1.0}
-            )
+            explanations.append({"sample": input_row.input, "explanation": explanation_text, "shap_value": 1.0})
 
         explanation_df = pd.DataFrame(explanations)
         # Return the DataFrame as a SHAPValues type. Note that schemas.SHAPValues is defined as a type alias.
