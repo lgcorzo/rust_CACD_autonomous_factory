@@ -5,6 +5,7 @@ from typing import Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
+from confluent_kafka import KafkaError
 
 # Assuming the code you provided is in a file named 'app.py'
 from autogen_team.controller.kafka_app import (
@@ -14,7 +15,6 @@ from autogen_team.controller.kafka_app import (
     PredictionResponse,
     app,
 )
-from confluent_kafka import KafkaError
 
 
 @pytest.fixture()
@@ -323,12 +323,13 @@ def test_main_function() -> None:
     """Test the main function."""
     with (
         patch("autogen_team.controller.kafka_app.services.MlflowService") as MockMlflowService,
-        patch(
-            "autogen_team.controller.kafka_app.registries.uri_for_model_alias_or_version"
-        ) as MockUri,
         patch("autogen_team.controller.kafka_app.CustomLoader") as MockCustomLoader,
         patch("autogen_team.controller.kafka_app.FastAPIKafkaService") as MockFastAPIKafkaService,
         patch("autogen_team.controller.kafka_app.print") as mock_print,
+        patch(
+            "autogen_team.controller.kafka_app.os.path.abspath",
+            return_value="/mock/path/outputs/champion_model",
+        ),
     ):
         # Mock the mlflow service and its methods
         mock_mlflow_service = MagicMock()
@@ -342,8 +343,6 @@ def test_main_function() -> None:
         mock_loader.load.return_value = mock_model
         mock_model.predict.return_value = MagicMock()
 
-        MockUri.return_value = "test_uri"
-
         # Call the main function
         from autogen_team.controller.kafka_app import main
 
@@ -352,9 +351,8 @@ def test_main_function() -> None:
         # Assertions
         MockMlflowService.assert_called_once()
         mock_mlflow_service.start.assert_called_once()
-        MockUri.assert_called_once()
         MockCustomLoader.assert_called_once()
-        mock_loader.load.assert_called_once_with(uri="test_uri")
+        mock_loader.load.assert_called_once_with(uri="file:///mock/path/outputs/champion_model")
         MockFastAPIKafkaService.assert_called_once()
         mock_fastapi_kafka_service = MockFastAPIKafkaService.return_value
         mock_fastapi_kafka_service.start.assert_called_once()

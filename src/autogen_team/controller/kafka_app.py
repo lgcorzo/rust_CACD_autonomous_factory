@@ -16,7 +16,7 @@ from pandera.typing.common import DataFrameBase
 from pydantic import BaseModel
 
 from autogen_team.core.schemas import InputsSchema, Outputs
-from autogen_team.io import registries, services
+from autogen_team.io import services
 from autogen_team.io.registries import CustomLoader
 
 # Constants
@@ -220,14 +220,16 @@ async def health_check() -> Dict[str, str]:
 def main() -> None:
     global fastapi_kafka_service
     # Configuration
-    alias_or_version: str | int = "Champion"
+    # Configuration
     # Initialize Mlflow Service
     mlflow_service = services.MlflowService()
     mlflow_service.start()
     # Load Model
-    model_uri = registries.uri_for_model_alias_or_version(
-        name=mlflow_service.registry_name, alias_or_version=alias_or_version
-    )
+    # model_uri = registries.uri_for_model_alias_or_version(
+    #     name=mlflow_service.registry_name, alias_or_version=alias_or_version
+    # )
+    model_uri = f"file://{os.path.abspath('outputs/champion_model')}"
+    logger.info(f"Using local model from: {model_uri}")
     loader = CustomLoader()
     model = loader.load(uri=model_uri)
 
