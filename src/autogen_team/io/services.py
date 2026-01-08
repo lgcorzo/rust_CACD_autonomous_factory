@@ -7,6 +7,7 @@ from __future__ import annotations
 import abc
 import contextlib as ctx
 import logging
+import os
 import sys
 import typing as T
 from typing import ClassVar
@@ -154,9 +155,10 @@ class AlertsService(Service):
             message (str): message of the notification.
         """
         if self.enable:
-            notification.notify(
-                title=title, message=message, app_name=self.app_name, timeout=self.timeout
-            )
+            try:
+                notification.notify(title=title, message=message, app_name=self.app_name, timeout=self.timeout)
+            except Exception:
+                print(f"[{self.app_name}] {title}: {message} (Notification ignored: No usable implementation)")
         else:
             print(f"[{self.app_name}] {title}: {message}")
 
@@ -225,6 +227,13 @@ class MlflowService(Service):
             log_model_signatures=self.autolog_log_model_signatures,
             log_datasets=self.autolog_log_datasets,
             silent=self.autolog_silent,
+        )
+        # S3 credentials
+        os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID", self.env.aws_access_key_id)
+        os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY", self.env.aws_secret_access_key)
+        os.environ["MLFLOW_S3_ENDPOINT_URL"] = os.getenv("MLFLOW_S3_ENDPOINT_URL", self.env.mlflow_s3_endpoint_url)
+        os.environ["MLFLOW_S3_IGNORE_TLS"] = os.getenv(
+            "MLFLOW_S3_IGNORE_TLS", str(self.env.mlflow_s3_ignore_tls).lower()
         )
 
     @ctx.contextmanager
