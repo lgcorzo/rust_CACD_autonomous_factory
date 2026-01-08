@@ -20,7 +20,7 @@ from autogen_team.io import services
 from autogen_team.io.registries import CustomLoader
 
 # Constants
-DEFAULT_KAFKA_SERVER = os.getenv("DEFAULT_KAFKA_SERVER", "kafka_server:9092")
+DEFAULT_KAFKA_SERVER = os.getenv("DEFAULT_KAFKA_SERVER", "my-kafka-cluster.confluent.svc.cluster.local:9092")
 DEFAULT_GROUP_ID = os.getenv("DEFAULT_GROUP_ID", "llmops-regression")
 DEFAULT_AUTO_OFFSET_RESET = os.getenv("DEFAULT_AUTO_OFFSET_RESET", "earliest")
 DEFAULT_INPUT_TOPIC = os.getenv("DEFAULT_INPUT_TOPIC", "llm_input_topic")
