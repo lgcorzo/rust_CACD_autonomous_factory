@@ -352,7 +352,7 @@ def test_main_function() -> None:
         MockMlflowService.assert_called_once()
         mock_mlflow_service.start.assert_called_once()
         MockCustomLoader.assert_called_once()
-        mock_loader.load.assert_called_once_with(uri="file:///mock/path/outputs/champion_model")
+        mock_loader.load.assert_called_once_with(uri="models:/test_registry@latest")
         MockFastAPIKafkaService.assert_called_once()
         mock_fastapi_kafka_service = MockFastAPIKafkaService.return_value
         mock_fastapi_kafka_service.start.assert_called_once()

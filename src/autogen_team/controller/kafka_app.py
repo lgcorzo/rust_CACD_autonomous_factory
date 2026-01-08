@@ -20,7 +20,9 @@ from autogen_team.io import services
 from autogen_team.io.registries import CustomLoader
 
 # Constants
-DEFAULT_KAFKA_SERVER = os.getenv("DEFAULT_KAFKA_SERVER", "kafka_server:9092")
+DEFAULT_KAFKA_SERVER = os.getenv(
+    "DEFAULT_KAFKA_SERVER", "my-kafka-cluster.confluent.svc.cluster.local:9092"
+)
 DEFAULT_GROUP_ID = os.getenv("DEFAULT_GROUP_ID", "llmops-regression")
 DEFAULT_AUTO_OFFSET_RESET = os.getenv("DEFAULT_AUTO_OFFSET_RESET", "earliest")
 DEFAULT_INPUT_TOPIC = os.getenv("DEFAULT_INPUT_TOPIC", "llm_input_topic")
@@ -239,7 +241,9 @@ def main() -> None:
     def my_prediction_function(input_data: PredictionRequest) -> PredictionResponse:
         predictionresponse: PredictionResponse = PredictionResponse()
         try:
-            outputs: Outputs = model.predict(inputs=InputsSchema.check(pd.DataFrame(input_data.input_data)))
+            outputs: Outputs = model.predict(
+                inputs=InputsSchema.check(pd.DataFrame(input_data.input_data))
+            )
             predictionresponse.result["inference"] = outputs.to_numpy().tolist()
             predictionresponse.result["quality"] = 1
             predictionresponse.result["error"] = None
