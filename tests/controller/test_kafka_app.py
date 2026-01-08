@@ -18,9 +18,9 @@ from autogen_team.controller.kafka_app import (
 
 
 @pytest.fixture()
-def mock_kafka_service() -> Generator[
-    tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock], None, None
-]:
+def mock_kafka_service() -> (
+    Generator[tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock], None, None]
+):
     """Fixture to create a mocked FastAPIKafkaService."""
     with (
         patch("autogen_team.controller.kafka_app.Producer") as MockProducer,

@@ -3,26 +3,30 @@
 # PROJECT
 
 [tool.poetry]
+packages = [{ include = "autogen_team", from = "src" }]
+requires-poetry = ">=2.0"
+
+[project]
 name = "autogen_team"
 version = "2.0.0"
 description = "Predict the number of autogen_team available."
-repository = "https://github.com/lgcorzo/llmops-python-package"
-documentation = "https://lgcorzo.github.io/llmops-python-package/"
-authors = []
 readme = "README.md"
+authors = []
 license = "MIT"
 keywords = ["mlops", "python", "package"]
-packages = [{ include = "autogen_team", from = "src" }]
+requires-python = ">=3.10,<3.13"
+dynamic = ["dependencies"]
 
-# SCRIPTS
+[project.urls]
+Repository = "https://github.com/lgcorzo/llmops-python-package"
+Documentation = "https://lgcorzo.github.io/llmops-python-package/"
 
-[tool.poetry.scripts]
-autogen_team = 'autogen_team.scripts:main'
+[project.scripts]
+autogen_team = "autogen_team.scripts:main"
 
 # DEPENDENCIES
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
 loguru = "^0.7.2"
 matplotlib = "^3.9.0"
 mlflow = "3.1.1"
