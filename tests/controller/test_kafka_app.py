@@ -18,9 +18,9 @@ from autogen_team.controller.kafka_app import (
 
 
 @pytest.fixture()
-def mock_kafka_service() -> (
-    Generator[tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock], None, None]
-):
+def mock_kafka_service() -> Generator[
+    tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock], None, None
+]:
     """Fixture to create a mocked FastAPIKafkaService."""
     with (
         patch("autogen_team.controller.kafka_app.Producer") as MockProducer,
@@ -352,7 +352,7 @@ def test_main_function() -> None:
         MockMlflowService.assert_called_once()
         mock_mlflow_service.start.assert_called_once()
         MockCustomLoader.assert_called_once()
-        mock_loader.load.assert_called_once_with(uri="file:///mock/path/outputs/champion_model")
+        mock_loader.load.assert_called_once_with(uri="models:/test_registry@latest")
         MockFastAPIKafkaService.assert_called_once()
         mock_fastapi_kafka_service = MockFastAPIKafkaService.return_value
         mock_fastapi_kafka_service.start.assert_called_once()
