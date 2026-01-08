@@ -18,6 +18,12 @@ class Env(Singleton, BaseSettings):
     mlflow_experiment_name: str = "autogen_team"
     mlflow_registered_model_name: str = "autogen_team"
 
+    # S3
+    aws_access_key_id: str = ""
+    aws_secret_access_key: str = ""
+    mlflow_s3_endpoint_url: str = ""
+    mlflow_s3_ignore_tls: bool = False
+
     class Config:
         case_sensitive = False  # Optional: make env var lookup case-insensitive
         env_file = ".env"  # Enable reading from .env file
