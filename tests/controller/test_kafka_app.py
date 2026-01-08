@@ -5,7 +5,6 @@ from typing import Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
-from confluent_kafka import KafkaError
 
 # Assuming the code you provided is in a file named 'app.py'
 from autogen_team.controller.kafka_app import (
@@ -15,6 +14,7 @@ from autogen_team.controller.kafka_app import (
     PredictionResponse,
     app,
 )
+from confluent_kafka import KafkaError
 
 
 @pytest.fixture()
@@ -352,7 +352,7 @@ def test_main_function() -> None:
         MockMlflowService.assert_called_once()
         mock_mlflow_service.start.assert_called_once()
         MockCustomLoader.assert_called_once()
-        mock_loader.load.assert_called_once_with(uri="models:/test_registry@latest")
+        mock_loader.load.assert_called_once_with(uri="models:/test_registry@Champion")
         MockFastAPIKafkaService.assert_called_once()
         mock_fastapi_kafka_service = MockFastAPIKafkaService.return_value
         mock_fastapi_kafka_service.start.assert_called_once()

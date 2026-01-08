@@ -9,13 +9,13 @@ from typing import Any, cast
 import omegaconf
 import pytest
 from _pytest import logging as pl
+from agent_framework import ChatMessage
+from agent_framework.openai import OpenAIChatClient
 from autogen_team.core import metrics, models, schemas
 from autogen_team.io import datasets, registries, services
 from autogen_team.utils import searchers, signers, splitters
 from mocogpt import GptServer, gpt_server
 from openai import OpenAI
-from agent_framework.openai import OpenAIChatClient
-from agent_framework import ChatMessage
 
 # %% COMPATIBILITY PATCH
 # agent-framework ALWAYS sends 'content' as a list of dicts: [{'type': 'text', 'text': '...'}]
