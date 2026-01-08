@@ -166,11 +166,13 @@ class CustomSaver(Saver):
         adapter = CustomSaver.Adapter(model=model)
 
         # Local save block
-        import shutil
+        import tempfile
 
-        local_path = "outputs/champion_model"
-        if os.path.exists(local_path):
-            shutil.rmtree(local_path)
+        # Create a unique temporary directory for the model
+        local_path = tempfile.mkdtemp(prefix="champion_model_", dir="outputs")
+
+        # Ensure outputs directory exists
+        os.makedirs("outputs", exist_ok=True)
 
         mlflow.pyfunc.save_model(
             path=local_path,

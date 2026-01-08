@@ -143,12 +143,17 @@ This project uses [Invoke](https://www.pyinvoke.org/) for task automation.
 
 - **Run tests:**
   ```bash
-  inv checks.test
+  inv checks
   ```
 
 - **List all tasks:**
   ```bash
   inv --list
+  ```
+
+  - **run app**
+  ```bash
+  poetry run python src/autogen_team/controller/kafka_app.py
   ```
 
 ### Pre-commit Hooks
