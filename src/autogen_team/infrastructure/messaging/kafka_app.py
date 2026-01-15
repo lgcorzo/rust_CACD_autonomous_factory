@@ -277,6 +277,9 @@ def main() -> None:
     print("FastAPI and Kafka service is running.  Press Ctrl+C to stop.")
 
 
+KafkaController = FastAPIKafkaService
+
+
 # Main Execution
 if __name__ == "__main__":
     main()

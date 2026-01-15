@@ -5,7 +5,6 @@ from __future__ import annotations
 import abc
 import logging
 import sys
-import typing as T
 
 import loguru
 import pydantic as pdt

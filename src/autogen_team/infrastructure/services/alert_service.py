@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pydantic as pdt
 from plyer import notification
 
 from .logger_service import Service
@@ -22,8 +21,12 @@ class AlertsService(Service):
         """Send a notification to the system."""
         if self.enable:
             try:
-                notification.notify(title=title, message=message, app_name=self.app_name, timeout=self.timeout)
+                notification.notify(
+                    title=title, message=message, app_name=self.app_name, timeout=self.timeout
+                )
             except Exception:
-                print(f"[{self.app_name}] {title}: {message} (Notification ignored: No usable implementation)")
+                print(
+                    f"[{self.app_name}] {title}: {message} (Notification ignored: No usable implementation)"
+                )
         else:
             print(f"[{self.app_name}] {title}: {message}")

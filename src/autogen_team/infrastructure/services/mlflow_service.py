@@ -54,8 +54,12 @@ class MlflowService(Service):
             silent=self.autolog_silent,
         )
         os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID", self.env.aws_access_key_id)
-        os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY", self.env.aws_secret_access_key)
-        os.environ["MLFLOW_S3_ENDPOINT_URL"] = os.getenv("MLFLOW_S3_ENDPOINT_URL", self.env.mlflow_s3_endpoint_url)
+        os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv(
+            "AWS_SECRET_ACCESS_KEY", self.env.aws_secret_access_key
+        )
+        os.environ["MLFLOW_S3_ENDPOINT_URL"] = os.getenv(
+            "MLFLOW_S3_ENDPOINT_URL", self.env.mlflow_s3_endpoint_url
+        )
         os.environ["MLFLOW_S3_IGNORE_TLS"] = os.getenv(
             "MLFLOW_S3_IGNORE_TLS", str(self.env.mlflow_s3_ignore_tls).lower()
         )
