@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 # Assuming the metrics are in a module named 'metrics.py'
-from autogen_team.core.metrics import (
+from autogen_team.evaluation.metrics import (
     AutogenConversationMetric,
     AutogenMetric,
     Threshold,
@@ -17,11 +17,41 @@ from autogen_team.core.metrics import (
 # Mock schemas to avoid dependencies
 @pytest.fixture(autouse=True)
 def mock_schemas() -> Iterator[MagicMock]:
-    with patch("autogen_team.core.metrics.schemas") as mock_schemas:
+    with patch("autogen_team.evaluation.metrics.metrics.schemas") as mock_schemas:
         mock_schemas.TargetsSchema.response = "response"
         mock_schemas.OutputsSchema.response = "response"
         mock_schemas.OutputsSchema.metadata = "metadata"
         yield mock_schemas
+
+
+# ... (omitted similar lines, focus on changes)
+
+
+# Test Metric Integration
+class TestMetricIntegration:
+    def test_scorer_flow(self) -> None:
+        # Mock dependencies
+        mock_model = MagicMock()
+        mock_inputs = MagicMock()
+        mock_targets = MagicMock()
+        mock_outputs = MagicMock()
+
+        # Configure model to return outputs
+        mock_model.predict.return_value = mock_outputs
+
+        # Create metric with mocked score method
+        metric = AutogenMetric(
+            name="AutogenMetricTest", metric_type="exact_match", greater_is_better=True
+        )
+
+        # Execute scorer
+        with patch("autogen_team.evaluation.metrics.AutogenMetric.score") as mock_score:
+            mock_score.return_value = 0.5
+            result = metric.scorer(mock_model, mock_inputs, mock_targets)
+
+        # Verify calls
+        mock_score.assert_called_once_with(targets=mock_targets, outputs=mock_outputs)
+        assert result == 0.5
 
 
 # Test AutogenMetric
@@ -169,33 +199,6 @@ class TestThreshold:
 
         assert mlflow_thresh.threshold == threshold
         assert mlflow_thresh.greater_is_better == greater_is_better
-
-
-# Test Metric Integration
-class TestMetricIntegration:
-    def test_scorer_flow(self) -> None:
-        # Mock dependencies
-        mock_model = MagicMock()
-        mock_inputs = MagicMock()
-        mock_targets = MagicMock()
-        mock_outputs = MagicMock()
-
-        # Configure model to return outputs
-        mock_model.predict.return_value = mock_outputs
-
-        # Create metric with mocked score method
-        metric = AutogenMetric(
-            name="AutogenMetricTest", metric_type="exact_match", greater_is_better=True
-        )
-
-        # Execute scorer
-        with patch("autogen_team.core.metrics.AutogenMetric.score") as mock_score:
-            mock_score.return_value = 0.5
-            result = metric.scorer(mock_model, mock_inputs, mock_targets)
-
-        # Verify calls
-        mock_score.assert_called_once_with(targets=mock_targets, outputs=mock_outputs)
-        assert result == 0.5
 
 
 if __name__ == "__main__":

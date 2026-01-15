@@ -2,9 +2,12 @@
 
 import _pytest.capture as pc
 import pytest
-from autogen_team import jobs
-from autogen_team.core import metrics, schemas
-from autogen_team.io import datasets, registries, services
+from autogen_team.application import jobs
+from autogen_team.core import schemas
+from autogen_team.data_access.adapters import datasets
+from autogen_team.evaluation import metrics
+from autogen_team.infrastructure import services
+from autogen_team.registry.adapters import mlflow_adapter as registries
 from mlflow.entities import Experiment
 
 # %% JOBS

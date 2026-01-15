@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 # Assuming the code you provided is in a file named 'app.py'
-from autogen_team.controller.kafka_app import (
+from autogen_team.infrastructure.messaging.kafka_app import (
     DEFAULT_FASTAPI_HOST,
     DEFAULT_FASTAPI_PORT,
     FastAPIKafkaService,
@@ -23,8 +23,8 @@ def mock_kafka_service() -> (
 ):
     """Fixture to create a mocked FastAPIKafkaService."""
     with (
-        patch("autogen_team.controller.kafka_app.Producer") as MockProducer,
-        patch("autogen_team.controller.kafka_app.Consumer") as MockConsumer,
+        patch("autogen_team.infrastructure.messaging.kafka_app.Producer") as MockProducer,
+        patch("autogen_team.infrastructure.messaging.kafka_app.Consumer") as MockConsumer,
         patch("threading.Thread") as MockThread,
         patch("time.sleep") as MockSleep,
     ):
@@ -75,12 +75,12 @@ def test_delivery_report(
     msg.topic.return_value = "test_topic"
     msg.partition.return_value = 1
 
-    with patch("autogen_team.controller.kafka_app.logger.info") as mock_logger_info:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.info") as mock_logger_info:
         service.delivery_report(err, msg)
         mock_logger_info.assert_called_once()
 
     err = MagicMock(spec=KafkaError)
-    with patch("autogen_team.controller.kafka_app.logger.error") as mock_logger_error:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.error") as mock_logger_error:
         service.delivery_report(err, msg)
         mock_logger_error.assert_called_once()
 
@@ -110,7 +110,7 @@ def test_run_server(
 ) -> None:
     """Test the _run_server method."""
     service, *_ = mock_kafka_service
-    with patch("autogen_team.controller.kafka_app.uvicorn.run") as mock_uvicorn_run:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.uvicorn.run") as mock_uvicorn_run:
         service._run_server()
         mock_uvicorn_run.assert_called_once_with(
             app, host=DEFAULT_FASTAPI_HOST, port=DEFAULT_FASTAPI_PORT, log_level="info"
@@ -122,7 +122,7 @@ def test_run_server_failure(
 ) -> None:
     """Test the _run_server method when uvicorn fails."""
     service, *_ = mock_kafka_service
-    with patch("autogen_team.controller.kafka_app.uvicorn.run") as mock_uvicorn_run:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.uvicorn.run") as mock_uvicorn_run:
         mock_uvicorn_run.side_effect = Exception("Uvicorn failed")
         service._run_server()
 
@@ -187,7 +187,7 @@ def test_poll_message_no_consumer(
     """Test _poll_message handles missing consumer."""
     service, *_ = mock_kafka_service
     service.consumer = None
-    with patch("autogen_team.controller.kafka_app.logger.error") as mock_logger_error:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.error") as mock_logger_error:
         message = service._poll_message()
         assert message is None
         mock_logger_error.assert_called_once()
@@ -200,7 +200,7 @@ def test_handle_message_error_partition_eof(
     service, *_ = mock_kafka_service
     msg = MagicMock()
     msg.error.return_value = MagicMock(code=MagicMock(return_value=KafkaError._PARTITION_EOF))
-    with patch("autogen_team.controller.kafka_app.logger.debug") as mock_logger_debug:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.debug") as mock_logger_debug:
         result = service._handle_message_error(msg)
         assert result is True
         mock_logger_debug.assert_called_once()
@@ -213,7 +213,7 @@ def test_handle_message_error_other_error(
     service, *_ = mock_kafka_service
     msg = MagicMock()
     msg.error.return_value = MagicMock(code=MagicMock(return_value=1))
-    with patch("autogen_team.controller.kafka_app.logger.error") as mock_logger_error:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.error") as mock_logger_error:
         result = service._handle_message_error(msg)
         assert result is False
         mock_logger_error.assert_called_once()
@@ -259,7 +259,7 @@ def test_process_message_json_decode_error(
 
     service.producer = MagicMock()
     service.consumer = MagicMock()
-    with patch("autogen_team.controller.kafka_app.logger.error") as mock_logger_error:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.error") as mock_logger_error:
         service._process_message(msg)
         mock_logger_error.assert_called()
     service.prediction_callback.assert_not_called()
@@ -281,7 +281,9 @@ def test_process_message_prediction_error(
     service.producer = MagicMock()
     service.consumer = MagicMock()
     service.prediction_callback.side_effect = Exception("Prediction Failed")
-    with patch("autogen_team.controller.kafka_app.logger.exception") as mock_logger_exception:
+    with patch(
+        "autogen_team.infrastructure.messaging.kafka_app.logger.exception"
+    ) as mock_logger_exception:
         service._process_message(msg)
         mock_logger_exception.assert_called()
     # service.prediction_callback.assert_called_once()
@@ -296,7 +298,7 @@ def test_close_consumer(
     service.consumer = MagicMock()
     service._close_consumer()
     service.consumer.close.assert_called_once()
-    with patch("autogen_team.controller.kafka_app.logger.info") as mock_logger_info:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.info") as mock_logger_info:
         service._close_consumer()
         mock_logger_info.assert_called()
 
@@ -313,7 +315,7 @@ def test_stop(
     service.consumer.close.assert_called_once()
     mock_os_kill.assert_called_once_with(os.getpid(), signal.SIGINT)
     assert service.stop_event.is_set()
-    with patch("autogen_team.controller.kafka_app.logger.info") as mock_logger_info:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.info") as mock_logger_info:
         service.stop()
         assert service.stop_event.is_set()
         assert mock_logger_info.call_count == 2
@@ -322,12 +324,16 @@ def test_stop(
 def test_main_function() -> None:
     """Test the main function."""
     with (
-        patch("autogen_team.controller.kafka_app.services.MlflowService") as MockMlflowService,
-        patch("autogen_team.controller.kafka_app.CustomLoader") as MockCustomLoader,
-        patch("autogen_team.controller.kafka_app.FastAPIKafkaService") as MockFastAPIKafkaService,
-        patch("autogen_team.controller.kafka_app.print") as mock_print,
         patch(
-            "autogen_team.controller.kafka_app.os.path.abspath",
+            "autogen_team.infrastructure.messaging.kafka_app.services.MlflowService"
+        ) as MockMlflowService,
+        patch("autogen_team.infrastructure.messaging.kafka_app.CustomLoader") as MockCustomLoader,
+        patch(
+            "autogen_team.infrastructure.messaging.kafka_app.FastAPIKafkaService"
+        ) as MockFastAPIKafkaService,
+        patch("autogen_team.infrastructure.messaging.kafka_app.print") as mock_print,
+        patch(
+            "autogen_team.infrastructure.messaging.kafka_app.os.path.abspath",
             return_value="/mock/path/outputs/champion_model",
         ),
     ):
@@ -344,7 +350,7 @@ def test_main_function() -> None:
         mock_model.predict.return_value = MagicMock()
 
         # Call the main function
-        from autogen_team.controller.kafka_app import main
+        from autogen_team.infrastructure.messaging.kafka_app import main
 
         main()
 

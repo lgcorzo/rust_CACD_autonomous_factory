@@ -1,6 +1,6 @@
 # %% IMPORTS
 
-from autogen_team.io import services
+from autogen_team.infrastructure import services
 from autogen_team.jobs import base
 
 # %% JOBS

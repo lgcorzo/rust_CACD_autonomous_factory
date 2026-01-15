@@ -45,7 +45,7 @@ def test_predict(baseline_model: BaselineAutogenModel) -> None:
     input_data = pd.DataFrame({"input": ["Some large input string"]})
     inputs = schemas.Inputs(input_data)
 
-    with patch("autogen_team.core.models.asyncio.run") as MockModelrun:
+    with patch("autogen_team.models.entities.asyncio.run") as MockModelrun:
         # Mock the response
         mock_msg = MagicMock()
         mock_msg.text = "Result 1"
@@ -95,7 +95,7 @@ def test_load_context(baseline_model: BaselineAutogenModel) -> None:
             "max_tokens": 512,  # Optional
         },
     }  # Provide your model config as necessary
-    with patch("autogen_team.core.models.OpenAIChatClient") as MockOpenAIChatClient:
+    with patch("autogen_team.models.entities.OpenAIChatClient") as MockOpenAIChatClient:
         # Execute
         baseline_model.load_context(model_config)
         # Verify

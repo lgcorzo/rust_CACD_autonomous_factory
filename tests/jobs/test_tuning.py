@@ -1,10 +1,13 @@
 # %% IMPORTS
 
 import _pytest.capture as pc
-from autogen_team import jobs
-from autogen_team.core import metrics, models, schemas
-from autogen_team.io import datasets, services
-from autogen_team.utils import searchers, splitters
+from autogen_team.application import jobs
+from autogen_team.core import schemas
+from autogen_team.data_access.adapters import datasets
+from autogen_team.evaluation import metrics
+from autogen_team.infrastructure import services
+from autogen_team.infrastructure.utils import searchers, splitters
+from autogen_team.models import entities as models
 from mlflow.entities import Experiment
 
 # %% JOBS

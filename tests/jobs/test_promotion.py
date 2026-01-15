@@ -3,8 +3,9 @@
 import _pytest.capture as pc
 import mlflow
 import pytest
-from autogen_team import jobs
-from autogen_team.io import registries, services
+from autogen_team.application import jobs
+from autogen_team.infrastructure import services
+from autogen_team.registry.adapters import mlflow_adapter as registries
 
 # %% JOBS
 
