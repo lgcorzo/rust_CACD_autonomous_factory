@@ -1,9 +1,9 @@
 """Infrastructure IO - Configuration and environment."""
 
 from .configs import (
+    merge_configs,
     parse_file,
     parse_string,
-    merge_configs,
     to_object,
 )
 from .osvariables import Env

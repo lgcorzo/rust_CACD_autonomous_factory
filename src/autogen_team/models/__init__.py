@@ -1,12 +1,12 @@
 """Models Domain - ML model entities and repository."""
 
 from .entities import (
-    Model,
     BaselineAutogenModel,
+    Model,
     ModelKind,
     ParamKey,
-    ParamValue,
     Params,
+    ParamValue,
 )
 
 __all__ = [

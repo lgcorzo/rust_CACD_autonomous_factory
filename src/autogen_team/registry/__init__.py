@@ -1,6 +1,6 @@
 """Registry Domain - Model registration and versioning."""
 
-from .entities import ModelVersion, ModelInfo
+from .entities import ModelInfo, ModelVersion
 from .repositories import RegistryRepository
 
 __all__ = [

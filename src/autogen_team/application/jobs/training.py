@@ -7,11 +7,14 @@ import typing as T
 import mlflow
 import pydantic as pdt
 
-from autogen_team.core import metrics as metrics_
-from autogen_team.core import models, schemas
-from autogen_team.io import datasets, registries, services
-from autogen_team.jobs import base
-from autogen_team.utils import signers, splitters
+from autogen_team.application.jobs import base
+from autogen_team.core import schemas
+from autogen_team.data_access.adapters import datasets
+from autogen_team.evaluation.metrics import metrics as metrics_
+from autogen_team.infrastructure import services
+from autogen_team.infrastructure.utils import signers, splitters
+from autogen_team.models import entities as models
+from autogen_team.registry.adapters import mlflow_adapter as registries
 
 # %% JOBS
 

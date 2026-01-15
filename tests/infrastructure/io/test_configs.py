@@ -3,7 +3,7 @@
 import os
 
 import omegaconf as oc
-from autogen_team.io import configs
+from autogen_team.infrastructure.io import configs
 
 # %% PARSERS
 

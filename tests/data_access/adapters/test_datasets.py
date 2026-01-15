@@ -5,7 +5,7 @@ import os
 
 import pytest
 from autogen_team.core import schemas
-from autogen_team.io import datasets
+from autogen_team.data_access.adapters import datasets
 
 # %% READERS
 

@@ -1,7 +1,7 @@
 # %% IMPORTS
 
 from autogen_team.core import schemas
-from autogen_team.utils import splitters
+from autogen_team.infrastructure.utils import splitters
 
 # %% SPLITTERS
 

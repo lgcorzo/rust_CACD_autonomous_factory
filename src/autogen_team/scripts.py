@@ -13,7 +13,7 @@ import sys
 import warnings
 
 from autogen_team import settings
-from autogen_team.io import configs
+from autogen_team.infrastructure.io import configs
 
 # disable annoying mlflow warnings
 warnings.filterwarnings(action="ignore", category=UserWarning)

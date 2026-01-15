@@ -4,7 +4,7 @@
 
 import typing as T
 
-from autogen_team.jobs import base
+from autogen_team.application.jobs import base
 
 # %% JOBS
 

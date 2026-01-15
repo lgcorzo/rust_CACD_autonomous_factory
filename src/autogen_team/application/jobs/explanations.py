@@ -6,9 +6,10 @@ import typing as T
 
 import pydantic as pdt
 
+from autogen_team.application.jobs import base
 from autogen_team.core import schemas
-from autogen_team.io import datasets, registries
-from autogen_team.jobs import base
+from autogen_team.data_access.adapters import datasets
+from autogen_team.registry.adapters import mlflow_adapter as registries
 
 NUM_MAX_INPUTS = 2
 

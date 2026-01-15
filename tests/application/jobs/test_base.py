@@ -1,7 +1,7 @@
 # %% IMPORTS
 
+from autogen_team.application.jobs import base
 from autogen_team.infrastructure import services
-from autogen_team.jobs import base
 
 # %% JOBS
 

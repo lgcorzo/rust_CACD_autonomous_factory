@@ -9,8 +9,10 @@ import pandas as pd
 import pydantic as pdt
 from sklearn import model_selection
 
-from autogen_team.core import metrics, models, schemas
+from autogen_team.core import schemas
+from autogen_team.evaluation import metrics
 from autogen_team.infrastructure.utils import splitters
+from autogen_team.models import entities as models
 
 # %% TYPES
 

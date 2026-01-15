@@ -16,8 +16,8 @@ from pandera.typing.common import DataFrameBase
 from pydantic import BaseModel
 
 from autogen_team.core.schemas import InputsSchema, Outputs
-from autogen_team.io import services
-from autogen_team.io.registries import CustomLoader
+from autogen_team.infrastructure import services
+from autogen_team.registry.adapters.mlflow_adapter import CustomLoader
 
 # Constants
 DEFAULT_KAFKA_SERVER = os.getenv(

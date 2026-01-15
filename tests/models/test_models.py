@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from agent_framework.openai import OpenAIChatClient
 from autogen_team.core import schemas
-from autogen_team.core.models import BaselineAutogenModel
+from autogen_team.models.entities import BaselineAutogenModel
 
 
 @pytest.fixture

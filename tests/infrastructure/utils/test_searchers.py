@@ -1,7 +1,9 @@
 # %% IMPORTS
 
-from autogen_team.core import metrics, models, schemas
-from autogen_team.utils import searchers, splitters
+from autogen_team.core import schemas
+from autogen_team.evaluation import metrics
+from autogen_team.infrastructure.utils import searchers, splitters
+from autogen_team.models import entities as models
 
 # %% SEARCHERS
 

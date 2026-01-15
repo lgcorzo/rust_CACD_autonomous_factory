@@ -17,8 +17,9 @@ import pandas as pd
 import pydantic as pdt
 from mlflow.pyfunc.model import PythonModel, PythonModelContext
 
-from autogen_team.core import models, schemas
-from autogen_team.utils import signers
+from autogen_team.core import schemas
+from autogen_team.infrastructure.utils import signers
+from autogen_team.models import entities as models
 
 # %% TYPES
 

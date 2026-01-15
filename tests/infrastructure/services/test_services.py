@@ -6,7 +6,7 @@ import mlflow
 import plyer
 import pytest
 import pytest_mock as pm
-from autogen_team.io import services
+from autogen_team.infrastructure import services
 
 # %% SERVICES
 

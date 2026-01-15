@@ -1,7 +1,7 @@
 # %% IMPORTS
 
 from autogen_team.core import schemas
-from autogen_team.utils import signers
+from autogen_team.infrastructure.utils import signers
 
 # %% SIGNERS
 

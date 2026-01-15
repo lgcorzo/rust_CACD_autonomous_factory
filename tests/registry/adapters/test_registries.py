@@ -1,8 +1,10 @@
 # %% IMPORTS
 
-from autogen_team.core import models, schemas
-from autogen_team.io import registries, services
-from autogen_team.utils import signers
+from autogen_team.core import schemas
+from autogen_team.infrastructure import services
+from autogen_team.infrastructure.utils import signers
+from autogen_team.models import entities as models
+from autogen_team.registry.adapters import mlflow_adapter as registries
 
 # %% HELPERS
 

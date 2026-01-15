@@ -16,7 +16,8 @@ import pandas as pd
 import pydantic as pdt
 from mlflow.metrics import MetricValue
 
-from autogen_team.core import models, schemas
+from autogen_team.core import schemas
+from autogen_team.models import entities as models
 
 # %% TYPINGS
 MlflowMetric: T.TypeAlias = MetricValue
