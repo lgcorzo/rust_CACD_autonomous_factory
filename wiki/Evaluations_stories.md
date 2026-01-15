@@ -1,7 +1,6 @@
-
 # US [Model Evaluation Job](./backlog_llmlops_regresion.md) : Define a job for evaluating registered models with given datasets.
-I'll help create user stories for the provided code.
 
+I'll help create user stories for the provided code.
 
 - [US Model Evaluation Job : Define a job for evaluating registered models with given datasets.](#us-model-evaluation-job--define-a-job-for-evaluating-registered-models-with-given-datasets)
   - [classes relations](#classes-relations)
@@ -16,7 +15,7 @@ I'll help create user stories for the provided code.
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -84,7 +83,7 @@ The `EvaluationsJob` class allows users to configure an evaluation job, defining
 
 - The job should be initializable, configurable via Python code, by setting input data, target data, and run configurations.
 - Default values are properly set for the evaluation metrics.
-- It should configure the `AutogenMetric` list using the proper  `metric_type`
+- It should configure the `AutogenMetric` list using the proper `metric_type`
 
 ---
 
@@ -94,12 +93,13 @@ The `EvaluationsJob` class allows users to configure an evaluation job, defining
 As a **data analyst**, I want to be able to read input data and expected target responses for my Autogen model from configured data sources, so I can feed it into the evaluation job and make sure it is working on real scenarios.
 
 **Description:**
-The  `EvaluationsJob` must be able to read the input and target data from their sources.
+The `EvaluationsJob` must be able to read the input and target data from their sources.
 
 **Acceptance Criteria:**
 
 - The inputs from specified ReaderKind are properly reading data.
-- The targets for the model  to train or make searchs has to be properly configured.
+- The targets for the model to train or make searchs has to be properly configured.
+
 ---
 
 ### **3. User Story: Log Data Lineage**
@@ -108,7 +108,7 @@ The  `EvaluationsJob` must be able to read the input and target data from their 
 As a **data engineer**, I want to log the lineage of input and target data used to evaluate Autogen models, so that there is traceability and auditing of the evaluation processes.
 
 **Description:**
-This story involves configuring the  `EvaluationsJob` to log the lineage of the used data.
+This story involves configuring the `EvaluationsJob` to log the lineage of the used data.
 
 **Acceptance Criteria:**
 
@@ -122,7 +122,7 @@ This story involves configuring the  `EvaluationsJob` to log the lineage of the 
 **Title:**
 As a **data scientist**, I want to evaluate Autogen responses to know the model performance for Q&A
 **Description:**
-The  `EvaluationsJob` has to evaluate and read if the model´s metrics reach the requierments for a Q&A.
+The `EvaluationsJob` has to evaluate and read if the model´s metrics reach the requierments for a Q&A.
 
 **Acceptance Criteria:**
 
@@ -137,24 +137,28 @@ The  `EvaluationsJob` has to evaluate and read if the model´s metrics reach the
 As a **stakeholder**, I want to receive a notification to see if the performance evaluation finishes correctly.
 
 **Description:**
-The  `EvaluationsJob` is able to send a message saying that the execution has finished.
+The `EvaluationsJob` is able to send a message saying that the execution has finished.
 
 **Acceptance Criteria:**
 
 - A messaje in the alerts system saying that the execution has finished is raised
+
 ---
 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `EvaluationsJob` class inherits from a base Job and defines a method to configure.
    - A Pydantic schema is available for configuration
    - All job properties can be customizable.
 
 2. **Error Handling:**
+
    - The job has to have error handling for each process.
 
 3. **Testing:**
+
    - Implement unit tests to validate correct data reading and configuration
 
 4. **Documentation:**
@@ -168,8 +172,8 @@ The  `EvaluationsJob` is able to send a message saying that the execution has fi
 
 ## Code location
 
-[src/autogen_team/jobs/evaluations.py](../src/autogen_team/jobs/evaluations.py)
+- **Application Layer (Evaluations Job)**: [src/autogen_team/application/jobs/evaluations.py](../src/autogen_team/application/jobs/evaluations.py)
 
 ## Test location
 
-[tests/jobs/test_evaluations.py](../tests/jobs/test_evaluations.py)
+- [tests/application/jobs/test_evaluations.py](../tests/application/jobs/test_evaluations.py)

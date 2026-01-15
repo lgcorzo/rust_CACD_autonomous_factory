@@ -1,6 +1,5 @@
 # US [Model Tuning Job](./backlog_mlops_regresion.md) : Define a job for finding the best hyperparameters for a model
 
-
 - [US Model Tuning Job : Define a job for finding the best hyperparameters for a model](#us-model-tuning-job--define-a-job-for-finding-the-best-hyperparameters-for-a-model)
   - [classes relations](#classes-relations)
   - [**User Stories: Tuning Job Management**](#user-stories-tuning-job-management)
@@ -16,7 +15,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -132,6 +131,7 @@ As a **data scientist**, I want to configure a tuning job with the required para
 The `TuningJob` class allows the setup of parameters such as input data readers, target data readers, the model to be tuned, the metric to be optimized, and the hyperparameter search strategy.
 
 **Acceptance Criteria:**
+
 - The job can be initialized with all the necessary parameters.
 - Default values are properly configured for optional parameters.
 - The following configurations are available:
@@ -149,6 +149,7 @@ As a **data engineer**, I want to read input and target datasets from specified 
 In the `run` method, input and target data are read using the designated data readers, and the integrity of this data is validated.
 
 **Acceptance Criteria:**
+
 - The job successfully reads and validates input and target datasets.
 - The shapes of the datasets are logged for monitoring purposes.
 
@@ -163,6 +164,7 @@ As a **compliance officer**, I want to log the lineage of input and target datas
 Lineage information for both the input and target datasets is logged using MLflow to provide visibility into the data utilized during hyperparameter tuning.
 
 **Acceptance Criteria:**
+
 - The lineage of both the input and target datasets is successfully logged in MLflow.
 - Logged lineage includes necessary details to trace back the data source.
 
@@ -190,6 +192,7 @@ As a **data scientist**, I want to execute a hyperparameter search using the spe
 The job invokes the hyperparameter searcher to find optimal hyperparameters based on evaluation against the provided metric.
 
 **Acceptance Criteria:**
+
 - The hyperparameter search is performed successfully using the configured searcher.
 - Results from the search, including performance metrics, should be logged.
 
@@ -204,6 +207,7 @@ As a **data scientist**, I want to identify the best hyperparameters as part of 
 The results of the hyperparameter search should include the best score and best parameters, which are then logged.
 
 **Acceptance Criteria:**
+
 - The job captures and logs the best hyperparameters found and the associated performance score.
 - This information should be available for review and future reference.
 
@@ -218,6 +222,7 @@ As a **user**, I want to receive a notification when the tuning job is finished,
 At the conclusion of the job execution, the tuning job sends a notification detailing the completion of the process and the best score achieved.
 
 **Acceptance Criteria:**
+
 - Notifications include information about the best hyperparameter score.
 - The alerts service successfully communicates the tuning job's completion.
 
@@ -226,13 +231,16 @@ At the conclusion of the job execution, the tuning job sends a notification deta
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `TuningJob` class correctly implements the abstract `run` method from the base `Job` class.
    - All necessary services (logging, MLflow, alerts) are properly initialized.
 
 2. **Error Handling:**
+
    - Clear error messages should be logged for any issues encountered during data reading, hyperparameter tuning, or logging steps.
 
 3. **Testing:**
+
    - Unit tests validate job setup, data reading, hyperparameter search execution, and notification delivery.
    - Tests ensure effective handling of edge cases and error scenarios.
 
@@ -250,8 +258,8 @@ At the conclusion of the job execution, the tuning job sends a notification deta
 
 ## Code location
 
-[src/autogen_team/jobs/tuning.py](../src/autogen_team/jobs/tuning.py)
+- **Application Layer (Tuning Job)**: [src/autogen_team/application/jobs/tuning.py](../src/autogen_team/application/jobs/tuning.py)
 
 ## Test location
 
-[tests/jobs/test_tuning.py](../tests/jobs/test_tuning.py)
+- [tests/application/jobs/test_tuning.py](../tests/application/jobs/test_tuning.py)

@@ -1,6 +1,5 @@
 # US [Model Performance Evaluation](./backlog_llmlops_performance.md) : Evaluate model performances using various metrics and thresholds.
 
-
 - [US Model Performance Evaluation : Evaluate model performances using various metrics and thresholds.](#us-model-performance-evaluation--evaluate-model-performances-using-various-metrics-and-thresholds)
   - [classes relations](#classes-relations)
   - [**User Stories: Model Evaluation**](#user-stories-model-evaluation)
@@ -19,7 +18,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -76,6 +75,7 @@ As a **data scientist**, I want a **base `Metric` class** that defines a standar
 The `Metric` class establishes a consistent structure for defining and calculating evaluation metrics. This standardization allows for easier integration of new metrics and promotes reusability across different models and datasets.
 
 **Acceptance Criteria:**
+
 - The `Metric` class must be an abstract base class (`abc.ABC`).
 - The `KIND` attribute should identify the specific type of metric.
 - The class includes `name` (string) and `greater_is_better` (boolean) attributes.
@@ -94,6 +94,7 @@ As a **data scientist**, I want to evaluate model performance using base metrics
 The `Metric` base class defines an abstract method called `score` that child classes need to implement.
 
 **Acceptance Criteria:**
+
 - Be able to call `score` method on every metric object.
 - Return an float that represent the score.
 
@@ -108,6 +109,7 @@ As a **data scientist**, I want to evaluate performance using Autogen-specific m
 The `AutogenMetric` class enables calculating metrics specific to text generation models. It handles response comparison based on exact match, similarity, or length ratio.
 
 **Acceptance Criteria:**
+
 - Should return a similarity score.
 - Should return length ratio.
 - Should return a exact match score.
@@ -123,6 +125,7 @@ As a **data scientist**, I want a metric that evaluates the exact correspondence
 The `_exact_match_score` function inside `AutogenMetric` provides a method for scoring exact matches between target and output texts.
 
 **Acceptance Criteria:**
+
 - Returns 1.0 when the output text exactly matches the target text.
 - Returns 0.0 when there is any difference between the texts.
 
@@ -137,6 +140,7 @@ As a **data scientist**, I want a metric that evaluates the similarity between t
 The `_similarity_score` function calculates a similarity score between the generated output and the target using `SequenceMatcher`.
 
 **Acceptance Criteria:**
+
 - Should return the mean value.
 - Values should be calculated between the text strings.
 
@@ -151,6 +155,7 @@ As a **data scientist**, I want a metric that evaluates the appropriateness of r
 The `_length_ratio` function calculates the ratio between the length of the predicted and target responses.
 
 **Acceptance Criteria:**
+
 - Should return the realation between the strings.
 
 ---
@@ -164,6 +169,7 @@ As a **data scientist**, I want to evaluate the quality of conversations to meas
 The `AutogenConversationMetric` class allows for checking if a conversation reached a termination and if any error messages occurred during the process.
 
 **Acceptance Criteria:**
+
 - Must check the terination is reached and the check termination is True.
 - Must check has messages and the check messages is True.
 
@@ -178,6 +184,7 @@ As a **machine learning engineer**, I want to define performance thresholds for 
 The `Threshold` class is used to define threshold values and to ensure that if is greather or lower of them.
 
 **Acceptance Criteria:**
+
 - Class have to return value greather than the threshold when `greather_is_better` property is `True`
 - Class have to return value lower than the threshold when `greather_is_better` property is `False`
 
@@ -192,6 +199,7 @@ As a **machine learning platform engineer**, I want to be able to convert define
 The to_mlflow method converts the threshold to an MLflow-compatible format.
 
 **Acceptance Criteria:**
+
 - It must be an object of type `MlflowThreshold`
 - The `threshold` has to be the same as the source `threshold`
 - The `greater_is_better` property has to be the same as the source.
@@ -207,6 +215,7 @@ As a **MLOps Engineer**, I want to enable integration with MLflow, so that all m
 Each metric has a to_mlflow method and allow integration with MLFlow objects.
 
 **Acceptance Criteria:**
+
 - Check that the to_mlflow method exists.
 - Check that all attributes are passed to MLFlow properly.
 
@@ -215,14 +224,17 @@ Each metric has a to_mlflow method and allow integration with MLFlow objects.
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - All classes are correctly implemented with required abstract methods overridden.
    - Proper inheritance is used to share functionality and maintain consistency.
    - Pydantic is used for validation of class attributes.
 
 2. **Error Handling:**
+
    - Custom exceptions are raised for specific issues, like unsupported metric types or invalid input data.
 
 3. **Testing:**
+
    - Implement unit tests to validate correct metrics calculations and handling of edge cases.
    - Create integration tests to check interaction with MLflow.
 
@@ -241,8 +253,8 @@ Each metric has a to_mlflow method and allow integration with MLFlow objects.
 
 ## Code location
 
-[src/autogen_team/core/metrics.py](../src/autogen_team/core/metrics.py)
+- **Domain Layer (Metrics)**: [src/autogen_team/evaluation/metrics/metrics.py](../src/autogen_team/evaluation/metrics/metrics.py)
 
 ## Test location
 
-[tests/core/test_metrics.py](../tests/core/test_metrics.py)
+- [tests/evaluation/metrics/test_metrics.py](../tests/evaluation/metrics/test_metrics.py)

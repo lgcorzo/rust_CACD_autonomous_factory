@@ -1,6 +1,6 @@
-# US [Datasetes](./backlog_mlops_regresion.md) :  Handle loading, preprocessing, and managing data sets for training, evaluation, and inference.
+# US [Datasetes](./backlog_mlops_regresion.md) : Handle loading, preprocessing, and managing data sets for training, evaluation, and inference.
 
-- [US Datasetes :  Handle loading, preprocessing, and managing data sets for training, evaluation, and inference.](#us-datasetes---handle-loading-preprocessing-and-managing-data-sets-for-training-evaluation-and-inference)
+- [US Datasetes : Handle loading, preprocessing, and managing data sets for training, evaluation, and inference.](#us-datasetes---handle-loading-preprocessing-and-managing-data-sets-for-training-evaluation-and-inference)
   - [classes relations](#classes-relations)
   - [**User Stories: Dataset Reader and Lineage Generator**](#user-stories-dataset-reader-and-lineage-generator)
     - [**1. User Story: Load Dataset into Memory**](#1-user-story-load-dataset-into-memory)
@@ -22,7 +22,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -75,6 +75,7 @@ classDiagram
     ParquetReader ..> pd.DataFrame : "uses"
 
 ```
+
 ## **User Stories: Dataset Reader and Lineage Generator**
 
 ---
@@ -87,7 +88,8 @@ As a **data scientist**, I want to load datasets into memory using a standardize
 **Description:**  
 The `Reader` class provides a base implementation for loading datasets into a Pandas DataFrame from various sources (e.g., files, databases, or cloud storage). This ensures consistent data handling across the project.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The reader supports loading datasets into a Pandas DataFrame.
 - The `limit` parameter can restrict the number of rows read (optional).
 - The `read` method is abstract and must be implemented by subclasses to support specific data sources.
@@ -103,7 +105,8 @@ As a **data engineer**, I want to generate lineage information for datasets so t
 **Description:**  
 The `lineage` method generates metadata describing the dataset's origin, target columns, and prediction columns. This enables better tracking and reproducibility in the machine learning workflow.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The `lineage` method accepts the following parameters:
   - `name`: The name of the dataset.
   - `data`: The DataFrame representation of the dataset.
@@ -117,14 +120,17 @@ The `lineage` method generates metadata describing the dataset's origin, target 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `Reader` class is abstract and cannot be instantiated directly.
    - Subclasses must implement both the `read` and `lineage` methods.
 
 2. **Error Handling:**
+
    - If the `read` method is not implemented in a subclass, an appropriate error is raised.
    - If `lineage` parameters (e.g., `data`, `name`) are invalid or missing, the method raises an informative error.
 
 3. **Testing:**
+
    - Unit tests for the `Reader` base class validate correct implementation by subclasses.
    - Tests cover various data sources and edge cases, such as large datasets, missing parameters, and invalid configurations.
 
@@ -143,7 +149,6 @@ The `lineage` method generates metadata describing the dataset's origin, target 
 - Unit tests cover a wide range of scenarios and achieve high test coverage.
 - Documentation includes usage examples for developers and data scientists.
 
-
 ## **User Stories: ParquetReader Implementation**
 
 ---
@@ -156,7 +161,8 @@ As a **data scientist**, I want to load datasets stored in Parquet format into a
 **Description:**  
 The `ParquetReader` class provides functionality to read data from Parquet files and return it as a Pandas DataFrame. It ensures compatibility with modern data storage formats and supports optional row limits.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The `read` method reads the dataset from the specified Parquet file path.
 - If a `limit` is provided, the number of rows in the DataFrame is capped accordingly.
 - The method raises an informative error if the file path is invalid or the file format is unsupported.
@@ -172,7 +178,8 @@ As a **data engineer**, I want to generate lineage metadata for datasets read fr
 **Description:**  
 The `lineage` method generates metadata describing the dataset's source, name, and optional target or prediction columns. This metadata integrates with lineage tracking tools for debugging and audit trails.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The `lineage` method accepts the following parameters:
   - `name`: The logical name of the dataset.
   - `data`: The Pandas DataFrame representation of the dataset.
@@ -186,14 +193,17 @@ The `lineage` method generates metadata describing the dataset's source, name, a
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `ParquetReader` class extends the `Reader` base class.
    - The `KIND` attribute is set to `"ParquetReader"` for identification.
 
 2. **Error Handling:**
+
    - The `read` method raises an error if the file does not exist or is not a valid Parquet file.
    - The `lineage` method validates the presence and correctness of the input parameters (e.g., `name`, `data`).
 
 3. **Testing:**
+
    - Unit tests for `read` verify correct data loading, row limiting, and error scenarios (e.g., missing or invalid files).
    - Unit tests for `lineage` validate proper metadata generation and integration with lineage tracking tools.
 
@@ -206,6 +216,7 @@ The `lineage` method generates metadata describing the dataset's source, name, a
 ### **Example Use Cases**
 
 1. **Load and Limit Rows:**
+
    ```python
    reader = ParquetReader(path="data/dataset.parquet", limit=1000)
    data = reader.read()
@@ -229,7 +240,6 @@ The `lineage` method generates metadata describing the dataset's source, name, a
 - The `lineage` metadata integrates seamlessly with lineage tracking tools.
 - Documentation and usage examples are complete and accessible to developers and data scientists.
 
-
 ## **User Stories: Writer and ParquetWriter Implementation**
 
 ---
@@ -242,7 +252,8 @@ As a **data engineer**, I want to save a Pandas DataFrame to a specified locatio
 **Description:**  
 The `Writer` base class defines an abstract interface for saving datasets to various storage backends (e.g., file systems, databases, cloud storage). Implementations of this class, like the `ParquetWriter`, provide specific functionality to save data in a defined format.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The `Writer` class defines an abstract `write` method to be implemented by subclasses.
 - Subclasses specify the `KIND` attribute to identify the type of writer.
 - Documentation exists for how to extend the `Writer` class for other formats or storage solutions.
@@ -257,7 +268,8 @@ As a **data scientist**, I want to save a Pandas DataFrame as a Parquet file so 
 **Description:**  
 The `ParquetWriter` class provides functionality to save a DataFrame in Parquet format to a local or remote path. This ensures compatibility with modern analytics workflows and data pipelines.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The `ParquetWriter` class:
   - Inherits from the `Writer` base class.
   - Implements the `write` method to save a DataFrame to a Parquet file.
@@ -275,14 +287,17 @@ The `ParquetWriter` class provides functionality to save a DataFrame in Parquet 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `Writer` class is abstract and enforces implementation of the `write` method in subclasses.
    - The `ParquetWriter` class sets its `KIND` attribute to `"ParquetWriter"` for identification.
 
 2. **Error Handling:**
+
    - The `write` method raises informative errors for invalid paths, permissions issues, or serialization problems.
    - Validation ensures the `data` argument is a valid Pandas DataFrame.
 
 3. **Testing:**
+
    - Unit tests verify:
      - Successful writing of DataFrames to Parquet files.
      - Handling of edge cases like empty DataFrames or invalid paths.
@@ -297,6 +312,7 @@ The `ParquetWriter` class provides functionality to save a DataFrame in Parquet 
 ### **Example Use Cases**
 
 1. **Write DataFrame to Local Path:**
+
    ```python
    writer = ParquetWriter(path="data/output.parquet")
    writer.write(data=df)
@@ -319,8 +335,9 @@ The `ParquetWriter` class provides functionality to save a DataFrame in Parquet 
 
 ## Code location
 
-[src/autogen_team/core/datasets.py](../src/autogen_team/io/datasets.py)
+- **Data Access Layer (Datasets Entities)**: [src/autogen_team/data_access/entities.py](../src/autogen_team/data_access/entities.py)
+- **Data Access Layer (Datasets Repositories)**: [src/autogen_team/data_access/repositories.py](../src/autogen_team/data_access/repositories.py)
 
 ## Test location
 
-[tests/core/test_datasets.py](../tests/io/test_datasets.py)
+- [tests/data_access/test_datasets.py](../tests/data_access/test_datasets.py)

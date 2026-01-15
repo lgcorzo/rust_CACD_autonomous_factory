@@ -1,6 +1,5 @@
 # US [Model Registry](./backlog_llmlops_regresion.md) : Manage saving, loading, and registering machine learning models using MLflow.
 
-
 - [US Model Registry : Manage saving, loading, and registering machine learning models using MLflow.](#us-model-registry--manage-saving-loading-and-registering-machine-learning-models-using-mlflow)
   - [classes relations](#classes-relations)
   - [**User Stories: Model Saver and Loader**](#user-stories-model-saver-and-loader)
@@ -12,7 +11,7 @@
     - [**1. User Story: Saving Custom Models**](#1-user-story-saving-custom-models)
     - [**2. User Story: Using LiteLLM-compatible Client to Initialize CustomSaver Adapter**](#2-user-story-using-litellm-compatible-client-to-initialize-customsaver-adapter)
     - [**3. User Story: Load Configurations from JSON file**](#3-user-story-load-configurations-from-json-file)
-    - [**4. User Story: Define prediction  method**](#4-user-story-define-prediction--method)
+    - [**4. User Story: Define prediction method**](#4-user-story-define-prediction--method)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria-1)
     - [**Definition of Done (DoD):**](#definition-of-done-dod-1)
   - [**User Stories: Custom Loaders**](#user-stories-custom-loaders)
@@ -27,7 +26,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -113,6 +112,7 @@ As a **data engineer**, I want to save machine learning models to an MLflow regi
 The `Saver` class serves as a base for saving models to the MLflow model registry. The `save` method allows for saving various types of models using either custom or built-in save methods.
 
 **Acceptance Criteria:**
+
 - The `save` method is implemented by subclasses of `Saver` (CustomSaver).
 - Supports saving models with their signatures and input examples.
 - Provides metadata regarding the saved model through `ModelInfo`.
@@ -128,6 +128,7 @@ As a **data scientist**, I want to load machine learning models from the MLflow 
 The `Loader` class serves as a base for loading models from the MLflow model registry. The `load` method allows for loading models which can then be used for inference.
 
 **Acceptance Criteria:**
+
 - The `load` method is implemented by subclasses of `Loader` (CustomLoader).
 - Models can be loaded using a unique URI, providing flexibility in model retrieval.
 
@@ -136,13 +137,16 @@ The `Loader` class serves as a base for loading models from the MLflow model reg
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `Saver` and `Loader` base classes cannot be instantiated directly.
    - Subclass implementations (CustomSaver, CustomLoader) must clearly define `save` and `load` methods, respectively.
 
 2. **Error Handling:**
+
    - Appropriate errors are raised for failed save or load operations, including invalid model URIs and unsupported formats.
 
 3. **Testing:**
+
    - Unit tests validate the correct implementation of save and load methods for all subclasses.
    - Tests cover both the handling of valid and invalid model URIs and serialization formats.
 
@@ -174,6 +178,7 @@ As a **machine learning engineer**, I want to save my custom models using the ML
 The `CustomSaver` class extends the `Saver` base class and implements the logic to save custom models that conform to the MLflow PyFunc flavor.
 
 **Acceptance Criteria:**
+
 - Custom models can be saved using the `save` method from the `CustomSaver` class.
 - The saved model must retain its signature and input/output examples for later use.
 
@@ -182,13 +187,14 @@ The `CustomSaver` class extends the `Saver` base class and implements the logic 
 ### **2. User Story: Using LiteLLM-compatible Client to Initialize CustomSaver Adapter**
 
 **Title:**
-As a **machine learning engineer**, I want to use LiteLLM-compatible client for  `CustomSaver` Adapter, so I can leverage the features provided and easy deployment via the client .
+As a **machine learning engineer**, I want to use LiteLLM-compatible client for `CustomSaver` Adapter, so I can leverage the features provided and easy deployment via the client .
 
 **Description:**
-The  `__init__` on  `CustomSaver.Adapter`  should have the functionality  to setup a `LiteLLM`-compatible client ( `OpenAIChatCompletionClient` ) based on the provided configurations .
+The `__init__` on `CustomSaver.Adapter` should have the functionality to setup a `LiteLLM`-compatible client ( `OpenAIChatCompletionClient` ) based on the provided configurations .
 
 **Acceptance Criteria:**
-- The  `__init__`  initializes a LiteLLM-compatible client in `CustomSaver.Adapter`.
+
+- The `__init__` initializes a LiteLLM-compatible client in `CustomSaver.Adapter`.
 - The config contains the fields model,api_key,base_url, temeperature and max_tokens.
 
 ---
@@ -199,40 +205,45 @@ The  `__init__` on  `CustomSaver.Adapter`  should have the functionality  to set
 As a **machine learning engineer**, I want to load the model´s config from a specified path and use it later to load the model in the `CustomSaver.Adapter`class.
 
 **Description:**
-The  `load_context`  on `CustomSaver.Adapter` should load the context information from a json file and use it to initiate a new model
+The `load_context` on `CustomSaver.Adapter` should load the context information from a json file and use it to initiate a new model
 
 **Acceptance Criteria:**
+
 - The load from the `config_file` property should be implemented correctly
-- If a  configuration is not provided should raise the exception Value Error
+- If a configuration is not provided should raise the exception Value Error
 - If a file doesn´t exists should raise the exception FileNotFoundError
 
 ---
 
-### **4. User Story: Define prediction  method**
+### **4. User Story: Define prediction method**
 
 **Title:**
-As a **machine learning engineer**, I want to define a method to  predict and validate the `CustomeSaver` model for a  `fastAPI` enpoint.
+As a **machine learning engineer**, I want to define a method to predict and validate the `CustomeSaver` model for a `fastAPI` enpoint.
 
 **Description:**
-The   `predict` method, should use the method already implemented and the response should follow the data Schema of the project.
+The `predict` method, should use the method already implemented and the response should follow the data Schema of the project.
 
 **Acceptance Criteria:**
+
 - The predict method should be implemented correctly
-- The output  should be a valid `schemas.Outputs` object, containing both the prediction and metadata.
-- If something fails, the method should use the  method of the model to try and infer otherwise the exception is handled
+- The output should be a valid `schemas.Outputs` object, containing both the prediction and metadata.
+- If something fails, the method should use the method of the model to try and infer otherwise the exception is handled
 
 ---
 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `CustomSaver` class extends the `Saver` base class and implements required methods.
    - All necessary parameters for saving models are correctly handled.
 
 2. **Error Handling:**
+
    - The `save` method raises informative errors for issues such as unprocessable model types or incorrect input schemas.
 
 3. **Testing:**
+
    - Unit tests verify successful model saving and correct handling of error scenarios.
 
 4. **Documentation:**
@@ -262,6 +273,7 @@ As a **data scientist**, I want to load custom models from the MLflow registry s
 The `CustomLoader` class is responsible for retrieving custom models stored in the MLflow registry and providing them for prediction purposes.
 
 **Acceptance Criteria:**
+
 - The `load` method retrieves the model and returns it wrapped in an adapter for inference.
 - Supports flexible model input as per the defined schema.
 
@@ -270,12 +282,13 @@ The `CustomLoader` class is responsible for retrieving custom models stored in t
 ### **2. User Story: Adapt Custom Loaders**
 
 **Title:**
-As a **Developer** ,I need to create a Custom adapter to load the context and  predict the model, so the fastAPI can make request to the model.
+As a **Developer** ,I need to create a Custom adapter to load the context and predict the model, so the fastAPI can make request to the model.
 
 **Description:**
 The `Adapter` allows to adapt load the configurations and predict
 
 **Acceptance Criteria:**
+
 - The `load_context`method must be created.
 - The `predict`method must return a `schemas.Outputs` objects.
 
@@ -284,12 +297,15 @@ The `Adapter` allows to adapt load the configurations and predict
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `CustomLoader` class must implement the abstract methods from the Loader.
 
 2. **Error Handling:**
+
    - Raised exceptions for issues encountered during model retrieval (e.g., non-existent models).
 
 3. **Testing:**
+
    - Unit tests validate the loading of models and the appropriateness of the returned adapters.
 
 4. **Documentation:**
@@ -316,6 +332,7 @@ As a **data engineer**, I want to register models into the MLflow Model Registry
 The `MlflowRegister` class provides methods for registering models within the MLflow registry, allowing model management through versioning.
 
 **Acceptance Criteria:**
+
 - The `register` method can successfully save a model instance along with its URI.
 - Proper versioning is maintained and retrievable through the registry interface.
 
@@ -324,12 +341,15 @@ The `MlflowRegister` class provides methods for registering models within the ML
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `MlflowRegister` class extends the `Register` base class and implements the registration method.
 
 2. **Error Handling:**
+
    - Informative errors are raised for registration issues, such as non-existent model URIs.
 
 3. **Testing:**
+
    - Unit tests verify successful and error scenarios in model registration.
 
 4. **Documentation:**
@@ -344,8 +364,10 @@ The `MlflowRegister` class provides methods for registering models within the ML
 
 ## Code location
 
-[src/autogen_team/io/model_registries.py](../src/autogen_team/io/registries.py)
+- **Data Access Layer (Registries Entities)**: [src/autogen_team/data_access/entities.py](../src/autogen_team/data_access/entities.py)
+- **Data Access Layer (Registries Repositories)**: [src/autogen_team/data_access/repositories.py](../src/autogen_team/data_access/repositories.py)
+- **Data Access Layer (Registries Adapters)**: [src/autogen_team/data_access/adapters/registries/](../src/autogen_team/data_access/adapters/registries/)
 
 ## Test location
 
-[tests/io/test_model_registries.py](../tests/io/test_registries.py)
+- [tests/data_access/test_registries.py](../tests/data_access/test_registries.py)

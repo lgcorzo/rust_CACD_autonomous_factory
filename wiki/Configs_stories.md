@@ -2,7 +2,7 @@
 
 - [US Configs : Parse, Merge, and Convert Configuration Objects](#us-configs--parse-merge-and-convert-configuration-objects)
   - [methods uml diagram](#methods-uml-diagram)
-  - [**1.  User Story: Parse Configuration File**](#1--user-story-parse-configuration-file)
+  - [**1. User Story: Parse Configuration File**](#1--user-story-parse-configuration-file)
   - [**2. User Story: Parse Configuration String**](#2-user-story-parse-configuration-string)
   - [**3. User Story: Merge Multiple Configurations**](#3-user-story-merge-multiple-configurations)
   - [**4. User Story: Convert Configuration to Python Object**](#4-user-story-convert-configuration-to-python-object)
@@ -12,6 +12,7 @@
   - [Test location](#test-location)
 
 ---
+
 ## methods uml diagram
 
 ```mermaid
@@ -48,14 +49,14 @@ classDiagram
     Parser --> Config : "returns"
     Merger --> Config : "returns"
     Converter --> object : "returns"
-    
+
     %% Dependencies on OmegaConf
     oc.OmegaConf --> Config : "returns ListConfig | DictConfig"
     oc.OmegaConf --> object : "converts to container"
 
 ```
 
-## **1.  User Story: Parse Configuration File**
+## **1. User Story: Parse Configuration File**
 
 **Title:**  
 As a **developer**, I want to parse configuration files from a specified path so that I can load application settings dynamically.
@@ -63,7 +64,7 @@ As a **developer**, I want to parse configuration files from a specified path so
 **Description:**  
 The `parse_file` function allows developers to load a configuration file located at a given file path. This enables flexible management of settings across various environments.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The function accepts a string path to the configuration file.
 - It returns an `OmegaConf` configuration object representing the file contents.
@@ -79,7 +80,7 @@ As a **developer**, I want to parse configuration strings so that I can dynamica
 **Description:**  
 The `parse_string` function allows developers to create a configuration object directly from a string input. This is useful for testing or dynamically generating configurations.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The function accepts a string representing the configuration content.
 - It returns an `OmegaConf` configuration object.
@@ -95,7 +96,7 @@ As a **developer**, I want to merge multiple configuration objects so that I can
 **Description:**  
 The `merge_configs` function merges a sequence of `OmegaConf` configuration objects into one, ensuring no conflicting or redundant settings across configurations.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The function accepts a sequence of `OmegaConf` configuration objects.
 - It returns a single merged configuration object.
@@ -112,7 +113,7 @@ As a **developer**, I want to convert configuration objects into Python-native d
 **Description:**  
 The `to_object` function converts an `OmegaConf` configuration object into standard Python data structures like dictionaries or lists, enabling easy interaction and manipulation.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The function accepts an `OmegaConf` configuration object and an optional `resolve` flag (default: `True`).
 - It returns the configuration as a Python object (e.g., dictionary, list).
@@ -138,12 +139,10 @@ The `to_object` function converts an `OmegaConf` configuration object into stand
 - Functions are robust, handling errors gracefully with meaningful messages.
 - Code passes peer review and adheres to the project's coding standards.
 
-
-
 ## Code location
 
-[src/autogen_team/io/configs.py](../src/autogen_team/io/configs.py)
+- **Infrastructure Layer (Configs)**: [src/autogen_team/infrastructure/io/configs.py](../src/autogen_team/infrastructure/io/configs.py)
 
 ## Test location
 
-[tests/core/test_schemas.py](../tests/io/test_configs.py)
+- [tests/infrastructure/io/test_configs.py](../tests/infrastructure/io/test_configs.py)

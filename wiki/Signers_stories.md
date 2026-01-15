@@ -11,7 +11,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -68,7 +68,8 @@ As a **data scientist**, I want to configure a model signer to generate the mode
 **Description:**  
 The `Signer` abstract class allows for creating different signing strategies for models, enabling flexibility in how signatures are generated.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The signer class can be configured with specific signing strategies.
 - Default implementations may be available while allowing users to define custom strategies.
 
@@ -82,7 +83,8 @@ As a **data engineer**, I want to generate model signatures based on the input a
 **Description:**  
 The `sign` method of the `Signer` class generates a model signature using the provided inputs and outputs.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The method accurately captures the information from inputs and outputs to create the signature.
 - The generated signature is usable in downstream applications, such as model deployment or tracking.
 
@@ -96,7 +98,8 @@ As a **data scientist**, I want to use the built-in inference capabilities to au
 **Description:**  
 The `InferSigner` class provides functionality that leverages the MLflow library to automatically infer signatures based on the model's data.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - Model signatures are generated accurately using the `InferSigner` strategy.
 - The inference correctly captures the structure of both inputs and outputs based on the received data.
 
@@ -105,13 +108,16 @@ The `InferSigner` class provides functionality that leverages the MLflow library
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `Signer` and its child classes are structured in a way that supports flexibility and extensibility of signing strategies.
    - Clear abstractions are provided for signing methods to ensure consistent interface usage.
 
 2. **Error Handling:**
+
    - Any issues encountered during the signature generation process are logged, with informative messages describing the nature of the error.
 
 3. **Testing:**
+
    - Unit tests validate the creation and functionality of different signer implementations.
    - Tests ensure that signatures reflect accurately based on provided inputs and outputs.
 
@@ -121,7 +127,7 @@ The `InferSigner` class provides functionality that leverages the MLflow library
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
 - The `Signer` and `InferSigner` classes are fully implemented and functioning as intended.
 - All user stories are tested, and acceptance criteria are met.
@@ -129,8 +135,8 @@ The `InferSigner` class provides functionality that leverages the MLflow library
 
 ## Code location
 
-[src/autogen_team/utils/signers.py](../src/autogen_team/utils/signers.py)
+- **Infrastructure Layer (Signers)**: [src/autogen_team/infrastructure/utils/signers.py](../src/autogen_team/infrastructure/utils/signers.py)
 
 ## Test location
 
-[tests/utils/test_signers.py](../tests/utils/test_signers.py)
+- [tests/infrastructure/utils/test_signers.py](../tests/infrastructure/utils/test_signers.py)

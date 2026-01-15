@@ -1,6 +1,5 @@
 # US [Model Training Job](./backlog_llmlops_regresion.md) : Define a job for training and registering a single AI/ML model
 
-
 - [US Model Training Job : Define a job for training and registering a single AI/ML model](#us-model-training-job--define-a-job-for-training-and-registering-a-single-aiml-model)
   - [classes relations](#classes-relations)
   - [**User Stories: Training Job Management**](#user-stories-training-job-management)
@@ -21,7 +20,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -157,6 +156,7 @@ As a **machine learning engineer**, I want to configure a training job with all 
 The `TrainingJob` class allows for setting up parameters such as input and target data readers, model configuration, metrics, data splitters, and methods to save, sign, and register the model.
 
 **Acceptance Criteria:**
+
 - The job can be initialized with all required parameters.
 - Defaults should be set for optional parameters where applicable.
 - Configuration parameters must allow the specification of different implementations of the `ReaderKind`, `SplitterKind`, `SaverKind`, `SignerKind`, and `RegisterKind`.
@@ -172,6 +172,7 @@ As a **data engineer**, I want to read input and target datasets from specified 
 The `run` method reads input and target data from configured sources, ensuring that the data is validated against predefined schemas.
 
 **Acceptance Criteria:**
+
 - The job successfully reads and validates input and target datasets using their respective readers.
 - The shapes of the datasets are logged for reference.
 
@@ -186,6 +187,7 @@ As a **compliance officer**, I want to log the lineage of the input and target d
 Lineage information for both the input and target datasets is logged using MLflow to provide visibility into the data utilized during model training.
 
 **Acceptance Criteria:**
+
 - The lineage of both the input and target datasets is successfully logged in MLflow.
 - Logged lineage includes necessary details to trace back the data source.
 
@@ -200,6 +202,7 @@ As a **data scientist**, I want to split the input and target datasets into trai
 The job utilizes a defined splitter to partition the datasets into training and testing sets, facilitating effective model training and evaluation.
 
 **Acceptance Criteria:**
+
 - The job splits the datasets into training and testing subsets based on the specified splitter.
 - The shapes of the resulting training and testing sets are logged.
 
@@ -214,6 +217,7 @@ As a **data scientist**, I want to load the model´s properties form a config fi
 The model is loaded from the configuration of the `model_config_path`, so its setup.
 
 **Acceptance Criteria:**
+
 - The `Model.load_context_path` has to be called
 - The has a error control for `model_config_path` when this value is null or the file doesn´t exists
 
@@ -228,6 +232,7 @@ As a **data scientist**, I want to fit the model using the training data, so tha
 The training job invokes the model's fit method to train using the training data, preparing it for predictions.
 
 **Acceptance Criteria:**
+
 - The model is successfully fitted with the training data.
 - Any relevant training progress or metrics are logged for monitoring.
 
@@ -242,6 +247,7 @@ As a **data scientist**, I want to use the trained model to generate predictions
 After training, the model is used to generate predictions on the unseen test dataset.
 
 **Acceptance Criteria:**
+
 - Predictions are generated successfully for the test dataset.
 - The shape of the predictions is logged for reference.
 
@@ -256,6 +262,7 @@ As a **data scientist**, I want to evaluate the trained model's predictions usin
 The job calculates specified metrics (e.g., exact match) using the model's predictions and the actual target values.
 
 **Acceptance Criteria:**
+
 - Each metric is computed and logged with its corresponding score.
 - The metrics must be correctly linked to the predictions and actual targets.
 
@@ -270,6 +277,7 @@ As a **model manager**, I want to sign the trained model with metadata, so that 
 The trained model is signed using a specified signer to ensure that it captures the input-output relationship and any other pertinent details.
 
 **Acceptance Criteria:**
+
 - The model is signed successfully, with the signature logged.
 - The signature includes all necessary metadata like versioning info or model parameters.
 
@@ -284,6 +292,7 @@ As a **data engineer**, I want to save the trained model into a specified format
 The job invokes the appropriate saver to store the model and its signature in a persistent storage solution.
 
 **Acceptance Criteria:**
+
 - The trained model is successfully saved, and the model URI is logged for future reference.
 - The saved model adheres to the defined specifications for the chosen format.
 
@@ -298,6 +307,7 @@ As a **model manager**, I want to register the trained model in the model regist
 The job registers the model using a specified registry service, making it available in the model registry for future access.
 
 **Acceptance Criteria:**
+
 - The model is successfully registered in the MLflow model registry.
 - The model version is logged and confirmed as part of the registration process.
 
@@ -312,6 +322,7 @@ As a **user**, I want to receive a notification upon completion of the training 
 At the conclusion of the job execution, the system sends a notification summarizing the training job results, including the registered model version.
 
 **Acceptance Criteria:**
+
 - Notifications include a summary of job completion, along with the registered model version.
 - The alerts system effectively communicates the status to relevant stakeholders.
 
@@ -320,13 +331,16 @@ At the conclusion of the job execution, the system sends a notification summariz
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `TrainingJob` class correctly implements the abstract `run` method from the base `Job` class.
    - All necessary services (logging, MLflow, alerts) are properly initialized.
 
 2. **Error Handling:**
+
    - Any issues encountered during training, evaluation, model saving, or registration should trigger appropriate logging and error messaging.
 
 3. **Testing:**
+
    - Unit tests validate job configuration, data reading, model training, metric calculations, model saving, and registration.
    - Tests ensure that error scenarios are identified and handled gracefully.
 
@@ -344,8 +358,8 @@ At the conclusion of the job execution, the system sends a notification summariz
 
 ## Code location
 
-[src/autogen_team/jobs/training.py](../src/autogen_team/jobs/training.py)
+- **Application Layer (Training Job)**: [src/autogen_team/application/jobs/training.py](../src/autogen_team/application/jobs/training.py)
 
 ## Test location
 
-[tests/jobs/test_training.py](../tests/jobs/test_training.py)
+- [tests/application/jobs/test_training.py](../tests/application/jobs/test_training.py)

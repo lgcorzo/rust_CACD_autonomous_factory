@@ -274,8 +274,9 @@ The `get_internal_model` method exposes the underlying `OpenAIChatClient`, allow
 
 ## Code location
 
-[src/autogen_team/core/models.py](../src/autogen_team/core/models.py)
+- **Domain Layer (Entities)**: [src/autogen_team/models/entities.py](../src/autogen_team/models/entities.py)
+- **Domain Layer (Repositories)**: [src/autogen_team/models/repositories.py](../src/autogen_team/models/repositories.py)
 
 ## Test location
 
-[tests/core/test_models.py](../tests/core/test_models.py)
+- [tests/models/test_models.py](../tests/models/test_models.py)

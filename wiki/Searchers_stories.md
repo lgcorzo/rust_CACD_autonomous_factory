@@ -12,7 +12,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -92,7 +92,8 @@ As a **data scientist**, I want to configure a hyperparameter searcher with a pa
 **Description:**  
 The `Searcher` class serves as a base for defining parameter grids used in hyperparameter tuning, allowing customization of search strategies.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The configuration allows for a parameter grid to be specified at initialization.
 - The searcher instance accurately reflects the provided parameters.
 
@@ -106,7 +107,8 @@ As a **data scientist**, I want to execute a hyperparameter search using the con
 **Description:**  
 The `search` method of a searcher class (e.g., `GridCVSearcher`) is called to perform the hyperparameter optimization process.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The search process runs without errors and utilizes the training data.
 - The searcher effectively integrates with the MLflow model and metrics used during evaluation.
 
@@ -120,7 +122,8 @@ As a **data scientist**, I want to collect the results from the hyperparameter s
 **Description:**  
 The results from the search include a DataFrame with cross-validation scores and other relevant metrics.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The job retrieves results in the expected format after executing the search.
 - The search results include performance metrics for each parameter configuration.
 
@@ -134,7 +137,8 @@ As a **data scientist**, I want to identify the best-performing hyperparameters 
 **Description:**  
 The searcher should return the best score and the corresponding hyperparameters after completing the search.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The best hyperparameters and their scores are easily accessible after the search.
 - Clearly logged parameters should reflect the optimal configuration for the model.
 
@@ -143,14 +147,17 @@ The searcher should return the best score and the corresponding hyperparameters 
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `Searcher` class is appropriately abstract, with subclasses implementing the `search` method.
    - The configuration settings should allow customization for the search process.
 
 2. **Error Handling:**
+
    - Any errors encountered during the search process should be logged with appropriate messages.
    - Validations for input data and parameters should occur before the search process starts.
 
 3. **Testing:**
+
    - Unit tests validate the functionality of the searchers, ensuring that they can run searches and return results correctly.
    - Edge cases related to parameter configurations should be included in the tests.
 
@@ -160,7 +167,7 @@ The searcher should return the best score and the corresponding hyperparameters 
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
 - The `TuningJob` class and all associated searcher functionality are implemented as outlined.
 - All user stories are reflected in the implemented code and tested.
@@ -168,8 +175,8 @@ The searcher should return the best score and the corresponding hyperparameters 
 
 ## Code location
 
-[src/autogen_team/utils/searchers.py](../src/autogen_team/utils/searchers.py)
+- **Infrastructure Layer (Searchers)**: [src/autogen_team/infrastructure/utils/searchers.py](../src/autogen_team/infrastructure/utils/searchers.py)
 
 ## Test location
 
-[tests/utils/test_searchers.py](../tests/utils/test_searchers.py)
+- [tests/infrastructure/utils/test_searchers.py](../tests/infrastructure/utils/test_searchers.py)
