@@ -1,5 +1,21 @@
 """Evaluation Metrics."""
 
-from autogen_team.core.metrics import Metric, AutogenMetric, MetricKind, MetricsKind
+from .metrics import (
+    AutogenConversationMetric,
+    AutogenMetric,
+    Metric,
+    MetricKind,
+    MetricsKind,
+    MlflowModelValidationFailedException,
+    Threshold,
+)
 
-__all__ = ["Metric", "AutogenMetric", "MetricKind", "MetricsKind"]
+__all__ = [
+    "Metric",
+    "AutogenMetric",
+    "AutogenConversationMetric",
+    "MetricKind",
+    "MetricsKind",
+    "Threshold",
+    "MlflowModelValidationFailedException",
+]

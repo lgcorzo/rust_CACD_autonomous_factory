@@ -1,7 +1,14 @@
 """Evaluation Domain - Metrics and model evaluation."""
 
 from .entities import MetricResult
-from .metrics import Metric, AutogenMetric, MetricKind, MetricsKind
+from .metrics import (
+    AutogenMetric,
+    Metric,
+    MetricKind,
+    MetricsKind,
+    MlflowModelValidationFailedException,
+    Threshold,
+)
 
 __all__ = [
     "MetricResult",
@@ -9,4 +16,6 @@ __all__ = [
     "AutogenMetric",
     "MetricKind",
     "MetricsKind",
+    "Threshold",
+    "MlflowModelValidationFailedException",
 ]
