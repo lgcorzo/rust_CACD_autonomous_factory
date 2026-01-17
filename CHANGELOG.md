@@ -1,3 +1,16 @@
+## v2.1.0 (2025-01-15)
+
+### Refactor
+
+- **DDD**: Complete refactoring of the codebase to follow Domain-Driven Design principles.
+  - **Infrastructure**: New layer for services, IO, messaging, and utils.
+  - **Models**: Dedicated domain for model entities.
+  - **Data Access**: Dedicated domain for data access adapters and repositories.
+  - **Registry**: Dedicated domain for model registry adapters and repositories.
+  - **Evaluation**: Dedicated domain for metrics and evaluation services.
+  - **Application**: dedicated layer for job orchestration.
+- **Cleanup**: Removed legacy `jobs/` directory and updated all imports.
+
 ## v2.0.0 (2024-07-28)
 
 ### Feat

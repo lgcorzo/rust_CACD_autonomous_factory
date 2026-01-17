@@ -9,6 +9,7 @@
 **Autogen Team** is a comprehensive MLOps and Agentic Framework Python package. It is designed to streamline the lifecycle of machine learning models and AI agents, supporting tasks such as training, tuning, evaluation, promotion, and inference (both batch and realtime).
 
 Key features include:
+
 - **MLOps Workflow:** Managed jobs for training, tuning, and promoting models.
 - **Inference:** Support for both batch inference (via CLI) and realtime inference (via Kafka).
 - **Agent Framework:** Integration with [AutoGen Studio](https://microsoft.github.io/autogen/) for building and managing multi-agent workflows.
@@ -35,6 +36,7 @@ Key features include:
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/lgcorzo/llmops-python-package
    cd llmops-python-package
@@ -72,6 +74,7 @@ poetry run autogen_team confs/explanations.yaml
 ```
 
 To see the configuration schema:
+
 ```bash
 poetry run autogen_team --schema
 ```
@@ -87,11 +90,13 @@ docker-compose up -d
 ```
 
 This will start:
+
 - **Kafka Service:** For messaging.
 - **MLflow Service:** For model registry and tracking.
 - **Inference Service:** The `autogen_team` container running the Kafka consumer/producer.
 
 **Service Configuration (in `docker-compose.yml`):**
+
 - `DEFAULT_INPUT_TOPIC`: Topic to consume data from.
 - `DEFAULT_OUTPUT_TOPIC`: Topic to produce predictions to.
 - `MLFLOW_TRACKING_URI`: URL of the MLflow server.
@@ -111,6 +116,7 @@ Access the UI at `http://localhost:8081`.
 The project uses [OmegaConf](https://omegaconf.readthedocs.io/) and [Pydantic](https://docs.pydantic.dev/) for configuration management. Configuration files are located in `confs/`.
 
 **Example `confs/training.yaml`:**
+
 ```yaml
 job:
   KIND: TrainingJob
@@ -131,27 +137,33 @@ This project uses [Invoke](https://www.pyinvoke.org/) for task automation.
 **Common Tasks:**
 
 - **Check code quality:**
+
   ```bash
   inv checks
   ```
+
   This runs linting (Ruff), formatting (Ruff), type checking (Mypy), and testing (Pytest).
 
 - **Format code:**
+
   ```bash
   inv format
   ```
 
 - **Run tests:**
+
   ```bash
   inv checks
   ```
 
 - **List all tasks:**
+
   ```bash
   inv --list
   ```
 
   - **run app**
+
   ```bash
   poetry run python src/autogen_team/controller/kafka_app.py
   ```
@@ -159,6 +171,7 @@ This project uses [Invoke](https://www.pyinvoke.org/) for task automation.
 ### Pre-commit Hooks
 
 We use pre-commit hooks to ensure code quality before committing.
+
 ```bash
 poetry run pre-commit install
 ```
@@ -171,10 +184,15 @@ poetry run pre-commit install
 ├── data/                   # Data directory (inputs/targets)
 ├── src/
 │   └── autogen_team/       # Main package source code
-│       ├── controller/     # FastAPI/Kafka controllers
-│       ├── core/           # Core logic (schemas, models)
-│       ├── io/             # I/O utilities (datasets, registries, services)
-│       ├── jobs/           # Job implementations (training, inference, etc.)
+│       ├── application/    # Application layer (jobs)
+│       ├── core/           # Shared kernel (schemas, exceptions)
+│       ├── data_access/    # Data access domain (adapters, repositories)
+│       ├── evaluation/     # Evaluation domain (metrics, services)
+│       ├── infrastructure/ # Infrastructure layer (io, services, messaging)
+│       ├── models/         # Models domain (entities, repositories)
+│       ├── registry/       # Registry domain (adapters, repositories)
+│       ├── jobs/           # Backward compatibility re-exports
+│       ├── settings.py     # Application settings
 │       └── scripts.py      # CLI entry point
 ├── tasks/                  # Invoke tasks definitions
 ├── tests/                  # Unit and integration tests

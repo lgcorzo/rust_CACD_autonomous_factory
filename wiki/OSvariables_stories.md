@@ -1,6 +1,6 @@
-# US [IO](./backlog_mlops_regresion.md) :  Provide environment variables and system-level configurations for portability across various environments.
+# US [IO](./backlog_mlops_regresion.md) : Provide environment variables and system-level configurations for portability across various environments.
 
-- [US IO :  Provide environment variables and system-level configurations for portability across various environments.](#us-io---provide-environment-variables-and-system-level-configurations-for-portability-across-various-environments)
+- [US IO : Provide environment variables and system-level configurations for portability across various environments.](#us-io---provide-environment-variables-and-system-level-configurations-for-portability-across-various-environments)
   - [classes relations](#classes-relations)
   - [**User Story: Environment Configuration Management with Singleton and Pydantic**](#user-story-environment-configuration-management-with-singleton-and-pydantic)
     - [**1. User Story: Centralized Environment Configuration**](#1-user-story-centralized-environment-configuration)
@@ -11,7 +11,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -46,7 +46,6 @@ classDiagram
 
 ```
 
-
 ## **User Story: Environment Configuration Management with Singleton and Pydantic**
 
 ---
@@ -59,7 +58,8 @@ As a **developer**, I want a centralized and reusable way to manage environment 
 **Description:**  
 The `Env` class combines the Singleton pattern and Pydantic's `BaseSettings` to create a single shared instance for managing environment-specific configurations. It ensures that environment variables are accessible, validated, and loaded from a `.env` file if available.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The `Env` class:
   - Inherits from both `Singleton` and Pydantic's `BaseSettings`.
   - Ensures only one instance of the class exists throughout the application (Singleton behavior).
@@ -83,7 +83,8 @@ As a **machine learning engineer**, I want to configure MLflow settings (trackin
 **Description:**  
 The `Env` class provides default and customizable values for MLflow-related configurations. It ensures that all MLflow components use the same settings consistently, reducing potential misconfigurations.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
+
 - The following MLflow configuration keys are available:
   - `mlflow_tracking_uri`: Default is `"./mlruns"`.
   - `mlflow_registry_uri`: Default is `"./mlruns"`.
@@ -97,19 +98,23 @@ The `Env` class provides default and customizable values for MLflow-related conf
 ## **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `Singleton` pattern ensures a single shared instance of the `Env` class.
    - Default values are provided for MLflow configuration keys.
 
 2. **Environment Variable Management:**
+
    - Values are first read from the environment variables.
    - If not set, values are read from the `.env` file.
    - Defaults are used if neither source provides a value.
 
 3. **Error Handling:**
+
    - The `Env` class validates all settings using Pydantic's type system.
    - Errors are raised if a setting does not meet its type requirements.
 
 4. **Testing:**
+
    - Unit tests verify:
      - Singleton behavior of the `Env` class.
      - Correct loading of environment variables and `.env` file values.
@@ -127,12 +132,14 @@ The `Env` class provides default and customizable values for MLflow-related conf
 ## **Example Use Cases**
 
 1. **Accessing MLflow Settings:**
+
    ```python
    env = Env()
    print(env.mlflow_tracking_uri)  # Output: "./mlruns" (default or overridden)
    ```
 
 2. **Using the Singleton Pattern:**
+
    ```python
    env1 = Env()
    env2 = Env()
@@ -156,11 +163,12 @@ The `Env` class provides default and customizable values for MLflow-related conf
 - The `.env` file and environment variables are correctly loaded and take precedence over defaults.
 - All functionality is tested, with error scenarios validated.
 - Documentation provides clear usage instructions and examples.
-- 
+-
+
 ## Code location
 
-[src/autogen_team/core/osvariables.py](../src/autogen_team/io/osvariables.py)
+- **Infrastructure Layer (OS Variables)**: [src/autogen_team/infrastructure/io/osvariables.py](../src/autogen_team/infrastructure/io/osvariables.py)
 
 ## Test location
 
-[tests/core/test_osvariables.py](../tests/io/test_osvariables.py)
+- [tests/infrastructure/io/test_osvariables.py](../tests/infrastructure/io/test_osvariables.py)

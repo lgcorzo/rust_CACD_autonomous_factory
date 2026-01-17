@@ -1,6 +1,5 @@
 # US [Model Explanations Job](./backlog_llmlops_regresion.md) : Define a job for explaining the model structure and decisions.
 
-
 - [US Model Explanations Job : Define a job for explaining the model structure and decisions.](#us-model-explanations-job--define-a-job-for-explaining-the-model-structure-and-decisions)
   - [classes relations](#classes-relations)
   - [**User Stories: Explanation Job Management**](#user-stories-explanation-job-management)
@@ -16,7 +15,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -95,6 +94,7 @@ As a **data scientist**, I want to configure an explanations job that includes a
 The `ExplanationsJob` class allows for setting up parameters such as input sample data readers, explanation writers, model references, and a loader for accessing the model from the registry.
 
 **Acceptance Criteria:**
+
 - The explanations job is initialized with required parameters.
 - The parameters for readers and writers use the `KIND` discriminator.
 - Default values are correctly handled for optional parameters.
@@ -110,6 +110,7 @@ As a **data engineer**, I want to read input samples from specified sources, so 
 In the `run` method, input samples are read using the configured data reader, ensuring that the data is prepared for explanation generation.
 
 **Acceptance Criteria:**
+
 - The job successfully reads input samples from the designated reader.
 - Input data is validated using `schemas.InputsSchema.check`.
 
@@ -124,6 +125,7 @@ As a **data scientist**, I want to load the registered model using a loader, so 
 The job utilizes the specified loader to access the designated version/alias from the model registry, so that it can create the explanations.
 
 **Acceptance Criteria:**
+
 - The model is correctly loaded from the registry using the configured loader.
 - The model has to use an alias or version name.
 
@@ -138,6 +140,7 @@ As a **data scientist**, I want to generate explanations for the model's structu
 The `explain_model` method retrieves explanation from the model object.
 
 **Acceptance Criteria:**
+
 - The model can creates the explanations.
 
 ---
@@ -151,6 +154,7 @@ As a **data scientist**, I want to generate explanations for specific input samp
 Sample explanations are generated based on the provided input samples, aiding in understanding how the model processes and predicts data.
 
 **Acceptance Criteria:**
+
 - The generated Explanations has the propper shape.
 
 ---
@@ -164,6 +168,7 @@ As a **data engineer**, I want to write the generated model and sample explanati
 The explanations generated for both the model and the input samples are saved to designated storage locations using the configured writers.
 
 **Acceptance Criteria:**
+
 - The generated models are saved.
 - The generated samples are saved.
 
@@ -178,6 +183,7 @@ As a **user**, I want to be notified once the explanation job is completed, so t
 At the end of the job execution, notifications are sent to relevant stakeholders summarizing the particulars of the job completion.
 
 **Acceptance Criteria:**
+
 - The correct information has to be in the message.
 
 ---
@@ -185,13 +191,16 @@ At the end of the job execution, notifications are sent to relevant stakeholders
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `ExplanationsJob` class correctly implements the abstract `run` method from the base `Job` class.
    - All services (logging, model registry, alerts) are initialized at the start of the explanation job.
 
 2. **Error Handling:**
+
    - Clear error messages are logged for any issues encountered during the reading, loading, or writing processes.
 
 3. **Testing:**
+
    - The job has to pass all validation checks.
 
 4. **Documentation:**
@@ -208,8 +217,8 @@ At the end of the job execution, notifications are sent to relevant stakeholders
 
 ## Code location
 
-[src/autogen_team/jobs/explanations.py](../src/autogen_team/jobs/explanations.py)
+- **Application Layer (Explanations Job)**: [src/autogen_team/application/jobs/explanations.py](../src/autogen_team/application/jobs/explanations.py)
 
 ## Test location
 
-[tests/jobs/test_explanations.py](../tests/jobs/test_explanations.py)
+- [tests/application/jobs/test_explanations.py](../tests/application/jobs/test_explanations.py)

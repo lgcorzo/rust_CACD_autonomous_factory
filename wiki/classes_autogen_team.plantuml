@@ -1,34 +1,34 @@
 @startuml classes_autogen_team
 set namespaceSeparator none
-class "Adapter" as autogen_team.io.registries.CustomSaver.Adapter {
+class "Adapter" as autogen_team.registry.adapters.mlflow_adapter.CustomSaver.Adapter {
   model
   model_config : dict
   load_context(context: PythonModelContext) -> None
   predict(context: PythonModelContext, model_input: schemas.Inputs) -> schemas.Outputs
 }
-class "Adapter" as autogen_team.io.registries.Loader.Adapter {
+class "Adapter" as autogen_team.registry.adapters.mlflow_adapter.Loader.Adapter {
   {abstract}load_context(model_config: Dict[str, Any]) -> None
   {abstract}predict(inputs: schemas.Inputs) -> schemas.Outputs
 }
-class "Adapter" as autogen_team.io.registries.CustomLoader.Adapter {
+class "Adapter" as autogen_team.registry.adapters.mlflow_adapter.CustomLoader.Adapter {
   model
   load_context(model_config: Dict[str, Any]) -> None
   predict(inputs: schemas.Inputs) -> schemas.Outputs
 }
-class "AlertsService" as autogen_team.io.services.AlertsService {
+class "AlertsService" as autogen_team.infrastructure.services.AlertsService {
   app_name : str
   enable : bool
   timeout : int | None
   notify(title: str, message: str) -> None
   {abstract}start() -> None
 }
-class "AutogenConversationMetric" as autogen_team.core.metrics.AutogenConversationMetric {
+class "AutogenConversationMetric" as autogen_team.evaluation.metrics.metrics.AutogenConversationMetric {
   KIND : T.Literal['AutogenConversationMetric']
   check_error_messages : bool
   check_termination : bool
   score(targets: pd.DataFrame, outputs: pd.DataFrame) -> float
 }
-class "AutogenMetric" as autogen_team.core.metrics.AutogenMetric {
+class "AutogenMetric" as autogen_team.evaluation.metrics.metrics.AutogenMetric {
   KIND : T.Literal['AutogenMetric']
   metric_type : T.Literal['exact_match', 'similarity', 'length_ratio']
   similarity_threshold : Optional[float]
@@ -64,7 +64,7 @@ class "BaseModel" as pydantic.main.BaseModel {
   update_forward_refs() -> None
   validate(value: Any) -> Self
 }
-class "BaselineAutogenModel" as autogen_team.core.models.BaselineAutogenModel {
+class "BaselineAutogenModel" as autogen_team.models.entities.BaselineAutogenModel {
   KIND : T.Literal['BaselineAutogenModel']
   max_tokens : Optional[int]
   _model_client : Optional[Any]
@@ -86,26 +86,26 @@ class "Config" as autogen_team.core.schemas.Schema.Config {
 class "Config" as autogen_team.core.schemas.SHAPValuesSchema.Config {
   strict : bool
 }
-class "Config" as autogen_team.io.osvariables.Env.Config {
+class "Config" as autogen_team.infrastructure.io.osvariables.Env.Config {
   case_sensitive : bool
   env_file : str
   env_file_encoding : str
 }
-class "CustomLoader" as autogen_team.io.registries.CustomLoader {
+class "CustomLoader" as autogen_team.registry.adapters.mlflow_adapter.CustomLoader {
   KIND : T.Literal['CustomLoader']
   load(uri: str) -> 'CustomLoader.Adapter'
 }
-class "CustomSaver" as autogen_team.io.registries.CustomSaver {
+class "CustomSaver" as autogen_team.registry.adapters.mlflow_adapter.CustomSaver {
   KIND : T.Literal['CustomSaver']
   save(model: models.Model, signature: signers.Signature, input_example: schemas.Inputs) -> Info
 }
-class "Env" as autogen_team.io.osvariables.Env {
+class "Env" as autogen_team.infrastructure.io.osvariables.Env {
   mlflow_experiment_name : str
   mlflow_registered_model_name : str
   mlflow_registry_uri : str
   mlflow_tracking_uri : str
 }
-class "EvaluationsJob" as autogen_team.jobs.evaluations.EvaluationsJob {
+class "EvaluationsJob" as autogen_team.application.jobs.evaluations.EvaluationsJob {
   KIND : T.Literal['EvaluationsJob']
   alias_or_version : T.Union[str, int]
   evaluators : List[str]
@@ -117,7 +117,7 @@ class "EvaluationsJob" as autogen_team.jobs.evaluations.EvaluationsJob {
   thresholds : Dict[str, metrics_.Threshold]
   run() -> base.Locals
 }
-class "ExplanationsJob" as autogen_team.jobs.explanations.ExplanationsJob {
+class "ExplanationsJob" as autogen_team.application.jobs.explanations.ExplanationsJob {
   KIND : T.Literal['ExplanationsJob']
   alias_or_version : str | int
   inputs_samples
@@ -130,7 +130,7 @@ class "FeatureImportancesSchema" as autogen_team.core.schemas.FeatureImportances
   feature : papd.Series[padt.String]
   importance : papd.Series[padt.Float32]
 }
-class "GridCVSearcher" as autogen_team.utils.searchers.GridCVSearcher {
+class "GridCVSearcher" as autogen_team.infrastructure.utils.searchers.GridCVSearcher {
   KIND : T.Literal['GridCVSearcher']
   error_score : str | float
   n_jobs : int | None
@@ -139,11 +139,11 @@ class "GridCVSearcher" as autogen_team.utils.searchers.GridCVSearcher {
   verbose : int
   search(model: models.Model, metric: metrics.Metric, inputs: schemas.Inputs, targets: schemas.Targets, cv: CrossValidation) -> Results
 }
-class "InferSigner" as autogen_team.utils.signers.InferSigner {
+class "InferSigner" as autogen_team.infrastructure.utils.signers.InferSigner {
   KIND : T.Literal['InferSigner']
   sign(inputs: schemas.Inputs, outputs: schemas.Outputs) -> Signature
 }
-class "InferenceJob" as autogen_team.jobs.inference.InferenceJob {
+class "InferenceJob" as autogen_team.application.jobs.inference.InferenceJob {
   KIND : T.Literal['InferenceJob']
   alias_or_version : str | int
   inputs
@@ -154,18 +154,18 @@ class "InferenceJob" as autogen_team.jobs.inference.InferenceJob {
 class "InputsSchema" as autogen_team.core.schemas.InputsSchema {
   input : papd.Series[padt.String]
 }
-class "Job" as autogen_team.jobs.base.Job {
+class "Job" as autogen_team.application.jobs.base.Job {
   KIND : str
   alerts_service
   logger_service
   mlflow_service
   {abstract}run() -> Locals
 }
-class "Loader" as autogen_team.io.registries.Loader {
+class "Loader" as autogen_team.registry.adapters.mlflow_adapter.Loader {
   KIND : str
   {abstract}load(uri: str) -> 'Loader.Adapter'
 }
-class "LoggerService" as autogen_team.io.services.LoggerService {
+class "LoggerService" as autogen_team.infrastructure.services.LoggerService {
   backtrace : bool
   catch : bool
   colorize : bool
@@ -184,7 +184,7 @@ class "MetadataSchema" as autogen_team.core.schemas.MetadataSchema {
   model_version : papd.Series[padt.String]
   timestamp : papd.Series[padt.String]
 }
-class "Metric" as autogen_team.core.metrics.Metric {
+class "Metric" as autogen_team.evaluation.metrics.metrics.Metric {
   KIND : str
   greater_is_better : bool
   name : str
@@ -192,11 +192,11 @@ class "Metric" as autogen_team.core.metrics.Metric {
   scorer(model: models.Model, inputs: schemas.Inputs, targets: pd.DataFrame) -> float
   to_mlflow() -> MlflowMetric
 }
-class "MlflowRegister" as autogen_team.io.registries.MlflowRegister {
+class "MlflowRegister" as autogen_team.registry.adapters.mlflow_adapter.MlflowRegister {
   KIND : T.Literal['MlflowRegister']
   register(name: str, model_uri: str) -> Version
 }
-class "MlflowService" as autogen_team.io.services.MlflowService {
+class "MlflowService" as autogen_team.infrastructure.services.MlflowService {
   autolog_disable : bool
   autolog_disable_for_unsupported_versions : bool
   autolog_exclusive : bool
@@ -214,7 +214,7 @@ class "MlflowService" as autogen_team.io.services.MlflowService {
   run_context(run_config: RunConfig) -> T.Generator[mlflow.ActiveRun, None, None]
   start() -> None
 }
-class "Model" as autogen_team.core.models.Model {
+class "Model" as autogen_team.models.entities.Model {
   KIND : str
   {abstract}explain_model() -> schemas.FeatureImportances
   {abstract}explain_samples(inputs: schemas.Inputs) -> schemas.SHAPValues
@@ -229,35 +229,35 @@ class "OutputsSchema" as autogen_team.core.schemas.OutputsSchema {
   metadata : papd.Series[padt.Object]
   response : papd.Series[padt.String]
 }
-class "ParquetReader" as autogen_team.io.datasets.ParquetReader {
+class "ParquetReader" as autogen_team.data_access.adapters.datasets.ParquetReader {
   KIND : T.Literal['ParquetReader']
   path : str
   lineage(name: str, data: pd.DataFrame, targets: str | None, predictions: str | None) -> Lineage
   read() -> pd.DataFrame
 }
-class "ParquetWriter" as autogen_team.io.datasets.ParquetWriter {
+class "ParquetWriter" as autogen_team.data_access.adapters.datasets.ParquetWriter {
   KIND : T.Literal['ParquetWriter']
   path : str
   write(data: pd.DataFrame) -> None
 }
-class "PromotionJob" as autogen_team.jobs.promotion.PromotionJob {
+class "PromotionJob" as autogen_team.application.jobs.promotion.PromotionJob {
   KIND : T.Literal['PromotionJob']
   alias : str
   version : int | None
   run() -> base.Locals
 }
-class "Reader" as autogen_team.io.datasets.Reader {
+class "Reader" as autogen_team.data_access.adapters.datasets.Reader {
   KIND : str
   limit : int | None
   {abstract}lineage(name: str, data: pd.DataFrame, targets: str | None, predictions: str | None) -> Lineage
   {abstract}read() -> pd.DataFrame
 }
-class "Register" as autogen_team.io.registries.Register {
+class "Register" as autogen_team.registry.adapters.mlflow_adapter.Register {
   KIND : str
   tags : dict[str, T.Any]
   {abstract}register(name: str, model_uri: str) -> Version
 }
-class "RunConfig" as autogen_team.io.services.MlflowService.RunConfig {
+class "RunConfig" as autogen_team.infrastructure.services.MlflowService.RunConfig {
   description : str | None
   log_system_metrics : bool | None
   name : str
@@ -268,7 +268,7 @@ class "SHAPValuesSchema" as autogen_team.core.schemas.SHAPValuesSchema {
   sample : papd.Series[padt.String]
   shap_value : papd.Series[padt.Float32]
 }
-class "Saver" as autogen_team.io.registries.Saver {
+class "Saver" as autogen_team.registry.adapters.mlflow_adapter.Saver {
   KIND : str
   config_file : str
   path : str
@@ -277,24 +277,24 @@ class "Saver" as autogen_team.io.registries.Saver {
 class "Schema" as autogen_team.core.schemas.Schema {
   check(data: pd.DataFrame) -> papd.DataFrame[TSchema]
 }
-class "Searcher" as autogen_team.utils.searchers.Searcher {
+class "Searcher" as autogen_team.infrastructure.utils.searchers.Searcher {
   KIND : str
   param_grid : dict
   {abstract}search(model: models.Model, metric: metrics.Metric, inputs: schemas.Inputs, targets: schemas.Targets, cv: CrossValidation) -> Results
 }
-class "Service" as autogen_team.io.services.Service {
+class "Service" as autogen_team.infrastructure.services.Service {
   {abstract}start() -> None
   {abstract}stop() -> None
 }
 class "Settings" as autogen_team.settings.Settings {
 }
-class "Signer" as autogen_team.utils.signers.Signer {
+class "Signer" as autogen_team.infrastructure.utils.signers.Signer {
   KIND : str
   {abstract}sign(inputs: schemas.Inputs, outputs: schemas.Outputs) -> Signature
 }
-class "Singleton" as autogen_team.io.osvariables.Singleton {
+class "Singleton" as autogen_team.infrastructure.io.osvariables.Singleton {
 }
-class "Splitter" as autogen_team.utils.splitters.Splitter {
+class "Splitter" as autogen_team.infrastructure.utils.splitters.Splitter {
   KIND : str
   {abstract}get_n_splits(inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None) -> int
   {abstract}split(inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None) -> TrainTestSplits
@@ -303,12 +303,12 @@ class "TargetsSchema" as autogen_team.core.schemas.TargetsSchema {
   input_target : papd.Series[padt.String]
   response : papd.Series[padt.String]
 }
-class "Threshold" as autogen_team.core.metrics.Threshold {
+class "Threshold" as autogen_team.evaluation.metrics.metrics.Threshold {
   greater_is_better : bool
   threshold : int | float
   to_mlflow() -> MlflowThreshold
 }
-class "TimeSeriesSplitter" as autogen_team.utils.splitters.TimeSeriesSplitter {
+class "TimeSeriesSplitter" as autogen_team.infrastructure.utils.splitters.TimeSeriesSplitter {
   KIND : T.Literal['TimeSeriesSplitter']
   gap : int
   n_splits : int
@@ -316,7 +316,7 @@ class "TimeSeriesSplitter" as autogen_team.utils.splitters.TimeSeriesSplitter {
   get_n_splits(inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None) -> int
   split(inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None) -> TrainTestSplits
 }
-class "TrainTestSplitter" as autogen_team.utils.splitters.TrainTestSplitter {
+class "TrainTestSplitter" as autogen_team.infrastructure.utils.splitters.TrainTestSplitter {
   KIND : T.Literal['TrainTestSplitter']
   random_state : int
   shuffle : bool
@@ -324,7 +324,7 @@ class "TrainTestSplitter" as autogen_team.utils.splitters.TrainTestSplitter {
   get_n_splits(inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None) -> int
   split(inputs: schemas.Inputs, targets: schemas.Targets, groups: Index | None) -> TrainTestSplits
 }
-class "TrainingJob" as autogen_team.jobs.training.TrainingJob {
+class "TrainingJob" as autogen_team.application.jobs.training.TrainingJob {
   KIND : T.Literal['TrainingJob']
   inputs
   metrics : list
@@ -337,7 +337,7 @@ class "TrainingJob" as autogen_team.jobs.training.TrainingJob {
   targets
   run() -> base.Locals
 }
-class "TuningJob" as autogen_team.jobs.tuning.TuningJob {
+class "TuningJob" as autogen_team.application.jobs.tuning.TuningJob {
   KIND : T.Literal['TuningJob']
   inputs
   metric
@@ -348,78 +348,78 @@ class "TuningJob" as autogen_team.jobs.tuning.TuningJob {
   targets
   run() -> base.Locals
 }
-class "Writer" as autogen_team.io.datasets.Writer {
+class "Writer" as autogen_team.data_access.adapters.datasets.Writer {
   KIND : str
   {abstract}write(data: pd.DataFrame) -> None
 }
-autogen_team.core.metrics.AutogenConversationMetric --|> autogen_team.core.metrics.Metric
-autogen_team.core.metrics.AutogenMetric --|> autogen_team.core.metrics.Metric
-autogen_team.core.metrics.Metric --|> pydantic.main.BaseModel
-autogen_team.core.metrics.Threshold --|> pydantic.main.BaseModel
-autogen_team.core.models.BaselineAutogenModel --|> autogen_team.core.models.Model
-autogen_team.core.models.Model --|> pydantic.main.BaseModel
+autogen_team.evaluation.metrics.metrics.AutogenConversationMetric --|> autogen_team.evaluation.metrics.metrics.Metric
+autogen_team.evaluation.metrics.metrics.AutogenMetric --|> autogen_team.evaluation.metrics.metrics.Metric
+autogen_team.evaluation.metrics.metrics.Metric --|> pydantic.main.BaseModel
+autogen_team.evaluation.metrics.metrics.Threshold --|> pydantic.main.BaseModel
+autogen_team.models.entities.BaselineAutogenModel --|> autogen_team.models.entities.Model
+autogen_team.models.entities.Model --|> pydantic.main.BaseModel
 autogen_team.core.schemas.FeatureImportancesSchema --|> autogen_team.core.schemas.Schema
 autogen_team.core.schemas.InputsSchema --|> autogen_team.core.schemas.Schema
 autogen_team.core.schemas.MetadataSchema --|> autogen_team.core.schemas.Schema
 autogen_team.core.schemas.OutputsSchema --|> autogen_team.core.schemas.Schema
 autogen_team.core.schemas.SHAPValuesSchema --|> autogen_team.core.schemas.Schema
 autogen_team.core.schemas.TargetsSchema --|> autogen_team.core.schemas.Schema
-autogen_team.io.datasets.ParquetReader --|> autogen_team.io.datasets.Reader
-autogen_team.io.datasets.ParquetWriter --|> autogen_team.io.datasets.Writer
-autogen_team.io.datasets.Reader --|> pydantic.main.BaseModel
-autogen_team.io.datasets.Writer --|> pydantic.main.BaseModel
-autogen_team.io.osvariables.Env --|> autogen_team.io.osvariables.Singleton
-autogen_team.io.registries.CustomLoader --|> autogen_team.io.registries.Loader
-autogen_team.io.registries.CustomLoader.Adapter --|> autogen_team.io.registries.Loader.Adapter
-autogen_team.io.registries.CustomSaver --|> autogen_team.io.registries.Saver
-autogen_team.io.registries.Loader --|> pydantic.main.BaseModel
-autogen_team.io.registries.MlflowRegister --|> autogen_team.io.registries.Register
-autogen_team.io.registries.Register --|> pydantic.main.BaseModel
-autogen_team.io.registries.Saver --|> pydantic.main.BaseModel
-autogen_team.io.services.AlertsService --|> autogen_team.io.services.Service
-autogen_team.io.services.LoggerService --|> autogen_team.io.services.Service
-autogen_team.io.services.MlflowService --|> autogen_team.io.services.Service
-autogen_team.io.services.MlflowService.RunConfig --|> pydantic.main.BaseModel
-autogen_team.io.services.Service --|> pydantic.main.BaseModel
-autogen_team.jobs.base.Job --|> pydantic.main.BaseModel
-autogen_team.jobs.evaluations.EvaluationsJob --|> autogen_team.jobs.base.Job
-autogen_team.jobs.explanations.ExplanationsJob --|> autogen_team.jobs.base.Job
-autogen_team.jobs.inference.InferenceJob --|> autogen_team.jobs.base.Job
-autogen_team.jobs.promotion.PromotionJob --|> autogen_team.jobs.base.Job
-autogen_team.jobs.training.TrainingJob --|> autogen_team.jobs.base.Job
-autogen_team.jobs.tuning.TuningJob --|> autogen_team.jobs.base.Job
+autogen_team.data_access.adapters.datasets.ParquetReader --|> autogen_team.data_access.adapters.datasets.Reader
+autogen_team.data_access.adapters.datasets.ParquetWriter --|> autogen_team.data_access.adapters.datasets.Writer
+autogen_team.data_access.adapters.datasets.Reader --|> pydantic.main.BaseModel
+autogen_team.data_access.adapters.datasets.Writer --|> pydantic.main.BaseModel
+autogen_team.infrastructure.io.osvariables.Env --|> autogen_team.infrastructure.io.osvariables.Singleton
+autogen_team.registry.adapters.mlflow_adapter.CustomLoader --|> autogen_team.registry.adapters.mlflow_adapter.Loader
+autogen_team.registry.adapters.mlflow_adapter.CustomLoader.Adapter --|> autogen_team.registry.adapters.mlflow_adapter.Loader.Adapter
+autogen_team.registry.adapters.mlflow_adapter.CustomSaver --|> autogen_team.registry.adapters.mlflow_adapter.Saver
+autogen_team.registry.adapters.mlflow_adapter.Loader --|> pydantic.main.BaseModel
+autogen_team.registry.adapters.mlflow_adapter.MlflowRegister --|> autogen_team.registry.adapters.mlflow_adapter.Register
+autogen_team.registry.adapters.mlflow_adapter.Register --|> pydantic.main.BaseModel
+autogen_team.registry.adapters.mlflow_adapter.Saver --|> pydantic.main.BaseModel
+autogen_team.infrastructure.services.AlertsService --|> autogen_team.infrastructure.services.Service
+autogen_team.infrastructure.services.LoggerService --|> autogen_team.infrastructure.services.Service
+autogen_team.infrastructure.services.MlflowService --|> autogen_team.infrastructure.services.Service
+autogen_team.infrastructure.services.MlflowService.RunConfig --|> pydantic.main.BaseModel
+autogen_team.infrastructure.services.Service --|> pydantic.main.BaseModel
+autogen_team.application.jobs.base.Job --|> pydantic.main.BaseModel
+autogen_team.application.jobs.evaluations.EvaluationsJob --|> autogen_team.application.jobs.base.Job
+autogen_team.application.jobs.explanations.ExplanationsJob --|> autogen_team.application.jobs.base.Job
+autogen_team.application.jobs.inference.InferenceJob --|> autogen_team.application.jobs.base.Job
+autogen_team.application.jobs.promotion.PromotionJob --|> autogen_team.application.jobs.base.Job
+autogen_team.application.jobs.training.TrainingJob --|> autogen_team.application.jobs.base.Job
+autogen_team.application.jobs.tuning.TuningJob --|> autogen_team.application.jobs.base.Job
 autogen_team.settings.MainSettings --|> autogen_team.settings.Settings
-autogen_team.utils.searchers.GridCVSearcher --|> autogen_team.utils.searchers.Searcher
-autogen_team.utils.searchers.Searcher --|> pydantic.main.BaseModel
-autogen_team.utils.signers.InferSigner --|> autogen_team.utils.signers.Signer
-autogen_team.utils.signers.Signer --|> pydantic.main.BaseModel
-autogen_team.utils.splitters.Splitter --|> pydantic.main.BaseModel
-autogen_team.utils.splitters.TimeSeriesSplitter --|> autogen_team.utils.splitters.Splitter
-autogen_team.utils.splitters.TrainTestSplitter --|> autogen_team.utils.splitters.Splitter
-autogen_team.core.models.BaselineAutogenModel --* autogen_team.jobs.training.TrainingJob : model
-autogen_team.core.models.BaselineAutogenModel --* autogen_team.jobs.tuning.TuningJob : model
-autogen_team.io.datasets.ParquetReader --* autogen_team.jobs.evaluations.EvaluationsJob : inputs
-autogen_team.io.datasets.ParquetReader --* autogen_team.jobs.evaluations.EvaluationsJob : targets
-autogen_team.io.datasets.ParquetReader --* autogen_team.jobs.explanations.ExplanationsJob : inputs_samples
-autogen_team.io.datasets.ParquetReader --* autogen_team.jobs.inference.InferenceJob : inputs
-autogen_team.io.datasets.ParquetReader --* autogen_team.jobs.training.TrainingJob : inputs
-autogen_team.io.datasets.ParquetReader --* autogen_team.jobs.training.TrainingJob : targets
-autogen_team.io.datasets.ParquetReader --* autogen_team.jobs.tuning.TuningJob : inputs
-autogen_team.io.datasets.ParquetReader --* autogen_team.jobs.tuning.TuningJob : targets
-autogen_team.io.datasets.ParquetWriter --* autogen_team.jobs.explanations.ExplanationsJob : models_explanations
-autogen_team.io.datasets.ParquetWriter --* autogen_team.jobs.explanations.ExplanationsJob : samples_explanations
-autogen_team.io.datasets.ParquetWriter --* autogen_team.jobs.inference.InferenceJob : outputs
-autogen_team.io.registries.CustomLoader --* autogen_team.jobs.explanations.ExplanationsJob : loader
-autogen_team.io.registries.CustomLoader --* autogen_team.jobs.inference.InferenceJob : loader
-autogen_team.io.registries.CustomSaver --* autogen_team.jobs.training.TrainingJob : saver
-autogen_team.io.registries.MlflowRegister --* autogen_team.jobs.training.TrainingJob : registry
-autogen_team.io.services.AlertsService --* autogen_team.jobs.base.Job : alerts_service
-autogen_team.io.services.LoggerService --* autogen_team.jobs.base.Job : logger_service
-autogen_team.io.services.MlflowService --* autogen_team.jobs.base.Job : mlflow_service
-autogen_team.io.services.MlflowService.RunConfig --* autogen_team.jobs.evaluations.EvaluationsJob : run_config
-autogen_team.io.services.MlflowService.RunConfig --* autogen_team.jobs.training.TrainingJob : run_config
-autogen_team.io.services.MlflowService.RunConfig --* autogen_team.jobs.tuning.TuningJob : run_config
-autogen_team.utils.searchers.GridCVSearcher --* autogen_team.jobs.tuning.TuningJob : searcher
-autogen_team.utils.signers.InferSigner --* autogen_team.jobs.training.TrainingJob : signer
-autogen_team.core.models.Model --o autogen_team.io.registries.CustomSaver.Adapter : model
+autogen_team.infrastructure.utils.searchers.GridCVSearcher --|> autogen_team.infrastructure.utils.searchers.Searcher
+autogen_team.infrastructure.utils.searchers.Searcher --|> pydantic.main.BaseModel
+autogen_team.infrastructure.utils.signers.InferSigner --|> autogen_team.infrastructure.utils.signers.Signer
+autogen_team.infrastructure.utils.signers.Signer --|> pydantic.main.BaseModel
+autogen_team.infrastructure.utils.splitters.Splitter --|> pydantic.main.BaseModel
+autogen_team.infrastructure.utils.splitters.TimeSeriesSplitter --|> autogen_team.infrastructure.utils.splitters.Splitter
+autogen_team.infrastructure.utils.splitters.TrainTestSplitter --|> autogen_team.infrastructure.utils.splitters.Splitter
+autogen_team.models.entities.BaselineAutogenModel --* autogen_team.application.jobs.training.TrainingJob : model
+autogen_team.models.entities.BaselineAutogenModel --* autogen_team.application.jobs.tuning.TuningJob : model
+autogen_team.data_access.adapters.datasets.ParquetReader --* autogen_team.application.jobs.evaluations.EvaluationsJob : inputs
+autogen_team.data_access.adapters.datasets.ParquetReader --* autogen_team.application.jobs.evaluations.EvaluationsJob : targets
+autogen_team.data_access.adapters.datasets.ParquetReader --* autogen_team.application.jobs.explanations.ExplanationsJob : inputs_samples
+autogen_team.data_access.adapters.datasets.ParquetReader --* autogen_team.application.jobs.inference.InferenceJob : inputs
+autogen_team.data_access.adapters.datasets.ParquetReader --* autogen_team.application.jobs.training.TrainingJob : inputs
+autogen_team.data_access.adapters.datasets.ParquetReader --* autogen_team.application.jobs.training.TrainingJob : targets
+autogen_team.data_access.adapters.datasets.ParquetReader --* autogen_team.application.jobs.tuning.TuningJob : inputs
+autogen_team.data_access.adapters.datasets.ParquetReader --* autogen_team.application.jobs.tuning.TuningJob : targets
+autogen_team.data_access.adapters.datasets.ParquetWriter --* autogen_team.application.jobs.explanations.ExplanationsJob : models_explanations
+autogen_team.data_access.adapters.datasets.ParquetWriter --* autogen_team.application.jobs.explanations.ExplanationsJob : samples_explanations
+autogen_team.data_access.adapters.datasets.ParquetWriter --* autogen_team.application.jobs.inference.InferenceJob : outputs
+autogen_team.registry.adapters.mlflow_adapter.CustomLoader --* autogen_team.application.jobs.explanations.ExplanationsJob : loader
+autogen_team.registry.adapters.mlflow_adapter.CustomLoader --* autogen_team.application.jobs.inference.InferenceJob : loader
+autogen_team.registry.adapters.mlflow_adapter.CustomSaver --* autogen_team.application.jobs.training.TrainingJob : saver
+autogen_team.registry.adapters.mlflow_adapter.MlflowRegister --* autogen_team.application.jobs.training.TrainingJob : registry
+autogen_team.infrastructure.services.AlertsService --* autogen_team.application.jobs.base.Job : alerts_service
+autogen_team.infrastructure.services.LoggerService --* autogen_team.application.jobs.base.Job : logger_service
+autogen_team.infrastructure.services.MlflowService --* autogen_team.application.jobs.base.Job : mlflow_service
+autogen_team.infrastructure.services.MlflowService.RunConfig --* autogen_team.application.jobs.evaluations.EvaluationsJob : run_config
+autogen_team.infrastructure.services.MlflowService.RunConfig --* autogen_team.application.jobs.training.TrainingJob : run_config
+autogen_team.infrastructure.services.MlflowService.RunConfig --* autogen_team.application.jobs.tuning.TuningJob : run_config
+autogen_team.infrastructure.utils.searchers.GridCVSearcher --* autogen_team.application.jobs.tuning.TuningJob : searcher
+autogen_team.infrastructure.utils.signers.InferSigner --* autogen_team.application.jobs.training.TrainingJob : signer
+autogen_team.models.entities.Model --o autogen_team.registry.adapters.mlflow_adapter.CustomSaver.Adapter : model
 @enduml

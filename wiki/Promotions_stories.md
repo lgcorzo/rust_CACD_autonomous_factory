@@ -1,6 +1,4 @@
-
 # US [Model Promotion Job](./backlog_llmlops_regresion.md) : Define a job for promoting a registered model version with an alias.
-
 
 - [US Model Promotion Job : Define a job for promoting a registered model version with an alias.](#us-model-promotion-job--define-a-job-for-promoting-a-registered-model-version-with-an-alias)
   - [classes relations](#classes-relations)
@@ -14,7 +12,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -84,6 +82,7 @@ As a **model manager**, I want to configure a promotion job with the required al
 The `PromotionJob` class allows for the setup of the job by specifying the alias to be used for the promoted model and the model version to be promoted.
 
 **Acceptance Criteria:**
+
 - The promotion job is initialized with the specified alias and model version.
 - The alias defaults to `"Champion"` if not specified.
 - The version defaults to `None`, indicating the latest version.
@@ -99,6 +98,7 @@ As a **data engineer**, I want the job to determine which version of the model t
 In the `run` method, the promotion job should check if a specific model version is provided; if not, it should default to the latest version in the model registry.
 
 **Acceptance Criteria:**
+
 - If a version is not specified, the job retrieves the latest model version using `client.search_model_versions`.
 - The retrieval should order results to get the most recent version.
 - The selected version is logged for clarity.
@@ -114,6 +114,7 @@ As a **model manager**, I want to promote the specified model version under the 
 The job should use the MLflow client to set the specified alias to the chosen model version, making it easy to reference the promoted model in future operations.
 
 **Acceptance Criteria:**
+
 - The job correctly promotes the model version and sets the alias through the MLflow client.
 - Confirmation of the promotion action is logged with details of the model and version.
 - The function `set_registered_model_alias` is called with the right arguments
@@ -129,6 +130,7 @@ As a **user**, I want to receive a notification upon completion of the promotion
 At the conclusion of the job execution, the promotion job sends notifications to inform stakeholders of the results.
 
 **Acceptance Criteria:**
+
 - Notifications include details about the promoted version and alias.
 - The alerts service successfully informs users of the job completion.
 - The correct information is passed to the message property
@@ -138,13 +140,16 @@ At the conclusion of the job execution, the promotion job sends notifications to
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `PromotionJob` class correctly implements the abstract `run` method from the base `Job` class.
    - All necessary services (logging, MLflow, alerts) are initialized appropriately.
 
 2. **Error Handling:**
+
    - Any issues encountered during the promotion process should be logged with clear error messages and handled gracefully.
 
 3. **Testing:**
+
    - Unit tests validate job initialization, model version retrieval, promotion actions, and notification delivery.
 
 4. **Documentation:**
@@ -161,8 +166,8 @@ At the conclusion of the job execution, the promotion job sends notifications to
 
 ## Code location
 
-[src/autogen_team/jobs/promotion.py](../src/autogen_team/jobs/promotion.py)
+- **Application Layer (Promotion Job)**: [src/autogen_team/application/jobs/promotion.py](../src/autogen_team/application/jobs/promotion.py)
 
 ## Test location
 
-[tests/jobs/test_promotion.py](../tests/jobs/test_promotion.py)
+- [tests/application/jobs/test_promotion.py](../tests/application/jobs/test_promotion.py)

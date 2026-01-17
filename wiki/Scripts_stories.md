@@ -15,7 +15,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -81,7 +81,7 @@ As a **user**, I want to provide job configuration files and options via command
 **Description:**  
 The CLI script parses command-line arguments to take in configuration files and other options.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The script successfully retrieves job configuration files and additional strings from the command-line input.
 - Help instructions are clearly available when required by the user.
@@ -96,7 +96,7 @@ As a **developer**, I want to view the settings schema, so that I can understand
 **Description:**  
 The CLI application can output the settings schema as JSON when the `--schema` flag is used.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The schema is printed in JSON format with correct indentation when invoked.
 - The application exits successfully after displaying the schema.
@@ -111,7 +111,7 @@ As a **user**, I want the application to read configuration files in YAML or JSO
 **Description:**  
 The CLI script reads specified configuration files and parses their contents to configure the job properly.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The script can read and parse configuration files without errors.
 - The settings gathered from files are stored correctly for further processing.
@@ -126,7 +126,7 @@ As a **user**, I want to combine settings from both files and command-line strin
 **Description:**  
 The CLI application merges configurations from multiple sources (files and strings) into a single config object.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The merging process combines settings appropriately without conflicts.
 - The final configuration object accurately reflects the merged settings.
@@ -141,7 +141,7 @@ As a **user**, I want to validate my configuration settings, so I can ensure the
 **Description:**  
 The application validates the combined configuration settings against a predefined model.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The settings are validated, and any discrepancies trigger clear error messages.
 - Proper messages are presented if validation is successful.
@@ -156,7 +156,7 @@ As a **user**, I want the application to execute the AI/ML job based on the prov
 **Description:**  
 The CLI invokes the job runner, executing the task as described by the gathered configurations.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - The job is executed successfully when appropriate configurations are provided.
 - Log messages indicate progress and completion of the job.
@@ -171,7 +171,7 @@ As a **user**, I want clear feedback if no configurations are provided, so that 
 **Description:**  
 The application checks if any configurations have been provided and raises an error if none are present.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 
 - A RuntimeError is raised when both configuration files and command-line strings are absent.
 - The error message clearly informs the user of the missing configurations.
@@ -181,13 +181,16 @@ The application checks if any configurations have been provided and raises an er
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The CLI application parses arguments correctly, handles files, and executes tasks.
    - Clear help instructions are provided as part of the command-line interface.
 
 2. **Error Handling:**
+
    - Meaningful error messages guide the user in case of issues like missing configurations or validation errors.
 
 3. **Testing:**
+
    - Unit tests validate command-line parsing, configuration reading, merging, validation, and job execution.
    - Tests ensure effective handling of edge cases related to configurations.
 
@@ -205,8 +208,8 @@ The application checks if any configurations have been provided and raises an er
 
 ## Code location
 
-[src/autogen_team/scripts.py](../src/autogen_team/scripts.py)
+- **Infrastructure Layer (Scripts)**: [src/autogen_team/scripts.py](../src/autogen_team/scripts.py)
 
 ## Test location
 
-[tests/cli/test_cli.py](../tests/test_scrpits.py)
+- [tests/cli/test_cli.py](../tests/cli/test_cli.py)

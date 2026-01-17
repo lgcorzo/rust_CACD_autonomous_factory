@@ -11,9 +11,13 @@ import pytest
 from _pytest import logging as pl
 from agent_framework import ChatMessage
 from agent_framework.openai import OpenAIChatClient
-from autogen_team.core import metrics, models, schemas
-from autogen_team.io import datasets, registries, services
-from autogen_team.utils import searchers, signers, splitters
+from autogen_team.core import schemas
+from autogen_team.data_access.adapters import datasets
+from autogen_team.evaluation import metrics
+from autogen_team.infrastructure import services
+from autogen_team.infrastructure.utils import searchers, signers, splitters
+from autogen_team.models import entities as models
+from autogen_team.registry.adapters import mlflow_adapter as registries
 from mocogpt import GptServer, gpt_server
 from openai import OpenAI
 

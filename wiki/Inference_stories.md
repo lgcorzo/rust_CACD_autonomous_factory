@@ -1,6 +1,5 @@
 # US [Model Inference Job](./backlog_llmlops_regresion.md) : Define a job for generating batch predictions from a registered model.
 
-
 - [US Model Inference Job : Define a job for generating batch predictions from a registered model.](#us-model-inference-job--define-a-job-for-generating-batch-predictions-from-a-registered-model)
   - [classes relations](#classes-relations)
   - [**User Stories: Inference Job Management**](#user-stories-inference-job-management)
@@ -15,7 +14,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -92,9 +91,10 @@ As a **data scientist**, I want to configure an inference job that specifies the
 The `InferenceJob` class enables the setup of the job with parameters such as input data readers, output data writers, model details, and the loader for accessing the model.
 
 **Acceptance Criteria:**
+
 - The job is initialized with the necessary parameters.
 - Default values are properly handled for optional fields.
-- Has  `KIND` attribute  defined for the class.
+- Has `KIND` attribute defined for the class.
 
 ---
 
@@ -107,6 +107,7 @@ As a **data engineer**, I want to read input data from specified sources, so tha
 In the `run` method, the input data is read using the designated data reader, which ensures data integrity and prepares it for prediction.
 
 **Acceptance Criteria:**
+
 - The job successfully reads input data using the configured reader.
 - Input data is validated and conforms to the expected schema.
 
@@ -121,6 +122,7 @@ As a **data scientist**, I want to load the registered model from the model regi
 The job uses the configured loader to access the specified version or alias of the model from the registry.
 
 **Acceptance Criteria:**
+
 - The model is loaded correctly from the registry using the provided loader.
 - The model client has a valid URI.
 
@@ -135,6 +137,7 @@ As a **data scientist**, I want to generate predictions using the loaded model a
 The job leverages the model's predict method to produce output predictions based on the input data.
 
 **Acceptance Criteria:**
+
 - Predictions are generated using the loaded model and validated input data.
 - The output of the predictions is in a usable format for further processing.
 - Can check the number of generated outputs.
@@ -150,6 +153,7 @@ As a **data engineer**, I want to write the generated predictions to a specified
 The job takes the prediction outputs and writes them to the designated storage using the configured writer.
 
 **Acceptance Criteria:**
+
 - The predictions are successfully written to the specified output using the writer.
 - The method of storage should ensure data integrity.
 
@@ -164,6 +168,7 @@ As a **user**, I want to be notified when the inference job is finished, along w
 At the end of the job execution, notifications are sent to relevant stakeholders summarizing the outcome, including predictions shape.
 
 **Acceptance Criteria:**
+
 - Notifications include job completion details, specifically the shape of the outputs.
 - The alerts service successfully informs users about job completion status.
 
@@ -172,13 +177,16 @@ At the end of the job execution, notifications are sent to relevant stakeholders
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - The `InferenceJob` class correctly implements the abstract `run` method from the base `Job` class.
    - All necessary services (logging, MLflow, alerts) are initialized at the start of the inference job.
 
 2. **Error Handling:**
+
    - Clear error messages are logged for any issues encountered during the reading, loading, or writing processes.
 
 3. **Testing:**
+
    - Unit tests validate job initialization, data reading, model loading, prediction generation, and output writing.
    - Tests ensure that errors in processes trigger appropriate logging and notifications.
 
@@ -196,8 +204,8 @@ At the end of the job execution, notifications are sent to relevant stakeholders
 
 ## Code location
 
-[src/autogen_team/jobs/inference.py](../src/autogen_team/jobs/inference.py)
+- **Application Layer (Inference Job)**: [src/autogen_team/application/jobs/inference.py](../src/autogen_team/application/jobs/inference.py)
 
 ## Test location
 
-[tests/jobs/test_inference.py](../tests/jobs/test_inference.py)
+- [tests/application/jobs/test_inference.py](../tests/application/jobs/test_inference.py)

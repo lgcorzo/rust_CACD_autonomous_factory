@@ -1,4 +1,3 @@
-
 # US [Global Context Management](./backlog_llmlops_regresion.md) : Manage global contexts during execution for logging, notifications, and MLflow tracking.
 
 - [US Global Context Management : Manage global contexts during execution for logging, notifications, and MLflow tracking.](#us-global-context-management--manage-global-contexts-during-execution-for-logging-notifications-and-mlflow-tracking)
@@ -12,7 +11,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -113,6 +112,7 @@ As a **developer**, I want a centralized logging service that captures and forma
 The `LoggerService` class provides functionality to manage logging in the application using the Loguru library. It allows configuration of log outputs, levels, and formats.
 
 **Acceptance Criteria:**
+
 - The `start` method initializes the logger with the desired configuration.
 - Log entries should show timestamps, log levels, and the source of the log message.
 - The logger can be retrieved through the `logger` method.
@@ -129,6 +129,7 @@ As a **user**, I want to be able to receive notifications from the application, 
 The `AlertsService` class provides capabilities to send notifications through the system or display them on the console if notifications are disabled.
 
 **Acceptance Criteria:**
+
 - The `start` method initializes the notification service (though it does nothing).
 - The `notify` method allows sending notifications with a title and message.
 - When notifications are disabled, messages should be printed to the console instead.
@@ -145,6 +146,7 @@ As a **data scientist**, I want to manage MLflow tracking and model registry thr
 The `MlflowService` class integrates MLflow tracking features, enabling experiment management, automatic logging, and model registrations.
 
 **Acceptance Criteria:**
+
 - The `start` method sets the tracking and registry URIs and initializes the experiment for logging.
 - Automatic logging of parameters and metrics is enabled based on the class configuration.
 - Users can retrieve the MLflow client through the `client` method to perform direct MLflow API operations.
@@ -155,13 +157,16 @@ The `MlflowService` class integrates MLflow tracking features, enabling experime
 ### **Common Acceptance Criteria**
 
 1. **Implementation Requirements:**
+
    - Each service class must extend the `Service` base class and implement the `start` method.
    - Clear separation of responsibilities among services (logging, notifications, MLflow tracking).
 
 2. **Configuration:**
+
    - Each service should have configurable attributes that can be set via environment variables or default values.
 
 3. **Testing:**
+
    - Unit tests validate the functionality of each service, ensuring they operate as intended when invoked.
    - Tests ensure that the logging outputs are correct, notifications are sent or printed based on settings, and MLflow is correctly configured.
 
@@ -178,8 +183,10 @@ The `MlflowService` class integrates MLflow tracking features, enabling experime
 
 ## Code location
 
-[src/autogen_team/io/services.py](../src/autogen_team/io/services.py)
+- **Infrastructure Layer (Alert Service)**: [src/autogen_team/infrastructure/services/alert_service.py](../src/autogen_team/infrastructure/services/alert_service.py)
+- **Infrastructure Layer (Logger Service)**: [src/autogen_team/infrastructure/services/logger_service.py](../src/autogen_team/infrastructure/services/logger_service.py)
+- **Infrastructure Layer (Mlflow Service)**: [src/autogen_team/infrastructure/services/mlflow_service.py](../src/autogen_team/infrastructure/services/mlflow_service.py)
 
 ## Test location
 
-[tests/io/test_services.py](../tests/io/test_services.py)
+- [tests/infrastructure/services/](../tests/infrastructure/services/)

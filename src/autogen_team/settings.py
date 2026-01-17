@@ -5,7 +5,7 @@
 import pydantic as pdt
 import pydantic_settings as pdts
 
-from autogen_team import jobs
+from autogen_team.application import jobs
 
 # %% SETTINGS
 

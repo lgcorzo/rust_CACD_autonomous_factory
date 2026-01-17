@@ -1,6 +1,5 @@
 # US [High-Level Project Jobs](./backlog_llmlops_regresion.md) : Manage the execution context for high-level project jobs with integrated services.
 
-
 - [US High-Level Project Jobs : Manage the execution context for high-level project jobs with integrated services.](#us-high-level-project-jobs--manage-the-execution-context-for-high-level-project-jobs-with-integrated-services)
   - [classes relations](#classes-relations)
   - [**User Stories: Base Job Class**](#user-stories-base-job-class)
@@ -13,7 +12,7 @@
   - [Code location](#code-location)
   - [Test location](#test-location)
 
-------------
+---
 
 ## classes relations
 
@@ -29,7 +28,7 @@ classDiagram
         +__exit__(exc_type, exc_value, exc_traceback) : Literal[False]
         +run() : Locals
     }
-    
+
     class LoggerService {
        <<external>>
         +start()
@@ -71,6 +70,7 @@ As a **developer**, I want to define a context for executing high-level jobs so 
 The `Job` class provides a base implementation for managing the execution context of high-level project jobs. It handles the lifecycle of various services such as logging, alerts, and MLflow tracking.
 
 **Acceptance Criteria:**
+
 - The `Job` class provides a base implementation for all job types in the system.
 - Attributes for `logger_service`, `alerts_service`, and `mlflow_service` are initialized with default service implementations.
 
@@ -85,6 +85,7 @@ As a **developer**, I want the context to automatically initialize and start log
 The `__enter__` method initializes and starts the configured services (logger, alerts, and MLflow) at the beginning of the job execution context.
 
 **Acceptance Criteria:**
+
 - The `__enter__` method is called when the job context is entered.
 - The logging service is started and a debug message is logged.
 - The alerts service is started.
@@ -102,6 +103,7 @@ As a **developer**, I want the context to automatically stop and cleanup the con
 The `__exit__` method stops and cleans up the logging, alerting, and MLflow tracking services upon exiting the job execution context.
 
 **Acceptance Criteria:**
+
 - The `__exit__` method is called when the job context is exited.
 - The MLflow service is stopped and a debug message is logged.
 - The alerts service is stopped.
@@ -119,6 +121,7 @@ As a **developer**, I want the `Job` class to define an abstract `run` method, s
 The abstract `run` method defines the interface for executing the job-specific logic within the managed context, allowing for a consistent execution pattern across different job types.
 
 **Acceptance Criteria:**
+
 - The `run` method is declared as abstract.
 - Subclasses must implement the `run` method.
 - The `run` method returns a dictionary of local job variables.
@@ -128,20 +131,25 @@ The abstract `run` method defines the interface for executing the job-specific l
 ### **Common Acceptance Criteria**
 
 1.  **Base Class Implementation**:
+
     - The `Job` class is abstract and cannot be instantiated directly.
     - All concrete job types must inherit from the `Job` class.
 
 2.  **Service Management**:
+
     - The `__enter__` method starts all configured services.
     - The `__exit__` method stops all configured services.
 
 3.  **Error Propagation**:
+
     - The `__exit__` method always returns `False`, ensuring that any exceptions raised during job execution are propagated.
 
 4.  **Logging**:
+
     - The `LoggerService` is used to log lifecycle events (start and stop) for each service.
 
 5.  **Flexibility**:
+
     - The structure is flexible, allowing different types of services to be added or removed easily.
 
 6.  **Validation**:
@@ -158,11 +166,10 @@ The abstract `run` method defines the interface for executing the job-specific l
 - Unit tests validate the functionality and robustness of the class.
 - Documentation is complete, with examples and clear explanations.
 
-
 ## Code location
 
-[src/autogen_team/jobs/base.py](../src/autogen_team/jobs/base.py)
+- **Application Layer (Jobs Base)**: [src/autogen_team/application/jobs/base.py](../src/autogen_team/application/jobs/base.py)
 
 ## Test location
 
-[tests/jobs/test_base.py](../tests/jobs/test_base.py)
+- [tests/application/jobs/test_base.py](../tests/application/jobs/test_base.py)
