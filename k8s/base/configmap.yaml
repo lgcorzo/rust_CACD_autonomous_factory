@@ -4,8 +4,8 @@ metadata:
   name: llmops-config
   namespace: llm-apps
 data:
-  MLFLOW_TRACKING_URI: "http://mlflow.monitoring.svc.cluster.local:5000"
-  MLFLOW_REGISTRY_URI: "http://mlflow.monitoring.svc.cluster.local:5000"
+  MLFLOW_TRACKING_URI: "http://mlflow.llm-apps.svc.cluster.local:5000"
+  MLFLOW_REGISTRY_URI: "http://mlflow.llm-apps.svc.cluster.local:5000"
   MLFLOW_EXPERIMENT_NAME: "autogen_team_experiment"
   MLFLOW_REGISTERED_MODEL_NAME: "autogen_team_model"
   GOOGLE_CSE_ID: "e1af527f0377843d3"
