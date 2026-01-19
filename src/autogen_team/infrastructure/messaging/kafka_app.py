@@ -73,46 +73,6 @@ class PredictionResponse(BaseModel):
     result: Dict[str, Any] = {"inference": [0.0], "quality": 0.0, "error": ""}
 
 
-# Mock Classes
-class MockProducer:
-    def produce(self, topic, key, value, callback=None):
-        logger.info(f"[MOCK] Producing to {topic}: {value}")
-        if callback:
-            callback(None, MockMessage(topic))
-
-    def flush(self):
-        logger.info("[MOCK] Producer flushed")
-
-class MockConsumer:
-    def subscribe(self, topics):
-        logger.info(f"[MOCK] Subscribed to {topics}")
-
-    def poll(self, timeout):
-        time.sleep(timeout)
-        return None
-
-    def close(self):
-        logger.info("[MOCK] Consumer closed")
-
-    def commit(self, msg):
-        logger.info(f"[MOCK] Committed message")
-
-class MockMessage:
-    def __init__(self, topic):
-        self._topic = topic
-
-    def topic(self):
-        return self._topic
-
-    def partition(self):
-        return 0
-    
-    def error(self):
-        return None
-    
-    def value(self):
-        return b'{"input_data": {"input": ["mock input"]}}'
-
 # Core Service Class
 class FastAPIKafkaService:
     """Service for deploying a FastAPI application with a Kafka producer and consumer."""
@@ -130,8 +90,8 @@ class FastAPIKafkaService:
         self.kafka_config = kafka_config
         self.input_topic = input_topic
         self.output_topic = output_topic
-        self.producer: Producer | MockProducer | None = None
-        self.consumer: Consumer | MockConsumer | None = None
+        self.producer: Producer | None = None
+        self.consumer: Consumer | None = None
 
     def delivery_report(self, err: Optional[KafkaError], msg: Any) -> None:
         """Called once for each message produced to indicate delivery result."""
@@ -156,8 +116,8 @@ class FastAPIKafkaService:
             self.producer = Producer(self.kafka_config)
             logger.info("Kafka producer initialized")
         except Exception as e:
-            logger.error(f"Failed to initialize Kafka producer: {e}. Using MockProducer.")
-            self.producer = MockProducer()
+            logger.error(f"Failed to initialize Kafka producer: {e}")
+            raise
 
     def _initialize_kafka_consumer(self) -> None:
         """Initialize Kafka consumer."""
@@ -167,9 +127,8 @@ class FastAPIKafkaService:
             self.consumer.subscribe([self.input_topic])
             logger.info(f"Kafka consumer subscribed to topic: {self.input_topic}")
         except Exception as e:
-            logger.error(f"Failed to initialize Kafka consumer: {e}. Using MockConsumer.")
-            self.consumer = MockConsumer()
-            self.consumer.subscribe([self.input_topic])
+            logger.error(f"Failed to initialize Kafka consumer: {e}")
+            raise
 
     def _run_server(self) -> None:
         """Run the FastAPI server."""
