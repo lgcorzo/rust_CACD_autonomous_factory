@@ -24,7 +24,7 @@ spec:
             ]
       containers:
         - name: llmops-app
-          image: lgcorzo/llmops-python-package:v1.0.0
+          image: lgcorzo/llmops-python-package:latest
           ports:
             - containerPort: 8100
           envFrom:
