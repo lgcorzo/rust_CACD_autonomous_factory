@@ -20,15 +20,20 @@ from autogen_team.infrastructure import services
 from autogen_team.registry.adapters.mlflow_adapter import CustomLoader
 import sys
 import autogen_team.infrastructure.io
+
 sys.modules["autogen_team.io"] = autogen_team.infrastructure.io
-import autogen_team.registry
+import autogen_team.registry  # noqa: E402
+
 # Create synthetic module for legacy registries
-import types
+import types  # noqa: E402
+
 legacy_registries = types.ModuleType("autogen_team.io.registries")
-from autogen_team.registry.adapters.mlflow_adapter import CustomSaver
+from autogen_team.registry.adapters.mlflow_adapter import CustomSaver  # noqa: E402
+
 legacy_registries.CustomSaver = CustomSaver
 sys.modules["autogen_team.io.registries"] = legacy_registries
-import autogen_team.models
+import autogen_team.models  # noqa: E402
+
 sys.modules["autogen_team.core.models"] = autogen_team.models
 
 # Constants
@@ -161,11 +166,11 @@ class FastAPIKafkaService:
 
     def _handle_message_error(self, msg: Any) -> bool:
         """Handle errors in polled messages."""
-        if hasattr(msg, 'error') and msg.error():
-             if msg.error().code() == KafkaError._PARTITION_EOF:
+        if hasattr(msg, "error") and msg.error():
+            if msg.error().code() == KafkaError._PARTITION_EOF:
                 logger.debug("Reached end of partition.")
                 return True
-             else:
+            else:
                 logger.error(f"Consumer error: {msg.error()}")
                 return False
         return True
@@ -240,14 +245,14 @@ def main() -> None:
     # Initialize Mlflow Service
     mlflow_service = services.MlflowService()
     mlflow_service.start()
-    
+
     # Get model URI from environment or construct it from name/alias
     model_uri = os.getenv("MLFLOW_MODEL_URI")
     if not model_uri:
         if hasattr(mlflow_service, "registry_name"):
-             model_name = mlflow_service.registry_name
+            model_name = mlflow_service.registry_name
         else:
-             model_name = "default"
+            model_name = "default"
         model_alias = os.getenv("MLFLOW_MODEL_ALIAS", "Champion")
         model_uri = f"models:/{model_name}@{model_alias}"
 
@@ -269,11 +274,11 @@ def main() -> None:
             outputs: Outputs = model.predict(
                 inputs=InputsSchema.check(pd.DataFrame(input_data.input_data))
             )
-            # Handle outputs format 
+            # Handle outputs format
             if hasattr(outputs, "to_numpy"):
-                 predictionresponse.result["inference"] = outputs.to_numpy().tolist()
+                predictionresponse.result["inference"] = outputs.to_numpy().tolist()
             else:
-                 predictionresponse.result["inference"] = str(outputs)
+                predictionresponse.result["inference"] = str(outputs)
 
             predictionresponse.result["quality"] = 1
             predictionresponse.result["error"] = None
