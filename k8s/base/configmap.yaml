@@ -8,7 +8,6 @@ data:
   MLFLOW_REGISTRY_URI: "http://mlflow.llm-apps.svc.cluster.local:5000"
   MLFLOW_EXPERIMENT_NAME: "autogen_team_experiment"
   MLFLOW_REGISTERED_MODEL_NAME: "autogen_team_model"
-  GOOGLE_CSE_ID: "e1af527f0377843d3"
   DEFAULT_KAFKA_SERVER: "my-kafka-cluster.confluent.svc.cluster.local:9092"
   DEFAULT_GROUP_ID: "llmops-regression"
   DEFAULT_AUTO_OFFSET_RESET: "earliest"
