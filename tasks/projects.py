@@ -59,6 +59,7 @@ def run(ctx: Context, job: str) -> None:
         call(run, job="training"),
         call(run, job="promotion"),
         call(run, job="inference"),
+        call(run, job="hatchet_inference"),
         call(run, job="evaluations"),
         call(run, job="explanations"),
     ],

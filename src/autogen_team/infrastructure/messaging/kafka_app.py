@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import signal
+import sys
 import threading
 import time
 from typing import Any, Callable, Dict, Optional
@@ -15,17 +16,16 @@ from fastapi import FastAPI
 from pandera.typing.common import DataFrameBase
 from pydantic import BaseModel
 
+import autogen_team.infrastructure.io
 from autogen_team.core.schemas import InputsSchema, Outputs
 from autogen_team.infrastructure import services
 from autogen_team.registry.adapters.mlflow_adapter import CustomLoader
-import sys
-import autogen_team.infrastructure.io
 
 sys.modules["autogen_team.io"] = autogen_team.infrastructure.io
-import autogen_team.registry  # noqa: E402
-
 # Create synthetic module for legacy registries
 import types  # noqa: E402
+
+import autogen_team.registry  # noqa: E402
 
 legacy_registries = types.ModuleType("autogen_team.io.registries")
 from autogen_team.registry.adapters.mlflow_adapter import CustomSaver  # noqa: E402
