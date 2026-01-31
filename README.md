@@ -10,21 +10,28 @@
 
 Key features include:
 
-- **MLOps Workflow:** Managed jobs for training, tuning, and promoting models.
-- **Inference:** Support for both batch inference (via CLI) and realtime inference (via Kafka).
+- **MLops Workflow:** Managed jobs for training, tuning, and promoting models.
+- **Inference:** Support for both batch inference (via CLI), asynchronous managed inference (via Hatchet), and realtime inference (via Kafka).
+- **Orchestration:** Integrated with [Hatchet](https://hatchet.run/) for managing distributed and long-running ML workflows with built-in retries and monitoring.
 - **Agent Framework:** Integration with [AutoGen Studio](https://microsoft.github.io/autogen/) for building and managing multi-agent workflows.
 - **Configuration Driven:** flexible execution using YAML configuration files.
 
 ## Table of Contents
 
-- [Install](#install)
-- [Usage](#usage)
-  - [CLI (Batch Jobs)](#cli-batch-jobs)
-  - [Realtime Inference (Kafka)](#realtime-inference-kafka)
-  - [AutoGen Studio](#autogen-studio)
-- [Configuration](#configuration)
-- [Development](#development)
-- [Project Structure](#project-structure)
+- [Autogen Team](#autogen-team)
+  - [Table of Contents](#table-of-contents)
+  - [Install](#install)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [Usage](#usage)
+    - [CLI (Batch Jobs)](#cli-batch-jobs)
+    - [Asynchronous Inference (Hatchet)](#asynchronous-inference-hatchet)
+    - [Realtime Inference (Kafka)](#realtime-inference-kafka)
+    - [AutoGen Studio](#autogen-studio)
+  - [Configuration](#configuration)
+  - [Development](#development)
+    - [Pre-commit Hooks](#pre-commit-hooks)
+  - [Project Structure](#project-structure)
 
 ## Install
 
@@ -78,6 +85,20 @@ To see the configuration schema:
 ```bash
 poetry run autogen_team --schema
 ```
+
+### Asynchronous Inference (Hatchet)
+
+For long-running inference tasks, you can use the Hatchet-powered asynchronous execution. This job triggers a workflow in the Hatchet engine and returns immediately, allowing for independent processing.
+
+```bash
+# Run asynchronous inference
+poetry run invoke projects.run --job hatchet_inference
+```
+
+**Requirements:**
+
+- Hatchet SDK configuration (`HATCHET_CLIENT_TOKEN`, `HATCHET_NAMESPACE`).
+- A running Hatchet worker listening for the `InferenceWorkflow`.
 
 ### Realtime Inference (Kafka)
 
