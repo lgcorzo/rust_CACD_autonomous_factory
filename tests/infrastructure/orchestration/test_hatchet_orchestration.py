@@ -7,7 +7,7 @@ from autogen_team.infrastructure.orchestration.hatchet_workflows import Inferenc
 def test_inference_workflow_step(mocker: pm.MockerFixture) -> None:
     # given
     mock_context = mocker.Mock()
-    mock_context.workflow_input.return_value = {
+    mock_context.workflow_input = {
         "alias_or_version": "Champion",
         "inputs": {"KIND": "ParquetReader", "path": "test.parquet"},
         "outputs": {"KIND": "ParquetWriter", "path": "results.parquet"},
