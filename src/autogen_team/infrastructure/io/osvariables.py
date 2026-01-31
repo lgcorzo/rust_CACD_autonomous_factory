@@ -24,6 +24,10 @@ class Env(Singleton, BaseSettings):
     mlflow_s3_endpoint_url: str = ""
     mlflow_s3_ignore_tls: bool = False
 
+    # Hatchet
+    hatchet_client_token: str = ""
+    hatchet_namespace: str = "autogen_team"
+
     class Config:
         case_sensitive = False  # Optional: make env var lookup case-insensitive
         env_file = ".env"  # Enable reading from .env file
