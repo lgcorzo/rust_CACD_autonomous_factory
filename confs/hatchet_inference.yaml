@@ -1,0 +1,10 @@
+job:
+  KIND: HatchetInferenceJob
+  inputs:
+    KIND: ParquetReader
+    path: data/inputs_test.parquet
+    limit: 4
+  outputs:
+    KIND: ParquetWriter
+    path: outputs/predictions_hatchet_test.parquet
+  alias_or_version: Champion
