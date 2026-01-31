@@ -25,6 +25,7 @@ Welcome to the LLMOps Python Package wiki. This package provides tools and utili
 - [Evaluations Stories](Evaluations_stories.md)
 - [Explanations Stories](Explanations_stories.md)
 - [Inference Stories](Inference_stories.md)
+- [Inference Stories (Hatchet Async)](Inference_Async_Hatchet_stories.md)
 - [Promotions Stories](Promotions_stories.md)
 - [Training Stories](Training_stories.md)
 - [Tuning Stories](Tuning_stories.md)
