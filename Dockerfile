@@ -4,5 +4,6 @@ FROM python:3.12
 COPY dist/*.whl .
 RUN pip install *.whl
 # Ejecuta la función main() del módulo infrastructure.messaging.kafka_app
+# CMD ["autogen_team", "--help"]
 CMD ["python", "-m", "autogen_team.infrastructure.messaging.kafka_app"]
 
