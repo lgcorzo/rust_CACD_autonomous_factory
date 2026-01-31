@@ -30,6 +30,7 @@ As part of the Onion Architecture, the `infrastructure` layer is on the outermos
 ### 3.1 Functional Requirements (Services)
 
 - **MLflow Integration**: Must initialize tracking and registry URIs from environment variables and support S3 as an artifact store.
+- **Orchestration (Hatchet)**: Must provide a `HatchetService` to manage asynchronous job execution and a workflow engine for complex ML task coordination.
 - **Logging**: Must provide a configurable `LoggerService` for capturing application traces.
 - **Environment Management**: Must support parsing and merging project configurations via the `io` module.
 
@@ -80,9 +81,14 @@ classDiagram
     class AlertsService {
         +start()
     }
+    class HatchetService {
+        +start()
+        +client() Hatchet
+    }
     Service <|-- MlflowService
     Service <|-- LoggerService
     Service <|-- AlertsService
+    Service <|-- HatchetService
 ```
 
 ### 6.2 Execution Diagram (MLflow Setup)

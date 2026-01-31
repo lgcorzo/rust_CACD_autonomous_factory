@@ -25,13 +25,13 @@ The project follows **Domain-Driven Design (DDD)** and **Onion Architecture** to
 
 ### 3.2 Application Layer
 
-- **Jobs/Use Cases**: TrainingJob, InferenceJob, EvaluationJob, TuningJob.
+- **Jobs/Use Cases**: TrainingJob, InferenceJob, HatchetInferenceJob, EvaluationJob, TuningJob.
 - **DTOs**: Job Contexts, Request/Response schemas.
 
 ### 3.3 Infrastructure Layer
 
-- **External Services**: MLflow (for tracking and registry), Kafka (optional messaging).
-- **Adapters**: Searchers, Splitters, Signers.
+- **External Services**: MLflow (for tracking and registry), Hatchet (for orchestration), Kafka (optional messaging).
+- **Adapters**: Searchers, Splitters, Signers, Orchestration Workflows.
 
 ### 3.4 Data Access Layer
 
@@ -56,8 +56,10 @@ graph TD
     C --> D[Model Implementations]
     B --> E[Infrastructure Layer]
     E --> F[MLflow / Registry]
+    E --> I[Hatchet Orchestration]
     B --> G[Data Access Layer]
     G --> H[Datasets]
+    I --> B
 ```
 
 ---
