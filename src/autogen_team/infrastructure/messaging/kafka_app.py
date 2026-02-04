@@ -182,17 +182,17 @@ class FastAPIKafkaService:
             kafka_msg: Dict[str, Any] = json.loads(msg.value().decode("utf-8"))
             input_obj: PredictionRequest = PredictionRequest()
             input_obj.input_data = kafka_msg["input_data"]
-            logger.info(f"kafka Received input  {kafka_msg}")
+            logger.info("kafka Received input message")
             prediction_result: Dict[str, Any] = self.prediction_callback(input_obj).result
         except json.JSONDecodeError as e:
-            error = f"Failed to decode JSON message: {e}. Raw message: {msg.value()}"
-            predictionresponse.result["error"] = error
-            logger.error(error)
+            error_log = f"Failed to decode JSON message: {e}. Raw message: {msg.value()}"
+            logger.error(error_log)
+            predictionresponse.result["error"] = "Invalid JSON format"
             prediction_result = predictionresponse.result
         except Exception as e:
-            error = f"Error during prediction processing: {e}"
-            logger.exception(error)
-            predictionresponse.result["error"] = error
+            error_msg = f"Error during prediction processing: {e}"
+            logger.exception(error_msg)
+            predictionresponse.result["error"] = "Internal processing error"
             prediction_result = predictionresponse.result
 
         try:
@@ -286,7 +286,7 @@ def main() -> None:
             logger.error(f"Prediction error: {e}")
             predictionresponse.result["inference"] = 0
             predictionresponse.result["quality"] = 0
-            predictionresponse.result["error"] = str(e)
+            predictionresponse.result["error"] = "Prediction failed"
         return predictionresponse
 
     # Kafka Configuration
