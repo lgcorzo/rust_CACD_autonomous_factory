@@ -7,14 +7,18 @@ from autogen_team.infrastructure.messaging.kafka_app import (
     PredictionResponse,
 )
 
+
+from typing import Generator
+
+
 @pytest.fixture()
-def mock_kafka_service():
+def mock_kafka_service() -> Generator[FastAPIKafkaService, None, None]:
     """Fixture to create a mocked FastAPIKafkaService."""
     with (
         patch("autogen_team.infrastructure.messaging.kafka_app.Producer") as MockProducer,
         patch("autogen_team.infrastructure.messaging.kafka_app.Consumer") as MockConsumer,
-        patch("threading.Thread") as MockThread,
-        patch("time.sleep") as MockSleep,
+        patch("threading.Thread"),
+        patch("time.sleep"),
     ):
         mock_producer = MagicMock()
         MockProducer.return_value = mock_producer
@@ -40,8 +44,8 @@ def mock_kafka_service():
 
 
 def test_process_message_generic_error_on_exception(
-    mock_kafka_service,
-):
+    mock_kafka_service: FastAPIKafkaService,
+) -> None:
     """Test that _process_message returns a generic error message on exception."""
     service = mock_kafka_service
 
@@ -71,21 +75,21 @@ def test_process_message_generic_error_on_exception(
     # Verify the produced message contains generic error
     service.producer.produce.assert_called_once()
     args, kwargs = service.producer.produce.call_args
-    value_json = json.loads(kwargs['value'].decode('utf-8'))
+    value_json = json.loads(kwargs["value"].decode("utf-8"))
 
     assert value_json["error"] == "Internal processing error"
     assert "Sensitive internal error" not in value_json["error"]
 
 
 def test_process_message_no_pii_logging(
-    mock_kafka_service,
-):
+    mock_kafka_service: FastAPIKafkaService,
+) -> None:
     """Test that _process_message does not log raw input data."""
     service = mock_kafka_service
     sensitive_input = {"input_data": "my_secret_password"}
 
     msg = MagicMock()
-    msg.value.return_value = json.dumps(sensitive_input).encode('utf-8')
+    msg.value.return_value = json.dumps(sensitive_input).encode("utf-8")
     # No need to mock decode, real bytes decode works. But wait, msg is a Mock.
     # msg.value() returns the bytes. The code calls msg.value().decode("utf-8").
     # If msg.value() returns a MagicMock, decode might fail or return another mock.
