@@ -6,7 +6,7 @@ from autogen_team.registry.adapters.mlflow_adapter import CustomSaver
 
 class TestSecurityLeak(unittest.TestCase):
     @patch.dict(os.environ, {"LITELLM_API_KEY": "super_secret_key"})
-    def test_adapter_captures_secret(self):
+    def test_adapter_captures_secret(self) -> None:
         mock_model = MagicMock()
         # Initialize the adapter
         adapter = CustomSaver.Adapter(model=mock_model)
