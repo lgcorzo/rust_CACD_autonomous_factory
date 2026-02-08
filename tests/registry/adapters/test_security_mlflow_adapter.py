@@ -5,7 +5,7 @@ from autogen_team.registry.adapters.mlflow_adapter import CustomSaver
 
 
 class TestSecurityMlflowAdapter(unittest.TestCase):
-    def test_no_secret_leakage_in_adapter_init(self):
+    def test_no_secret_leakage_in_adapter_init(self) -> None:
         """
         Test that CustomSaver.Adapter does not capture environment variables
         (secrets) in its __init__ method, which would be pickled into the model artifact.
