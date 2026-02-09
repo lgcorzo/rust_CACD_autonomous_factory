@@ -9,3 +9,8 @@
 **Learning:** In event-driven architectures like Kafka, error handling often involves producing to an error topic or the same output topic. Great care must be taken to sanitize these error messages. Also, logging "raw" messages for debugging is a common privacy trap.
 **Prevention:** Always catch exceptions at the top level of the message processor, log the full stack trace securely (server-side), but return/produce only generic error codes or messages to the downstream systems. Sanitize input logs to exclude data fields.
 >>>>>>> 36194fc (feat: Sanitize Kafka service logs and error responses)
+
+## 2026-02-09 - [Secret Leakage in Pickled MLflow Adapters]
+**Vulnerability:** Found a hardcoded `model_config` dictionary in `mlflow_adapter.py` that captured the `LITELLM_API_KEY` environment variable value at initialization time. This caused the secret API key to be stored in plain text within the pickled model artifact.
+**Learning:** When using MLflow's `PythonModel`, any instance attribute set in `__init__` is serialized (pickled) with the model. Reading secrets into instance attributes during `__init__` permanently bakes them into the artifact, leaking them to anyone with access to the model file.
+**Prevention:** Never store environment-dependent configuration or secrets in `__init__` of a `PythonModel`. Always load configuration dynamically in `load_context` or `predict`, or use the context object provided by MLflow at runtime.
