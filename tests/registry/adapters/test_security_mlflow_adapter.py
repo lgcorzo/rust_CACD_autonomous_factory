@@ -3,6 +3,7 @@ import pytest
 from unittest.mock import MagicMock
 from autogen_team.registry.adapters.mlflow_adapter import CustomSaver
 
+
 class TestSecurityMlflowAdapter:
     def test_adapter_does_not_capture_secrets_in_init(self) -> None:
         """
@@ -28,7 +29,9 @@ class TestSecurityMlflowAdapter:
                     api_key = config.get("config", {}).get("api_key")
                     # Assert that the API key is NOT captured
                     # This assertion will FAIL if the vulnerability exists
-                    assert api_key != secret_value, "VULNERABILITY DETECTED: API Key captured in adapter.model_config!"
+                    assert (
+                        api_key != secret_value
+                    ), "VULNERABILITY DETECTED: API Key captured in adapter.model_config!"
 
             # If model_config doesn't exist (after fix), the test passes for this check.
 
