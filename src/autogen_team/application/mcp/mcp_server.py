@@ -189,34 +189,44 @@ async def handle_call_tool(name: str, arguments: T.Dict[str, T.Any] | None) -> T
     """
     args = arguments or {}
 
-    if name == "plan_mission":
-        result = await plan_mission(goal=args.get("goal", ""))
-    elif name == "execute_code":
-        result = await execute_code(
-            task=args.get("task", {}),
-            workspace_path=args.get("workspace_path", ""),
-        )
-    elif name == "run_tests":
-        result = await run_tests(
-            changes=args.get("changes", {}),
-            workspace_path=args.get("workspace_path", ""),
-            timeout=args.get("timeout", 300),
-        )
-    elif name == "security_review":
-        result = await security_review(diff=args.get("diff", ""))
-    elif name == "retrieve_context":
-        result = await retrieve_context(
-            query=args.get("query", ""),
-            collection_name=args.get("collection_name", "default"),
-        )
-    elif name == "index_code":
-        result = await index_code(
-            file_path=args.get("file_path", ""),
-            content=args.get("content", ""),
-            metadata=args.get("metadata"),
-        )
-    else:
-        result = {"error": f"Unknown tool: {name}"}
+    try:
+        if name == "plan_mission":
+            result = await plan_mission(goal=args.get("goal", ""))
+        elif name == "execute_code":
+            result = await execute_code(
+                task=args.get("task", {}),
+                workspace_path=args.get("workspace_path", ""),
+            )
+        elif name == "run_tests":
+            result = await run_tests(
+                changes=args.get("changes", {}),
+                workspace_path=args.get("workspace_path", ""),
+                timeout=args.get("timeout", 300),
+            )
+        elif name == "security_review":
+            result = await security_review(diff=args.get("diff", ""))
+        elif name == "retrieve_context":
+            result = await retrieve_context(
+                query=args.get("query", ""),
+                collection_name=args.get("collection_name", "default"),
+            )
+        elif name == "index_code":
+            result = await index_code(
+                file_path=args.get("file_path", ""),
+                content=args.get("content", ""),
+                metadata=args.get("metadata"),
+            )
+        else:
+            result = {"error": f"Unknown tool: {name}"}
+    except Exception as e:
+        import traceback
+
+        result = {
+            "error": str(e),
+            "tool": name,
+            "status": "failed",
+            "traceback": traceback.format_exc(),
+        }
 
     return [TextContent(type="text", text=json.dumps(result, indent=2))]
 

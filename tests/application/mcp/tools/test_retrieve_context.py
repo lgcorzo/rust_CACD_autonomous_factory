@@ -5,7 +5,6 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from autogen_team.application.mcp.tools.retrieve_context import retrieve_context
 
 

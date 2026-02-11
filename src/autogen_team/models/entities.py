@@ -193,18 +193,27 @@ class BaselineAutogenModel(Model):
         # Store config for lazy loading/cloning
         self.model_config_data = model_config
 
-        # Handle env var substitution for API key
-        api_key = model_config["config"]["api_key"]
-        if api_key == "${LITELLM_API_KEY}":
-            api_key = os.getenv("LITELLM_API_KEY")
-            if not api_key:
-                raise ValueError("LITELLM_API_KEY environment variable is not set")
+        # Handle env var substitution for config fields
+        config = model_config["config"]
+
+        def expand_env(value: Any) -> Any:
+            if isinstance(value, str) and value.startswith("${") and value.endswith("}"):
+                env_var = value[2:-1]
+                return os.getenv(env_var, value)
+            return value
+
+        api_key = expand_env(config.get("api_key"))
+        model_id = expand_env(config.get("model"))
+        api_base = expand_env(config.get("api_base"))
+
+        if not api_key or api_key.startswith("${"):
+            raise ValueError("API Key not found or not resolved from environment.")
 
         # Load the client
         self._model_client = OpenAIChatClient(
-            model_id=model_config["config"]["model"],
+            model_id=model_id,
             api_key=api_key,
-            base_url=model_config["config"]["api_base"],
+            base_url=api_base,
         )
 
     def fit(self, inputs: schemas.Inputs, targets: schemas.Targets) -> "BaselineAutogenModel":

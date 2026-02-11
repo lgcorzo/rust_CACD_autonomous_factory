@@ -6,7 +6,6 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from autogen_team.application.mcp.tools.security_review import (
     _scan_owasp_patterns,
     security_review,

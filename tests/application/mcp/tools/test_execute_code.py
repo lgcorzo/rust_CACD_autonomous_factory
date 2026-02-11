@@ -7,7 +7,6 @@ import typing as T
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from autogen_team.application.mcp.tools.execute_code import execute_code
 
 
