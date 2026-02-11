@@ -3,6 +3,7 @@
 from .alert_service import AlertsService
 from .hatchet_service import HatchetService
 from .logger_service import LoggerService, PropagateHandler, Service
+from .mcp_service import MCPService
 from .mlflow_service import MlflowService
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "AlertsService",
     "MlflowService",
     "HatchetService",
+    "MCPService",
 ]

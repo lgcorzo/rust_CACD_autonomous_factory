@@ -28,6 +28,19 @@ class Env(Singleton, BaseSettings):
     hatchet_client_token: str = ""
     hatchet_namespace: str = "autogen_team"
 
+    # MCP / LiteLLM
+    litellm_api_base: str = "http://litellm.llm-apps.svc.cluster.local:4000/v1"
+    litellm_api_key: str = ""
+    litellm_model: str = "gemini/gemini-2.5-pro"
+
+    # R2R RAG
+    r2r_base_url: str = "http://r2r.knowledge.svc.cluster.local:7272"
+
+    # MCP Server
+    mcp_server_host: str = "0.0.0.0"
+    mcp_server_port: int = 8200
+    mcp_prompts_path: str = "confs/mcp_prompts.yaml"
+
     class Config:
         case_sensitive = False  # Optional: make env var lookup case-insensitive
         env_file = ".env"  # Enable reading from .env file

@@ -11,6 +11,7 @@ Welcome to the LLMOps Python Package wiki. This package provides tools and utili
 2. [**Data Understanding**](Data_Understanding.md): Data sources, quality analysis, and exploration.
 3. [**Solution Architecture Report**](Solution_Architecture_Report.md): Detailed architectural components and repository mapping.
 4. [**SRS Index (Package Requirements)**](SRS_Index.md): Central hub for all package-level requirements.
+   - [**SRS MCP**](SRS_MCP.md): Requirements for the Model Context Protocol server.
 5. [**Test Plan & Report**](Test_Plan_Report.md): Verification strategy and evaluation results.
 
 ## Technical Architecture
@@ -26,6 +27,7 @@ Welcome to the LLMOps Python Package wiki. This package provides tools and utili
 - [Explanations Stories](Explanations_stories.md)
 - [Inference Stories](Inference_stories.md)
 - [Inference Stories (Hatchet Async)](Inference_Async_Hatchet_stories.md)
+- [MCP Stories](MCP_stories.md)
 - [Promotions Stories](Promotions_stories.md)
 - [Training Stories](Training_stories.md)
 - [Tuning Stories](Tuning_stories.md)

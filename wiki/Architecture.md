@@ -21,6 +21,8 @@ The high-level directory structure corresponds to the DDD layers:
 This layer coordinates the application's activities. It does not contain business rules or state, but delegates to the domain objects.
 
 - **Jobs**: Defines the workflow for tasks like `TrainingJob`, `InferenceJob`, etc.
+- **MCP Server**: Coordinates autonomous AI tools (mission planning, code execution, RAG). Prompts are externalized to YAML for dynamic behavior tuning.
+- **Orchestration**: The `invoke all` task coordinates the sequence of training, inference, and service startup.
 
 ### 2. Domain Layers
 
