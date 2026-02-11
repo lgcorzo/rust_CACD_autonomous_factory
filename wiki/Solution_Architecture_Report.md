@@ -26,12 +26,13 @@ The project follows **Domain-Driven Design (DDD)** and **Onion Architecture** to
 ### 3.2 Application Layer
 
 - **Jobs/Use Cases**: TrainingJob, InferenceJob, HatchetInferenceJob, EvaluationJob, TuningJob.
-- **DTOs**: Job Contexts, Request/Response schemas.
+- **MCP Server**: Autonomous tool coordinator (MCP Server Bootstrap).
+- **DTOs**: Job Contexts, Request/Response schemas, MCP TextContent.
 
 ### 3.3 Infrastructure Layer
 
-- **External Services**: MLflow (for tracking and registry), Hatchet (for orchestration), Kafka (optional messaging).
-- **Adapters**: Searchers, Splitters, Signers, Orchestration Workflows.
+- **External Services**: MLflow (for tracking and registry), Hatchet (for orchestration), Kafka (optional messaging), LiteLLM (LLM provider), R2R (RAG engine).
+- **Adapters**: Searchers, Splitters, Signers, Orchestration Workflows, MCP Tools (plan_mission, execute_code, run_tests, security_review, retrieve_context, index_code).
 
 ### 3.4 Data Access Layer
 
@@ -40,9 +41,9 @@ The project follows **Domain-Driven Design (DDD)** and **Onion Architecture** to
 
 ## 4. LLM Component Interactions
 
-- **Vector Database**: N/A (Project focused on model lifecycle)
-- **LLM Provider**: Autogen (Microsoft)
-- **Embedding Model**: N/A
+- **Vector Database**: R2R RAG (Knowledge Graph + Vector)
+- **LLM Provider**: Autogen (Microsoft), LiteLLM (Gemini Pro)
+- **Embedding Model**: Managed by R2R
 
 ## 5. Design Diagrams
 
@@ -52,14 +53,19 @@ The project follows **Domain-Driven Design (DDD)** and **Onion Architecture** to
 ```mermaid
 graph TD
     A[CLI/Job Trigger] --> B[Application Layer]
+    M[MCP Client] --> MC[MCP Server]
+    MC --> B
     B --> C[Domain Layer]
     C --> D[Model Implementations]
     B --> E[Infrastructure Layer]
     E --> F[MLflow / Registry]
     E --> I[Hatchet Orchestration]
+    E --> R[R2R RAG / LiteLLM]
     B --> G[Data Access Layer]
     G --> H[Datasets]
     I --> B
+    MC -- "dispatches" --> T[MCP Tools]
+    T -- "validates" --> S[Sandbox]
 ```
 
 ---

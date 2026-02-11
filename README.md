@@ -14,6 +14,7 @@ Key features include:
 - **Inference:** Support for both batch inference (via CLI), asynchronous managed inference (via Hatchet), and realtime inference (via Kafka).
 - **Orchestration:** Integrated with [Hatchet](https://hatchet.run/) for managing distributed and long-running ML workflows with built-in retries and monitoring.
 - **Agent Framework:** Integration with [AutoGen Studio](https://microsoft.github.io/autogen/) for building and managing multi-agent workflows.
+- **Autonomous AI Tools:** Standardized [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server providing tools for mission planning, code generation, sandboxed testing, and security analysis.
 - **Configuration Driven:** flexible execution using YAML configuration files.
 
 ## Table of Contents
@@ -78,6 +79,15 @@ poetry run autogen_team confs/evaluations.yaml
 
 # Run explanations (SHAP)
 poetry run autogen_team confs/explanations.yaml
+
+# Run realtime inference (Kafka)
+poetry run invoke projects.kafka
+
+# Run MCP server
+poetry run invoke projects.mcp
+
+# Run with a custom configuration
+poetry run invoke projects.mcp --prompts=confs/mcp_prompts.yaml
 ```
 
 To see the configuration schema:
@@ -132,6 +142,39 @@ poetry run autogenstudio ui --port 8081
 
 Access the UI at `http://localhost:8081`.
 
+### MCP Server (Model Context Protocol)
+
+The project includes an MCP server that exposes 6 AI-powered tools for mission planning, code execution, testing, and security analysis.
+
+**Available Tools:**
+- `plan_mission`: Decompose goals into task DAGs.
+- `execute_code`: Generate and validate code changes.
+- `run_tests`: Run pytest in an isolated sandbox.
+- `security_review`: OWASP & RAG-based security analysis.
+- `retrieve_context`: Semantic search via R2R RAG.
+- `index_code`: Index files into R2R knowledge graph.
+
+**Running Locally:**
+```bash
+# Option 1: Using Invoke (Recommended)
+poetry run invoke projects.mcp
+# Run with a custom prompts config
+poetry run invoke projects.mcp --prompts=confs/custom_prompts.yaml
+
+# Option 2: Direct execution
+poetry run python -m autogen_team.application.mcp.mcp_server
+```
+
+**Customizing Prompts:**
+The agent's system prompts and instructions are configuration-driven and can be customized in **[confs/mcp_prompts.yaml](file:///home/lgcorzo/llmops-python-package/confs/mcp_prompts.yaml)**. This allows tuning the behavior of `plan_mission`, `execute_code`, and `security_review` without code changes.
+
+**Running in Kubernetes:**
+The server is deployed in the `agents` namespace. It uses `LITELLM_API_BASE` and `R2R_BASE_URL` for backend integrations.
+
+```bash
+kubectl apply -k k8s/base/
+```
+
 ## Configuration
 
 The project uses [OmegaConf](https://omegaconf.readthedocs.io/) and [Pydantic](https://docs.pydantic.dev/) for configuration management. Configuration files are located in `confs/`.
@@ -183,7 +226,14 @@ This project uses [Invoke](https://www.pyinvoke.org/) for task automation.
   inv --list
   ```
 
-  - **run app**
+- **Run all project tasks (Orchestration):**
+
+  ```bash
+  inv all
+  ```
+  This orchestrates the entire lifecycle: environment setup, MLOps jobs, evaluations, the **Kafka inference service**, and the **MCP server**.
+
+- **Run app (Kafka standalone):**
 
   ```bash
   poetry run python src/autogen_team/controller/kafka_app.py
@@ -205,7 +255,8 @@ poetry run pre-commit install
 ├── data/                   # Data directory (inputs/targets)
 ├── src/
 │   └── autogen_team/       # Main package source code
-│       ├── application/    # Application layer (jobs)
+│       ├── application/    # Application layer (jobs and MCP server)
+│       │   └── mcp/        # MCP Server implementation and tools
 │       ├── core/           # Shared kernel (schemas, exceptions)
 │       ├── data_access/    # Data access domain (adapters, repositories)
 │       ├── evaluation/     # Evaluation domain (metrics, services)
