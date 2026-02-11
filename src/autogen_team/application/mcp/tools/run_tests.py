@@ -5,7 +5,8 @@ from __future__ import annotations
 import abc
 import os
 import shutil
-import subprocess
+import subprocess  # nosec B404
+import sys
 import tempfile
 import typing as T
 
@@ -51,8 +52,8 @@ class SubprocessSandbox(SandboxBackend):
             Dict with passed, summary, and details fields.
         """
         try:
-            result = subprocess.run(
-                ["python", "-m", "pytest", "--tb=short", "-q", "--no-header"],
+            result = subprocess.run(  # nosec B603
+                [sys.executable, "-m", "pytest", "--tb=short", "-q", "--no-header"],
                 cwd=workspace_dir,
                 capture_output=True,
                 text=True,
