@@ -37,7 +37,7 @@ class Env(Singleton, BaseSettings):
     r2r_base_url: str = "http://r2r.knowledge.svc.cluster.local:7272"
 
     # MCP Server
-    mcp_server_host: str = "0.0.0.0"
+    mcp_server_host: str = "0.0.0.0"  # nosec B104
     mcp_server_port: int = 8200
     mcp_prompts_path: str = "confs/mcp_prompts.yaml"
 
