@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from typing import ClassVar
 import typing as T
+from typing import ClassVar
 
 import httpx
 import litellm
@@ -63,7 +63,7 @@ class MCPService(Service):
         """Get a specific prompt for a tool and key."""
         if self._prompts is None:
             self._load_prompts()
-        
+
         tool_prompts = self._prompts.get(tool_name, {}) if self._prompts else {}
         return str(tool_prompts.get(key, ""))
 

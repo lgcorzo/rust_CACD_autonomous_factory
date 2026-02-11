@@ -6,7 +6,6 @@ import json
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from autogen_team.application.mcp.mcp_server import (
     create_mcp_server,
     handle_call_tool,

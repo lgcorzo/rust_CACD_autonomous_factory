@@ -14,7 +14,6 @@ import litellm
 from autogen_team.infrastructure.services.mcp_service import MCPService
 
 
-
 async def execute_code(
     task: T.Dict[str, T.Any],
     workspace_path: str,

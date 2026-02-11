@@ -6,7 +6,6 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from autogen_team.application.mcp.tools.plan_mission import plan_mission
 
 

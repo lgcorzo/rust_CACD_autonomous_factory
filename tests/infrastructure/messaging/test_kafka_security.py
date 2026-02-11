@@ -1,4 +1,5 @@
 import json
+from typing import Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -6,9 +7,6 @@ from autogen_team.infrastructure.messaging.kafka_app import (
     FastAPIKafkaService,
     PredictionResponse,
 )
-
-
-from typing import Generator
 
 
 @pytest.fixture()

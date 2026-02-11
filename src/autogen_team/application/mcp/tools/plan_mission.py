@@ -10,7 +10,6 @@ import litellm
 from autogen_team.infrastructure.services.mcp_service import MCPService
 
 
-
 async def plan_mission(goal: str) -> T.Dict[str, T.Any]:
     """Decompose a high-level goal into a task DAG.
 

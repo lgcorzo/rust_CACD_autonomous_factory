@@ -24,62 +24,83 @@ async def test_mcp_server() -> None:
 
     # Path to the server module
     # We run it via 'python -m autogen_team.application.mcp.mcp_server'
+    # We explicitly pass the prompts config path
+    import os
+    env = os.environ.copy()
+    env["MCP_PROMPTS_PATH"] = "confs/mcp_prompts.yaml"
+
     server_params = StdioServerParameters(
         command="python",
         args=["-m", "autogen_team.application.mcp.mcp_server"],
-        env=None,
+        env=env,
     )
 
     try:
         async with stdio_client(server_params) as (read, write):
             async with ClientSession(read, write) as session:
                 # 1. Initialize
-                print("📦 Initializing session...")
+                print("📦 Initializing session...", flush=True)
                 await session.initialize()
 
                 # 2. List Tools
-                print("🔍 Listing tools...")
+                print("🔍 Listing tools...", flush=True)
                 tools_result = await session.list_tools()
                 tools = tools_result.tools
-                print(f"✅ Found {len(tools)} tools:")
+                print(f"✅ Found {len(tools)} tools:", flush=True)
                 for tool in tools:
-                    print(f"   - {tool.name}: {tool.description[:60]}...")
+                    print(f"   - {tool.name}: {tool.description[:60]}...", flush=True)
 
                 # 3. Test plan_mission
-                print("\n🧪 Testing 'plan_mission' tool...")
+                print("\n🧪 Testing 'plan_mission' tool...", flush=True)
                 goal = "Implement a simple calculator"
-                result = await session.call_tool(
-                    "plan_mission",
-                    arguments={"goal": goal},
-                )
-                
+                try:
+                    result = await asyncio.wait_for(
+                        session.call_tool(
+                            "plan_mission",
+                            arguments={"goal": goal},
+                        ),
+                        timeout=30.0
+                    )
+                except asyncio.TimeoutError:
+                    print("❌ 'plan_mission' timed out after 30s", flush=True)
+                    raise
+
                 # result.content is a list of content blocks
                 content = result.content[0].text
                 data = json.loads(content)
                 
                 if "parallel_tasks" in data:
-                    print(f"✅ 'plan_mission' success!")
-                    print(f"   Goal: {data.get('goal')}")
-                    print(f"   Tasks count: {len(data['parallel_tasks'])}")
+                    print(f"✅ 'plan_mission' success!", flush=True)
+                    print(f"   Goal: {data.get('goal')}", flush=True)
+                    print(f"   Tasks count: {len(data['parallel_tasks'])}", flush=True)
                 else:
-                    print(f"❌ 'plan_mission' failed to return tasks: {content}")
+                    print(f"❌ 'plan_mission' failed to return tasks: {content}", flush=True)
 
                 # 4. Test security_review (dry run/empty)
-                print("\n🧪 Testing 'security_review' tool...")
+                print("\n🧪 Testing 'security_review' tool...", flush=True)
                 diff = "+x = 1"
-                result = await session.call_tool(
-                    "security_review",
-                    arguments={"diff": diff},
-                )
+                try:
+                    result = await asyncio.wait_for(
+                        session.call_tool(
+                            "security_review",
+                            arguments={"diff": diff},
+                        ),
+                        timeout=30.0
+                    )
+                except asyncio.TimeoutError:
+                    print("❌ 'security_review' timed out after 30s", flush=True)
+                    raise
                 content = result.content[0].text
                 data = json.loads(content)
-                print(f"✅ 'security_review' status: {data.get('status')}")
+                print(f"✅ 'security_review' status: {data.get('status')}", flush=True)
 
-    except Exception as e:
-        print(f"❌ Error during test: {e!s}")
+    except Exception:
+        import traceback
+        print("\n❌ Error during test:", flush=True)
+        traceback.print_exc()
         sys.exit(1)
 
-    print("\n🎉 integration test completed successfully!")
+    print("\n🎉 integration test completed successfully!", flush=True)
 
 
 if __name__ == "__main__":
