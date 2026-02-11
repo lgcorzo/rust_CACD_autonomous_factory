@@ -22,6 +22,7 @@ This document serves as the central index for the software requirements of all p
 | [Evaluation](file:///mnt/F024B17C24B145FE/Repos/llmops-python-package/src/autogen_team/evaluation)                 | [SRS_Evaluation.md](SRS_Evaluation.md)         | Completed |
 | [Core](file:///mnt/F024B17C24B145FE/Repos/llmops-python-package/src/autogen_team/core)                             | [SRS_Core.md](SRS_Core.md)                     | Completed |
 | [Infrastructure](file:///mnt/F024B17C24B145FE/Repos/llmops-python-package/src/autogen_team/infrastructure)         | [SRS_Infrastructure.md](SRS_Infrastructure.md) | Completed |
+| [MCP Server](file:///home/lgcorzo/llmops-python-package/src/autogen_team/application/mcp)                      | [SRS_MCP.md](SRS_MCP.md)                       | Completed |
 
 ---
 

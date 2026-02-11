@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opencode-mcp-config
+  namespace: agents
+data:
+  LITELLM_API_BASE: "http://litellm.llm-apps.svc.cluster.local:4000/v1"
+  LITELLM_MODEL: "gemini/gemini-2.5-pro"
+  R2R_BASE_URL: "http://r2r.knowledge.svc.cluster.local:7272"
+  MCP_SERVER_HOST: "0.0.0.0"
+  MCP_SERVER_PORT: "8200"
