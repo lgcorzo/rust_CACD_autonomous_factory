@@ -52,6 +52,29 @@ def run(ctx: Context, job: str) -> None:
     )
 
 
+@task
+def mcp(ctx: Context, prompts: str | None = None) -> None:
+    """Run the MCP server.
+
+    Args:
+        prompts (str, optional): Path to the prompts YAML config.
+    """
+    env = {}
+    if prompts:
+        env["MCP_PROMPTS_PATH"] = prompts
+
+    ctx.run(
+        "poetry run python -m autogen_team.application.mcp.mcp_server",
+        env=env,
+    )
+
+
+@task
+def kafka(ctx: Context) -> None:
+    """Run the Kafka inference service."""
+    ctx.run("poetry run python -m autogen_team.infrastructure.messaging.kafka_app")
+
+
 @task(
     pre=[
         environment,
@@ -62,6 +85,8 @@ def run(ctx: Context, job: str) -> None:
         call(run, job="hatchet_inference"),
         call(run, job="evaluations"),
         call(run, job="explanations"),
+        kafka,
+        call(mcp, prompts="confs/mcp_prompts.yaml"),
     ],
     default=True,
 )

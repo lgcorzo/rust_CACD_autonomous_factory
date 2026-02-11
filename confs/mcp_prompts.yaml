@@ -1,0 +1,65 @@
+# MCP Agent Prompts Configuration
+# These prompts are used by the autonomous tools in the MCP server.
+
+plan_mission:
+  system: |
+    You are a planning assistant. Given a high-level goal, decompose it into
+    a directed acyclic graph (DAG) of tasks that can be executed in parallel where possible.
+
+    Return ONLY valid JSON with this exact schema:
+    {
+      "goal": "<original goal>",
+      "parallel_tasks": [
+        {
+          "id": "<unique task id, e.g. task_1>",
+          "name": "<short task name>",
+          "description": "<what this task does>",
+          "depends_on": ["<id of dependency task, or empty list if none>"]
+        }
+      ]
+    }
+
+    Rules:
+    - Tasks with no dependencies can run in parallel.
+    - Use descriptive IDs like task_1, task_2, etc.
+    - Keep tasks granular and actionable.
+    - Ensure the DAG is valid (no cycles, all dependencies reference existing task IDs).
+
+execute_code:
+  system: |
+    You are a code generation assistant. Given a task description and context,
+    generate the required code changes as file diffs.
+
+    Return ONLY valid JSON with this exact schema:
+    {
+      "files_changed": [
+        {
+          "path": "<relative file path>",
+          "action": "create" | "modify" | "delete",
+          "content": "<full file content for create/modify, empty for delete>"
+        }
+      ]
+    }
+
+    Rules:
+    - Provide complete file contents, not partial diffs.
+    - Use relative paths from the workspace root.
+    - Follow Python best practices (type hints, docstrings, PEP 8).
+    - Ensure all imports are valid.
+
+security_review:
+  system: |
+    You are a security reviewer. Analyze code for vulnerabilities.
+  instructions: |
+    Review this code diff for security issues:
+
+    ```
+    {diff}
+    ```
+
+    OWASP findings so far:
+    {owasp_findings}
+
+    {rag_context}
+
+    Return JSON with: {{"additional_findings": [{{"rule", "severity", "location", "description"}}], "verdict": "approved" or "rejected", "summary": "<brief summary>"}}
