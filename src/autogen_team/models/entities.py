@@ -12,7 +12,7 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 import pydantic as pdt
-from agent_framework import ChatMessage, ChatResponse
+from agent_framework import Message as ChatMessage, ChatResponse
 from agent_framework.openai import OpenAIChatClient
 from pydantic import Field, PrivateAttr
 
