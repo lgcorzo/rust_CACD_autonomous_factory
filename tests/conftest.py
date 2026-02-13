@@ -9,7 +9,7 @@ from typing import Any, cast
 import omegaconf
 import pytest
 from _pytest import logging as pl
-from agent_framework import ChatMessage
+from agent_framework import Message as ChatMessage
 from agent_framework.openai import OpenAIChatClient
 from autogen_team.core import schemas
 from autogen_team.data_access.adapters import datasets
