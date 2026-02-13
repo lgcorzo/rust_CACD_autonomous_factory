@@ -9,6 +9,8 @@ import threading
 import time
 from typing import Any, Callable, Dict, Optional
 
+import warnings
+import urllib3
 import pandas as pd
 import uvicorn
 from confluent_kafka import Consumer, KafkaError, Producer
@@ -37,9 +39,7 @@ import autogen_team.models  # noqa: E402
 sys.modules["autogen_team.core.models"] = autogen_team.models
 
 # Constants
-DEFAULT_KAFKA_SERVER = os.getenv(
-    "DEFAULT_KAFKA_SERVER", "my-kafka-cluster.confluent.svc.cluster.local:9092"
-)
+DEFAULT_KAFKA_SERVER = os.getenv("DEFAULT_KAFKA_SERVER", "my-kafka-cluster.confluent.svc.cluster.local:9092")
 DEFAULT_GROUP_ID = os.getenv("DEFAULT_GROUP_ID", "llmops-regression")
 DEFAULT_AUTO_OFFSET_RESET = os.getenv("DEFAULT_AUTO_OFFSET_RESET", "earliest")
 DEFAULT_INPUT_TOPIC = os.getenv("DEFAULT_INPUT_TOPIC", "llm_input_topic")
@@ -50,8 +50,13 @@ LOGGING_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
 
 
 # Configure logging
+# Configure logging
 logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 logger = logging.getLogger(__name__)
+
+# Suppress annoying warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+logging.getLogger("mlflow.utils.requirements_utils").setLevel(logging.ERROR)
 
 # FastAPI App Initialization
 app: FastAPI = FastAPI(
@@ -85,14 +90,16 @@ class FastAPIKafkaService:
     def __init__(
         self,
         prediction_callback: Callable[[PredictionRequest], PredictionResponse],
-        kafka_config: Dict[str, Any],
+        producer_config: Dict[str, Any],
+        consumer_config: Dict[str, Any],
         input_topic: str,
         output_topic: str,
     ):
         self.server_thread: threading.Thread | None = None
         self.stop_event: threading.Event = threading.Event()
         self.prediction_callback = prediction_callback
-        self.kafka_config = kafka_config
+        self.producer_config = producer_config
+        self.consumer_config = consumer_config
         self.input_topic = input_topic
         self.output_topic = output_topic
         self.producer: Producer | None = None
@@ -118,7 +125,7 @@ class FastAPIKafkaService:
     def _initialize_kafka_producer(self) -> None:
         """Initialize Kafka producer."""
         try:
-            self.producer = Producer(self.kafka_config)
+            self.producer = Producer(self.producer_config)
             logger.info("Kafka producer initialized")
         except Exception as e:
             logger.error(f"Failed to initialize Kafka producer: {e}")
@@ -126,9 +133,9 @@ class FastAPIKafkaService:
 
     def _initialize_kafka_consumer(self) -> None:
         """Initialize Kafka consumer."""
-        self.kafka_config["enable.auto.commit"] = False
+        self.consumer_config["enable.auto.commit"] = False
         try:
-            self.consumer = Consumer(self.kafka_config)
+            self.consumer = Consumer(self.consumer_config)
             self.consumer.subscribe([self.input_topic])
             logger.info(f"Kafka consumer subscribed to topic: {self.input_topic}")
         except Exception as e:
@@ -271,9 +278,7 @@ def main() -> None:
     def my_prediction_function(input_data: PredictionRequest) -> PredictionResponse:
         predictionresponse: PredictionResponse = PredictionResponse()
         try:
-            outputs: Outputs = model.predict(
-                inputs=InputsSchema.check(pd.DataFrame(input_data.input_data))
-            )
+            outputs: Outputs = model.predict(inputs=InputsSchema.check(pd.DataFrame(input_data.input_data)))
             # Handle outputs format
             if hasattr(outputs, "to_numpy"):
                 predictionresponse.result["inference"] = outputs.to_numpy().tolist()
@@ -290,18 +295,26 @@ def main() -> None:
         return predictionresponse
 
     # Kafka Configuration
-    kafka_config = {
+    common_kafka_config = {
         "bootstrap.servers": DEFAULT_KAFKA_SERVER,
-        "group.id": DEFAULT_GROUP_ID,
-        "auto.offset.reset": DEFAULT_AUTO_OFFSET_RESET,
-        # Reduce timeouts for faster fallbacks
-        "socket.timeout.ms": 500,
-        "metadata.request.timeout.ms": 1000,
+        "socket.timeout.ms": 1500,  # Increased to prevent timeouts with default fetch.wait.max.ms=500
     }
+
+    producer_config = common_kafka_config.copy()
+
+    consumer_config = common_kafka_config.copy()
+    consumer_config.update(
+        {
+            "group.id": DEFAULT_GROUP_ID,
+            "auto.offset.reset": DEFAULT_AUTO_OFFSET_RESET,
+        }
+    )
+
     # Initialize and Start Service
     fastapi_kafka_service = FastAPIKafkaService(
         prediction_callback=my_prediction_function,
-        kafka_config=kafka_config,
+        producer_config=producer_config,
+        consumer_config=consumer_config,
         input_topic=DEFAULT_INPUT_TOPIC,
         output_topic=DEFAULT_OUTPUT_TOPIC,
     )
