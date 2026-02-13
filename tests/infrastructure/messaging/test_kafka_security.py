@@ -24,7 +24,10 @@ def mock_kafka_service() -> Generator[FastAPIKafkaService, None, None]:
         MockConsumer.return_value = mock_consumer
 
         prediction_callback = MagicMock(return_value=PredictionResponse())
-        kafka_config = {
+        producer_config = {
+            "bootstrap.servers": "kafka_server:9092",
+        }
+        consumer_config = {
             "bootstrap.servers": "kafka_server:9092",
             "group.id": "test_group",
             "auto.offset.reset": "earliest",
@@ -34,7 +37,8 @@ def mock_kafka_service() -> Generator[FastAPIKafkaService, None, None]:
 
         service = FastAPIKafkaService(
             prediction_callback=prediction_callback,
-            kafka_config=kafka_config,
+            producer_config=producer_config,
+            consumer_config=consumer_config,
             input_topic=input_topic,
             output_topic=output_topic,
         )
