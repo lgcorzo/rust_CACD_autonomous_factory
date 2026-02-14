@@ -23,6 +23,17 @@ class HatchetService(Service):
 
     def start(self) -> None:
         """Initialize the Hatchet client."""
+        # Ensure env vars are set for the SDK
+        import os
+        if self.env.hatchet_client_token:
+            os.environ["HATCHET_CLIENT_TOKEN"] = self.env.hatchet_client_token
+        if self.env.hatchet_client_host_port:
+            os.environ["HATCHET_CLIENT_HOST_PORT"] = self.env.hatchet_client_host_port
+        if self.env.hatchet_client_server_url:
+            os.environ["HATCHET_CLIENT_SERVER_URL"] = self.env.hatchet_client_server_url
+        if self.env.hatchet_client_tls_strategy:
+            os.environ["HATCHET_CLIENT_TLS_STRATEGY"] = self.env.hatchet_client_tls_strategy
+
         try:
             self._client = Hatchet(debug=True)
         except Exception:

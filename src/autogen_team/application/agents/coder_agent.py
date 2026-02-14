@@ -1,27 +1,29 @@
 from typing import Dict, Any, List
 
+from autogen_team.infrastructure.client.mcp_client import MCPClient
+
 
 class CoderAgent:
     """
     Agent responsible for executing coding tasks.
-    Currently mocks the MCP tool call.
+    Uses the MCP 'execute_code' tool.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self) -> None:
+        self.client = MCPClient()
 
     async def execute_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Calls the `execute_code` tool via MCP (mocked for now).
+        Calls the `execute_code` tool via MCP.
         """
-        print(f"[CoderAgent] Executing task: {task['description']}")
+        print(f"[CoderAgent] Executing task: {task.get('description', 'unknown')}")
 
-        # TODO: Replace with actual MCP tool call
-        # result = await mcp_client.call_tool("execute_code", {"instruction": task['description'], ...})
-
-        return {
-            "task_id": task["id"],
-            "status": "completed",
-            "diff": "diff --git a/src/api/handler.py b/src/api/handler.py\n+ def handle_request():\n+     pass",
-            "file_changes": task.get("files", []),
-        }
+        try:
+            await self.client.connect()
+            result = await self.client.call_tool(
+                "execute_code", 
+                {"task": task, "workspace_path": "."}
+            )
+            return result
+        finally:
+            await self.client.disconnect()

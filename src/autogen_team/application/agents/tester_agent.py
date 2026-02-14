@@ -1,22 +1,29 @@
 from typing import Dict, Any, List
 
+from autogen_team.infrastructure.client.mcp_client import MCPClient
+
 
 class TesterAgent:
     """
     Agent responsible for running tests.
-    Currently mocks the MCP tool call.
+    Uses the MCP 'run_tests' tool.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self) -> None:
+        self.client = MCPClient()
 
     async def run_tests(self, test_scope: str = "all") -> Dict[str, Any]:
         """
-        Calls the `run_tests` tool via MCP (mocked for now).
+        Calls the `run_tests` tool via MCP.
         """
         print(f"[TesterAgent] Running tests for scope: {test_scope}")
 
-        # TODO: Replace with actual MCP tool call
-        # result = await mcp_client.call_tool("run_tests", {"scope": test_scope})
-
-        return {"status": "passed", "passed": 10, "failed": 0, "duration": "1.5s", "report": "All tests passed."}
+        try:
+            await self.client.connect()
+            result = await self.client.call_tool(
+                "run_tests", 
+                {"workspace_path": "."}
+            )
+            return result
+        finally:
+            await self.client.disconnect()
