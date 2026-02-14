@@ -45,7 +45,8 @@ def mock_kafka_service() -> (
 
         service = FastAPIKafkaService(
             prediction_callback=prediction_callback,
-            kafka_config=kafka_config,
+            producer_config=kafka_config,
+            consumer_config=kafka_config,
             input_topic=input_topic,
             output_topic=output_topic,
         )
@@ -58,7 +59,8 @@ def test_initialization(
     """Test FastAPIKafkaService initialization."""
     service, *_ = mock_kafka_service
     assert service.prediction_callback is not None
-    assert service.kafka_config is not None
+    assert service.producer_config is not None
+    assert service.consumer_config is not None
     assert service.input_topic is not None
     assert service.output_topic is not None
     assert service.producer is None
