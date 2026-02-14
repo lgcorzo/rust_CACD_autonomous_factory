@@ -1,14 +1,16 @@
 from typing import Dict, List, Any
 
-from hatchet_sdk import Hatchet, Context
+from hatchet_sdk import Context
 from pydantic import BaseModel
+from autogen_team.infrastructure.services.hatchet_service import HatchetService
 from autogen_team.application.agents.planner_agent import PlannerAgent
 from autogen_team.application.agents.coder_agent import CoderAgent
 from autogen_team.application.agents.tester_agent import TesterAgent
 from autogen_team.application.agents.reviewer_agent import ReviewerAgent
 
-# Initialize Hatchet
-hatchet = Hatchet()
+# Initialize Hatchet via Service
+hatchet_service = HatchetService()
+hatchet = hatchet_service.client
 
 
 # Input/Output Models
@@ -32,11 +34,10 @@ autonomous_mission_workflow = hatchet.workflow(
 
 
 @autonomous_mission_workflow.task(execution_timeout="5m")
-async def plan(context: Context) -> Dict[str, Any]:
+async def plan(mission_input: MissionInput, context: Context) -> Dict[str, Any]:
     """
     Step 1: Planner Agent analyzes the goal and creates a plan.
     """
-    mission_input = context.workflow_input()
     context.log(f"Planning mission: {mission_input.goal}")
 
     planner = PlannerAgent()
@@ -46,7 +47,7 @@ async def plan(context: Context) -> Dict[str, Any]:
 
 
 @autonomous_mission_workflow.task(parents=[plan], execution_timeout="30m")
-async def fan_out_tasks(context: Context) -> List[Dict[str, Any]]:
+async def fan_out_tasks(input: Any, context: Context) -> List[Dict[str, Any]]:
     """
     Step 2: Fan-out coding tasks to Coder Agents.
     """
@@ -71,7 +72,7 @@ async def fan_out_tasks(context: Context) -> List[Dict[str, Any]]:
 
 
 @autonomous_mission_workflow.task(parents=[fan_out_tasks], execution_timeout="15m")
-async def aggregate_and_review(context: Context) -> MissionOutput:
+async def aggregate_and_review(input: Any, context: Context) -> MissionOutput:
     """
     Step 3: Aggregate results, run tests, and perform security review.
     """
