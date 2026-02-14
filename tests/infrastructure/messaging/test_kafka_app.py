@@ -50,7 +50,7 @@ def mock_kafka_service() -> (
             input_topic=input_topic,
             output_topic=output_topic,
         )
-        yield service, MockProducer, MockConsumer, MockThread, MockSleep
+        yield service, MockProducer, MockConsumer, MockThread, MockSleep, kafka_config
 
 
 def test_initialization(
