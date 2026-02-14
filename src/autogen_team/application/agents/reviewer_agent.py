@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import List
 from autogen_team.infrastructure.messaging.a2a_protocol import ReviewResult
 from autogen_team.infrastructure.client.mcp_client import MCPClient
 
@@ -19,17 +19,14 @@ class ReviewerAgent:
         print(f"[ReviewerAgent] Reviewing changes for mission: {mission_id}")
 
         # Aggregate diffs if possible, or just pass filenames if that's what we have
-        # Ideally file_changes should contain diffs. 
+        # Ideally file_changes should contain diffs.
         # For DA-7, we assume the tool handles string input or needs refactoring.
         # Here we just pass the list as a string for simplicity or update tool signature.
         diff_summary = "\n".join(file_changes)
 
         try:
             await self.client.connect()
-            result = await self.client.call_tool(
-                "security_review", 
-                {"diff": diff_summary}
-            )
+            result = await self.client.call_tool("security_review", {"diff": diff_summary})
 
             # Map tool result to ReviewResult
             status = result.get("status", "unknown")

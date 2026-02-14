@@ -34,7 +34,8 @@ def mock_kafka_service() -> Generator[FastAPIKafkaService, None, None]:
 
         service = FastAPIKafkaService(
             prediction_callback=prediction_callback,
-            kafka_config=kafka_config,
+            producer_config=kafka_config,
+            consumer_config=kafka_config,
             input_topic=input_topic,
             output_topic=output_topic,
         )

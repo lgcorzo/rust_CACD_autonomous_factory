@@ -1,6 +1,5 @@
 """MCP Client for connecting to the MCP Server."""
 
-import asyncio
 import json
 import os
 from typing import Any, Dict, Optional

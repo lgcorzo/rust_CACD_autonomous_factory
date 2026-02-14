@@ -8,7 +8,9 @@ class MissionStart(BaseModel):
     mission_id: str = Field(..., description="Unique identifier for the mission")
     goal: str = Field(..., description="High-level goal description")
     repository_path: str = Field(..., description="Path to the repository to modify")
-    context: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional context")
+    context: Optional[Dict[str, Any]] = Field(
+        default_factory=dict, description="Additional context"
+    )
 
 
 class TaskAssignment(BaseModel):

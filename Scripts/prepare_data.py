@@ -22,7 +22,9 @@ os.makedirs("tests/data", exist_ok=True)
 
 print("Downloading dataset...")
 try:
-    df_llm = pd.read_json("hf://datasets/Vezora/Tested-143k-Python-Alpaca/143k-Tested-Python-Alpaca-Vezora.json")
+    df_llm = pd.read_json(
+        "hf://datasets/Vezora/Tested-143k-Python-Alpaca/143k-Tested-Python-Alpaca-Vezora.json"
+    )
 except Exception as e:
     print(f"Error downloading dataset: {e}")
     # Fallback or exit?
