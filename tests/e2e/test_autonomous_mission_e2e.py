@@ -27,7 +27,6 @@ async def test_autonomous_mission_workflow() -> None:
     # Trigger the workflow
     mission_input = {"goal": "Add a new endpoint to the API", "repository_path": "/tmp/repo"}
     try:
-
         workflow_run_id = await hatchet.admin.run_workflow(
             "AutonomousMissionWorkflow", mission_input
         )
