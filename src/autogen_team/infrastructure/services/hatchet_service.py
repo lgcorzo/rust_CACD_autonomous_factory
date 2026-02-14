@@ -25,6 +25,7 @@ class HatchetService(Service):
         """Initialize the Hatchet client."""
         # Ensure env vars are set for the SDK
         import os
+
         if self.env.hatchet_client_token:
             os.environ["HATCHET_CLIENT_TOKEN"] = self.env.hatchet_client_token
         if self.env.hatchet_client_host_port:

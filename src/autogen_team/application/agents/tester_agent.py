@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, cast
 
 from autogen_team.infrastructure.client.mcp_client import MCPClient
 
@@ -12,18 +12,12 @@ class TesterAgent:
     def __init__(self) -> None:
         self.client = MCPClient()
 
-    async def run_tests(self, test_scope: str = "all") -> Dict[str, Any]:
-        """
-        Calls the `run_tests` tool via MCP.
-        """
-        print(f"[TesterAgent] Running tests for scope: {test_scope}")
+    async def run_tests(self) -> Dict[str, Any]:
+        print("[TesterAgent] Running tests...")
 
         try:
             await self.client.connect()
-            result = await self.client.call_tool(
-                "run_tests", 
-                {"workspace_path": "."}
-            )
-            return result
+            result = await self.client.call_tool("run_tests", {})
+            return cast(Dict[str, Any], result)
         finally:
             await self.client.disconnect()

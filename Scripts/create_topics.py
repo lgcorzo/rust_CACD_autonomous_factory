@@ -3,7 +3,9 @@ import os
 from confluent_kafka.admin import AdminClient, NewTopic
 
 # Load env vars implicitly or explicitly
-env_kafka_server = os.getenv("DEFAULT_KAFKA_SERVER", "my-kafka-cluster.confluent.svc.cluster.local:9092")
+env_kafka_server = os.getenv(
+    "DEFAULT_KAFKA_SERVER", "my-kafka-cluster.confluent.svc.cluster.local:9092"
+)
 print(f"Connecting to Kafka at {env_kafka_server}")
 
 admin_client = AdminClient({"bootstrap.servers": env_kafka_server})

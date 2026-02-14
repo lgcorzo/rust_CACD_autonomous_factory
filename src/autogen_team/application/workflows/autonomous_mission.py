@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 from hatchet_sdk import Context
 from pydantic import BaseModel
@@ -41,13 +41,15 @@ async def plan(mission_input: MissionInput, context: Context) -> Dict[str, Any]:
     context.log(f"Planning mission: {mission_input.goal}")
 
     planner = PlannerAgent()
-    plan = await planner.create_plan(goal=mission_input.goal, repository_path=mission_input.repository_path)
+    plan = await planner.create_plan(
+        goal=mission_input.goal, repository_path=mission_input.repository_path
+    )
 
     return {"plan": plan}
 
 
 @autonomous_mission_workflow.task(parents=[plan], execution_timeout="30m")
-async def fan_out_tasks(input: Any, context: Context) -> List[Dict[str, Any]]:
+async def fan_out_tasks(input: Any, context: Context) -> Dict[str, Any]:
     """
     Step 2: Fan-out coding tasks to Coder Agents.
     """
@@ -68,7 +70,7 @@ async def fan_out_tasks(input: Any, context: Context) -> List[Dict[str, Any]]:
         result = await coder.execute_task(task)
         results.append(result)
 
-    return results
+    return {"results": results}
 
 
 @autonomous_mission_workflow.task(parents=[fan_out_tasks], execution_timeout="15m")
@@ -76,7 +78,8 @@ async def aggregate_and_review(input: Any, context: Context) -> MissionOutput:
     """
     Step 3: Aggregate results, run tests, and perform security review.
     """
-    task_results = context.step_output("fan_out_tasks")
+    fan_out_output = context.step_output("fan_out_tasks")
+    task_results = fan_out_output["results"]
     context.log("Aggregating results and reviewing...")
 
     tester = TesterAgent()
@@ -88,9 +91,13 @@ async def aggregate_and_review(input: Any, context: Context) -> MissionOutput:
     for res in task_results:
         all_file_changes.extend(res.get("file_changes", []))
 
-    review_result = await reviewer.review_changes(mission_id="mission-mock", file_changes=all_file_changes)
+    review_result = await reviewer.review_changes(
+        mission_id="mission-mock", file_changes=all_file_changes
+    )
 
-    status = "success" if test_results.get("status") == "passed" and review_result.approved else "failed"
+    status = (
+        "success" if test_results.get("status") == "passed" and review_result.approved else "failed"
+    )
 
     summary = (
         f"Mission {status}. "

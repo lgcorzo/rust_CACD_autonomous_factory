@@ -6,7 +6,8 @@ from autogen_team.application.agents.coder_agent import CoderAgent
 from autogen_team.application.agents.tester_agent import TesterAgent
 from autogen_team.application.agents.reviewer_agent import ReviewerAgent
 
-async def main():
+
+async def main() -> None:
     print("🚀 Starting Agent-MCP Integration Verification...")
 
     # 1. Verify PlannerAgent
@@ -14,8 +15,7 @@ async def main():
     planner = PlannerAgent()
     try:
         plan = await planner.create_plan(
-            goal="Create a hello world python script", 
-            repository_path="."
+            goal="Create a hello world python script", repository_path="."
         )
         print(f"✅ Planner Result: {plan.keys() if isinstance(plan, dict) else plan}")
     except Exception as e:
@@ -28,10 +28,10 @@ async def main():
         task = {
             "id": "task-test",
             "description": "Create a file named hello.py with print('Hello World')",
-            "files": ["hello.py"]
+            "files": ["hello.py"],
         }
-        result = await coder.execute_task(task)
-        print(f"✅ Coder Result: {result.keys() if isinstance(result, dict) else result}")
+        coder_result = await coder.execute_task(task)
+        print(f"✅ Coder Result: {coder_result.keys() if isinstance(coder_result, dict) else coder_result}")
     except Exception as e:
         print(f"❌ Coder Failed: {e}")
 
@@ -39,8 +39,8 @@ async def main():
     print("\n[3] Testing TesterAgent...")
     tester = TesterAgent()
     try:
-        result = await tester.run_tests()
-        print(f"✅ Tester Result: {result.keys() if isinstance(result, dict) else result}")
+        tester_result = await tester.run_tests()
+        print(f"✅ Tester Result: {tester_result.keys() if isinstance(tester_result, dict) else tester_result}")
     except Exception as e:
         print(f"❌ Tester Failed: {e}")
 
@@ -49,13 +49,14 @@ async def main():
     reviewer = ReviewerAgent()
     try:
         # Pass a dummy diff string
-        result = await reviewer.review_changes(
-            mission_id="mission-test", 
-            file_changes=["diff --git a/hello.py b/hello.py\n+print('Hello')"]
+        review_result = await reviewer.review_changes(
+            mission_id="mission-test",
+            file_changes=["diff --git a/hello.py b/hello.py\n+print('Hello')"],
         )
-        print(f"✅ Reviewer Result: Approved={result.approved}, Comments={result.comments}")
+        print(f"✅ Reviewer Result: Approved={review_result.approved}, Comments={review_result.comments}")
     except Exception as e:
         print(f"❌ Reviewer Failed: {e}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

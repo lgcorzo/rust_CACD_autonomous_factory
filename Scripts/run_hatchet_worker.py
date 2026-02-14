@@ -1,12 +1,12 @@
 """Script to run the Hatchet worker and register workflows."""
 
-from hatchet_sdk import Hatchet
 from autogen_team.infrastructure.services.hatchet_service import HatchetService
 from autogen_team.application.workflows.autonomous_mission import autonomous_mission_workflow
 
-def main():
+
+def main() -> None:
     print("🚀 Starting Hatchet Worker...")
-    
+
     # Initialize Service
     service = HatchetService()
     hatchet = service.client
@@ -18,6 +18,7 @@ def main():
 
     print("✅ Worker initialized. Listening for tasks...")
     worker.start()
+
 
 if __name__ == "__main__":
     main()

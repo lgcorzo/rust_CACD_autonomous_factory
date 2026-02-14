@@ -1,4 +1,5 @@
 from typing import Dict, Any
+from typing import cast
 
 from autogen_team.infrastructure.client.mcp_client import MCPClient
 
@@ -20,10 +21,7 @@ class PlannerAgent:
 
         try:
             await self.client.connect()
-            result = await self.client.call_tool(
-                "plan_mission", 
-                {"goal": goal}
-            )
-            return result
+            result = await self.client.call_tool("plan_mission", {"goal": goal})
+            return cast(Dict[str, Any], result)
         finally:
             await self.client.disconnect()

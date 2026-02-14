@@ -9,7 +9,7 @@ from autogen_team.application.workflows.autonomous_mission import autonomous_mis
 
 @pytest.mark.skipif(not os.getenv("HATCHET_CLIENT_TOKEN"), reason="HATCHET_CLIENT_TOKEN not set")
 @pytest.mark.asyncio
-async def test_autonomous_mission_workflow():
+async def test_autonomous_mission_workflow() -> None:
     hatchet = Hatchet()
 
     # Create a worker
@@ -18,13 +18,19 @@ async def test_autonomous_mission_workflow():
     # Register the workflow
     worker.register_workflow(autonomous_mission_workflow)
 
-    # Start worker in background
-    start_task = asyncio.create_task(worker.async_start())
+    # Start worker in background using threading since async_start is not available or synchronous
+    import threading
+
+    worker_thread = threading.Thread(target=worker.start, daemon=True)
+    worker_thread.start()
 
     # Trigger the workflow
     mission_input = {"goal": "Add a new endpoint to the API", "repository_path": "/tmp/repo"}
     try:
-        workflow_run_id = await hatchet.admin.run_workflow("AutonomousMissionWorkflow", mission_input)
+
+        workflow_run_id = await hatchet.admin.run_workflow(
+            "AutonomousMissionWorkflow", mission_input
+        )
         print(f"Workflow triggered: {workflow_run_id}")
     except Exception as e:
         print(f"Caught error (Hatchet instance likely not running): {e}")
@@ -39,14 +45,7 @@ async def test_autonomous_mission_workflow():
     # We will let the worker run for a few seconds.
 
     try:
-        await asyncio.sleep(10)
-    except asyncio.CancelledError:
-        pass
-
-    # Clean up
-    start_task.cancel()
-    try:
-        await start_task
+        await asyncio.sleep(5)
     except asyncio.CancelledError:
         pass
 
