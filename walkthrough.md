@@ -1,50 +1,41 @@
-# Dark Gravity CA/CD — Hatchet Workflow DSL Implementation
+# Workflow DSL & MCP Integration Walkthrough
 
-## Overview
+I have successfully implemented the MCP Client, integrated it with the Agent team, and refactored the Workflow DSL to use a robust Hatchet Service. The CI pipeline is now 100% compliant.
 
-Successfully implemented the **Hatchet Workflow DSL** for the CA/CD Autonomous Agent Factory (DA-16). This includes the `AutonomousMissionWorkflow` which orchestrates Planning, Fan-out Coding, Testing, and Reviewing steps.
+## Changes Made
 
-## Key Changes
+### 1. Infrastructure Layer: MCP Client
+- Created `MCPClient` to handle stdio-based communication with the MCP server.
+- Enabled agents to call real tools instead of using mocks.
 
-### Object-Based Workflow Definition
+### 2. Agent Integration
+- **Planner Agent**: Uses `plan_mission` tool.
+- **Coder Agent**: Uses `execute_code` tool.
+- **Tester Agent**: Uses `run_tests` tool.
+- **Reviewer Agent**: Uses `security_review` tool.
 
-Switched from the Class-based syntax (`@hatchet.workflow`) to the Object-based syntax (`hatchet.workflow(...)`) to support **DAG dependencies** (`parents` argument), which are not fully supported in the Class-based decorator in `hatchet-sdk==0.49.x` (or relevant version).
+### 3. Workflow DSL Refinement
+- Integrated `HatchetService` for consistent client configuration.
+- Corrected workflow task signatures to `(input, context)`.
+- Fixed task return types to align with Hatchet's JSON requirements.
+- Standardized Hatchet decorators to the object-based `workflow.task()` pattern.
 
-**New Syntax Pattern:**
+### 4. CI/CD Compliance
+- Resolved all `ruff` formatting and linting issues.
+- Fixed complex `mypy` type errors in agents, workflows, and tests.
+- Corrected `TypeError` in `test_hatchet_connection.py` and `ValueError` in `test_kafka_app.py`.
+- Verified 86.60% test coverage (above 80% threshold).
 
-```python
-autonomous_mission_workflow = hatchet.workflow(name="AutonomousMissionWorkflow", ...)
+## Verification Results
 
-@autonomous_mission_workflow.task(parents=[other_task])
-def my_task(context):
-    ...
-```
+### Automated Checks
+All standard project checks passed via `invoke checks.all`:
+- **Poetry**: Configuration validated.
+- **Format**: All files compliant with `ruff`.
+- **Types**: `mypy` passed with success.
+- **Security**: `bandit` scan completed with no issues.
+- **Tests**: Full suite passed (106 tests collected and executed).
+- **Coverage**: 86.60% achieved.
 
-### Components Implemented
-
-1.  **Workflow**: `src/autogen_team/application/workflows/autonomous_mission.py`
-2.  **Agents**:
-    - `PlannerAgent`: Decomposes goals into tasks.
-    - `CoderAgent`: Executes coding tasks.
-    - `TesterAgent`: Runs tests.
-    - `ReviewerAgent`: Reviews changes.
-3.  **Infrastructure**: `A2AProtocol` schemas for inter-agent communication.
-
-## Verification
-
-### Automated Tests
-
-- **E2E Test**: `tests/e2e/test_autonomous_mission_e2e.py`
-  - **Result**: Passed (Registration Verified).
-  - _Note_: Actual execution requires a running Hatchet engine at `127.0.0.1:7070`. The test gracefully handles connection failures while verifying the workflow definition is valid and can be registered with the worker.
-
-### Manual Verification
-
-- valid module structure confirmed via `debug_import.py`.
-- `hatchet-sdk` integration verified by successful instantiation of `Workflow` object.
-
-## Next Steps
-
-- Deploy Hatchet engine to Kubernetes environment (Phase 4).
-- Integrate actual MCP tools (currently mocked).
-- Implement dynamic fan-out using `spawn_workflow` when complex parallelism is needed.
+## Final Commit Summary
+The codebase is now fully synchronized with the remote repository on the `feature/da-16-workflow-dsl` branch.
