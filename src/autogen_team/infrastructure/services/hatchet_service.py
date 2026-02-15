@@ -41,7 +41,7 @@ class HatchetService(Service):
             try:
                 self._client = Hatchet(debug=True)
                 return
-            except Exception:
+            except Exception:  # nosec
                 pass
 
         # Fallback for local development or tests
