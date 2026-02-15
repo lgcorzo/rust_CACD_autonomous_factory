@@ -63,9 +63,7 @@ develop_task_workflow = hatchet.workflow(
 
 
 @develop_task_workflow.task(execution_timeout="15m")
-async def execute_coding_task(
-    task_input: TaskInput, context: Context
-) -> Dict[str, Any]:
+async def execute_coding_task(task_input: TaskInput, context: Context) -> Dict[str, Any]:
     """Run the Coder Agent on a single task inside a child workflow."""
     context.log(f"Child workflow: executing task {task_input.task_id}")
 
@@ -92,9 +90,7 @@ autonomous_mission_workflow = hatchet.workflow(
 
 
 @autonomous_mission_workflow.task(execution_timeout="5m")
-async def plan(
-    mission_input: MissionInput, context: Context
-) -> Dict[str, Any]:
+async def plan(mission_input: MissionInput, context: Context) -> Dict[str, Any]:
     """Step 1: Planner Agent analyses the goal and creates a task DAG."""
     context.log(f"Planning mission: {mission_input.goal}")
 
@@ -107,9 +103,7 @@ async def plan(
 
 
 @autonomous_mission_workflow.task(parents=[plan], execution_timeout="30m")
-async def fan_out_tasks(
-    mission_input: MissionInput, context: Context
-) -> Dict[str, Any]:
+async def fan_out_tasks(mission_input: MissionInput, context: Context) -> Dict[str, Any]:
     """Step 2: Spawn parallel child workflows for each coding task.
 
     Uses ``develop_task_workflow.aio_run_many`` for true parallel
@@ -141,12 +135,8 @@ async def fan_out_tasks(
     return {"results": results}
 
 
-@autonomous_mission_workflow.task(
-    parents=[fan_out_tasks], execution_timeout="15m"
-)
-async def aggregate_and_review(
-    mission_input: MissionInput, context: Context
-) -> MissionOutput:
+@autonomous_mission_workflow.task(parents=[fan_out_tasks], execution_timeout="15m")
+async def aggregate_and_review(mission_input: MissionInput, context: Context) -> MissionOutput:
     """Step 3: Aggregate child results, run tests, and perform security review."""
     fan_out_output = context.task_output(fan_out_tasks)
     task_results = fan_out_output["results"]
@@ -168,9 +158,7 @@ async def aggregate_and_review(
     )
 
     status = (
-        "success"
-        if test_results.get("status") == "passed" and review_result.approved
-        else "failed"
+        "success" if test_results.get("status") == "passed" and review_result.approved else "failed"
     )
 
     summary = (
