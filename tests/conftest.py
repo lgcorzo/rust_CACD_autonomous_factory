@@ -9,7 +9,7 @@ from typing import Any, cast
 import omegaconf
 import pytest
 from _pytest import logging as pl
-from agent_framework import ChatMessage
+from agent_framework import Message
 from agent_framework.openai import OpenAIChatClient
 from autogen_team.core import schemas
 from autogen_team.data_access.adapters import datasets
@@ -27,7 +27,7 @@ from openai import OpenAI
 _orig_prepare = OpenAIChatClient._prepare_message_for_openai
 
 
-def _patched_prepare(self: OpenAIChatClient, message: ChatMessage) -> T.List[T.Dict[str, T.Any]]:
+def _patched_prepare(self: OpenAIChatClient, message: Message) -> T.List[T.Dict[str, T.Any]]:
     res_list = _orig_prepare(self, message)
     for res in res_list:
         if (

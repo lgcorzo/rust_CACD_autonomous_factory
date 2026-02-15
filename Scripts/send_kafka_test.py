@@ -6,19 +6,23 @@ import uuid
 from confluent_kafka import Consumer, Producer
 
 # Configuration
-KAFKA_SERVER = os.getenv("DEFAULT_KAFKA_SERVER", "my-kafka-cluster.confluent.svc.cluster.local:9092")
+KAFKA_SERVER = os.getenv(
+    "DEFAULT_KAFKA_SERVER", "my-kafka-cluster.confluent.svc.cluster.local:9092"
+)
 INPUT_TOPIC = "llm_input_topic"
 OUTPUT_TOPIC = "llm_output_topic"
 
 
-def delivery_report(err, msg):
+from typing import Any, Dict, cast
+
+def delivery_report(err: Any, msg: Any) -> None:
     if err is not None:
         print(f"Message delivery failed: {err}")
     else:
         print(f"Message delivered to {msg.topic()} [{msg.partition()}]")
 
 
-def main():
+def main() -> None:
     print(f"Connecting to Kafka broker: {KAFKA_SERVER}")
 
     # Initialize Consumer BEFORE sending to ensure we don't miss the message
@@ -28,7 +32,7 @@ def main():
         "group.id": f"test_script_{uuid.uuid4()}",
         "auto.offset.reset": "earliest",
     }
-    consumer = Consumer(consumer_conf)
+    consumer = Consumer(cast(Dict[str, Any], consumer_conf))
     consumer.subscribe([OUTPUT_TOPIC])
     print(f"Subscribed to {OUTPUT_TOPIC}")
 
@@ -41,10 +45,12 @@ def main():
     json_payload = json.dumps(payload)
     print(f"Sending message: {json_payload}")
 
-    producer.produce(INPUT_TOPIC, key=b"test_key", value=json_payload.encode("utf-8"), callback=delivery_report)
+    producer.produce(
+        INPUT_TOPIC, key=b"test_key", value=json_payload.encode("utf-8"), callback=delivery_report
+    )
     producer.flush()
 
-    print(f"Waiting for response...")
+    print("Waiting for response...")
     start_time = time.time()
     try:
         while True:

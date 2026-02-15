@@ -1,7 +1,7 @@
 import json
 import os
 import signal
-from typing import Generator
+from typing import Any, Dict, Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -45,20 +45,24 @@ def mock_kafka_service() -> (
 
         service = FastAPIKafkaService(
             prediction_callback=prediction_callback,
-            kafka_config=kafka_config,
+            producer_config=kafka_config,
+            consumer_config=kafka_config,
             input_topic=input_topic,
             output_topic=output_topic,
         )
-        yield service, MockProducer, MockConsumer, MockThread, MockSleep
+        yield service, MockProducer, MockConsumer, MockThread, MockSleep, kafka_config
 
 
 def test_initialization(
-    mock_kafka_service: tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock],
+    mock_kafka_service: tuple[
+        FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock, Dict[str, Any]
+    ],
 ) -> None:
     """Test FastAPIKafkaService initialization."""
-    service, *_ = mock_kafka_service
+    service, _, _, _, _, kafka_config = mock_kafka_service
     assert service.prediction_callback is not None
-    assert service.kafka_config is not None
+    assert service.producer_config == kafka_config
+    assert service.consumer_config == kafka_config
     assert service.input_topic is not None
     assert service.output_topic is not None
     assert service.producer is None

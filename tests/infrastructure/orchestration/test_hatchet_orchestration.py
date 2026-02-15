@@ -1,27 +1,33 @@
 """Tests for Hatchet Orchestration."""
 
 import pytest_mock as pm
-from autogen_team.infrastructure.orchestration.hatchet_workflows import InferenceWorkflow
+from autogen_team.infrastructure.orchestration.hatchet_workflows import run_inference
 
 
 def test_inference_workflow_step(mocker: pm.MockerFixture) -> None:
     # given
     mock_context = mocker.Mock()
-    mock_context.workflow_input = {
-        "alias_or_version": "Champion",
-        "inputs": {"KIND": "ParquetReader", "path": "test.parquet"},
-        "outputs": {"KIND": "ParquetWriter", "path": "results.parquet"},
-    }
+    # Mock workflow_input as a property
+    type(mock_context).workflow_input = mocker.PropertyMock(
+        return_value={
+            "alias_or_version": "Champion",
+            "inputs": {"KIND": "ParquetReader", "path": "test.parquet"},
+            "outputs": {"KIND": "ParquetWriter", "path": "results.parquet"},
+        }
+    )
 
     # Mock the InferenceJob to avoid actual model loading and inference
     mock_job = mocker.patch("autogen_team.application.jobs.inference.InferenceJob")
     mock_job_instance = mock_job.return_value.__enter__.return_value
     mock_job_instance.run.return_value = {"outputs": mocker.Mock(shape=(10, 2))}
 
-    workflow = InferenceWorkflow()
-
     # when
-    result = workflow.run_inference(mock_context)
+    import asyncio
+    from typing import cast, Any, Dict
+
+    # The Task object is not callable, we need to call the underlying function
+    # In the refactored hatchet_workflows, run_inference is the decorated Task.
+    result: Dict[str, Any] = asyncio.run(cast(Any, run_inference.fn)(None, mock_context))
 
     # then
     assert result["status"] == "completed"

@@ -27,6 +27,9 @@ class Env(Singleton, BaseSettings):
     # Hatchet
     hatchet_client_token: str = ""
     hatchet_namespace: str = "autogen_team"
+    hatchet_client_host_port: str = "hatchet.orchestrators.svc.cluster.local:7077"
+    hatchet_client_server_url: str = "http://hatchet.orchestrators.svc.cluster.local:8000"
+    hatchet_client_tls_strategy: str = "tls"
 
     # MCP / LiteLLM
     litellm_api_base: str = "http://litellm.llm-apps.svc.cluster.local:4000/v1"
