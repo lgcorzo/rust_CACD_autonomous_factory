@@ -35,20 +35,24 @@ async def check_mcp_health() -> None:
                 print("📦 Requesting tool list...")
                 tools_result = await session.list_tools()
                 tools = tools_result.tools
-                
+
                 expected_tools = {
-                    "plan_mission", "execute_code", "run_tests", 
-                    "security_review", "retrieve_context", "index_code"
+                    "plan_mission",
+                    "execute_code",
+                    "run_tests",
+                    "security_review",
+                    "retrieve_context",
+                    "index_code",
                 }
                 found_tools = {t.name for t in tools}
 
                 print(f"✅ Found {len(tools)} tools registered.")
-                
+
                 missing = expected_tools - found_tools
                 if missing:
                     print(f"❌ Missing tools: {missing}")
                     sys.exit(1)
-                
+
                 print("✨ All 6 tools are correctly registered and schema-validated.")
                 print("   - " + "\n   - ".join(sorted(found_tools)))
 
