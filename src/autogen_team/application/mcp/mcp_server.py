@@ -89,7 +89,8 @@ async def handle_list_tools() -> T.List[Tool]:
         Tool(
             name="run_tests",
             description=(
-                "Runs pytest in isolated sandbox. " "Input: changes dict + workspace path. Output: test results."
+                "Runs pytest in isolated sandbox. "
+                "Input: changes dict + workspace path. Output: test results."
             ),
             inputSchema={
                 "type": "object",
@@ -276,7 +277,9 @@ def create_sse_app() -> FastAPI:
 def main() -> None:
     """Run the MCP server."""
     parser = argparse.ArgumentParser(description="MCP Server")
-    parser.add_argument("--transport", choices=["stdio", "sse"], default=os.getenv("MCP_TRANSPORT", "sse"))
+    parser.add_argument(
+        "--transport", choices=["stdio", "sse"], default=os.getenv("MCP_TRANSPORT", "sse")
+    )
     parser.add_argument("--host", default=os.getenv("DEFAULT_FASTAPI_HOST", "0.0.0.0"))  # nosec B104
     parser.add_argument("--port", type=int, default=int(os.getenv("DEFAULT_FASTAPI_PORT", 8100)))
     args = parser.parse_args()

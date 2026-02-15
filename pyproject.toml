@@ -2,20 +2,25 @@
 
 # PROJECT
 
-[tool.poetry]
+[project]
 name = "autogen_team"
 version = "2.1.0"
 description = "Predict the number of autogen_team available."
-authors = ["Admin <admin@example.com>"]
+authors = [{name = "Admin", email = "admin@example.com"}]
 license = "MIT"
 readme = "README.md"
+keywords = ["mlops", "python", "package"]
+dynamic = ["dependencies", "requires-python"]
+
+[project.urls]
 repository = "https://github.com/lgcorzo/llmops-python-package"
 documentation = "https://lgcorzo.github.io/llmops-python-package/"
-keywords = ["mlops", "python", "package"]
-packages = [{ include = "autogen_team", from = "src" }]
 
-[tool.poetry.scripts]
+[project.scripts]
 autogen_team = "autogen_team.scripts:main"
+
+[tool.poetry]
+packages = [{ include = "autogen_team", from = "src" }]
 
 # DEPENDENCIES
 
