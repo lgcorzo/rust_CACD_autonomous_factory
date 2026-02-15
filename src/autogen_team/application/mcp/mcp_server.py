@@ -9,11 +9,16 @@ Usage:
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import json
+import os
 import typing as T
 
+import uvicorn
+from fastapi import FastAPI, Request
 from mcp.server import Server
+from mcp.server.sse import SseServerTransport
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
@@ -84,8 +89,7 @@ async def handle_list_tools() -> T.List[Tool]:
         Tool(
             name="run_tests",
             description=(
-                "Runs pytest in isolated sandbox. "
-                "Input: changes dict + workspace path. Output: test results."
+                "Runs pytest in isolated sandbox. " "Input: changes dict + workspace path. Output: test results."
             ),
             inputSchema={
                 "type": "object",
@@ -231,7 +235,7 @@ async def handle_call_tool(name: str, arguments: T.Dict[str, T.Any] | None) -> T
     return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
 
-async def main() -> None:
+async def run_stdio() -> None:
     """Run the MCP server using stdio transport."""
     async with stdio_server() as (read_stream, write_stream):
         await _server.run(
@@ -241,5 +245,48 @@ async def main() -> None:
         )
 
 
+def create_sse_app() -> FastAPI:
+    """Create a FastAPI app for SSE transport."""
+    app = FastAPI(title="MCP SSE Server")
+    sse = SseServerTransport("/messages")
+
+    @app.get("/sse")
+    async def handle_sse(request: Request) -> None:
+        async with sse.connect_sse(request.scope, request.receive, request.send) as (
+            read_stream,
+            write_stream,
+        ):
+            await _server.run(
+                read_stream,
+                write_stream,
+                _server.create_initialization_options(),
+            )
+
+    @app.post("/messages")
+    async def handle_messages(request: Request) -> None:
+        await sse.handle_post_message(request.scope, request.receive, request.send)
+
+    @app.get("/health")
+    async def health_check() -> dict[str, str]:
+        return {"status": "healthy"}
+
+    return app
+
+
+def main() -> None:
+    """Run the MCP server."""
+    parser = argparse.ArgumentParser(description="MCP Server")
+    parser.add_argument("--transport", choices=["stdio", "sse"], default=os.getenv("MCP_TRANSPORT", "sse"))
+    parser.add_argument("--host", default=os.getenv("DEFAULT_FASTAPI_HOST", "0.0.0.0"))  # nosec B104
+    parser.add_argument("--port", type=int, default=int(os.getenv("DEFAULT_FASTAPI_PORT", 8100)))
+    args = parser.parse_args()
+
+    if args.transport == "stdio":
+        asyncio.run(run_stdio())
+    else:
+        app = create_sse_app()
+        uvicorn.run(app, host=args.host, port=args.port)
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
