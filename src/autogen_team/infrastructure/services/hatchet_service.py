@@ -35,9 +35,13 @@ class HatchetService(Service):
         if self.env.hatchet_client_tls_strategy:
             os.environ["HATCHET_CLIENT_TLS_STRATEGY"] = self.env.hatchet_client_tls_strategy
 
-        # Force mock in tests or if no token
+        # Force mock in tests unless Hatchet is explicitly mocked (unit tests)
         is_test = "PYTEST_CURRENT_TEST" in os.environ
-        if not is_test and self.env.hatchet_client_token:
+        from unittest.mock import Mock
+
+        is_mocked = isinstance(Hatchet, Mock)
+
+        if (not is_test or is_mocked) and self.env.hatchet_client_token:
             try:
                 self._client = Hatchet(debug=True)
                 return
