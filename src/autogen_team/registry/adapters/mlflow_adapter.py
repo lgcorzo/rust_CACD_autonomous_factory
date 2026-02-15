@@ -131,16 +131,6 @@ class CustomSaver(Saver):
                 model (models.Model): project model.
             """
             self.model = model
-            self.model_config = {
-                "provider": "openai_chat_completion_client",  # Use LiteLLM-compatible client
-                "config": {
-                    "model": "azure-gpt",  # LiteLLM model
-                    "api_base": "http://litellm.llm-apps.svc.cluster.local/v1",  # LiteLLM Gateway URL
-                    "api_key": os.getenv("LITELLM_API_KEY"),
-                    "temperature": 0.7,  # Optional
-                    "max_tokens": 512,  # Optional
-                },
-            }
 
         def load_context(self, context: PythonModelContext) -> None:
             """
