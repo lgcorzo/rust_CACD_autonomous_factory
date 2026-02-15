@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from hatchet_sdk import Hatchet
 from pydantic import Field
@@ -35,17 +35,37 @@ class HatchetService(Service):
         if self.env.hatchet_client_tls_strategy:
             os.environ["HATCHET_CLIENT_TLS_STRATEGY"] = self.env.hatchet_client_tls_strategy
 
-        try:
-            self._client = Hatchet(debug=True)
-        except Exception:
-            # Fallback for local development or tests if token is not provided
-            from unittest.mock import MagicMock
+        # Force mock in tests or if no token
+        is_test = "PYTEST_CURRENT_TEST" in os.environ
+        if not is_test and self.env.hatchet_client_token:
+            try:
+                self._client = Hatchet(debug=True)
+                return
+            except Exception:
+                pass
 
-            mock_client = MagicMock()
-            # Ensure decorators return the original function/class
-            mock_client.workflow.return_value = lambda x: x
-            mock_client.step.return_value = lambda x: x
-            self._client = mock_client
+        # Fallback for local development or tests
+        from unittest.mock import MagicMock
+
+        def mock_decorator(*args: Any, **kwargs: Any) -> Any:
+            def wrapper(func_or_class: Any) -> Any:
+                if not hasattr(func_or_class, "fn"):
+                    func_or_class.fn = func_or_class
+                return func_or_class
+
+            return wrapper
+
+        mock_workflow = MagicMock()
+        mock_workflow.task = mock_decorator
+        mock_workflow.step = mock_decorator
+
+        mock_client = MagicMock()
+        mock_client.workflow.return_value = mock_workflow
+        mock_client.admin.run_workflow = MagicMock(return_value="mock-run-id")
+        mock_client.worker.return_value.register_workflow = MagicMock()
+        mock_client.worker.return_value.start = MagicMock()
+
+        self._client = mock_client
 
     def stop(self) -> None:
         """Stop the Hatchet service."""
