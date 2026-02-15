@@ -1,7 +1,7 @@
 import pytest
 import asyncio
 import os
-from hatchet_sdk import Hatchet
+from autogen_team.infrastructure.services.hatchet_service import HatchetService
 from autogen_team.application.workflows.autonomous_mission import autonomous_mission_workflow
 
 # ...
@@ -10,7 +10,7 @@ from autogen_team.application.workflows.autonomous_mission import autonomous_mis
 @pytest.mark.skipif(not os.getenv("HATCHET_CLIENT_TOKEN"), reason="HATCHET_CLIENT_TOKEN not set")
 @pytest.mark.asyncio
 async def test_autonomous_mission_workflow() -> None:
-    hatchet = Hatchet()
+    hatchet = HatchetService().client
 
     # Create a worker
     worker = hatchet.worker("e2e-mission-worker")
