@@ -41,7 +41,7 @@ class HatchetService(Service):
 
         is_mocked = isinstance(Hatchet, Mock)
 
-        if (not is_test or is_mocked) and self.env.hatchet_client_token:
+        if (not is_test or is_mocked) and self.token:
             try:
                 self._client = Hatchet(debug=True)
                 return
