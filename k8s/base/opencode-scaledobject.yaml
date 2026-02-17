@@ -1,0 +1,32 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: opencode-agent-scaler
+  namespace: agents
+spec:
+  scaleTargetRef:
+    name: opencode-agent
+  minReplicaCount: 0 # Scale to zero when idle — zero cost
+  maxReplicaCount: 5 # Max parallel agents
+  cooldownPeriod: 300 # 5 min cooldown before scale-down
+  triggers:
+    - type: rabbitmq
+      metadata:
+        protocol: amqp
+        queueName: autonomous_mission
+        mode: QueueLength
+        value: "1" # 1 pending mission = 1 new pod
+      authenticationRef:
+        name: rabbitmq-auth
+        kind: TriggerAuthentication
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: rabbitmq-auth
+  namespace: agents
+spec:
+  secretTargetRef:
+    - parameter: host
+      name: hatchet-rabbitmq
+      key: connection-string

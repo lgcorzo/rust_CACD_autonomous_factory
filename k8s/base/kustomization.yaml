@@ -6,3 +6,6 @@ resources:
   - sealed-secret.yaml
   - mcp-configmap.yaml
   - mcp-deployment.yaml
+  - opencode-deployment.yaml
+  - opencode-configmap.yaml
+  - opencode-scaledobject.yaml
