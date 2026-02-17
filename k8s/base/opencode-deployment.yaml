@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencode-agent
+  namespace: agents
+spec:
+  replicas: 0 # KEDA manages replicas (0→N)
+  selector:
+    matchLabels:
+      app: opencode-agent
+  template:
+    metadata:
+      labels:
+        app: opencode-agent
+    spec:
+      containers:
+        - name: opencode
+          image: ghcr.io/anomalyco/opencode:beta
+          ports:
+            - containerPort: 4096 # OpenCode REST API / SDK
+          env:
+            # Hatchet connection
+            - name: HATCHET_CLIENT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hatchet-admin-token
+                  key: token
+                  optional: true
+            - name: HATCHET_CLIENT_HOST_PORT
+              value: "hatchet.orchestrators.svc.cluster.local:7077"
+            - name: HATCHET_CLIENT_TLS_STRATEGY
+              value: "none"
+            # LiteLLM API key (if required)
+            - name: LITELLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: litellm-keys
+                  key: master-key
+                  optional: true
+          volumeMounts:
+            - name: config
+              mountPath: /app/opencode.json
+              subPath: opencode.json
+            - name: workspace
+              mountPath: /workspace
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4096
+            initialDelaySeconds: 15
+            periodSeconds: 30
+      volumes:
+        - name: config
+          configMap:
+            name: opencode-agent-config
+        - name: workspace
+          emptyDir:
+            sizeLimit: 10Gi # Ephemeral, per-pod — enables KEDA scaling
