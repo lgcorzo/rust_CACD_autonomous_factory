@@ -95,7 +95,9 @@ async def execute_code(
             if not full_path.startswith(sandbox_abs) or (
                 len(full_path) > len(sandbox_abs) and full_path[len(sandbox_abs)] != os.sep
             ):
-                validation_errors.append(f"Security Error: Invalid path traversal detected: {file_path}")
+                validation_errors.append(
+                    f"Security Error: Invalid path traversal detected: {file_path}"
+                )
                 continue
 
             os.makedirs(os.path.dirname(full_path), exist_ok=True)

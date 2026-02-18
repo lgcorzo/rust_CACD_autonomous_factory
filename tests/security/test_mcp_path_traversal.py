@@ -6,6 +6,7 @@ import tempfile
 from autogen_team.application.mcp.tools.execute_code import execute_code
 from autogen_team.application.mcp.tools.run_tests import run_tests
 
+
 @pytest.mark.asyncio
 async def test_execute_code_path_traversal() -> None:
     # Setup
@@ -18,15 +19,9 @@ async def test_execute_code_path_traversal() -> None:
 
     mock_response = MagicMock()
     mock_response.choices = [MagicMock()]
-    mock_response.choices[0].message.content = json.dumps({
-        "files_changed": [
-            {
-                "path": malicious_path,
-                "action": "create",
-                "content": "PWNED"
-            }
-        ]
-    })
+    mock_response.choices[0].message.content = json.dumps(
+        {"files_changed": [{"path": malicious_path, "action": "create", "content": "PWNED"}]}
+    )
 
     with patch("autogen_team.application.mcp.tools.execute_code.MCPService") as MockMCPService:
         MockMCPService.return_value.get_prompt.return_value = "system prompt"
@@ -43,6 +38,7 @@ async def test_execute_code_path_traversal() -> None:
                 if content == "PWNED":
                     pytest.fail(f"VULNERABILITY EXPLOITED: File written to {target_file}")
 
+
 @pytest.mark.asyncio
 async def test_run_tests_path_traversal() -> None:
     # Setup
@@ -52,15 +48,7 @@ async def test_run_tests_path_traversal() -> None:
 
     malicious_path = "../../../../../../../../../../tmp/autogen_team_pwned_run_tests.txt"
 
-    changes = {
-        "files_changed": [
-            {
-                "path": malicious_path,
-                "action": "create",
-                "content": "PWNED"
-            }
-        ]
-    }
+    changes = {"files_changed": [{"path": malicious_path, "action": "create", "content": "PWNED"}]}
 
     # Use a safe temp dir as workspace
     with tempfile.TemporaryDirectory() as workspace_dir:
