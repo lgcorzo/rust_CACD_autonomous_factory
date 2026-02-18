@@ -123,7 +123,14 @@ async def run_tests(
             action = file_change.get("action", "create")
             content = file_change.get("content", "")
 
-            full_path = os.path.join(sandbox_dir, file_path)
+            full_path = os.path.abspath(os.path.join(sandbox_dir, file_path))
+            sandbox_abs = os.path.abspath(sandbox_dir)
+
+            if not full_path.startswith(sandbox_abs) or (
+                len(full_path) > len(sandbox_abs) and full_path[len(sandbox_abs)] != os.sep
+            ):
+                # Skip malicious paths
+                continue
 
             if action == "delete":
                 if os.path.exists(full_path):
