@@ -9,3 +9,8 @@
 **Learning:** In event-driven architectures like Kafka, error handling often involves producing to an error topic or the same output topic. Great care must be taken to sanitize these error messages. Also, logging "raw" messages for debugging is a common privacy trap.
 **Prevention:** Always catch exceptions at the top level of the message processor, log the full stack trace securely (server-side), but return/produce only generic error codes or messages to the downstream systems. Sanitize input logs to exclude data fields.
 >>>>>>> 36194fc (feat: Sanitize Kafka service logs and error responses)
+
+## 2026-02-05 - [Path Traversal in MCP Tools]
+**Vulnerability:** Found unvalidated file path operations in `run_tests` and `execute_code` MCP tools, allowing agents to overwrite arbitrary files outside the sandbox using `../` sequences.
+**Learning:** Tools designed for AI agents often manipulate files based on model output. If the model hallucinates or is maliciously prompted to use relative paths like `../../etc/passwd`, standard `os.path.join` does not prevent directory traversal.
+**Prevention:** Always use a secure path joining utility (like `safe_join` implementing `os.path.commonpath`) when handling file paths from untrusted sources (including LLMs) to enforce sandbox boundaries.
