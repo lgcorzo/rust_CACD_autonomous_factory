@@ -13,6 +13,7 @@ spec:
       labels:
         app: mcp-server
     spec:
+      enableServiceLinks: false
       containers:
         - name: mcp-server
           image: lgcorzo/llmops-python-package:latest
