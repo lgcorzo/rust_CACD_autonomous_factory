@@ -25,7 +25,6 @@ spec:
                 secretKeyRef:
                   name: hatchet-admin-token
                   key: token
-                  optional: true
             - name: HATCHET_CLIENT_HOST_PORT
               value: "hatchet.orchestrators.svc.cluster.local:7077"
             - name: HATCHET_CLIENT_TLS_STRATEGY
