@@ -9,3 +9,4 @@ resources:
   - opencode-deployment.yaml
   - opencode-configmap.yaml
   - opencode-scaledobject.yaml
+  - keda-trigger-auth.yaml

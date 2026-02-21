@@ -10,23 +10,11 @@ spec:
   maxReplicaCount: 5 # Max parallel agents
   cooldownPeriod: 300 # 5 min cooldown before scale-down
   triggers:
-    - type: rabbitmq
+    - type: kafka
       metadata:
-        protocol: amqp
-        queueName: autonomous_mission
-        mode: QueueLength
-        value: "1" # 1 pending mission = 1 new pod
+        bootstrapServers: my-kafka-cluster.confluent.svc.cluster.local:9092
+        topic: mission-input
+        consumerGroup: opencode-agents
+        lagThreshold: "1"
       authenticationRef:
-        name: rabbitmq-auth
-        kind: TriggerAuthentication
----
-apiVersion: keda.sh/v1alpha1
-kind: TriggerAuthentication
-metadata:
-  name: rabbitmq-auth
-  namespace: agents
-spec:
-  secretTargetRef:
-    - parameter: host
-      name: hatchet-rabbitmq
-      key: connection-string
+        name: keda-trigger-auth
