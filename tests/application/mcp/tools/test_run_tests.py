@@ -66,3 +66,23 @@ def test_subprocess_sandbox_direct() -> None:
     assert "passed" in result
     assert "summary" in result
     assert isinstance(result["passed"], bool)
+
+
+@pytest.mark.asyncio
+async def test_run_tests_path_traversal(tmp_path: str) -> None:
+    """Test run_tests prevents path traversal."""
+    changes = {
+        "files_changed": [
+            {
+                "path": "../evil.py",
+                "action": "create",
+                "content": "print('evil')",
+            }
+        ]
+    }
+
+    result = await run_tests(changes=changes, workspace_path=str(tmp_path))
+
+    assert result["passed"] is False
+    assert "Security Error" in result["summary"]
+    assert "Path traversal attempt" in result["details"]
