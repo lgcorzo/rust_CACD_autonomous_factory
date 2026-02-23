@@ -28,7 +28,6 @@ Key features include:
     - [CLI (Batch Jobs)](#cli-batch-jobs)
     - [Asynchronous Inference (Hatchet)](#asynchronous-inference-hatchet)
     - [Realtime Inference (Kafka)](#realtime-inference-kafka)
-    - [AutoGen Studio](#autogen-studio)
     - [CA/CD Autonomous Agent Factory (OpenCode + Hatchet)](#cacd-autonomous-agent-factory-opencode--hatchet)
   - [Configuration](#configuration)
   - [Development](#development)
@@ -133,13 +132,7 @@ This will start:
 - `DEFAULT_OUTPUT_TOPIC`: Topic to produce predictions to.
 - `MLFLOW_TRACKING_URI`: URL of the MLflow server.
 
-### AutoGen Studio
 
-To run the AutoGen Studio UI for managing agents:
-
-```bash
-poetry run autogenstudio ui --port 8081
-```
 
 Access the UI at `http://localhost:8081`.
 
