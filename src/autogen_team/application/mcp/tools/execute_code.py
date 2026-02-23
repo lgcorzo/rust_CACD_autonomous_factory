@@ -11,6 +11,7 @@ import typing as T
 
 import litellm
 
+from autogen_team.core.security import safe_join
 from autogen_team.infrastructure.services.mcp_service import MCPService
 
 
@@ -90,7 +91,12 @@ async def execute_code(
             if action == "delete":
                 continue
 
-            full_path = os.path.join(sandbox_dir, file_path)
+            try:
+                full_path = safe_join(sandbox_dir, file_path)
+            except ValueError as e:
+                validation_errors.append(f"{file_path}: {e}")
+                continue
+
             os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
             with open(full_path, "w") as f:
