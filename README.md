@@ -29,6 +29,7 @@ Key features include:
     - [Asynchronous Inference (Hatchet)](#asynchronous-inference-hatchet)
     - [Realtime Inference (Kafka)](#realtime-inference-kafka)
     - [AutoGen Studio](#autogen-studio)
+    - [CA/CD Autonomous Agent Factory (OpenCode + Hatchet)](#cacd-autonomous-agent-factory-opencode--hatchet)
   - [Configuration](#configuration)
   - [Development](#development)
     - [Pre-commit Hooks](#pre-commit-hooks)
@@ -142,19 +143,30 @@ poetry run autogenstudio ui --port 8081
 
 Access the UI at `http://localhost:8081`.
 
-### MCP Server (Model Context Protocol)
+### CA/CD Autonomous Agent Factory (OpenCode + Hatchet)
 
-The project includes an MCP server that exposes 6 AI-powered tools for mission planning, code execution, testing, and security analysis.
+The project includes an **Autonomous Agent Workforce** that transforms mission requests into production-ready pull requests, running entirely inside a Zero Trust cluster. This uses **OpenWebUI** for mission input, **Hatchet** as the durable workflow orchestrator, and **OpenCode** agents as scaled workers.
 
-**Available Tools:**
-- `plan_mission`: Decompose goals into task DAGs.
-- `execute_code`: Generate and validate code changes.
-- `run_tests`: Run pytest in an isolated sandbox.
-- `security_review`: OWASP & RAG-based security analysis.
-- `retrieve_context`: Semantic search via R2R RAG.
-- `index_code`: Index files into R2R knowledge graph.
+**Core Components:**
+
+- **Hatchet Workflow:** The `AutonomousMissionWorkflow` handles mission planning, fan-out execution of agent tasks, and aggregation/review with durable state management.
+- **OpenCode Workers:** Go-based agentic coding engines (`ghcr.io/anomalyco/opencode:beta`) act as Hatchet workers, scaling dynamically via **KEDA** based on Kafaka queue depth (`mission-input` and `agent-thought` topics).
+- **MCP Server (Model Context Protocol):** A consolidated Python MCP server that provides tools for mission planning, code generation, sandboxed testing, and security analysis.
+- **Zero Trust:** All agent-to-agent (A2A) traffic is encapsulated via **OpenZiti**.
+- **Model Gateway:** **LiteLLM** provides unified access to models like **Gemini Pro 2.5**.
+- **RAG & Knowledge Graph:** **R2R** with **pgvector** stores code contexts and enables semantic search for the agents.
+
+**Available MCP Tools:**
+
+- `plan_mission`: Decompose goals into task DAGs via Planner Agent.
+- `execute_code`: Generate and validate code changes via Coder Agent in a Firecracker MicroVM sandbox.
+- `run_tests`: Run isolated pytest suites via Tester Agent.
+- `security_review`: OWASP & RAG-based security analysis via Reviewer Agent.
+- `retrieve_context`: Semantic search via R2R RAG system.
+- `index_code`: Index files into the R2R knowledge graph.
 
 **Running Locally:**
+
 ```bash
 # Option 1: Using Invoke (Recommended)
 poetry run invoke projects.mcp
@@ -166,10 +178,11 @@ poetry run python -m autogen_team.application.mcp.mcp_server
 ```
 
 **Customizing Prompts:**
-The agent's system prompts and instructions are configuration-driven and can be customized in **[confs/mcp_prompts.yaml](file:///home/lgcorzo/llmops-python-package/confs/mcp_prompts.yaml)**. This allows tuning the behavior of `plan_mission`, `execute_code`, and `security_review` without code changes.
+The agent's system prompts and instructions are configuration-driven and can be customized in **[confs/mcp_prompts.yaml](confs/mcp_prompts.yaml)**. This allows tuning the behavior of `plan_mission`, `execute_code`, and `security_review` without code changes.
 
 **Running in Kubernetes:**
-The server is deployed in the `agents` namespace. It uses `LITELLM_API_BASE` and `R2R_BASE_URL` for backend integrations.
+The workers and MCP Server are deployed in the `agents` namespace.
+OpenCode pods run the worker agent, while the MCP server provides the tools via SSE transport.
 
 ```bash
 kubectl apply -k k8s/base/
@@ -231,6 +244,7 @@ This project uses [Invoke](https://www.pyinvoke.org/) for task automation.
   ```bash
   inv all
   ```
+
   This orchestrates the entire lifecycle: environment setup, MLOps jobs, evaluations, the **Kafka inference service**, and the **MCP server**.
 
 - **Run app (Kafka standalone):**
