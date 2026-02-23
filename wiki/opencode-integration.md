@@ -45,28 +45,35 @@ classDiagram
 
 ## Execution Flow
 
-When a mission is triggered, Hatchet creates a durable state and delegates execution tasks to the OpenCode workers. The workers utilize the MCP server to autonomously process the required coding adjustments.
+When a mission is triggered, Hatchet establishes the durable state. In the `plan` step, an OpenCode worker generates a Directed Acyclic Graph (DAG) using the Planner Agent's capabilities via MCP.
+
+**Critical Control Flow:** Hatchet then natively parses this DAG (via `fan_out_tasks`) to spawn dedicated parallel child workflows for each coding task. OpenCode workers process these individual child tasks, invoking the testing and reviewing tools before Hatchet aggregates the final outcome.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant K as Kafka (mission-input)
-    participant H as Hatchet Engine
-    participant O as OpenCode Worker Node
+    participant H as Hatchet Engine (Orchestrator)
+    participant O as OpenCode Worker Node(s)
     participant M as MCP Server (llmops-python-package)
     participant E as Firecracker MicroVM / E2B
 
     K->>H: Trigger `cacd-mission` workflow
-    H->>O: Assign 'Plan and Execute' parallel tasks
+    H->>O: Assign 'plan' step
 
     Note over O,M: OpenCode connects to MCP via SSE
     O->>M: Tool Call: `retrieve_context(goal)`
-    M-->>O: R2R pgvector context
+    M-->>O: R2R pgvector codebase context
 
     O->>M: Tool Call: `plan_mission(goal, context)`
     M-->>O: Task DAG Returned
+    O-->>H: Return DAG Outcome
 
-    loop Parallel Task Execution
+    Note over H,O: Hatchet uses dynamic fan-out to orchestrate the DAG.
+    H->>H: Parse DAG & Spawn Child Workflows
+
+    par For each task in DAG
+        H->>O: Assign 'execute task' step
         O->>M: Tool Call: `execute_code()`
         M->>E: Send generated code to Secure Sandbox
         E-->>M: Evaluation & Runtime results
@@ -76,12 +83,14 @@ sequenceDiagram
         M->>E: pytest isolated run
         E-->>M: Test reports
         M-->>O: Test Pass/Fail
+        O-->>H: Child task complete
     end
 
+    H->>O: Assign 'aggregate_and_review' step
     O->>M: Tool Call: `security_review()`
     M-->>O: Security Assessment Pass
+    O-->>H: Review complete
 
-    O-->>H: Task Complete (Heartbeat & Status Updates)
     H->>K: Publish to `mission-artifact` (Done)
 ```
 
