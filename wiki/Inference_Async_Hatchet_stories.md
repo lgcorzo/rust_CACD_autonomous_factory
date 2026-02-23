@@ -164,7 +164,8 @@ Check the status of your jobs in the Hatchet Dashboard to see:
 
 - **Application Layer**: [src/autogen_team/application/jobs/hatchet_inference.py](../src/autogen_team/application/jobs/hatchet_inference.py)
 - **Infrastructure Layer (Service)**: [src/autogen_team/infrastructure/services/hatchet_service.py](../src/autogen_team/infrastructure/services/hatchet_service.py)
-- **Orchestration Layer (Workflows)**: [src/autogen_team/infrastructure/orchestration/hatchet_workflows.py](../src/autogen_team/infrastructure/orchestration/hatchet_workflows.py)
+- **Orchestration Layer (Inference)**: [src/autogen_team/infrastructure/orchestration/hatchet_workflows.py](../src/autogen_team/infrastructure/orchestration/hatchet_workflows.py)
+- **Orchestration Layer (Autonomous Mission)**: [src/autogen_team/application/workflows/autonomous_mission.py](../src/autogen_team/application/workflows/autonomous_mission.py)
 
 ## Test location
 

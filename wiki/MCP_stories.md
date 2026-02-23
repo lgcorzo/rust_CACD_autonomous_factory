@@ -1,4 +1,4 @@
-# US [MCP Autonomous Capabilities](./backlog_llmlops_regresion.md) : Provide standardized AI tools for autonomous mission execution.
+# US [MCP Autonomous Capabilities](./backlog_llmlops_regresion.md) : Provide standardized AI tools for autonomous mission execution
 
 - [US MCP Autonomous Capabilities : Provide standardized AI tools for autonomous mission execution.](#us-mcp-autonomous-capabilities--provide-standardized-ai-tools-for-autonomous-mission-execution)
   - [classes relations](#classes-relations)
@@ -71,6 +71,7 @@ As an **autonomous agent**, I want to decompose a high-level goal into a task DA
 The `plan_mission` tool uses Gemini Pro (via LiteLLM) to take an arbitrary goal and return a JSON structure of interdependent tasks.
 
 **Acceptance Criteria:**
+
 - Returns a valid JSON DAG with IDs, names, and dependency lists.
 - Handles empty or nonsense goals gracefully.
 
@@ -85,6 +86,7 @@ As a **developer**, I want to run generated code in an isolated environment, so 
 The `run_tests` tool leverages `SubprocessSandbox` to execute `pytest` in a transient directory containing the proposed code changes.
 
 **Acceptance Criteria:**
+
 - Captures pass/fail status and stdout/stderr results.
 - Supports configurable timeouts to prevent hanging processes.
 
@@ -99,6 +101,7 @@ As a **security officer**, I want every code change to be automatically reviewed
 The `security_review` tool combines regex-based OWASP pattern detection with R2R RAG retrieval of security best practices to provide a final "Approved" or "Rejected" verdict.
 
 **Acceptance Criteria:**
+
 - Detects Command Injection, SQL Injection, and Hardcoded Secrets.
 - Rejects any code containing high-severity OWASP findings.
 
@@ -112,9 +115,16 @@ The `security_review` tool combines regex-based OWASP pattern detection with R2R
 
 ## Code location
 
-- **MCP Application Layer**: [src/autogen_team/application/mcp/](file:///home/lgcorzo/llmops-python-package/src/autogen_team/application/mcp/)
-- **MCP Infrastructure Layer**: [src/autogen_team/infrastructure/services/mcp_service.py](file:///home/lgcorzo/llmops-python-package/src/autogen_team/infrastructure/services/mcp_service.py)
+- **MCP Application Layer**: [src/autogen_team/application/mcp/](../src/autogen_team/application/mcp/)
+- **Agent Workers Layer**: [src/autogen_team/application/agents/](../src/autogen_team/application/agents/)
+- **MCP Infrastructure Layer**: [src/autogen_team/infrastructure/services/mcp_service.py](../src/autogen_team/infrastructure/services/mcp_service.py)
+
+## Deployment location
+
+- **Kubernetes Base**: [k8s/base](../k8s/base/)
+  - `mcp-deployment.yaml` & `mcp-configmap.yaml` (MCP tool server running via SSE)
+  - `opencode-deployment.yaml` & `opencode-scaledobject.yaml` (Hatchet Worker agent managed by KEDA)
 
 ## Test location
 
-- [tests/application/mcp/](file:///home/lgcorzo/llmops-python-package/tests/application/mcp/)
+- [tests/application/mcp/](../tests/application/mcp/)
