@@ -1,13 +1,14 @@
-
 import os
 import pickle
 import pytest
 from unittest.mock import MagicMock
 from autogen_team.registry.adapters.mlflow_adapter import CustomSaver
 
+
 # Create a dummy model class to avoid pickling issues with MagicMock
 class DummyModel:
     pass
+
 
 def test_adapter_does_not_pickle_secrets():
     # Arrange: Set a secret in the environment
@@ -27,7 +28,9 @@ def test_adapter_does_not_pickle_secrets():
         config = restored_adapter.model_config
         # If model_config exists, it MUST NOT contain the secret
         if "config" in config and "api_key" in config["config"]:
-            assert config["config"]["api_key"] != secret_key, "CRITICAL: API Key was pickled with the adapter!"
+            assert (
+                config["config"]["api_key"] != secret_key
+            ), "CRITICAL: API Key was pickled with the adapter!"
 
     # Ideally, model_config should not even exist or be empty of secrets
     # But for this test, we primarily want to ensure the specific secret is not there.
