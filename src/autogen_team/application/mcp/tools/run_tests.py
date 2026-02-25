@@ -10,6 +10,8 @@ import sys
 import tempfile
 import typing as T
 
+from autogen_team.core.security import safe_join
+
 
 class SandboxBackend(abc.ABC):
     """Abstract sandbox backend for running tests.
@@ -118,24 +120,32 @@ async def run_tests(
             shutil.copytree(workspace_path, sandbox_dir, dirs_exist_ok=True)
 
         # Apply changes
-        for file_change in files_changed:
-            file_path = file_change.get("path", "")
-            action = file_change.get("action", "create")
-            content = file_change.get("content", "")
+        try:
+            for file_change in files_changed:
+                file_path = file_change.get("path", "")
+                action = file_change.get("action", "create")
+                content = file_change.get("content", "")
 
-            full_path = os.path.join(sandbox_dir, file_path)
+                full_path = safe_join(sandbox_dir, file_path)
 
-            if action == "delete":
-                if os.path.exists(full_path):
-                    os.remove(full_path)
-                continue
+                if action == "delete":
+                    if os.path.exists(full_path):
+                        os.remove(full_path)
+                    continue
 
-            os.makedirs(os.path.dirname(full_path), exist_ok=True)
-            with open(full_path, "w") as f:
-                f.write(content)
+                os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                with open(full_path, "w") as f:
+                    f.write(content)
 
-        # Run tests
-        result = backend.run_tests(workspace_dir=sandbox_dir, timeout=timeout)
+            # Run tests
+            result = backend.run_tests(workspace_dir=sandbox_dir, timeout=timeout)
+        except ValueError as e:
+            return {
+                "passed": False,
+                "summary": f"Security Error: {str(e)}",
+                "details": str(e),
+                "exit_code": -1,
+            }
 
     finally:
         shutil.rmtree(sandbox_dir, ignore_errors=True)
