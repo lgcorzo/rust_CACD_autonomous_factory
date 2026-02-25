@@ -3,7 +3,9 @@
 import os
 import pickle
 import typing as T
+import unittest
 from typing import Any, Dict
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
@@ -61,3 +63,26 @@ def test_mlflow_adapter_no_secret_leak() -> None:
     # Check pickling serialization
     pickled_adapter = pickle.dumps(adapter)
     assert secret_key.encode() not in pickled_adapter, "API Key leaked in pickled adapter"
+
+
+class TestSecurityLeak(unittest.TestCase):
+    @patch.dict(os.environ, {"LITELLM_API_KEY": "super_secret_key"})
+    def test_adapter_captures_secret(self) -> None:
+        mock_model = MagicMock()
+        # Initialize the adapter
+        adapter = CustomSaver.Adapter(model=mock_model)
+
+        # model_config should not exist, or if it does, it shouldn't contain the secret
+        if hasattr(adapter, "model_config"):
+            self.assertNotIn("config", adapter.model_config, "model_config should not contain config dict")
+            # If config exists, check for api_key
+            if "config" in adapter.model_config:
+                self.assertNotEqual(
+                    adapter.model_config["config"].get("api_key"),
+                    "super_secret_key",
+                    "API Key leaked!",
+                )
+
+
+if __name__ == "__main__":
+    unittest.main()
