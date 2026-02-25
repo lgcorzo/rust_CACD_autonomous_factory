@@ -28,6 +28,12 @@
 **Learning:** When using MLflow's `PythonModel`, any instance attribute set in `__init__` is serialized (pickled) with the model. Reading secrets into instance attributes during `__init__` permanently bakes them into the artifact, leaking them to anyone with access to the model file.
 **Prevention:** Never store environment-dependent configuration or secrets in `__init__` of a `PythonModel`. Always load configuration dynamically in `load_context` or `predict`, or use the context object provided by MLflow at runtime.
 
+## 2026-02-14 - [Insecure HTTPS Warning Suppression]
+
+**Vulnerability:** Found `urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)` in `kafka_app.py`. This globally suppressed warnings for invalid SSL certificates, potentially masking MITM attacks.
+**Learning:** Suppressing warnings at the module level affects the entire application lifecycle and can hide critical security misconfigurations in production environments.
+**Prevention:** Never suppress security warnings globally. If necessary for development, scope suppressions narrowly or use environment-specific configurations.
+
 ## 2026-02-17 - [Sensitive Data in PythonModel Adapter]
 
 **Vulnerability:** The `CustomSaver.Adapter` class in `mlflow_adapter.py` was capturing the `LITELLM_API_KEY` environment variable in its `__init__` method, causing the secret to be pickled into the MLflow model artifact.
