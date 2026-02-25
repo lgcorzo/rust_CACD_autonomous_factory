@@ -18,9 +18,9 @@ from confluent_kafka import KafkaError
 
 
 @pytest.fixture()
-def mock_kafka_service() -> (
-    Generator[tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock], None, None]
-):
+def mock_kafka_service() -> Generator[
+    tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock], None, None
+]:
     """Fixture to create a mocked FastAPIKafkaService."""
     with (
         patch("autogen_team.infrastructure.messaging.kafka_app.Producer") as MockProducer,
@@ -54,9 +54,7 @@ def mock_kafka_service() -> (
 
 
 def test_initialization(
-    mock_kafka_service: tuple[
-        FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock, Dict[str, Any]
-    ],
+    mock_kafka_service: tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock, Dict[str, Any]],
 ) -> None:
     """Test FastAPIKafkaService initialization."""
     service, _, _, _, _, kafka_config = mock_kafka_service
@@ -285,9 +283,7 @@ def test_process_message_prediction_error(
     service.producer = MagicMock()
     service.consumer = MagicMock()
     service.prediction_callback.side_effect = Exception("Prediction Failed")
-    with patch(
-        "autogen_team.infrastructure.messaging.kafka_app.logger.exception"
-    ) as mock_logger_exception:
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.exception") as mock_logger_exception:
         service._process_message(msg)
         mock_logger_exception.assert_called()
     # service.prediction_callback.assert_called_once()
@@ -328,13 +324,9 @@ def test_stop(
 def test_main_function() -> None:
     """Test the main function."""
     with (
-        patch(
-            "autogen_team.infrastructure.messaging.kafka_app.services.MlflowService"
-        ) as MockMlflowService,
+        patch("autogen_team.infrastructure.messaging.kafka_app.services.MlflowService") as MockMlflowService,
         patch("autogen_team.infrastructure.messaging.kafka_app.CustomLoader") as MockCustomLoader,
-        patch(
-            "autogen_team.infrastructure.messaging.kafka_app.FastAPIKafkaService"
-        ) as MockFastAPIKafkaService,
+        patch("autogen_team.infrastructure.messaging.kafka_app.FastAPIKafkaService") as MockFastAPIKafkaService,
         patch("autogen_team.infrastructure.messaging.kafka_app.print") as mock_print,
         patch(
             "autogen_team.infrastructure.messaging.kafka_app.os.path.abspath",
