@@ -85,4 +85,7 @@ async def test_run_tests_path_traversal(sample_changes: T.Dict[str, T.Any], tmp_
 
     assert result["passed"] is False
     assert "Security Error" in result["summary"]
-    assert "Path traversal detected" in result["details"] or "Path traversal attempt" in result["details"]
+    assert (
+        "Path traversal detected" in result["details"]
+        or "Path traversal attempt" in result["details"]
+    )

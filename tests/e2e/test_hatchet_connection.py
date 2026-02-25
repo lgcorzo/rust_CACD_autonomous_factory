@@ -1,4 +1,3 @@
-import os
 import pytest
 from typing import Dict, Any
 from hatchet_sdk import Hatchet, Context
@@ -21,6 +20,8 @@ def test_hatchet_connection() -> None:
         # For now just instantiating confirms basic connectivity if token is valid
         assert worker is not None
     except SystemExit:
-        pytest.skip("Hatchet SDK exited (likely due to missing/invalid credentials or unreachable server)")
+        pytest.skip(
+            "Hatchet SDK exited (likely due to missing/invalid credentials or unreachable server)"
+        )
     except Exception as e:
         pytest.skip(f"Hatchet connection failed: {e}")
