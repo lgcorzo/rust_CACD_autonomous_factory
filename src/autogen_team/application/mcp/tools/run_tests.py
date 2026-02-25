@@ -126,7 +126,19 @@ async def run_tests(
                 action = file_change.get("action", "create")
                 content = file_change.get("content", "")
 
+<<<<<<< HEAD
                 full_path = safe_join(sandbox_dir, file_path)
+=======
+            try:
+                full_path = safe_join(sandbox_dir, file_path)
+            except ValueError as e:
+                return {
+                    "passed": False,
+                    "summary": f"Security Error: {e}",
+                    "details": str(e),
+                    "exit_code": -1,
+                }
+>>>>>>> origin/sentinel/fix-path-traversal-14250803625781569863
 
                 if action == "delete":
                     if os.path.exists(full_path):

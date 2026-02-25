@@ -87,7 +87,16 @@ async def execute_code(
             if action == "delete":
                 continue
 
+<<<<<<< HEAD
             full_path = safe_join(sandbox_dir, file_path)
+=======
+            try:
+                full_path = safe_join(sandbox_dir, file_path)
+            except ValueError as e:
+                validation_errors.append(f"Security Error: {file_path}: {e}")
+                continue
+
+>>>>>>> origin/sentinel/fix-path-traversal-14250803625781569863
             os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
             with open(full_path, "w") as f:
