@@ -304,7 +304,9 @@ def model(
 @pytest.fixture(scope="session")
 def metric() -> metrics.AutogenMetric:
     """Return the default metric."""
-    return metrics.AutogenMetric(name="AutogenMetricTest", metric_type="exact_match", greater_is_better=True)
+    return metrics.AutogenMetric(
+        name="AutogenMetricTest", metric_type="exact_match", greater_is_better=True
+    )
 
 
 # %% - Signers
@@ -380,7 +382,9 @@ def chtgpt_service(targets: schemas.Targets, inputs_samples: schemas.Inputs) -> 
     server.chat.completions.request(prompt="Hola").response(content="Cómo puedo ayudarte?")
     with server:
         client = OpenAI(base_url="http://localhost:12306/v1", api_key="sk-123456789")
-        response = client.chat.completions.create(model="gpt-4", messages=[{"role": "user", "content": "Hola"}])
+        response = client.chat.completions.create(
+            model="gpt-4", messages=[{"role": "user", "content": "Hola"}]
+        )
 
         assert response.choices[0].message.content == "Cómo puedo ayudarte?"
         yield server
@@ -418,7 +422,9 @@ def tmp_path_resolver(tmp_path: str) -> str:
 
 
 @pytest.fixture(scope="session")
-def signature(signer: signers.Signer, inputs: schemas.Inputs, outputs: schemas.Outputs) -> signers.Signature:
+def signature(
+    signer: signers.Signer, inputs: schemas.Inputs, outputs: schemas.Outputs
+) -> signers.Signature:
     """Return the signature for the testing model."""
     return signer.sign(inputs=inputs, outputs=outputs)
 
@@ -470,6 +476,8 @@ def model_alias(
     """Promote the default model version with an alias."""
     alias = "Promotion"
     client = mlflow_service.client()
-    client.set_registered_model_alias(name=mlflow_service.registry_name, alias=alias, version=model_version.version)
+    client.set_registered_model_alias(
+        name=mlflow_service.registry_name, alias=alias, version=model_version.version
+    )
     model_alias = client.get_model_version_by_alias(name=mlflow_service.registry_name, alias=alias)
     return model_alias

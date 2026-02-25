@@ -9,7 +9,6 @@ import threading
 import time
 from typing import Any, Callable, Dict, Optional
 
-import urllib3
 import pandas as pd
 import uvicorn
 from confluent_kafka import Consumer, KafkaError, Producer

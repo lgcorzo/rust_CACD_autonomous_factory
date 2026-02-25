@@ -8,7 +8,6 @@ from typing import Any, Dict
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-import pytest
 
 from autogen_team.core import schemas
 from autogen_team.models import entities as models
@@ -74,7 +73,9 @@ class TestSecurityLeak(unittest.TestCase):
 
         # model_config should not exist, or if it does, it shouldn't contain the secret
         if hasattr(adapter, "model_config"):
-            self.assertNotIn("config", adapter.model_config, "model_config should not contain config dict")
+            self.assertNotIn(
+                "config", adapter.model_config, "model_config should not contain config dict"
+            )
             # If config exists, check for api_key
             if "config" in adapter.model_config:
                 self.assertNotEqual(
@@ -110,7 +111,9 @@ class TestSecurityMlflowAdapter(unittest.TestCase):
             if fake_secret in config_str:
                 found_secret = True
 
-        self.assertFalse(found_secret, "CRITICAL: CustomSaver.Adapter captured LITELLM_API_KEY in model_config!")
+        self.assertFalse(
+            found_secret, "CRITICAL: CustomSaver.Adapter captured LITELLM_API_KEY in model_config!"
+        )
 
         # Double check __dict__
         for key, value in adapter.__dict__.items():

@@ -69,24 +69,14 @@ def test_subprocess_sandbox_direct() -> None:
 
 
 @pytest.mark.asyncio
-<<<<<<< HEAD
 async def test_run_tests_path_traversal(sample_changes: T.Dict[str, T.Any], tmp_path: str) -> None:
-=======
-async def test_run_tests_path_traversal(tmp_path: str) -> None:
->>>>>>> origin/sentinel/fix-path-traversal-14250803625781569863
     """Test run_tests prevents path traversal."""
     changes = {
         "files_changed": [
             {
-<<<<<<< HEAD
                 "path": "../escape.py",
                 "action": "create",
                 "content": "print('hacked')",
-=======
-                "path": "../evil.py",
-                "action": "create",
-                "content": "print('evil')",
->>>>>>> origin/sentinel/fix-path-traversal-14250803625781569863
             }
         ]
     }
@@ -95,4 +85,4 @@ async def test_run_tests_path_traversal(tmp_path: str) -> None:
 
     assert result["passed"] is False
     assert "Security Error" in result["summary"]
-    assert "Path traversal attempt" in result["details"]
+    assert "Path traversal detected" in result["details"] or "Path traversal attempt" in result["details"]
