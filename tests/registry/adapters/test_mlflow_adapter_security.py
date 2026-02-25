@@ -31,37 +31,47 @@ def test_custom_saver_adapter_does_not_capture_env_vars() -> None:
                 assert captured_key != secret_key, "LITELLM_API_KEY leaked into model configuration!"
 
 
-class TestMlflowAdapterSecurity:
+class TestMlflowAdapterSecurity(unittest.TestCase):
+    """Test suite for security aspects of MLflow adapters."""
+
     def test_custom_saver_adapter_does_not_capture_secrets(self) -> None:
         """
-        Verify that CustomSaver.Adapter does not capture environment variables
-        (like LITELLM_API_KEY) in its __init__ method.
-
-        Vulnerability: If the adapter captures env vars in __init__ and stores them
-        in self, they will be pickled with the model, leaking secrets into the artifact.
+        Vulnerability Check: Ensure CustomSaver.Adapter does NOT capture
+        environment variables (like LITELLM_API_KEY) in its state during initialization.
         """
-        secret_value = "secret_key_value_12345"
+        # Given: A secret is present in the environment
+        secret_value = "SUPER_SECRET_VALUE"
+        os.environ["LITELLM_API_KEY"] = secret_value
 
-        with mock.patch.dict(os.environ, {"LITELLM_API_KEY": secret_value}):
-            # Mock the model argument as it's required
-            mock_model = mock.Mock()
+        # And: A mock model
+        mock_model = unittest.mock.MagicMock()
 
-            # Instantiate the adapter
-            adapter = CustomSaver.Adapter(model=mock_model)
+        # When: The adapter is initialized
+        adapter = CustomSaver.Adapter(model=mock_model)
 
-            # Check for the vulnerability
-            # If the code is VULNERABLE, adapter.model_config exists and has the secret.
+        # Then: The adapter should NOT have 'model_config' attribute containing the secret
+        # Note: If model_config exists, it must NOT contain the secret.
+        # Ideally, it shouldn't exist if it's dead code.
 
-            # We assert that the secret is NOT present in the object state
-            # This handles both cases: model_config removed (safe) or present but sanitized (safe).
+        if hasattr(adapter, "model_config"):
+            self.assertNotIn(
+                secret_value,
+                str(adapter.model_config),
+                "CRITICAL: LITELLM_API_KEY captured in adapter.model_config! This will be pickled with the model.",
+            )
 
-            if hasattr(adapter, "model_config"):
-                config = adapter.model_config
-                # Navigate to the key
-                api_key = config.get("config", {}).get("api_key")
-
-                # Fail explicitly if the secret is found
-                assert api_key != secret_value, (
-                    "CRITICAL VULNERABILITY: Adapter captured LITELLM_API_KEY from environment! "
-                    "This secret will be pickled with the model artifact."
+        # Also check __dict__ just in case it's stored under another name
+        for key, value in adapter.__dict__.items():
+            if isinstance(value, (str, dict, list)):
+                self.assertNotIn(
+                    secret_value,
+                    str(value),
+                    f"CRITICAL: LITELLM_API_KEY captured in adapter attribute '{key}'!",
                 )
+
+        # Cleanup
+        del os.environ["LITELLM_API_KEY"]
+
+
+if __name__ == "__main__":
+    unittest.main()
