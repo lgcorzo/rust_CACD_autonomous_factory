@@ -4,6 +4,12 @@
 **Learning:** `PythonModel` subclasses are pickled by MLflow. Configuration dependent on environment variables must be resolved at load time (e.g., in `load_context` or `predict`), never in `__init__`.
 **Prevention:** Remove environment variable resolution from `__init__`. Use `load_context` to read configuration from artifacts or resolve environment variables at runtime.
 
+## 2026-02-03 - [Hardcoded Secrets in MLflow Adapters]
+
+**Vulnerability:** Found a hardcoded fallback API key and internal cluster URL in `mlflow_adapter.py`.
+**Learning:** Custom MLflow adapters (`PythonModel` subclasses) might contain copy-pasted debugging configurations or hardcoded environments that were accidentally committed.
+**Prevention:** Ensure all `PythonModel` implementations load configuration strictly from artifacts or environment variables, never from hardcoded dictionaries in `__init__`.
+
 ## 2026-02-04 - Information Exposure in Kafka Service
 
 **Vulnerability:** The Kafka consumer service (`kafka_app.py`) was logging raw input messages which could contain PII, and returning raw exception messages to the output topic which could leak internal implementation details.
@@ -15,3 +21,9 @@
 **Vulnerability:** Found a hardcoded `model_config` dictionary in `mlflow_adapter.py` that captured the `LITELLM_API_KEY` environment variable value at initialization time. This caused the secret API key to be stored in plain text within the pickled model artifact.
 **Learning:** When using MLflow's `PythonModel`, any instance attribute set in `__init__` is serialized (pickled) with the model. Reading secrets into instance attributes during `__init__` permanently bakes them into the artifact, leaking them to anyone with access to the model file.
 **Prevention:** Never store environment-dependent configuration or secrets in `__init__` of a `PythonModel`. Always load configuration dynamically in `load_context` or `predict`, or use the context object provided by MLflow at runtime.
+
+## 2026-02-17 - [Sensitive Data in PythonModel Adapter]
+
+**Vulnerability:** The `CustomSaver.Adapter` class in `mlflow_adapter.py` was capturing the `LITELLM_API_KEY` environment variable in its `__init__` method, causing the secret to be pickled into the MLflow model artifact.
+**Learning:** Even unused code in `__init__` can be dangerous if it captures secrets into the object state, as pickling serializes the entire object state.
+**Prevention:** Removed the `self.model_config` assignment. Always verify that `PythonModel` subclasses do not store secrets in `self`.
