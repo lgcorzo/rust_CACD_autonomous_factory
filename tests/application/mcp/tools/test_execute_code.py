@@ -76,3 +76,29 @@ async def test_execute_code_malformed_response(
 
     assert result["status"] == "error"
     assert "Failed to parse" in result["error"]
+
+
+@pytest.mark.asyncio
+async def test_execute_code_path_traversal(sample_task: T.Dict[str, T.Any], tmp_path: str) -> None:
+    """Test execute_code prevents path traversal."""
+    mock_response = MagicMock()
+    mock_response.choices = [MagicMock()]
+    mock_response.choices[0].message.content = json.dumps(
+        {
+            "files_changed": [
+                {
+                    "path": "../evil.py",
+                    "action": "create",
+                    "content": "print('evil')",
+                }
+            ]
+        }
+    )
+
+    with patch("autogen_team.application.mcp.tools.execute_code.litellm") as mock_litellm:
+        mock_litellm.acompletion = AsyncMock(return_value=mock_response)
+        result = await execute_code(task=sample_task, workspace_path=str(tmp_path))
+
+    # Should report an error in validation_errors
+    assert result["status"] == "error"
+    assert any("Security Error" in err for err in result["validation_errors"])
