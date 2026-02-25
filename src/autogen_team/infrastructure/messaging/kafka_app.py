@@ -9,7 +9,6 @@ import threading
 import time
 from typing import Any, Callable, Dict, Optional
 
-import urllib3
 import pandas as pd
 import uvicorn
 from confluent_kafka import Consumer, KafkaError, Producer
@@ -56,7 +55,6 @@ logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 logger = logging.getLogger(__name__)
 
 # Suppress annoying warnings
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.getLogger("mlflow.utils.requirements_utils").setLevel(logging.ERROR)
 
 # FastAPI App Initialization
