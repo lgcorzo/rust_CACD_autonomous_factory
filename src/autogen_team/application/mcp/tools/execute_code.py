@@ -88,6 +88,7 @@ async def execute_code(
                 continue
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             full_path = safe_join(sandbox_dir, file_path)
 =======
             try:
@@ -97,6 +98,14 @@ async def execute_code(
                 continue
 
 >>>>>>> origin/sentinel/fix-path-traversal-14250803625781569863
+=======
+            try:
+                full_path = safe_join(sandbox_dir, file_path)
+            except ValueError as e:
+                validation_errors.append(f"{file_path}: {e}")
+                continue
+
+>>>>>>> origin/sentinel/fix-path-traversal-execute-code-1486026776790124242
             os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
             with open(full_path, "w") as f:
