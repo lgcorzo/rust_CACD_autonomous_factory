@@ -51,11 +51,7 @@ async def execute_code(
             {"role": "system", "content": system_prompt},
             {
                 "role": "user",
-                "content": (
-                    f"Task: {task_name}\n"
-                    f"Description: {task_description}\n\n"
-                    f"Context:\n{context}"
-                ),
+                "content": (f"Task: {task_name}\nDescription: {task_description}\n\nContext:\n{context}"),
             },
         ],
         api_base=mcp_service.litellm_api_base,
