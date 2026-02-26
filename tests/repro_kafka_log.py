@@ -1,9 +1,7 @@
-
 import unittest
-import json
-import logging
 from unittest.mock import MagicMock, patch
 from autogen_team.infrastructure.messaging.kafka_app import FastAPIKafkaService
+
 
 class TestKafkaAppLogging(unittest.TestCase):
     def test_log_raw_message_on_json_error(self):
@@ -13,7 +11,7 @@ class TestKafkaAppLogging(unittest.TestCase):
             producer_config={},
             consumer_config={},
             input_topic="in",
-            output_topic="out"
+            output_topic="out",
         )
 
         mock_msg = MagicMock()
@@ -23,7 +21,7 @@ class TestKafkaAppLogging(unittest.TestCase):
         mock_msg.error.return_value = None
 
         # Capture logs
-        with patch('autogen_team.infrastructure.messaging.kafka_app.logger') as mock_logger:
+        with patch("autogen_team.infrastructure.messaging.kafka_app.logger") as mock_logger:
             # When
             service._process_message(mock_msg)
 
@@ -42,5 +40,6 @@ class TestKafkaAppLogging(unittest.TestCase):
 
             self.assertFalse(found_sensitive_log, "Found sensitive data in error logs")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
