@@ -4,7 +4,7 @@ from autogen_team.infrastructure.messaging.kafka_app import FastAPIKafkaService
 
 
 class TestKafkaAppLogging(unittest.TestCase):
-    def test_log_raw_message_on_json_error(self):
+    def test_log_raw_message_on_json_error(self) -> None:
         # Given
         service = FastAPIKafkaService(
             prediction_callback=MagicMock(),
