@@ -191,7 +191,7 @@ class FastAPIKafkaService:
             logger.info("kafka Received input message")
             prediction_result: Dict[str, Any] = self.prediction_callback(input_obj).result
         except json.JSONDecodeError as e:
-            error_log = f"Failed to decode JSON message: {e}. Raw message: {msg.value()}"
+            error_log = f"Failed to decode JSON message: {e}."
             logger.error(error_log)
             predictionresponse.result["error"] = "Invalid JSON format"
             prediction_result = predictionresponse.result
