@@ -148,7 +148,7 @@ async def run_stdio() -> None:
 
 
 def create_sse_app() -> Starlette:
-    sse = SseServerTransport("/messages/")
+    sse = SseServerTransport("/sse/messages/")
 
     async def _sse_asgi(scope: Scope, receive: Receive, send: Send) -> None:
         async with sse.connect_sse(scope, receive, send) as (read_stream, write_stream):
@@ -158,8 +158,9 @@ def create_sse_app() -> Starlette:
         return Response(json.dumps({"status": "healthy"}), media_type="application/json")
 
     routes = [
-        Mount("/sse", app=_sse_asgi),
-        Mount("/messages/", app=sse.handle_post_message),
+        Route("/", endpoint=health_check),  # Prevents the 404s we saw earlier
+        Route("/sse/", endpoint=_sse_asgi, methods=["GET"]),
+        Route("/sse/messages/", endpoint=sse.handle_post_message, methods=["POST"]),
         Route("/health", endpoint=health_check, methods=["GET"]),
     ]
     return Starlette(routes=routes)
