@@ -89,8 +89,7 @@ async def handle_list_tools() -> T.List[Tool]:
         Tool(
             name="run_tests",
             description=(
-                "Runs pytest in isolated sandbox. "
-                "Input: changes dict + workspace path. Output: test results."
+                "Runs pytest in isolated sandbox. " "Input: changes dict + workspace path. Output: test results."
             ),
             inputSchema={
                 "type": "object",
@@ -253,7 +252,7 @@ def create_sse_app() -> FastAPI:
 
     @app.get("/sse")
     async def handle_sse(request: Request) -> None:
-        async with sse.connect_sse(request.scope, request.receive, request.send) as (
+        async with sse.connect_sse(request.scope, request.receive, request._send) as (
             read_stream,
             write_stream,
         ):
@@ -265,7 +264,7 @@ def create_sse_app() -> FastAPI:
 
     @app.post("/messages")
     async def handle_messages(request: Request) -> None:
-        await sse.handle_post_message(request.scope, request.receive, request.send)
+        await sse.handle_post_message(request.scope, request.receive, request._send)
 
     @app.get("/health")
     async def health_check() -> dict[str, str]:
@@ -277,9 +276,7 @@ def create_sse_app() -> FastAPI:
 def main() -> None:
     """Run the MCP server."""
     parser = argparse.ArgumentParser(description="MCP Server")
-    parser.add_argument(
-        "--transport", choices=["stdio", "sse"], default=os.getenv("MCP_TRANSPORT", "sse")
-    )
+    parser.add_argument("--transport", choices=["stdio", "sse"], default=os.getenv("MCP_TRANSPORT", "sse"))
     parser.add_argument("--host", default=os.getenv("DEFAULT_FASTAPI_HOST", "0.0.0.0"))  # nosec B104
     parser.add_argument("--port", type=int, default=int(os.getenv("DEFAULT_FASTAPI_PORT", 8100)))
     args = parser.parse_args()
