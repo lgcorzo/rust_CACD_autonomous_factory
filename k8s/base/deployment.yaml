@@ -13,6 +13,7 @@ spec:
       labels:
         app: llmops-python-package
     spec:
+      enableServiceLinks: false
       initContainers:
         - name: wait-for-dependencies
           image: busybox:latest
