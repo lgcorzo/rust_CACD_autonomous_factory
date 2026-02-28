@@ -35,6 +35,14 @@ def test_owasp_scan_unsafe_deserialization() -> None:
     assert any("Deserialization" in f["rule"] for f in findings)
 
 
+def test_owasp_scan_weak_hash() -> None:
+    """Test OWASP scanner detects weak hash usage."""
+    diff = "+hash_val = hashlib.md5(data)\n"
+    findings = _scan_owasp_patterns(diff)
+    assert len(findings) > 0
+    assert any("Cryptographic Failures" in f["rule"] for f in findings)
+
+
 @pytest.mark.asyncio
 async def test_security_review_clean_diff(sample_diff: str) -> None:
     """Test security_review approves clean code."""

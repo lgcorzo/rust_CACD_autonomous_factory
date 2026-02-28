@@ -49,6 +49,12 @@ OWASP_PATTERNS: T.List[T.Dict[str, str]] = [
         "severity": "high",
         "description": "Unsafe deserialization or code execution.",
     },
+    {
+        "rule": "A02:Cryptographic Failures",
+        "pattern": r"(?:hashlib\.md5\(|hashlib\.sha1\()",
+        "severity": "high",
+        "description": "Use of weak cryptographic hash functions.",
+    },
 ]
 
 
