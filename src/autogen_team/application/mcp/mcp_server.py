@@ -16,11 +16,14 @@ import os
 import typing as T
 
 import uvicorn
-from fastapi import FastAPI, Request
 from mcp.server import Server
 from mcp.server.sse import SseServerTransport
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import Response
+from starlette.routing import Mount, Route
 
 from autogen_team.application.mcp.tools import (
     execute_code,
@@ -245,13 +248,18 @@ async def run_stdio() -> None:
         )
 
 
-def create_sse_app() -> FastAPI:
-    """Create a FastAPI app for SSE transport."""
-    app = FastAPI(title="MCP SSE Server")
-    sse = SseServerTransport("/messages")
+def create_sse_app() -> Starlette:
+    """Create a Starlette app for SSE transport.
 
-    @app.get("/sse")
-    async def handle_sse(request: Request) -> None:
+    Uses Starlette directly (instead of FastAPI) so that `sse.handle_post_message`
+    can be mounted as a proper ASGI sub-application.  FastAPI wraps route handlers
+    in a way that prevents the raw ASGI `send` callable from reaching the MCP
+    transport, causing the 'Unexpected ASGI message' RuntimeError.
+    """
+    sse = SseServerTransport("/messages/")
+
+    async def handle_sse(request: Request) -> Response:
+        """Open a persistent SSE connection and run the MCP session."""
         async with sse.connect_sse(request.scope, request.receive, request._send) as (
             read_stream,
             write_stream,
@@ -261,16 +269,23 @@ def create_sse_app() -> FastAPI:
                 write_stream,
                 _server.create_initialization_options(),
             )
+        # Must return a Response to avoid a NoneType error when the SSE
+        # connection closes and Starlette tries to send a final response.
+        return Response()
 
-    @app.post("/messages")
-    async def handle_messages(request: Request) -> None:
-        await sse.handle_post_message(request.scope, request.receive, request._send)
+    async def health_check(request: Request) -> Response:
+        import json as _json
 
-    @app.get("/health")
-    async def health_check() -> dict[str, str]:
-        return {"status": "healthy"}
+        return Response(_json.dumps({"status": "healthy"}), media_type="application/json")
 
-    return app
+    routes = [
+        Route("/sse", endpoint=handle_sse, methods=["GET"]),
+        # Mount the MCP post-message handler as a raw ASGI app so it receives
+        # the real `send` callable from the ASGI server, not a wrapped version.
+        Mount("/messages", app=sse.handle_post_message),
+        Route("/health", endpoint=health_check, methods=["GET"]),
+    ]
+    return Starlette(routes=routes)
 
 
 def main() -> None:
