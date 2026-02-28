@@ -20,7 +20,7 @@ spec:
             [
               "sh",
               "-c",
-              "until nc -zv mlflow.monitoring.svc.cluster.local 5000 && nc -zv my-kafka-cluster.confluent.svc.cluster.local 9092; do echo 'Waiting for dependencies...'; sleep 2; done",
+              "until nc -zv mlflow.llm-apps.svc.cluster.local 5000 && nc -zv my-kafka-cluster.confluent.svc.cluster.local 9092 && nc -zv keycloak-service.security.svc.cluster.local 8443; do echo 'Waiting for dependencies...'; sleep 2; done",
             ]
       containers:
         - name: llmops-app
