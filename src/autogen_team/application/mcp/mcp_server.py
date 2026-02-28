@@ -24,6 +24,7 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Mount, Route
+
 # Crucial imports for solving the mypy [arg-type] and [no-untyped-def] errors
 from starlette.types import Receive, Scope, Send
 
