@@ -24,6 +24,8 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Mount, Route
+# Crucial imports for solving the mypy [arg-type] and [no-untyped-def] errors
+from starlette.types import Receive, Scope, Send
 
 from autogen_team.application.mcp.tools import (
     execute_code,
@@ -186,15 +188,7 @@ async def handle_list_tools() -> T.List[Tool]:
 
 @_server.call_tool()  # type: ignore[untyped-decorator]
 async def handle_call_tool(name: str, arguments: T.Dict[str, T.Any] | None) -> T.List[TextContent]:
-    """Dispatch tool calls to the appropriate handler.
-
-    Args:
-        name: Name of the tool to call.
-        arguments: Tool arguments dict.
-
-    Returns:
-        List with a single TextContent containing the JSON result.
-    """
+    """Dispatch tool calls to the appropriate handler."""
     args = arguments or {}
 
     try:
@@ -250,31 +244,12 @@ async def run_stdio() -> None:
 
 
 def create_sse_app() -> Starlette:
-    """Create a Starlette app for SSE transport.
-
-    Both the SSE endpoint and the message handler are mounted as raw ASGI
-    sub-applications (via ``Mount``) so that Starlette never wraps their
-    coroutines in a ``Route`` handler.  Wrapping via ``Route`` causes two
-    problems:
-
-    1. Starlette calls the handler's *return value* as another ASGI app,
-       producing an ``Unexpected ASGI message 'http.response.start'``
-       RuntimeError because EventSourceResponse already sent the response.
-    2. Returning ``None`` from the handler raises ``TypeError: 'NoneType'
-       object is not callable``.
-
-    Mounting as raw ASGI avoids both issues because Starlette passes
-    ``(scope, receive, send)`` directly without interpreting the return value.
-    """
+    """Create a Starlette app for SSE transport."""
     sse = SseServerTransport("/messages/")
 
-    async def _sse_asgi(scope: dict, receive, send) -> None:  # type: ignore[type-arg]
-        """Raw ASGI handler for the SSE endpoint.
-
-        connect_sse() drives the full HTTP response lifecycle (status + streaming
-        body) via EventSourceResponse.  We must NOT return a Response object
-        because nothing is left to send once connect_sse exits.
-        """
+    # FIXED: Added Scope, Receive, and Send type hints to satisfy mypy
+    async def _sse_asgi(scope: Scope, receive: Receive, send: Send) -> None:
+        """Raw ASGI handler for the SSE endpoint."""
         async with sse.connect_sse(scope, receive, send) as (
             read_stream,
             write_stream,
@@ -286,15 +261,11 @@ def create_sse_app() -> Starlette:
             )
 
     async def health_check(request: Request) -> Response:
-        import json as _json
-
-        return Response(_json.dumps({"status": "healthy"}), media_type="application/json")
+        return Response(json.dumps({"status": "healthy"}), media_type="application/json")
 
     routes = [
-        # Mount the SSE stream as a raw ASGI app — must handle GET /sse
+        # FIXED: Now matches the expected ASGI application signature
         Mount("/sse", app=_sse_asgi),
-        # Mount the MCP post-message handler as a raw ASGI app — must match
-        # the trailing slash in SseServerTransport("/messages/").
         Mount("/messages/", app=sse.handle_post_message),
         Route("/health", endpoint=health_check, methods=["GET"]),
     ]
@@ -307,7 +278,7 @@ def main() -> None:
     parser.add_argument(
         "--transport", choices=["stdio", "sse"], default=os.getenv("MCP_TRANSPORT", "sse")
     )
-    parser.add_argument("--host", default=os.getenv("DEFAULT_FASTAPI_HOST", "0.0.0.0"))  # nosec B104
+    parser.add_argument("--host", default=os.getenv("DEFAULT_FASTAPI_HOST", "0.0.0.0"))
     parser.add_argument("--port", type=int, default=int(os.getenv("DEFAULT_FASTAPI_PORT", 8100)))
     args = parser.parse_args()
 
