@@ -1,12 +1,27 @@
 """Security regression tests for MLflow adapters."""
 
 import os
+import pickle
+import typing as T
 import unittest.mock
-
+import pytest
 
 from autogen_team.models import entities as models
-from autogen_team.registry.adapters import mlflow_adapter
 from autogen_team.registry.adapters.mlflow_adapter import CustomSaver
+
+
+# Create a dummy model class to avoid pickling issues with MagicMock
+class DummyModel(models.Model):
+    KIND: T.Literal["DummyModel"] = "DummyModel"
+
+    def load_context(self, model_config: dict[str, T.Any]) -> None:
+        pass
+
+    def fit(self, inputs: T.Any, targets: T.Any) -> T.Self:
+        return self
+
+    def predict(self, inputs: T.Any) -> T.Any:
+        return None
 
 
 def test_custom_saver_adapter_does_not_capture_env_vars() -> None:
@@ -14,10 +29,8 @@ def test_custom_saver_adapter_does_not_capture_env_vars() -> None:
     # given
     secret_key = "secret_api_key_123"
     with unittest.mock.patch.dict(os.environ, {"LITELLM_API_KEY": secret_key}):
-        mock_model = unittest.mock.MagicMock(spec=models.Model)
-
         # when
-        adapter = mlflow_adapter.CustomSaver.Adapter(model=mock_model)
+        adapter = CustomSaver.Adapter(model=DummyModel())
 
         # then
         # Check if model_config exists and contains the key
@@ -25,52 +38,30 @@ def test_custom_saver_adapter_does_not_capture_env_vars() -> None:
             config = adapter.model_config
             if "config" in config:
                 captured_key = config["config"].get("api_key")
-                assert (
-                    captured_key != secret_key
-                ), "LITELLM_API_KEY leaked into model configuration!"
+                assert captured_key != secret_key, "LITELLM_API_KEY leaked into model configuration!"
 
 
-class TestMlflowAdapterSecurity(unittest.TestCase):
-    """Test suite for security aspects of MLflow adapters."""
+def test_adapter_does_not_pickle_secrets() -> None:
+    """Test that the adapter does not pickle secrets into the model artifact."""
+    # Arrange: Set a secret in the environment
+    secret_key = "SECRET_API_KEY_123"
+    with unittest.mock.patch.dict(os.environ, {"LITELLM_API_KEY": secret_key}):
+        # Act: Instantiate the Adapter
+        adapter = CustomSaver.Adapter(model=DummyModel())
 
-    def test_custom_saver_adapter_does_not_capture_secrets(self) -> None:
-        """
-        Vulnerability Check: Ensure CustomSaver.Adapter does NOT capture
-        environment variables (like LITELLM_API_KEY) in its state during initialization.
-        """
-        # Given: A secret is present in the environment
-        secret_value = "SUPER_SECRET_VALUE"
-        os.environ["LITELLM_API_KEY"] = secret_value
+        # Assert: Verify that the secret is NOT present in the adapter's state
+        # We pickle and unpickle to simulate MLflow saving/loading process
+        pickled_adapter = pickle.dumps(adapter)
+        restored_adapter = pickle.loads(pickled_adapter)
 
-        # And: A mock model
-        mock_model = unittest.mock.MagicMock()
-
-        # When: The adapter is initialized
-        adapter = CustomSaver.Adapter(model=mock_model)
-
-        # Then: The adapter should NOT have 'model_config' attribute containing the secret
-        # Note: If model_config exists, it must NOT contain the secret.
-        # Ideally, it shouldn't exist if it's dead code.
-
-        if hasattr(adapter, "model_config"):
-            self.assertNotIn(
-                secret_value,
-                str(adapter.model_config),
-                "CRITICAL: LITELLM_API_KEY captured in adapter.model_config! This will be pickled with the model.",
-            )
+        # Check if model_config exists and contains the secret
+        if hasattr(restored_adapter, "model_config"):
+            config = restored_adapter.model_config
+            # If model_config exists, it MUST NOT contain the secret
+            if "config" in config and "api_key" in config["config"]:
+                assert config["config"]["api_key"] != secret_key, "CRITICAL: API Key was pickled with the adapter!"
 
         # Also check __dict__ just in case it's stored under another name
-        for key, value in adapter.__dict__.items():
+        for key, value in restored_adapter.__dict__.items():
             if isinstance(value, (str, dict, list)):
-                self.assertNotIn(
-                    secret_value,
-                    str(value),
-                    f"CRITICAL: LITELLM_API_KEY captured in adapter attribute '{key}'!",
-                )
-
-        # Cleanup
-        del os.environ["LITELLM_API_KEY"]
-
-
-if __name__ == "__main__":
-    unittest.main()
+                assert secret_key not in str(value), f"CRITICAL: LITELLM_API_KEY captured in adapter attribute '{key}'!"
