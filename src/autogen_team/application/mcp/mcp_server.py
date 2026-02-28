@@ -258,8 +258,13 @@ def create_sse_app() -> Starlette:
     """
     sse = SseServerTransport("/messages/")
 
-    async def handle_sse(request: Request) -> Response:
-        """Open a persistent SSE connection and run the MCP session."""
+    async def handle_sse(request: Request) -> None:
+        """Open a persistent SSE connection and run the MCP session.
+
+        Note: connect_sse() handles the full HTTP response (headers + streaming body).
+        We must NOT return a Response here — doing so would trigger a second
+        'http.response.start' message, causing an ASGI RuntimeError.
+        """
         async with sse.connect_sse(request.scope, request.receive, request._send) as (
             read_stream,
             write_stream,
@@ -269,9 +274,6 @@ def create_sse_app() -> Starlette:
                 write_stream,
                 _server.create_initialization_options(),
             )
-        # Must return a Response to avoid a NoneType error when the SSE
-        # connection closes and Starlette tries to send a final response.
-        return Response()
 
     async def health_check(request: Request) -> Response:
         import json as _json
