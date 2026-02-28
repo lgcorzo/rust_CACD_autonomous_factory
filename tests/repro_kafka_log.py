@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
+
 from autogen_team.infrastructure.messaging.kafka_app import FastAPIKafkaService
 
 

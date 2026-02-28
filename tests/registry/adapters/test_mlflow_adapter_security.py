@@ -4,7 +4,6 @@ import os
 import pickle
 import typing as T
 import unittest.mock
-import pytest
 
 from autogen_team.models import entities as models
 from autogen_team.registry.adapters.mlflow_adapter import CustomSaver
@@ -38,7 +37,9 @@ def test_custom_saver_adapter_does_not_capture_env_vars() -> None:
             config = adapter.model_config
             if "config" in config:
                 captured_key = config["config"].get("api_key")
-                assert captured_key != secret_key, "LITELLM_API_KEY leaked into model configuration!"
+                assert (
+                    captured_key != secret_key
+                ), "LITELLM_API_KEY leaked into model configuration!"
 
 
 def test_adapter_does_not_pickle_secrets() -> None:
@@ -59,9 +60,13 @@ def test_adapter_does_not_pickle_secrets() -> None:
             config = restored_adapter.model_config
             # If model_config exists, it MUST NOT contain the secret
             if "config" in config and "api_key" in config["config"]:
-                assert config["config"]["api_key"] != secret_key, "CRITICAL: API Key was pickled with the adapter!"
+                assert (
+                    config["config"]["api_key"] != secret_key
+                ), "CRITICAL: API Key was pickled with the adapter!"
 
         # Also check __dict__ just in case it's stored under another name
         for key, value in restored_adapter.__dict__.items():
             if isinstance(value, (str, dict, list)):
-                assert secret_key not in str(value), f"CRITICAL: LITELLM_API_KEY captured in adapter attribute '{key}'!"
+                assert secret_key not in str(
+                    value
+                ), f"CRITICAL: LITELLM_API_KEY captured in adapter attribute '{key}'!"

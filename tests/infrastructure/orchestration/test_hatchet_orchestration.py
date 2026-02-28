@@ -23,7 +23,7 @@ def test_inference_workflow_step(mocker: pm.MockerFixture) -> None:
 
     # when
     import asyncio
-    from typing import cast, Any, Dict
+    from typing import Any, Dict, cast
 
     # The Task object is not callable, we need to call the underlying function
     # In the refactored hatchet_workflows, run_inference is the decorated Task.

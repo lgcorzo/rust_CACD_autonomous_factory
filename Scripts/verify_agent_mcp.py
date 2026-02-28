@@ -1,10 +1,11 @@
 """Verification script for Agent-MCP integration."""
 
 import asyncio
-from autogen_team.application.agents.planner_agent import PlannerAgent
+
 from autogen_team.application.agents.coder_agent import CoderAgent
-from autogen_team.application.agents.tester_agent import TesterAgent
+from autogen_team.application.agents.planner_agent import PlannerAgent
 from autogen_team.application.agents.reviewer_agent import ReviewerAgent
+from autogen_team.application.agents.tester_agent import TesterAgent
 
 
 async def main() -> None:

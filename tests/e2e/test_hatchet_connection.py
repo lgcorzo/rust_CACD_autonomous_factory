@@ -1,6 +1,7 @@
+from typing import Any, Dict
+
 import pytest
-from typing import Dict, Any
-from hatchet_sdk import Hatchet, Context
+from hatchet_sdk import Context, Hatchet
 
 
 # Skip if token not provided or is a dummy token
