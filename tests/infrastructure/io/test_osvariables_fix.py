@@ -3,7 +3,7 @@ import pytest
 from autogen_team.infrastructure.io.osvariables import Env
 
 
-def test_mcp_port_collision_avoidance()-> None:
+def test_mcp_port_collision_avoidance() -> None:
     # Simulate Kubernetes setting MCP_SERVER_PORT to a URL
     os.environ["MCP_SERVER_PORT"] = "tcp://10.152.183.212:8200"
 
@@ -19,7 +19,7 @@ def test_mcp_port_collision_avoidance()-> None:
     del os.environ["MCP_SERVER_PORT"]
 
 
-def test_mcp_port_custom_value()-> None:
+def test_mcp_port_custom_value() -> None:
     # Ensure mcp_port can still be set via environment variable
     os.environ["MCP_PORT"] = "9000"
 
