@@ -140,6 +140,11 @@ async def security_review(diff: str) -> T.Dict[str, T.Any]:
     rag_context = await _query_r2r_security(diff, mcp_service.r2r_base_url)
     rag_text = "\n".join(doc.get("text", "")[:200] for doc in rag_context[:3])
 
+    # Step 3: Optional Dynamic Analysis (Sandbox placeholder)
+    # if mcp_service.use_sandbox:
+    #     sandbox_result = await run_dynamic_analysis(diff)
+    #     ...
+
     # Step 3: LiteLLM synthesis
     prompt = instruction_template.format(
         diff=diff[:3000],
