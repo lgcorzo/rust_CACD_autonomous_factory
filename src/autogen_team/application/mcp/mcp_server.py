@@ -251,21 +251,30 @@ async def run_stdio() -> None:
 def create_sse_app() -> Starlette:
     """Create a Starlette app for SSE transport.
 
-    Uses Starlette directly (instead of FastAPI) so that `sse.handle_post_message`
-    can be mounted as a proper ASGI sub-application.  FastAPI wraps route handlers
-    in a way that prevents the raw ASGI `send` callable from reaching the MCP
-    transport, causing the 'Unexpected ASGI message' RuntimeError.
+    Both the SSE endpoint and the message handler are mounted as raw ASGI
+    sub-applications (via ``Mount``) so that Starlette never wraps their
+    coroutines in a ``Route`` handler.  Wrapping via ``Route`` causes two
+    problems:
+
+    1. Starlette calls the handler's *return value* as another ASGI app,
+       producing an ``Unexpected ASGI message 'http.response.start'``
+       RuntimeError because EventSourceResponse already sent the response.
+    2. Returning ``None`` from the handler raises ``TypeError: 'NoneType'
+       object is not callable``.
+
+    Mounting as raw ASGI avoids both issues because Starlette passes
+    ``(scope, receive, send)`` directly without interpreting the return value.
     """
     sse = SseServerTransport("/messages/")
 
-    async def handle_sse(request: Request) -> None:
-        """Open a persistent SSE connection and run the MCP session.
+    async def _sse_asgi(scope: dict, receive, send) -> None:  # type: ignore[type-arg]
+        """Raw ASGI handler for the SSE endpoint.
 
-        Note: connect_sse() handles the full HTTP response (headers + streaming body).
-        We must NOT return a Response here — doing so would trigger a second
-        'http.response.start' message, causing an ASGI RuntimeError.
+        connect_sse() drives the full HTTP response lifecycle (status + streaming
+        body) via EventSourceResponse.  We must NOT return a Response object
+        because nothing is left to send once connect_sse exits.
         """
-        async with sse.connect_sse(request.scope, request.receive, request._send) as (
+        async with sse.connect_sse(scope, receive, send) as (
             read_stream,
             write_stream,
         ):
@@ -281,10 +290,11 @@ def create_sse_app() -> Starlette:
         return Response(_json.dumps({"status": "healthy"}), media_type="application/json")
 
     routes = [
-        Route("/sse", endpoint=handle_sse, methods=["GET"]),
-        # Mount the MCP post-message handler as a raw ASGI app so it receives
-        # the real `send` callable from the ASGI server, not a wrapped version.
-        Mount("/messages", app=sse.handle_post_message),
+        # Mount the SSE stream as a raw ASGI app — must handle GET /sse
+        Mount("/sse", app=_sse_asgi),
+        # Mount the MCP post-message handler as a raw ASGI app — must match
+        # the trailing slash in SseServerTransport("/messages/").
+        Mount("/messages/", app=sse.handle_post_message),
         Route("/health", endpoint=health_check, methods=["GET"]),
     ]
     return Starlette(routes=routes)
