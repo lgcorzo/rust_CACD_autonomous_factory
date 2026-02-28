@@ -88,6 +88,65 @@ class SubprocessSandbox(SandboxBackend):
             }
 
 
+class FirecrackerSandbox(SandboxBackend):
+    """Firecracker-based sandbox using SandboxService."""
+
+    def __init__(self, sandbox_service: T.Any | None = None):
+        from autogen_team.infrastructure.services.sandbox_service import SandboxService
+
+        self.service = sandbox_service or SandboxService()
+
+    def run_tests(
+        self,
+        workspace_dir: str,
+        timeout: int = 300,
+    ) -> T.Dict[str, T.Any]:
+        """Note: This is a synchronous wrapper for the async service.
+        In a real scenario, the tool should be async.
+        """
+        import asyncio
+
+        async def _run():
+            sandbox_id = await self.service.create_sandbox()
+            try:
+                # Note: In a production environment, we would also sync files to the sandbox
+                # For now, we implement the interface for the backend.
+                result = await self.service.run_python_tests(sandbox_id, workspace_dir)
+                return {
+                    "passed": result.exit_code == 0,
+                    "summary": f"Sandbox tests {'passed' if result.exit_code == 0 else 'failed'}",
+                    "details": result.stdout + result.stderr,
+                    "exit_code": result.exit_code,
+                }
+            except Exception as e:
+                return {
+                    "passed": False,
+                    "summary": f"Sandbox error: {type(e).__name__}",
+                    "details": str(e),
+                    "exit_code": -1,
+                }
+            finally:
+                await self.service.destroy(sandbox_id)
+
+        # Run the async logic in the current thread (assuming it's not already in an event loop)
+        # or use the existing loop if available.
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # This is tricky in sync tools, better if the whole tool becomes async
+                # For this implementation, we assume the tool will be called correctly.
+                return asyncio.run_coroutine_threadsafe(_run(), loop).result(timeout=timeout)
+            else:
+                return loop.run_until_complete(_run())
+        except Exception as e:
+            return {
+                "passed": False,
+                "summary": "Async execution failed in sandbox",
+                "details": str(e),
+                "exit_code": -1,
+            }
+
+
 # Default sandbox implementation
 _default_sandbox: SandboxBackend = SubprocessSandbox()
 
