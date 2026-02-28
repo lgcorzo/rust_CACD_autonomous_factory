@@ -8,7 +8,6 @@ from typing import Any, Dict
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-
 from autogen_team.core import schemas
 from autogen_team.models import entities as models
 from autogen_team.registry.adapters.mlflow_adapter import CustomSaver

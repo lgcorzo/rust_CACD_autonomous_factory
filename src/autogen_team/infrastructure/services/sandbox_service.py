@@ -69,7 +69,9 @@ class SandboxService:
 
         # Local Firecracker implementation would go here
         # For DA-14, we start with E2B fallback and infrastructure for local connection
-        raise NotImplementedError("Local Firecracker integration not yet implemented in this cluster.")
+        raise NotImplementedError(
+            "Local Firecracker integration not yet implemented in this cluster."
+        )
 
     async def execute(
         self,
@@ -151,7 +153,9 @@ class SandboxService:
         Returns:
             The S3 URL of the uploaded artifact.
         """
-        s3_endpoint = os.getenv("MLFLOW_S3_ENDPOINT_URL", "http://mlflow-minio-hl.storage.svc.cluster.local:9000")
+        s3_endpoint = os.getenv(
+            "MLFLOW_S3_ENDPOINT_URL", "http://mlflow-minio-hl.storage.svc.cluster.local:9000"
+        )
         access_key = os.getenv("AWS_ACCESS_KEY_ID")
         secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 

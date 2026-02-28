@@ -9,14 +9,13 @@ child-workflow fan-out instead of sequential task execution.
 
 from typing import Any, Dict, List
 
-from hatchet_sdk import Context
-from pydantic import BaseModel
-
 from autogen_team.application.agents.coder_agent import CoderAgent
 from autogen_team.application.agents.planner_agent import PlannerAgent
 from autogen_team.application.agents.reviewer_agent import ReviewerAgent
 from autogen_team.application.agents.tester_agent import TesterAgent
 from autogen_team.infrastructure.services.hatchet_service import HatchetService
+from hatchet_sdk import Context
+from pydantic import BaseModel
 
 # ---------------------------------------------------------------------------
 # Hatchet client

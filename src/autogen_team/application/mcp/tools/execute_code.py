@@ -51,7 +51,9 @@ async def execute_code(
             {"role": "system", "content": system_prompt},
             {
                 "role": "user",
-                "content": (f"Task: {task_name}\nDescription: {task_description}\n\nContext:\n{context}"),
+                "content": (
+                    f"Task: {task_name}\nDescription: {task_description}\n\nContext:\n{context}"
+                ),
             },
         ],
         api_base=mcp_service.litellm_api_base,
@@ -108,14 +110,7 @@ async def execute_code(
     finally:
         shutil.rmtree(sandbox_dir, ignore_errors=True)
 
-    # Optional: Hardware-level validation if sandbox service is configured
-    try:
-        from autogen_team.infrastructure.services.sandbox_service import SandboxService
-        # If we wanted to run additional hardware-level validation, we'd do it here:
-        # svc = SandboxService()
-        # await svc.create_sandbox(...)
-    except ImportError:
-        pass
+    # Optional: Hardware-level validation logic to be added here.
 
     status = "error" if validation_errors else "success"
 

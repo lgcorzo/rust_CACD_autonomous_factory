@@ -1,6 +1,7 @@
 """Simple verification script for MCP Client connection."""
 
 import asyncio
+
 from autogen_team.infrastructure.client.mcp_client import MCPClient
 
 

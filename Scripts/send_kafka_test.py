@@ -15,6 +15,7 @@ OUTPUT_TOPIC = "llm_output_topic"
 
 from typing import Any, Dict, cast
 
+
 def delivery_report(err: Any, msg: Any) -> None:
     if err is not None:
         print(f"Message delivery failed: {err}")

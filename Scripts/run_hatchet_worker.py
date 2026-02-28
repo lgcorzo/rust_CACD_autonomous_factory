@@ -1,7 +1,7 @@
 """Script to run the Hatchet worker and register workflows."""
 
-from autogen_team.infrastructure.services.hatchet_service import HatchetService
 from autogen_team.application.workflows.autonomous_mission import autonomous_mission_workflow
+from autogen_team.infrastructure.services.hatchet_service import HatchetService
 
 
 def main() -> None:

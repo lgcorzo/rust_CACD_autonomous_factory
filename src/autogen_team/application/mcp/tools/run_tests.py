@@ -106,7 +106,7 @@ class FirecrackerSandbox(SandboxBackend):
         """
         import asyncio
 
-        async def _run():
+        async def _run() -> T.Dict[str, T.Any]:
             sandbox_id = await self.service.create_sandbox()
             try:
                 # Note: In a production environment, we would also sync files to the sandbox
@@ -135,7 +135,10 @@ class FirecrackerSandbox(SandboxBackend):
             if loop.is_running():
                 # This is tricky in sync tools, better if the whole tool becomes async
                 # For this implementation, we assume the tool will be called correctly.
-                return asyncio.run_coroutine_threadsafe(_run(), loop).result(timeout=timeout)
+                return T.cast(
+                    "T.Dict[str, T.Any]",
+                    asyncio.run_coroutine_threadsafe(_run(), loop).result(timeout=timeout),
+                )
             else:
                 return loop.run_until_complete(_run())
         except Exception as e:
