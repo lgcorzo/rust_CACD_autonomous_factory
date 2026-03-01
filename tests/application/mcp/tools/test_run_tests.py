@@ -127,6 +127,7 @@ async def test_run_tests_delete_action(tmp_path: str) -> None:
 def test_firecracker_sandbox_run_tests_success() -> None:
     """Test FirecrackerSandbox.run_tests success path."""
     import asyncio
+
     mock_service = MagicMock()
     mock_service.create_sandbox = AsyncMock(return_value="sb_123")
     mock_service.run_python_tests = AsyncMock(
@@ -148,6 +149,7 @@ def test_firecracker_sandbox_run_tests_success() -> None:
 def test_firecracker_sandbox_run_tests_failure() -> None:
     """Test FirecrackerSandbox.run_tests error handling."""
     import asyncio
+
     mock_service = MagicMock()
     mock_service.create_sandbox = AsyncMock(return_value="sb_123")
     mock_service.run_python_tests = AsyncMock(side_effect=Exception("Execution failed"))
@@ -160,4 +162,3 @@ def test_firecracker_sandbox_run_tests_failure() -> None:
 
     assert result["passed"] is False
     assert "Sandbox error" in result["summary"]
-
