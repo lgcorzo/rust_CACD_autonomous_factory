@@ -163,6 +163,8 @@ def test_firecracker_sandbox_run_tests_failure() -> None:
 
     assert result["passed"] is False
     assert "Sandbox error" in result["summary"]
+
+
 def test_subprocess_sandbox_exception() -> None:
     """Test SubprocessSandbox.run_tests generic exception."""
     sandbox = SubprocessSandbox()
@@ -174,20 +176,19 @@ def test_subprocess_sandbox_exception() -> None:
 
 def test_firecracker_sandbox_run_tests_loop_running() -> None:
     """Test FirecrackerSandbox.run_tests when event loop is already running."""
-    import asyncio
 
     mock_service = MagicMock()
     sandbox = FirecrackerSandbox(sandbox_service=mock_service)
-    
+
     mock_loop = MagicMock()
     mock_loop.is_running.return_value = True
-    
+
     with (
         patch("asyncio.get_event_loop", return_value=mock_loop),
-        patch("asyncio.run_coroutine_threadsafe") as mock_run_safe
+        patch("asyncio.run_coroutine_threadsafe") as mock_run_safe,
     ):
         mock_run_safe.return_value.result.return_value = {"passed": True}
         result = sandbox.run_tests(workspace_dir="/tmp/ws")
-        
+
     assert result["passed"] is True
     mock_run_safe.assert_called_once()

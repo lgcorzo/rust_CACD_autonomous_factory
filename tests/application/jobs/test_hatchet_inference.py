@@ -37,7 +37,7 @@ def test_hatchet_inference_job_trigger(
     )
 
     with job as runner:
-        out = runner.run()
+        runner.run()
 
     # then
     # Verify that admin.run_workflow was called with correct parameters
@@ -52,6 +52,7 @@ def test_hatchet_inference_job_trigger(
     assert "loader" in workflow_input
 
     # Verify return variables
+
 
 def test_hatchet_inference_job_failure(
     mocker: pm.MockerFixture,
@@ -82,7 +83,9 @@ def test_hatchet_inference_job_failure(
     )
 
     # then
-    with patch("autogen_team.infrastructure.services.alert_service.AlertsService.notify") as mock_notify:
+    with patch(
+        "autogen_team.infrastructure.services.alert_service.AlertsService.notify"
+    ) as mock_notify:
         with pytest.raises(Exception, match="Hatchet error"):
             with job as runner:
                 runner.run()

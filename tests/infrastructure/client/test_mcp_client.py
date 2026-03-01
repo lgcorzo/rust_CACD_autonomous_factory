@@ -1,7 +1,7 @@
 """Tests for MCPClient."""
 
 import pytest
-from typing import Generator, Any, Dict, Union
+from typing import Generator
 from unittest.mock import MagicMock, patch, AsyncMock
 from autogen_team.infrastructure.client.mcp_client import MCPClient
 
@@ -94,7 +94,7 @@ async def test_mcp_client_call_tool_no_session(mcp_client: MCPClient) -> None:
 
 @pytest.mark.asyncio
 async def test_mcp_client_call_tool_runtime_error(mcp_client: MCPClient) -> None:
-    with patch.object(mcp_client, "connect", new_callable=AsyncMock) as mock_connect:
+    with patch.object(mcp_client, "connect", new_callable=AsyncMock):
         mcp_client.session = None
         with pytest.raises(RuntimeError, match="Failed to connect to MCP Server"):
             await mcp_client.call_tool("test_tool", {})

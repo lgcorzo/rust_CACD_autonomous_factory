@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict
 from unittest.mock import MagicMock, patch
 
 from autogen_team.application.mcp.tools.plan_mission import plan_mission

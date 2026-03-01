@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 from contextlib import asynccontextmanager  # Added
 from typing import AsyncGenerator, Tuple, Any  # Added
 from unittest.mock import AsyncMock, patch, MagicMock
@@ -176,7 +175,6 @@ def test_mcp_server_main_default() -> None:
     mock_run.assert_called_once()
 
 
-
 @pytest.mark.asyncio
 async def test_run_stdio() -> None:
     """Test run_stdio executes stdio_server block."""
@@ -195,10 +193,14 @@ async def test_run_stdio() -> None:
             await run_stdio()
 
         mock_server.run.assert_called_once_with("read", "write", {})
+
+
 @pytest.mark.asyncio
 async def test_call_tool_security_review() -> None:
     """Test call_tool dispatches to security_review correctly."""
-    with patch("autogen_team.application.mcp.mcp_server.security_review", new_callable=AsyncMock) as mock:
+    with patch(
+        "autogen_team.application.mcp.mcp_server.security_review", new_callable=AsyncMock
+    ) as mock:
         mock.return_value = {"review": "safe"}
         result = await handle_call_tool("security_review", {"diff": "some diff"})
     data = json.loads(result[0].text)
@@ -209,7 +211,9 @@ async def test_call_tool_security_review() -> None:
 @pytest.mark.asyncio
 async def test_call_tool_retrieve_context() -> None:
     """Test call_tool dispatches to retrieve_context correctly."""
-    with patch("autogen_team.application.mcp.mcp_server.retrieve_context", new_callable=AsyncMock) as mock:
+    with patch(
+        "autogen_team.application.mcp.mcp_server.retrieve_context", new_callable=AsyncMock
+    ) as mock:
         mock.return_value = {"context": "found"}
         result = await handle_call_tool("retrieve_context", {"query": "test query"})
     data = json.loads(result[0].text)
@@ -220,7 +224,9 @@ async def test_call_tool_retrieve_context() -> None:
 @pytest.mark.asyncio
 async def test_call_tool_index_code() -> None:
     """Test call_tool dispatches to index_code correctly."""
-    with patch("autogen_team.application.mcp.mcp_server.index_code", new_callable=AsyncMock) as mock:
+    with patch(
+        "autogen_team.application.mcp.mcp_server.index_code", new_callable=AsyncMock
+    ) as mock:
         mock.return_value = {"indexed": True}
         result = await handle_call_tool("index_code", {"file_path": "f.py", "content": "print(1)"})
     data = json.loads(result[0].text)
@@ -232,29 +238,38 @@ async def test_call_tool_index_code() -> None:
 async def test_sse_asgi_connect() -> None:
     """Test the SSE ASGI connector block."""
     from autogen_team.application.mcp.mcp_server import create_sse_app
-    
+
     # We need to mock SseServerTransport so that connect_sse returns a mock stream
     mock_sse_transport = MagicMock()
-    
+
     @asynccontextmanager
-    async def mock_connect(scope, receive, send):
+    async def mock_connect(
+        scope: Any, receive: Any, send: Any
+    ) -> AsyncGenerator[Tuple[str, str], None]:
         yield ("read_stream", "write_stream")
-        
+
     mock_sse_transport.connect_sse = mock_connect
-    
-    with patch("autogen_team.application.mcp.mcp_server.SseServerTransport", return_value=mock_sse_transport):
+
+    with patch(
+        "autogen_team.application.mcp.mcp_server.SseServerTransport",
+        return_value=mock_sse_transport,
+    ):
         app = create_sse_app()
         # Find the route that matches /sse or /sse/
         sse_mount = None
         for r in app.routes:
-            path = getattr(r, 'path', '')
-            if path.rstrip('/') == '/sse':
+            path = getattr(r, "path", "")
+            if path.rstrip("/") == "/sse":
                 sse_mount = r
                 break
-        
-        assert sse_mount is not None, f"Could not find /sse mount in routes: {[getattr(r, 'path', '') for r in app.routes]}"
+
+        assert (
+            sse_mount is not None
+        ), f"Could not find /sse mount in routes: {[getattr(r, 'path', '') for r in app.routes]}"
         sse_asgi = sse_mount.app
-        
-        with patch("autogen_team.application.mcp.mcp_server._server.run", new_callable=AsyncMock) as mock_run:
+
+        with patch(
+            "autogen_team.application.mcp.mcp_server._server.run", new_callable=AsyncMock
+        ) as mock_run:
             await sse_asgi({"type": "http"}, AsyncMock(), AsyncMock())
             mock_run.assert_called_once()

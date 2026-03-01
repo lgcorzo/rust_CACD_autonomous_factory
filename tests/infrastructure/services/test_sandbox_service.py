@@ -1,9 +1,8 @@
 import pytest
-from typing import Generator, Any
+from typing import Generator
 from unittest.mock import MagicMock, patch, AsyncMock
 from autogen_team.infrastructure.services.sandbox_service import (
     SandboxService,
-    SandboxExecutionResult,
 )
 
 

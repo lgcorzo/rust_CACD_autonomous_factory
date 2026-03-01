@@ -1,5 +1,4 @@
 import os
-import pytest
 from autogen_team.infrastructure.io.osvariables import Env
 
 
