@@ -157,11 +157,14 @@ def create_sse_app() -> Starlette:
     async def health_check(request: Request) -> Response:
         return Response(json.dumps({"status": "healthy"}), media_type="application/json")
 
+    # The updated routing logic:
     routes = [
-        Route("/", endpoint=health_check),  # Prevents the 404s we saw earlier
-        Route("/sse/", endpoint=_sse_asgi, methods=["GET"]),
-        Route("/sse/messages/", endpoint=sse.handle_post_message, methods=["POST"]),
+        # Use Route for standard HTTP GETs
+        Route("/", endpoint=health_check, methods=["GET"]),
         Route("/health", endpoint=health_check, methods=["GET"]),
+        # Use Mount for the ASGI-based MCP transport
+        Mount("/sse/", app=_sse_asgi),
+        Mount("/sse/messages/", app=sse.handle_post_message),
     ]
     return Starlette(routes=routes)
 
