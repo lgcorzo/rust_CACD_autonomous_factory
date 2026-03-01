@@ -90,6 +90,8 @@ async def test_run_tests_path_traversal(sample_changes: T.Dict[str, T.Any], tmp_
         "Path traversal detected" in result["details"]
         or "Path traversal attempt" in result["details"]
     )
+
+
 @pytest.mark.asyncio
 async def test_run_tests_delete_action(tmp_path: str) -> None:
     """Test run_tests with delete action."""
@@ -98,7 +100,7 @@ async def test_run_tests_delete_action(tmp_path: str) -> None:
     workspace.mkdir()
     test_file = workspace / "to_delete.py"
     test_file.write_text("print('delete me')")
-    
+
     changes = {
         "files_changed": [
             {
@@ -107,60 +109,69 @@ async def test_run_tests_delete_action(tmp_path: str) -> None:
             }
         ]
     }
-    
-    with patch("autogen_team.application.mcp.tools.run_tests.subprocess") as mock_sub, \
-         patch("autogen_team.application.mcp.tools.run_tests.os.remove") as mock_remove:
+
+    with (
+        patch("autogen_team.application.mcp.tools.run_tests.subprocess") as mock_sub,
+        patch("autogen_team.application.mcp.tools.run_tests.os.remove") as mock_remove,
+    ):
         mock_sub.run.return_value = MagicMock(returncode=0, stdout="ok", stderr="")
         await run_tests(changes=changes, workspace_path=str(workspace))
-    
+
     # Verify os.remove was called on the file in the sandbox
     mock_remove.assert_called_once()
     args, _ = mock_remove.call_args
     assert "to_delete.py" in args[0]
     assert "mcp_test_sandbox_" in args[0]
 
+
 @pytest.mark.asyncio
 async def test_firecracker_sandbox_run_tests_success() -> None:
     """Test FirecrackerSandbox.run_tests success path."""
     mock_service = MagicMock()
     mock_service.create_sandbox = AsyncMock(return_value="sb_123")
-    mock_service.run_python_tests = AsyncMock(return_value=MagicMock(exit_code=0, stdout="pass", stderr=""))
+    mock_service.run_python_tests = AsyncMock(
+        return_value=MagicMock(exit_code=0, stdout="pass", stderr="")
+    )
     mock_service.destroy = AsyncMock()
-    
+
     sandbox = FirecrackerSandbox(sandbox_service=mock_service)
-    
+
     # Mock loop to be not running to test run_until_complete path
-    with patch("autogen_team.application.mcp.tools.run_tests.asyncio.get_event_loop") as mock_loop_get:
+    with patch("asyncio.get_event_loop") as mock_loop_get:
         mock_loop = MagicMock()
         mock_loop.is_running.return_value = False
+
         def side_effect(coro):
             import asyncio
+
             return asyncio.run(coro)
+
         mock_loop.run_until_complete.side_effect = side_effect
         mock_loop_get.return_value = mock_loop
-        
+
         result = sandbox.run_tests(workspace_dir="/tmp/ws")
-        
+
     assert result["passed"] is True
     assert result["exit_code"] == 0
     mock_service.create_sandbox.assert_called_once()
     mock_service.destroy.assert_called_once_with("sb_123")
+
 
 @pytest.mark.asyncio
 async def test_firecracker_sandbox_run_tests_failure() -> None:
     """Test FirecrackerSandbox.run_tests error handling."""
     mock_service = MagicMock()
     mock_service.create_sandbox = AsyncMock(side_effect=Exception("Creation failed"))
-    
+
     sandbox = FirecrackerSandbox(sandbox_service=mock_service)
-    
-    with patch("autogen_team.application.mcp.tools.run_tests.asyncio.get_event_loop") as mock_loop_get:
+
+    with patch("asyncio.get_event_loop") as mock_loop_get:
         mock_loop = MagicMock()
         mock_loop.is_running.return_value = False
         mock_loop.run_until_complete.side_effect = lambda coro: asyncio.run(coro)
         mock_loop_get.return_value = mock_loop
-        
+
         result = sandbox.run_tests(workspace_dir="/tmp/ws")
-        
+
     assert result["passed"] is False
     assert "Async execution failed" in result["summary"]
