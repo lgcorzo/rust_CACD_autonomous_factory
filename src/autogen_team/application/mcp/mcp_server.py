@@ -148,23 +148,31 @@ async def run_stdio() -> None:
 
 
 def create_sse_app() -> Starlette:
-    sse = SseServerTransport("/sse/messages/")
+    # Use a relative path for the message endpoint since it will be handled within the /sse/ mount
+    sse = SseServerTransport("messages")
 
     async def _sse_asgi(scope: Scope, receive: Receive, send: Send) -> None:
+        if (
+            scope["type"] == "http"
+            and scope.get("method") == "POST"
+            and (scope["path"] == "/messages" or scope["path"].endswith("/messages"))
+        ):
+            await sse.handle_post_message(scope, receive, send)
+            return
+
         async with sse.connect_sse(scope, receive, send) as (read_stream, write_stream):
-            await _server.run(read_stream, write_stream, _server.create_initialization_options())
+            # Create initialization options using the server's helper to ensure all required fields (like capabilities) are set correctly
+            init_options = _server.create_initialization_options()
+            await _server.run(read_stream, write_stream, init_options)
 
     async def health_check(request: Request) -> Response:
         return Response(json.dumps({"status": "healthy"}), media_type="application/json")
 
-    # The updated routing logic:
+    # Use a single mount for /sse to handle both the stream and message POSTs consistently
     routes = [
-        # Use Route for standard HTTP GETs
         Route("/", endpoint=health_check, methods=["GET"]),
         Route("/health", endpoint=health_check, methods=["GET"]),
-        # Use Mount for the ASGI-based MCP transport
-        Mount("/sse/", app=_sse_asgi),
-        Mount("/sse/messages/", app=sse.handle_post_message),
+        Mount("/sse", app=_sse_asgi),
     ]
     return Starlette(routes=routes)
 
