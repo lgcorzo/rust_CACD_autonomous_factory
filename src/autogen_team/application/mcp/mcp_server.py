@@ -117,21 +117,15 @@ async def handle_call_tool(name: str, arguments: T.Dict[str, T.Any] | None) -> T
         if name == "plan_mission":
             result = await plan_mission(goal=args.get("goal", ""))
         elif name == "execute_code":
-            result = await execute_code(
-                task=args.get("task", {}), workspace_path=args.get("workspace_path", "")
-            )
+            result = await execute_code(task=args.get("task", {}), workspace_path=args.get("workspace_path", ""))
         elif name == "run_tests":
-            result = await run_tests(
-                changes=args.get("changes", {}), workspace_path=args.get("workspace_path", "")
-            )
+            result = await run_tests(changes=args.get("changes", {}), workspace_path=args.get("workspace_path", ""))
         elif name == "security_review":
             result = await security_review(diff=args.get("diff", ""))
         elif name == "retrieve_context":
             result = await retrieve_context(query=args.get("query", ""))
         elif name == "index_code":
-            result = await index_code(
-                file_path=args.get("file_path", ""), content=args.get("content", "")
-            )
+            result = await index_code(file_path=args.get("file_path", ""), content=args.get("content", ""))
         else:
             result = {"error": f"Unknown tool: {name}"}
     except Exception as e:
@@ -149,10 +143,17 @@ async def run_stdio() -> None:
 
 def create_sse_app() -> Starlette:
     sse = SseServerTransport("/sse/messages/")
+    from mcp.server.models import InitializationOptions
 
     async def _sse_asgi(scope: Scope, receive: Receive, send: Send) -> None:
         async with sse.connect_sse(scope, receive, send) as (read_stream, write_stream):
-            await _server.run(read_stream, write_stream, _server.create_initialization_options())
+            # Create initialization options with explicit endpoint to avoid path duplication
+            init_options = InitializationOptions(
+                server_name="autogen-mcp-server",
+                server_version="0.1.0",
+                capabilities=_server.get_capabilities(),
+            )
+            await _server.run(read_stream, write_stream, init_options)
 
     async def health_check(request: Request) -> Response:
         return Response(json.dumps({"status": "healthy"}), media_type="application/json")
@@ -171,9 +172,7 @@ def create_sse_app() -> Starlette:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="MCP Server")
-    parser.add_argument(
-        "--transport", choices=["stdio", "sse"], default=os.getenv("MCP_TRANSPORT", "sse")
-    )
+    parser.add_argument("--transport", choices=["stdio", "sse"], default=os.getenv("MCP_TRANSPORT", "sse"))
     # FIX: Default to 127.0.0.1 for security; added # nosec B104 to allow the 0.0.0.0 string literal
     parser.add_argument(
         "--host",
