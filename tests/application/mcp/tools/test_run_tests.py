@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as T
+from pathlib import Path
 from unittest.mock import MagicMock, patch, AsyncMock
 
 import pytest
@@ -14,7 +15,7 @@ from autogen_team.application.mcp.tools.run_tests import (
 
 
 @pytest.mark.asyncio
-async def test_run_tests_passing(sample_changes: T.Dict[str, T.Any], tmp_path: str) -> None:
+async def test_run_tests_passing(sample_changes: T.Dict[str, T.Any], tmp_path: Path) -> None:
     """Test run_tests with passing tests."""
     mock_result = MagicMock()
     mock_result.returncode = 0
@@ -30,7 +31,7 @@ async def test_run_tests_passing(sample_changes: T.Dict[str, T.Any], tmp_path: s
 
 
 @pytest.mark.asyncio
-async def test_run_tests_failing(sample_changes: T.Dict[str, T.Any], tmp_path: str) -> None:
+async def test_run_tests_failing(sample_changes: T.Dict[str, T.Any], tmp_path: Path) -> None:
     """Test run_tests with failing tests."""
     mock_result = MagicMock()
     mock_result.returncode = 1
@@ -46,7 +47,7 @@ async def test_run_tests_failing(sample_changes: T.Dict[str, T.Any], tmp_path: s
 
 
 @pytest.mark.asyncio
-async def test_run_tests_timeout(sample_changes: T.Dict[str, T.Any], tmp_path: str) -> None:
+async def test_run_tests_timeout(sample_changes: T.Dict[str, T.Any], tmp_path: Path) -> None:
     """Test run_tests handles subprocess timeout."""
     import subprocess
 
@@ -70,7 +71,7 @@ def test_subprocess_sandbox_direct() -> None:
 
 
 @pytest.mark.asyncio
-async def test_run_tests_path_traversal(sample_changes: T.Dict[str, T.Any], tmp_path: str) -> None:
+async def test_run_tests_path_traversal(sample_changes: T.Dict[str, T.Any], tmp_path: Path) -> None:
     """Test run_tests prevents path traversal."""
     changes = {
         "files_changed": [
@@ -93,7 +94,7 @@ async def test_run_tests_path_traversal(sample_changes: T.Dict[str, T.Any], tmp_
 
 
 @pytest.mark.asyncio
-async def test_run_tests_delete_action(tmp_path: str) -> None:
+async def test_run_tests_delete_action(tmp_path: Path) -> None:
     """Test run_tests with delete action."""
     # Create a file in a mock workspace
     workspace = tmp_path / "workspace"

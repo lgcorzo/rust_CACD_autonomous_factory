@@ -1,6 +1,8 @@
 """Tests for agents."""
 
 import pytest
+import typing as T
+from typing import Any
 from unittest.mock import MagicMock, patch, AsyncMock
 from autogen_team.application.agents.coder_agent import CoderAgent
 from autogen_team.application.agents.planner_agent import PlannerAgent
@@ -9,7 +11,7 @@ from autogen_team.application.agents.tester_agent import TesterAgent
 
 
 @pytest.fixture
-def mock_mcp_client(mocker):
+def mock_mcp_client(mocker: Any) -> MagicMock:
     mock_instance = mocker.MagicMock()
     mock_instance.connect = mocker.AsyncMock()
     mock_instance.disconnect = mocker.AsyncMock()
@@ -26,11 +28,11 @@ def mock_mcp_client(mocker):
     mocker.patch(
         "autogen_team.application.agents.tester_agent.MCPClient", return_value=mock_instance
     )
-    return mock_instance
+    return T.cast(MagicMock, mock_instance)
 
 
 @pytest.mark.asyncio
-async def test_coder_agent_execute_task(mock_mcp_client):
+async def test_coder_agent_execute_task(mock_mcp_client: MagicMock) -> None:
     agent = CoderAgent()
     mock_mcp_client.call_tool.return_value = {"status": "success"}
 
@@ -43,7 +45,7 @@ async def test_coder_agent_execute_task(mock_mcp_client):
 
 
 @pytest.mark.asyncio
-async def test_planner_agent_create_plan(mock_mcp_client):
+async def test_planner_agent_create_plan(mock_mcp_client: MagicMock) -> None:
     agent = PlannerAgent()
     mock_mcp_client.call_tool.return_value = {"tasks": []}
 
@@ -54,7 +56,7 @@ async def test_planner_agent_create_plan(mock_mcp_client):
 
 
 @pytest.mark.asyncio
-async def test_reviewer_agent_review_changes(mock_mcp_client):
+async def test_reviewer_agent_review_changes(mock_mcp_client: MagicMock) -> None:
     agent = ReviewerAgent()
     mock_mcp_client.call_tool.return_value = {"status": "approved", "analysis": "Looks good"}
 
@@ -66,7 +68,7 @@ async def test_reviewer_agent_review_changes(mock_mcp_client):
 
 
 @pytest.mark.asyncio
-async def test_tester_agent_run_tests(mock_mcp_client):
+async def test_tester_agent_run_tests(mock_mcp_client: MagicMock) -> None:
     agent = TesterAgent()
     mock_mcp_client.call_tool.return_value = {"status": "passed"}
 
