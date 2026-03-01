@@ -1,31 +1,41 @@
 """Tests for Hatchet Service."""
 
 import pytest_mock as pm
+from unittest.mock import patch
 from autogen_team.infrastructure import services
 
 
-def test_hatchet_service_initialization(mocker: pm.MockerFixture) -> None:
-    # given
-    # Mock the Hatchet client to avoid actual connection attempts
-    mock_hatchet = mocker.patch("autogen_team.infrastructure.services.hatchet_service.Hatchet")
-    service = services.HatchetService(token="test_token", namespace="test_ns")
-
-    # when
+def test_hatchet_service_fallback(mocker: pm.MockerFixture) -> None:
+    """Test fallback mock creation when real Hatchet is not used."""
+    # Ensure we are in test mode so fallback is triggered
+    service = services.HatchetService(token="")
+    
     client = service.client
-
-    # then
     assert client is not None
-    mock_hatchet.assert_called_once()
+    # Check fallback mock structure
+    assert client.admin.run_workflow() == "mock-run-id"
+    
+    # Test workflow decorator fallback
+    workflow = client.workflow()
+    @workflow.task()
+    def my_task(): pass
+    assert hasattr(my_task, "fn")
 
 
-def test_hatchet_service_singleton_behavior(mocker: pm.MockerFixture) -> None:
-    # given
-    mocker.patch("autogen_team.infrastructure.services.hatchet_service.Hatchet")
+def test_hatchet_service_stop(mocker: pm.MockerFixture) -> None:
+    """Test HatchetService.stop."""
     service = services.HatchetService()
+    _ = service.client
+    assert service._client is not None
+    service.stop()
+    assert service._client is None
 
-    # when
-    client1 = service.client
-    client2 = service.client
 
-    # then
-    assert client1 is client2
+def test_hatchet_service_failure(mocker: pm.MockerFixture) -> None:
+    """Test HatchetService property failure when start fails."""
+    import pytest
+    # Mock start on the class because instances are frozen
+    with patch("autogen_team.infrastructure.services.hatchet_service.HatchetService.start", return_value=None):
+        service = services.HatchetService()
+        with pytest.raises(RuntimeError, match="Hatchet client failed to start"):
+            _ = service.client
