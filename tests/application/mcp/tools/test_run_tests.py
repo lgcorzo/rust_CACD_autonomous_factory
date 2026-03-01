@@ -124,9 +124,9 @@ async def test_run_tests_delete_action(tmp_path: str) -> None:
     assert "mcp_test_sandbox_" in args[0]
 
 
-@pytest.mark.asyncio
-async def test_firecracker_sandbox_run_tests_success() -> None:
+def test_firecracker_sandbox_run_tests_success() -> None:
     """Test FirecrackerSandbox.run_tests success path."""
+    import asyncio
     mock_service = MagicMock()
     mock_service.create_sandbox = AsyncMock(return_value="sb_123")
     mock_service.run_python_tests = AsyncMock(
@@ -136,19 +136,7 @@ async def test_firecracker_sandbox_run_tests_success() -> None:
 
     sandbox = FirecrackerSandbox(sandbox_service=mock_service)
 
-    # Mock loop to be not running to test run_until_complete path
-    with patch("asyncio.get_event_loop") as mock_loop_get:
-        mock_loop = MagicMock()
-        mock_loop.is_running.return_value = False
-
-        def side_effect(coro):
-            import asyncio
-
-            return asyncio.run(coro)
-
-        mock_loop.run_until_complete.side_effect = side_effect
-        mock_loop_get.return_value = mock_loop
-
+    with patch("asyncio.get_event_loop", side_effect=asyncio.new_event_loop):
         result = sandbox.run_tests(workspace_dir="/tmp/ws")
 
     assert result["passed"] is True
@@ -157,21 +145,19 @@ async def test_firecracker_sandbox_run_tests_success() -> None:
     mock_service.destroy.assert_called_once_with("sb_123")
 
 
-@pytest.mark.asyncio
-async def test_firecracker_sandbox_run_tests_failure() -> None:
+def test_firecracker_sandbox_run_tests_failure() -> None:
     """Test FirecrackerSandbox.run_tests error handling."""
+    import asyncio
     mock_service = MagicMock()
-    mock_service.create_sandbox = AsyncMock(side_effect=Exception("Creation failed"))
+    mock_service.create_sandbox = AsyncMock(return_value="sb_123")
+    mock_service.run_python_tests = AsyncMock(side_effect=Exception("Execution failed"))
+    mock_service.destroy = AsyncMock()
 
     sandbox = FirecrackerSandbox(sandbox_service=mock_service)
 
-    with patch("asyncio.get_event_loop") as mock_loop_get:
-        mock_loop = MagicMock()
-        mock_loop.is_running.return_value = False
-        mock_loop.run_until_complete.side_effect = lambda coro: asyncio.run(coro)
-        mock_loop_get.return_value = mock_loop
-
+    with patch("asyncio.get_event_loop", side_effect=asyncio.new_event_loop):
         result = sandbox.run_tests(workspace_dir="/tmp/ws")
 
     assert result["passed"] is False
-    assert "Async execution failed" in result["summary"]
+    assert "Sandbox error" in result["summary"]
+
