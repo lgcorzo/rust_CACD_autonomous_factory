@@ -3,7 +3,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.sse import sse_client
 
 async def test_mcp():
-    async with sse_client("http://localhost:8400/sse/") as streams:
+    async with sse_client("http://localhost:8200/sse") as streams:
         async with ClientSession(streams[0], streams[1]) as session:
             await session.initialize()
             print("Connected!")
