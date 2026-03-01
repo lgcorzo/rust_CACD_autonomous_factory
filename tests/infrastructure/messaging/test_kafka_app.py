@@ -367,3 +367,90 @@ def test_main_function() -> None:
         mock_fastapi_kafka_service = MockFastAPIKafkaService.return_value
         mock_fastapi_kafka_service.start.assert_called_once()
         mock_print.assert_called()
+
+
+def test_process_message_producer_none(
+    mock_kafka_service: tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock],
+) -> None:
+    """Test _process_message when producer is None (line 215)."""
+    service, *_ = mock_kafka_service
+    service.producer = None
+    msg = MagicMock()
+    msg.value.return_value = b'{"input_data": {"col": [1]}}'
+
+    with patch("autogen_team.infrastructure.messaging.kafka_app.logger.error") as mock_logger_error:
+        service._process_message(msg)
+        mock_logger_error.assert_any_call("Kafka producer is not initialized.")
+
+
+def test_process_message_exception_on_produce(
+    mock_kafka_service: tuple[FastAPIKafkaService, MagicMock, MagicMock, MagicMock, MagicMock],
+) -> None:
+    """Test _process_message when produce raises exception (line 219)."""
+    service, *_ = mock_kafka_service
+    service.producer = MagicMock()
+    service.producer.produce.side_effect = Exception("Produce failed")
+    msg = MagicMock()
+    msg.value.return_value = b'{"input_data": {"col": [1]}}'
+
+    with patch(
+        "autogen_team.infrastructure.messaging.kafka_app.logger.exception"
+    ) as mock_logger_exception:
+        service._process_message(msg)
+        mock_logger_exception.assert_any_call("Error during Kafka production/commit:")
+
+
+def test_main_prediction_callback_numpy() -> None:
+    """Test the prediction callback inside main with numpy output."""
+    with (
+        patch("autogen_team.infrastructure.messaging.kafka_app.services.MlflowService"),
+        patch("autogen_team.infrastructure.messaging.kafka_app.CustomLoader") as MockCustomLoader,
+        patch("autogen_team.infrastructure.messaging.kafka_app.FastAPIKafkaService") as MockService,
+    ):
+        mock_model = MagicMock()
+        MockCustomLoader.return_value.load.return_value = mock_model
+
+        # Mock predict to return something with to_numpy()
+        mock_output = MagicMock()
+        mock_output.to_numpy.return_value = MagicMock(tolist=lambda: [0.5])
+        mock_model.predict.return_value = mock_output
+
+        from autogen_team.infrastructure.messaging.kafka_app import (
+            main,
+            PredictionRequest,
+            InputsSchema,
+        )
+
+        with patch.object(InputsSchema, "check", side_effect=lambda x: x):
+            main()
+
+        # Get callback
+        args, kwargs = MockService.call_args
+        callback = kwargs.get("prediction_callback") or args[0]
+
+        req = PredictionRequest(input_data={"input": ["test"]})
+        resp = callback(req)
+        assert resp.result["inference"] == [0.5]
+
+
+def test_main_prediction_callback_error() -> None:
+    """Test the prediction callback inside main when predict fails."""
+    with (
+        patch("autogen_team.infrastructure.messaging.kafka_app.services.MlflowService"),
+        patch("autogen_team.infrastructure.messaging.kafka_app.CustomLoader") as MockCustomLoader,
+        patch("autogen_team.infrastructure.messaging.kafka_app.FastAPIKafkaService") as MockService,
+    ):
+        mock_model = MagicMock()
+        MockCustomLoader.return_value.load.return_value = mock_model
+        mock_model.predict.side_effect = Exception("Predict failed")
+
+        from autogen_team.infrastructure.messaging.kafka_app import main, PredictionRequest
+
+        main()
+
+        args, kwargs = MockService.call_args
+        callback = kwargs.get("prediction_callback") or args[0]
+
+        req = PredictionRequest(input_data={"input": ["test"]})
+        resp = callback(req)
+        assert resp.result["error"] == "Prediction failed"
