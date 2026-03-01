@@ -1,6 +1,5 @@
-"""Tests for SandboxService."""
-
 import pytest
+from typing import Generator, Any
 from unittest.mock import MagicMock, patch, AsyncMock
 from autogen_team.infrastructure.services.sandbox_service import (
     SandboxService,
@@ -9,13 +8,16 @@ from autogen_team.infrastructure.services.sandbox_service import (
 
 
 @pytest.fixture
-def sandbox_service():
+def sandbox_service() -> Generator[SandboxService, None, None]:
     with patch("autogen_team.infrastructure.services.sandbox_service.E2B_AVAILABLE", True):
-        yield SandboxService(use_e2b_fallback=True)
+        service = SandboxService(use_e2b_fallback=True)
+        yield service
+        # Cleanup state
+        service.active_sandboxes.clear()
 
 
 @pytest.mark.asyncio
-async def test_create_sandbox_e2b_success(sandbox_service):
+async def test_create_sandbox_e2b_success(sandbox_service: SandboxService) -> None:
     with (
         patch(
             "autogen_team.infrastructure.services.sandbox_service.CodeInterpreter",
@@ -25,6 +27,7 @@ async def test_create_sandbox_e2b_success(sandbox_service):
         patch("autogen_team.infrastructure.services.sandbox_service.E2B_AVAILABLE", True),
     ):
         mock_sandbox = AsyncMock()
+        mock_sandbox.id = "test-id"
         mock_interpreter.create.return_value = mock_sandbox
 
         sandbox_id = await sandbox_service.create_sandbox()
@@ -35,7 +38,7 @@ async def test_create_sandbox_e2b_success(sandbox_service):
 
 
 @pytest.mark.asyncio
-async def test_create_sandbox_e2b_failure(sandbox_service):
+async def test_create_sandbox_e2b_failure(sandbox_service: SandboxService) -> None:
     with patch(
         "autogen_team.infrastructure.services.sandbox_service.CodeInterpreter", create=True
     ) as mock_interpreter:
@@ -46,7 +49,7 @@ async def test_create_sandbox_e2b_failure(sandbox_service):
 
 
 @pytest.mark.asyncio
-async def test_create_sandbox_no_fallback(sandbox_service):
+async def test_create_sandbox_no_fallback(sandbox_service: SandboxService) -> None:
     sandbox_service.use_e2b_fallback = False
     with pytest.raises(
         NotImplementedError, match="Local Firecracker integration not yet implemented"
@@ -55,7 +58,7 @@ async def test_create_sandbox_no_fallback(sandbox_service):
 
 
 @pytest.mark.asyncio
-async def test_execute_success(sandbox_service):
+async def test_execute_success(sandbox_service: SandboxService) -> None:
     mock_sandbox = MagicMock()
     mock_sandbox.notebook.exec_cell.return_value = MagicMock(
         error=None, results=[MagicMock(text="output")]
@@ -70,7 +73,7 @@ async def test_execute_success(sandbox_service):
 
 
 @pytest.mark.asyncio
-async def test_execute_error(sandbox_service):
+async def test_execute_error(sandbox_service: SandboxService) -> None:
     mock_sandbox = MagicMock()
     mock_sandbox.notebook.exec_cell.return_value = MagicMock(
         error=MagicMock(value="error"), results=[]
@@ -85,13 +88,13 @@ async def test_execute_error(sandbox_service):
 
 
 @pytest.mark.asyncio
-async def test_execute_not_found(sandbox_service):
+async def test_execute_not_found(sandbox_service: SandboxService) -> None:
     with pytest.raises(ValueError, match="Sandbox unknown not found"):
         await sandbox_service.execute("unknown", "command")
 
 
 @pytest.mark.asyncio
-async def test_destroy_success(sandbox_service):
+async def test_destroy_success(sandbox_service: SandboxService) -> None:
     mock_sandbox = AsyncMock()
     sandbox_service.active_sandboxes["test_id"] = mock_sandbox
 
@@ -102,13 +105,13 @@ async def test_destroy_success(sandbox_service):
 
 
 @pytest.mark.asyncio
-async def test_destroy_not_found(sandbox_service):
+async def test_destroy_not_found(sandbox_service: SandboxService) -> None:
     # Should not raise exception
     await sandbox_service.destroy("unknown")
 
 
 @pytest.mark.asyncio
-async def test_upload_artifact(sandbox_service):
+async def test_upload_artifact(sandbox_service: SandboxService) -> None:
     with patch("boto3.client") as mock_boto:
         mock_s3 = MagicMock()
         mock_boto.return_value = mock_s3
@@ -121,7 +124,7 @@ async def test_upload_artifact(sandbox_service):
 
 
 @pytest.mark.asyncio
-async def test_run_python_tests(sandbox_service):
+async def test_run_python_tests(sandbox_service: SandboxService) -> None:
     with patch.object(sandbox_service, "execute", new_callable=AsyncMock) as mock_execute:
         await sandbox_service.run_python_tests("test_id", "/workspace")
         mock_execute.assert_called_with("test_id", "cd /workspace && pytest")

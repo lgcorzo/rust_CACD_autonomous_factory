@@ -1,2 +1,2 @@
-def test_sanity():
+def test_sanity() -> None:
     assert True
