@@ -158,3 +158,40 @@ def test_mcp_server_main_stdio() -> None:
         mock_args.return_value = MagicMock(transport="stdio")
         main()
     mock_asyncio_run.assert_called_once()
+
+
+def test_mcp_server_main_default() -> None:
+    """Test main with no arguments defaults to sse transport."""
+    from autogen_team.application.mcp.mcp_server import main
+
+    with (
+        patch("sys.argv", ["mcp_server.py"]),
+        patch("autogen_team.application.mcp.mcp_server.create_sse_app") as mock_sse,
+        patch("uvicorn.run") as mock_run,
+    ):
+        main()
+    mock_sse.assert_called_once()
+    mock_run.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_run_stdio() -> None:
+    """Test run_stdio executes stdio_server block."""
+    from autogen_team.application.mcp.mcp_server import run_stdio
+
+    with patch("autogen_team.application.mcp.mcp_server._server") as mock_server:
+        mock_server.run = AsyncMock()
+        mock_server.create_initialization_options.return_value = {}
+
+        # We must use contextlib.asynccontextmanager to mock stdio_server
+        from contextlib import asynccontextmanager
+
+        @asynccontextmanager
+        async def mock_stdio():
+            yield ("read", "write")
+
+        with patch("autogen_team.application.mcp.mcp_server.stdio_server", mock_stdio):
+            await run_stdio()
+
+        mock_server.run.assert_called_once_with("read", "write", {})
+
