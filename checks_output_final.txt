@@ -1,0 +1,20 @@
+[1;37mpoetry check --lock[0m
+All set!
+[1;37mpoetry run ruff format --check src/ tasks/ tests/[0m
+135 files already formatted
+[1;37mpoetry run mypy src/ tasks/ tests/[0m
+Success: no issues found in 135 source files
+[1;37mpoetry run ruff check src/ tasks/ tests/[0m
+tests/application/agents/test_documentation_agent.py:48:14: F841 Local variable `mock_connect` is assigned to but never used
+   |
+46 |             "autogen_team.infrastructure.client.mcp_client.MCPClient.connect",
+47 |             new_callable=AsyncMock,
+48 |         ) as mock_connect,
+   |              ^^^^^^^^^^^^ F841
+49 |         patch(
+50 |             "autogen_team.infrastructure.client.mcp_client.MCPClient.call_tool",
+   |
+   = help: Remove assignment to unused variable `mock_connect`
+
+Found 1 error.
+No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
