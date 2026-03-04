@@ -30,6 +30,7 @@ from autogen_team.application.mcp.tools import (
     retrieve_context,
     run_tests,
     security_review,
+    generate_mission_docs,
 )
 
 # Create the MCP server instance
@@ -107,6 +108,18 @@ async def handle_list_tools() -> T.List[Tool]:
                 "required": ["file_path", "content"],
             },
         ),
+        Tool(
+            name="generate_mission_docs",
+            description="Generates Mermaid diagrams and mission summary.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "mission_id": {"type": "string"},
+                    "mission_context": {"type": "object"},
+                },
+                "required": ["mission_id", "mission_context"],
+            },
+        ),
     ]
 
 
@@ -131,6 +144,11 @@ async def handle_call_tool(name: str, arguments: T.Dict[str, T.Any] | None) -> T
         elif name == "index_code":
             result = await index_code(
                 file_path=args.get("file_path", ""), content=args.get("content", "")
+            )
+        elif name == "generate_mission_docs":
+            result = await generate_mission_docs(
+                mission_id=args.get("mission_id", ""),
+                mission_context=args.get("mission_context", {}),
             )
         else:
             result = {"error": f"Unknown tool: {name}"}
