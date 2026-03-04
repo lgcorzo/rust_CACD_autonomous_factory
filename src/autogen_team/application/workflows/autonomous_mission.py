@@ -10,6 +10,7 @@ child-workflow fan-out instead of sequential task execution.
 from typing import Any, Dict, List
 
 from autogen_team.application.agents.coder_agent import CoderAgent
+from autogen_team.application.agents.documentation_agent import DocumentationAgent
 from autogen_team.application.agents.planner_agent import PlannerAgent
 from autogen_team.application.agents.reviewer_agent import ReviewerAgent
 from autogen_team.application.agents.tester_agent import TesterAgent
@@ -170,4 +171,43 @@ async def aggregate_and_review(mission_input: MissionInput, context: Context) ->
         status=status,
         pull_request_url="https://github.com/org/repo/pull/123",
         summary=summary,
+    )
+
+
+@autonomous_mission_workflow.task(parents=[aggregate_and_review], execution_timeout="10m")
+async def document_mission(mission_input: MissionInput, context: Context) -> MissionOutput:
+    """Step 4: Generate documentation and diagrams for the mission."""
+    review_output: MissionOutput = context.task_output(aggregate_and_review)
+    plan_data = context.task_output(plan)["plan"]
+    fan_out_output = context.task_output(fan_out_tasks)
+    task_results = fan_out_output["results"]
+
+    context.log("Generating mission documentation...")
+
+    # Gather data for documentation
+    all_file_changes: list[str] = []
+    for res in task_results:
+        all_file_changes.extend(res.get("file_changes", []))
+
+    mission_context = {
+        "goal": mission_input.goal,
+        "tasks": plan_data.get("tasks", []),
+        "results": task_results,
+        "file_changes": all_file_changes,
+    }
+
+    doc_agent = DocumentationAgent()
+    doc_results = await doc_agent.generate_docs(
+        mission_id="mission-auto", mission_context=mission_context
+    )
+
+    # In a real scenario, we would save doc_results["diagrams"] to a file or wiki
+    # For now, we update the summary
+    doc_summary = doc_results.get("summary", "Documentation generated.")
+    updated_summary = f"{review_output.summary} | Documentation: {doc_summary}"
+
+    return MissionOutput(
+        status=review_output.status,
+        pull_request_url=review_output.pull_request_url,
+        summary=updated_summary,
     )

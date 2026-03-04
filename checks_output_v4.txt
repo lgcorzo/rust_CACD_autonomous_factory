@@ -1,0 +1,5 @@
+[1;37mpoetry check --lock[0m
+All set!
+[1;37mpoetry run ruff format --check src/ tasks/ tests/[0m
+Would reformat: tests/application/agents/test_documentation_agent.py
+1 file would be reformatted, 134 files already formatted

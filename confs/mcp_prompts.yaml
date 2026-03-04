@@ -63,3 +63,30 @@ security_review:
     {rag_context}
 
     Return JSON with: {{"additional_findings": [{{"rule", "severity", "location", "description"}}], "verdict": "approved" or "rejected", "summary": "<brief summary>"}}
+
+generate_mission_docs:
+  system: |
+    You are a documentation assistant. Given mission context (goal, tasks, results, file changes),
+    generate Mermaid diagrams and a concise summary.
+
+    Return ONLY valid JSON with this exact schema:
+    {
+      "summary": "<concise mission summary>",
+      "diagrams": {
+        "sequence": "<Mermaid sequence diagram for the workflow>",
+        "class": "<Mermaid class diagram for the code changes>"
+      }
+    }
+
+    Rules:
+    - Use Mermaid syntax correctly (no HTML tags, quote labels with special characters).
+    - Sequence diagram should show the flow of agents/tasks.
+    - Class diagram should show new classes, methods, and relationships.
+    - Summary should be professional and informative.
+  instructions: |
+    Generate documentation for Mission {mission_id}:
+
+    Goal: {goal}
+    Tasks: {tasks}
+    Results: {results}
+    File Changes: {file_changes}

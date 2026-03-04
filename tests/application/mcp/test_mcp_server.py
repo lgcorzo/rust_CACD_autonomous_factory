@@ -24,9 +24,9 @@ def test_create_mcp_server() -> None:
 
 @pytest.mark.asyncio
 async def test_list_tools_returns_all_tools() -> None:
-    """Test that list_tools returns all 6 tools."""
+    """Test that list_tools returns all 7 tools."""
     tools = await handle_list_tools()
-    assert len(tools) == 6
+    assert len(tools) == 7
 
     tool_names = {t.name for t in tools}
     expected = {
@@ -36,6 +36,7 @@ async def test_list_tools_returns_all_tools() -> None:
         "security_review",
         "retrieve_context",
         "index_code",
+        "generate_mission_docs",
     }
     assert tool_names == expected
 
@@ -273,3 +274,20 @@ async def test_sse_asgi_connect() -> None:
         ) as mock_run:
             await sse_asgi({"type": "http"}, AsyncMock(), AsyncMock())
             mock_run.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_call_tool_generate_mission_docs() -> None:
+    """Test call_tool dispatches to generate_mission_docs correctly."""
+    with patch(
+        "autogen_team.application.mcp.mcp_server.generate_mission_docs",
+        new_callable=AsyncMock,
+    ) as mock:
+        mock.return_value = {"summary": "Done"}
+        result = await handle_call_tool(
+            "generate_mission_docs",
+            {"mission_id": "m1", "mission_context": {}},
+        )
+    data = json.loads(result[0].text)
+    assert data["summary"] == "Done"
+    mock.assert_called_once_with(mission_id="m1", mission_context={})
