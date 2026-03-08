@@ -8,6 +8,8 @@ spec:
   selector:
     matchLabels:
       app: llmops-python-package
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -16,7 +18,7 @@ spec:
       enableServiceLinks: false
       initContainers:
         - name: wait-for-dependencies
-          image: busybox:latest
+          image: alpine:latest
           command:
             [
               "sh",
