@@ -10,3 +10,4 @@ resources:
   - opencode-configmap.yaml
   - opencode-scaledobject.yaml
   - keda-trigger-auth.yaml
+  - kafka-credentials-secret.yaml
