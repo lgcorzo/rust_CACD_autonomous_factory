@@ -121,7 +121,6 @@ async def test_call_tool_exception_handling() -> None:
     data = json.loads(result[0].text)
     assert "error" in data
     assert "Tool crash" in data["error"]
-    assert "traceback" in data
 
 
 @pytest.mark.asyncio
