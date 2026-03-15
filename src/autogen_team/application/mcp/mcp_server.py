@@ -22,6 +22,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Mount, Route
 from starlette.types import Receive, Scope, Send
+from loguru import logger
 
 from autogen_team.application.mcp.tools import (
     execute_code,
@@ -153,9 +154,8 @@ async def handle_call_tool(name: str, arguments: T.Dict[str, T.Any] | None) -> T
         else:
             result = {"error": f"Unknown tool: {name}"}
     except Exception as e:
-        import traceback
-
-        result = {"error": str(e), "traceback": traceback.format_exc()}
+        logger.exception(f"Error executing tool {name}: {e}")
+        result = {"error": "An internal error occurred while processing the request."}
 
     return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
