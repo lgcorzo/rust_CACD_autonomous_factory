@@ -86,14 +86,15 @@ async def execute_code(
             action = file_change.get("action", "create")
             file_content = file_change.get("content", "")
 
-            if action == "delete":
-                continue
-
             try:
                 full_path = safe_join(sandbox_dir, file_path)
             except ValueError as e:
                 validation_errors.append(f"Security Error: {file_path}: {e}")
                 continue
+
+            if action == "delete":
+                continue
+
             os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
             with open(full_path, "w") as f:

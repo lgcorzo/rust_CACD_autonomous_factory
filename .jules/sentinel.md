@@ -39,3 +39,8 @@
 **Vulnerability:** The `CustomSaver.Adapter` class in `mlflow_adapter.py` was capturing the `LITELLM_API_KEY` environment variable in its `__init__` method, causing the secret to be pickled into the MLflow model artifact.
 **Learning:** Even unused code in `__init__` can be dangerous if it captures secrets into the object state, as pickling serializes the entire object state.
 **Prevention:** Removed the `self.model_config` assignment. Always verify that `PythonModel` subclasses do not store secrets in `self`.
+
+## 2024-05-15 - [Path Traversal in MCP Tools]
+**Vulnerability:** The MCP tools `execute_code` and `run_tests` process a `files_changed` payload containing `action` (e.g. `create`, `delete`) and `path`. In both tools, the `action == "delete"` block did not adequately prevent path traversal because either the path validation was skipped (via an early `continue`) or exceptions were incorrectly handled/omitted for the given operation. This allowed path traversal (e.g., `../../../tmp/pwned.txt`) to bypass the `safe_join` check effectively.
+**Learning:** File path validation using `safe_join` must occur *before* evaluating any conditional logic based on the action being performed (create, read, update, delete). Furthermore, missing `try...except` blocks around `safe_join` calls inside loops can cause uncaught errors or unintended flow.
+**Prevention:** Always validate and normalize paths from untrusted input before using them in any OS-level function or conditional logic blocks, and catch exceptions appropriately per-item.
