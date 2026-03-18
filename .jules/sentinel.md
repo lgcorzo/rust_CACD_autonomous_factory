@@ -39,3 +39,8 @@
 **Vulnerability:** The `CustomSaver.Adapter` class in `mlflow_adapter.py` was capturing the `LITELLM_API_KEY` environment variable in its `__init__` method, causing the secret to be pickled into the MLflow model artifact.
 **Learning:** Even unused code in `__init__` can be dangerous if it captures secrets into the object state, as pickling serializes the entire object state.
 **Prevention:** Removed the `self.model_config` assignment. Always verify that `PythonModel` subclasses do not store secrets in `self`.
+
+## 2026-03-18 - [Information Exposure via Exception Stack Traces]
+**Vulnerability:** The MCP server's `handle_call_tool` function (`mcp_server.py`) was returning raw exception strings (`str(e)`) and full stack traces (`traceback.format_exc()`) to the client when a tool failed.
+**Learning:** Returning full tracebacks in API or server responses exposes internal implementation details (file paths, dependency versions, internal logic) which can be leveraged by attackers.
+**Prevention:** Always log the full stack trace securely on the server side using `logger.exception()`, and return a sanitized, generic error message (e.g., "An internal error occurred") to the client.
