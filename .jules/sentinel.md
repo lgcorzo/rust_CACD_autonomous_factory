@@ -39,7 +39,9 @@
 **Vulnerability:** The `CustomSaver.Adapter` class in `mlflow_adapter.py` was capturing the `LITELLM_API_KEY` environment variable in its `__init__` method, causing the secret to be pickled into the MLflow model artifact.
 **Learning:** Even unused code in `__init__` can be dangerous if it captures secrets into the object state, as pickling serializes the entire object state.
 **Prevention:** Removed the `self.model_config` assignment. Always verify that `PythonModel` subclasses do not store secrets in `self`.
-## 2025-01-20 - [Fix Path Traversal in MCP Execute Code Delete Action]
-**Vulnerability:** The execute_code tool lacked the implementation for the "delete" action, simply doing a `continue` before checking for path traversal using `safe_join`. When implemented, it could have been vulnerable to path traversal if the `safe_join` check wasn't moved before the file deletion logic, allowing arbitrary file deletion on the host.
-**Learning:** Always validate and sanitize input file paths (e.g. using `safe_join` to ensure paths remain within the intended sandbox) *before* performing any action based on the action type, including deletion.
-**Prevention:** Ensure that all file operation actions in sandbox tools (create, update, delete) process the file path through a security boundary (like `safe_join`) before executing the file system operation.
+
+## 2026-03-12 - [Information Exposure via Tracebacks in MCP Server]
+
+**Vulnerability:** The `handle_call_tool` function in the MCP server (`mcp_server.py`) was catching all exceptions and returning the raw error message along with the full stack trace (`traceback.format_exc()`) to the client. This exposes internal application details and potentially sensitive execution context.
+**Learning:** Returning raw stack traces and unhandled exception details directly to API clients or external systems violates the principle of "Fail securely". This information can be leveraged by attackers to map internal application structure, discover library versions, or uncover configuration details.
+**Prevention:** Always log full exception details (including tracebacks) server-side using secure logging frameworks (e.g., `loguru`). Return generic error messages to external clients to prevent information leakage, ensuring the application fails securely without exposing its internals.

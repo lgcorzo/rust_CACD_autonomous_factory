@@ -154,8 +154,10 @@ async def handle_call_tool(name: str, arguments: T.Dict[str, T.Any] | None) -> T
         else:
             result = {"error": f"Unknown tool: {name}"}
     except Exception as e:
-        logger.exception("Error executing tool: {}", name)
-        result = {"error": str(e)}
+        from loguru import logger
+
+        logger.exception(f"Error executing tool {name}")
+        result = {"error": "An internal error occurred while executing the tool."}
 
     return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
