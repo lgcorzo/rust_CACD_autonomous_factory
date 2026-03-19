@@ -40,20 +40,12 @@
 **Learning:** Even unused code in `__init__` can be dangerous if it captures secrets into the object state, as pickling serializes the entire object state.
 **Prevention:** Removed the `self.model_config` assignment. Always verify that `PythonModel` subclasses do not store secrets in `self`.
 
-<<<<<<< HEAD
 ## 2024-05-15 - [Path Traversal in MCP Tools]
 **Vulnerability:** The MCP tools `execute_code` and `run_tests` process a `files_changed` payload containing `action` (e.g. `create`, `delete`) and `path`. In both tools, the `action == "delete"` block did not adequately prevent path traversal because either the path validation was skipped (via an early `continue`) or exceptions were incorrectly handled/omitted for the given operation. This allowed path traversal (e.g., `../../../tmp/pwned.txt`) to bypass the `safe_join` check effectively.
 **Learning:** File path validation using `safe_join` must occur *before* evaluating any conditional logic based on the action being performed (create, read, update, delete). Furthermore, missing `try...except` blocks around `safe_join` calls inside loops can cause uncaught errors or unintended flow.
 **Prevention:** Always validate and normalize paths from untrusted input before using them in any OS-level function or conditional logic blocks, and catch exceptions appropriately per-item.
 
 ## 2026-03-12 - [Information Exposure via Tracebacks in MCP Server]
-
 **Vulnerability:** The `handle_call_tool` function in the MCP server (`mcp_server.py`) was catching all exceptions and returning the raw error message along with the full stack trace (`traceback.format_exc()`) to the client. This exposes internal application details and potentially sensitive execution context.
 **Learning:** Returning raw stack traces and unhandled exception details directly to API clients or external systems violates the principle of "Fail securely". This information can be leveraged by attackers to map internal application structure, discover library versions, or uncover configuration details.
 **Prevention:** Always log full exception details (including tracebacks) server-side using secure logging frameworks (e.g., `loguru`). Return generic error messages to external clients to prevent information leakage, ensuring the application fails securely without exposing its internals.
-=======
-## 2026-03-18 - [Information Exposure via Exception Stack Traces]
-**Vulnerability:** The MCP server's `handle_call_tool` function (`mcp_server.py`) was returning raw exception strings (`str(e)`) and full stack traces (`traceback.format_exc()`) to the client when a tool failed.
-**Learning:** Returning full tracebacks in API or server responses exposes internal implementation details (file paths, dependency versions, internal logic) which can be leveraged by attackers.
-**Prevention:** Always log the full stack trace securely on the server side using `logger.exception()`, and return a sanitized, generic error message (e.g., "An internal error occurred") to the client.
->>>>>>> origin/sentinel/fix-mcp-server-traceback-leak-7308369564347232481
