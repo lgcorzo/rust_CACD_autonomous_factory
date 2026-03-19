@@ -13,6 +13,7 @@ import os
 import typing as T
 
 import uvicorn
+from loguru import logger
 from mcp.server import Server
 from mcp.server.sse import SseServerTransport
 from mcp.server.stdio import stdio_server
@@ -155,7 +156,11 @@ async def handle_call_tool(name: str, arguments: T.Dict[str, T.Any] | None) -> T
             result = {"error": f"Unknown tool: {name}"}
     except Exception as e:
         logger.exception(f"Error executing tool {name}: {e}")
+<<<<<<< HEAD
         result = {"error": "An internal error occurred while processing the request."}
+=======
+        result = {"error": "An internal error occurred while executing the tool."}
+>>>>>>> origin/sentinel/fix-mcp-server-traceback-leak-7308369564347232481
 
     return [TextContent(type="text", text=json.dumps(result, indent=2))]
 

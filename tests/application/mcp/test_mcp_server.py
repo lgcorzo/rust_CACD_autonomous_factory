@@ -120,7 +120,11 @@ async def test_call_tool_exception_handling() -> None:
 
     data = json.loads(result[0].text)
     assert "error" in data
+<<<<<<< HEAD
     assert "An internal error occurred while processing the request." in data["error"]
+=======
+    assert "An internal error occurred" in data["error"]
+>>>>>>> origin/sentinel/fix-mcp-server-traceback-leak-7308369564347232481
     assert "traceback" not in data
 
 
