@@ -1,9 +1,0 @@
-src/autogen_team/application/agents/documentation_agent.py:29: error: Returning
-Any from function declared to return "dict[str, Any]"  [no-any-return]
-                return result
-                ^~~~~~~~~~~~~
-src/autogen_team/application/mcp/mcp_server.py:149: error: Module not callable 
-[operator]
-                result = await generate_mission_docs(
-                               ^~~~~~~~~~~~~~~~~~~~~~
-Found 2 errors in 2 files (checked 134 source files)
