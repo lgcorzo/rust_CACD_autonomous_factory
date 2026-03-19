@@ -28,7 +28,7 @@ packages = [{ include = "autogen_team", from = "src" }]
 python = ">=3.10,<3.13"
 loguru = "^0.7.2"
 matplotlib = "^3.9.0"
-mlflow = "3.5.0"
+mlflow = "3.8.0rc0"
 numpy = "^1.26.4"
 omegaconf = "^2.3.0"
 pandas = "^2.2.2"
