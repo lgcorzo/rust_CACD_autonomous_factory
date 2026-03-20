@@ -198,14 +198,22 @@ async def run_tests(
                         "exit_code": -1,
                     }
 
-                if action == "delete":
-                    if os.path.exists(full_path):
-                        os.remove(full_path)
-                    continue
+                try:
+                    if action == "delete":
+                        if os.path.exists(full_path):
+                            os.remove(full_path)
+                        continue
 
-                os.makedirs(os.path.dirname(full_path), exist_ok=True)
-                with open(full_path, "w") as f:
-                    f.write(content)
+                    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                    with open(full_path, "w") as f:
+                        f.write(content)
+                except OSError as e:
+                    return {
+                        "passed": False,
+                        "summary": f"File Operation Error on {file_path}",
+                        "details": e.strerror,
+                        "exit_code": -1,
+                    }
 
             # Run tests
             result = backend.run_tests(workspace_dir=sandbox_dir, timeout=timeout)
