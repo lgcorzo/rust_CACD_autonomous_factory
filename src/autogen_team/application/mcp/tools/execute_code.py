@@ -92,15 +92,19 @@ async def execute_code(
                 validation_errors.append(f"Security Error: {file_path}: {e}")
                 continue
 
-            if action == "delete":
-                if os.path.exists(full_path):
-                    os.remove(full_path)
+            try:
+                if action == "delete":
+                    if os.path.exists(full_path):
+                        os.remove(full_path)
+                    continue
+
+                os.makedirs(os.path.dirname(full_path), exist_ok=True)
+
+                with open(full_path, "w") as f:
+                    f.write(file_content)
+            except OSError as e:
+                validation_errors.append(f"File Operation Error on {file_path}: {e.strerror}")
                 continue
-
-            os.makedirs(os.path.dirname(full_path), exist_ok=True)
-
-            with open(full_path, "w") as f:
-                f.write(file_content)
 
             # Validate Python syntax
             if file_path.endswith(".py"):
