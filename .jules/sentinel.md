@@ -49,3 +49,8 @@
 **Vulnerability:** The `handle_call_tool` function in the MCP server (`mcp_server.py`) was catching all exceptions and returning the raw error message along with the full stack trace (`traceback.format_exc()`) to the client. This exposes internal application details and potentially sensitive execution context.
 **Learning:** Returning raw stack traces and unhandled exception details directly to API clients or external systems violates the principle of "Fail securely". This information can be leveraged by attackers to map internal application structure, discover library versions, or uncover configuration details.
 **Prevention:** Always log full exception details (including tracebacks) server-side using secure logging frameworks (e.g., `loguru`). Return generic error messages to external clients to prevent information leakage, ensuring the application fails securely without exposing its internals.
+
+## 2026-03-22 - [Information Exposure via Exception Details in MCP Tools]
+**Vulnerability:** The `execute_code` and `run_tests` MCP tools were capturing and returning `e.strerror` from `OSError` exceptions during file operations (e.g., creating/writing files). This exposed raw OS-level error messages to the client, which could leak information about the underlying filesystem structure, permissions, or system state.
+**Learning:** Returning raw OS exception strings directly to clients violates the principle of failing securely. Attackers can use these details to map out the filesystem or understand the sandbox environment's constraints.
+**Prevention:** Always return generic failure messages (e.g., "Operation failed") to clients when handling low-level exceptions like `OSError` or `IOError`. Log the detailed exception server-side for debugging purposes.
