@@ -211,7 +211,7 @@ async def run_tests(
                     return {
                         "passed": False,
                         "summary": f"File Operation Error on {file_path}",
-                        "details": e.strerror,
+                        "details": "File operation failed.",
                         "exit_code": -1,
                     }
 
