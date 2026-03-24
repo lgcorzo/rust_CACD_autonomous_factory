@@ -102,8 +102,8 @@ async def execute_code(
 
                 with open(full_path, "w") as f:
                     f.write(file_content)
-            except OSError as e:
-                validation_errors.append(f"File Operation Error on {file_path}: {e.strerror}")
+            except OSError:
+                validation_errors.append(f"File Operation Error on {file_path}")
                 continue
 
             # Validate Python syntax
