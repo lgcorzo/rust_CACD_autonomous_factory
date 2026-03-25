@@ -4,8 +4,3 @@ resources:
   - deployment.yaml
   - configmap.yaml
   - sealed-secret.yaml
-  - opencode-deployment.yaml
-  - opencode-configmap.yaml
-  - opencode-scaledobject.yaml
-  - keda-trigger-auth.yaml
-  - kafka-credentials-secret.yaml
