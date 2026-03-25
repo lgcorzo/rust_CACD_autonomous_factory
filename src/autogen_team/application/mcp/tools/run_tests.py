@@ -190,30 +190,38 @@ async def run_tests(
 
                 try:
                     full_path = safe_join(sandbox_dir, file_path)
-                except ValueError as e:
+                except ValueError:
                     return {
                         "passed": False,
-                        "summary": f"Security Error: {file_path}: {e}",
-                        "details": str(e),
+                        "summary": f"Security Error: {file_path} is an invalid path.",
+                        "details": "Path traversal detected.",
                         "exit_code": -1,
                     }
 
-                if action == "delete":
-                    if os.path.exists(full_path):
-                        os.remove(full_path)
-                    continue
+                try:
+                    if action == "delete":
+                        if os.path.exists(full_path):
+                            os.remove(full_path)
+                        continue
 
-                os.makedirs(os.path.dirname(full_path), exist_ok=True)
-                with open(full_path, "w") as f:
-                    f.write(content)
+                    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                    with open(full_path, "w") as f:
+                        f.write(content)
+                except OSError:
+                    return {
+                        "passed": False,
+                        "summary": f"File Operation Error on {file_path}",
+                        "details": "File operation failed.",
+                        "exit_code": -1,
+                    }
 
             # Run tests
             result = backend.run_tests(workspace_dir=sandbox_dir, timeout=timeout)
-        except ValueError as e:
+        except ValueError:
             return {
                 "passed": False,
-                "summary": f"Security Error: {str(e)}",
-                "details": str(e),
+                "summary": "Security Error: Invalid path detected.",
+                "details": "Path traversal detected.",
                 "exit_code": -1,
             }
 
