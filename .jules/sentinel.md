@@ -50,6 +50,10 @@
 **Learning:** Returning raw stack traces and unhandled exception details directly to API clients or external systems violates the principle of "Fail securely". This information can be leveraged by attackers to map internal application structure, discover library versions, or uncover configuration details.
 **Prevention:** Always log full exception details (including tracebacks) server-side using secure logging frameworks (e.g., `loguru`). Return generic error messages to external clients to prevent information leakage, ensuring the application fails securely without exposing its internals.
 
+## 2026-04-03 - [Information Leakage via OS Errors in MCP Tools]
+**Vulnerability:** File operations in MCP sandbox tools (`execute_code.py`, `run_tests.py`) wrapped `os` calls (`os.remove`, `os.makedirs`, `open`) in `try...except OSError` blocks but returned `e.strerror` directly to the client.
+**Learning:** Returning raw OS exception properties like `e.strerror` can leak internal paths, OS state, and system configurations. This exposes information about the underlying execution environment that could aid an attacker in targeting further exploits.
+**Prevention:** Always catch exceptions from OS operations and return a generic failure message (e.g., "File operation failed.") to the external client, keeping internal environment details confidential.
 ## 2026-03-22 - [Information Exposure via Exception Details in MCP Tools]
 **Vulnerability:** The `execute_code` and `run_tests` MCP tools were capturing and returning `e.strerror` from `OSError` exceptions during file operations (e.g., creating/writing files). This exposed raw OS-level error messages to the client, which could leak information about the underlying filesystem structure, permissions, or system state.
 **Learning:** Returning raw OS exception strings directly to clients violates the principle of failing securely. Attackers can use these details to map out the filesystem or understand the sandbox environment's constraints.
