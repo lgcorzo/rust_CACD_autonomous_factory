@@ -207,7 +207,7 @@ async def run_tests(
                     os.makedirs(os.path.dirname(full_path), exist_ok=True)
                     with open(full_path, "w") as f:
                         f.write(content)
-                except OSError as e:
+                except OSError:
                     return {
                         "passed": False,
                         "summary": f"File Operation Error on {file_path}",
