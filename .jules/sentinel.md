@@ -50,6 +50,10 @@
 **Learning:** Returning raw stack traces and unhandled exception details directly to API clients or external systems violates the principle of "Fail securely". This information can be leveraged by attackers to map internal application structure, discover library versions, or uncover configuration details.
 **Prevention:** Always log full exception details (including tracebacks) server-side using secure logging frameworks (e.g., `loguru`). Return generic error messages to external clients to prevent information leakage, ensuring the application fails securely without exposing its internals.
 
+## 2026-03-22 - [Information Exposure via Exception Details in MCP Tools]
+**Vulnerability:** The `execute_code` and `run_tests` MCP tools were capturing and returning `e.strerror` from `OSError` exceptions during file operations (e.g., creating/writing files). This exposed raw OS-level error messages to the client, which could leak information about the underlying filesystem structure, permissions, or system state.
+**Learning:** Returning raw OS exception strings directly to clients violates the principle of failing securely. Attackers can use these details to map out the filesystem or understand the sandbox environment's constraints.
+**Prevention:** Always return generic failure messages (e.g., "Operation failed") to clients when handling low-level exceptions like `OSError` or `IOError`. Log the detailed exception server-side for debugging purposes.
 ## 2025-03-21 - Leaking internal OS error strings in file operations
 **Vulnerability:** When catching `OSError` in sandbox file operations (`execute_code.py` and `run_tests.py`), the internal OS error message (`e.strerror`) was directly returned in the payload to the end user. This leaks internal OS state and specifics about the environment, failing to safely fail securely with generic error messages.
 **Learning:** Returning exception properties directly like `e.strerror` without sanitization leaks internal details to clients, which can be useful for attackers performing reconnaissance or trying to understand the sandbox environment.
