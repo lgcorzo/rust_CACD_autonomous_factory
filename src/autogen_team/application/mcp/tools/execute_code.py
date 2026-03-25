@@ -88,8 +88,8 @@ async def execute_code(
 
             try:
                 full_path = safe_join(sandbox_dir, file_path)
-            except ValueError as e:
-                validation_errors.append(f"Security Error: {file_path}: {e}")
+            except ValueError:
+                validation_errors.append(f"Security Error: {file_path} is an invalid path.")
                 continue
 
             try:
@@ -102,7 +102,7 @@ async def execute_code(
 
                 with open(full_path, "w") as f:
                     f.write(file_content)
-            except OSError as e:
+            except OSError:
                 validation_errors.append(
                     f"File Operation Error on {file_path}: File operation failed."
                 )
@@ -113,9 +113,9 @@ async def execute_code(
                 try:
                     py_compile.compile(full_path, doraise=True)
                 except py_compile.PyCompileError as e:
-                    validation_errors.append(f"{file_path}: {e}")
-    except ValueError as e:
-        validation_errors.append(f"Security Error: {str(e)}")
+                    validation_errors.append(f"{file_path}: {e.msg}")
+    except ValueError:
+        validation_errors.append("Security Error: Invalid path detected.")
     finally:
         shutil.rmtree(sandbox_dir, ignore_errors=True)
 
