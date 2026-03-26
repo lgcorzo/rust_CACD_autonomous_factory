@@ -112,8 +112,8 @@ async def execute_code(
             if file_path.endswith(".py"):
                 try:
                     py_compile.compile(full_path, doraise=True)
-                except py_compile.PyCompileError as e:
-                    validation_errors.append(f"{file_path}: {e.msg}")
+                except py_compile.PyCompileError:
+                    validation_errors.append(f"{file_path}: SyntaxError in file.")
     except ValueError:
         validation_errors.append("Security Error: Invalid path detected.")
     finally:
