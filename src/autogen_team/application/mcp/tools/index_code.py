@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import typing as T
 
+from loguru import logger
+
 import httpx
 
 from autogen_team.infrastructure.io.osvariables import Env
@@ -46,16 +48,18 @@ async def index_code(
             data = response.json()
 
     except httpx.HTTPStatusError as e:
+        logger.error(f"R2R API HTTP status error: {e.response.status_code} - {e.response.text}")
         return {
             "document_id": "",
             "status": "error",
-            "error": f"R2R API error: {e.response.status_code} - {e.response.text[:200]}",
+            "error": "R2R API error: Internal server error",
         }
     except httpx.HTTPError as e:
+        logger.error(f"R2R connection error: {type(e).__name__}: {e!s}")
         return {
             "document_id": "",
             "status": "error",
-            "error": f"R2R connection error: {type(e).__name__}: {e!s}",
+            "error": "R2R connection error: Internal server error",
         }
 
     results = data.get("results", {})
