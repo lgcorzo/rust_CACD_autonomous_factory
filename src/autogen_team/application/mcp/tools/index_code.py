@@ -5,6 +5,7 @@ from __future__ import annotations
 import typing as T
 
 import httpx
+from loguru import logger
 
 from autogen_team.infrastructure.io.osvariables import Env
 
@@ -46,16 +47,18 @@ async def index_code(
             data = response.json()
 
     except httpx.HTTPStatusError as e:
+        logger.error(f"R2R API error: {e.response.status_code} - {e.response.text[:200]}")
         return {
             "document_id": "",
             "status": "error",
-            "error": f"R2R API error: {e.response.status_code} - {e.response.text[:200]}",
+            "error": "R2R API error: An unexpected error occurred while communicating with the service.",
         }
     except httpx.HTTPError as e:
+        logger.error(f"R2R connection error: {type(e).__name__}: {e!s}")
         return {
             "document_id": "",
             "status": "error",
-            "error": f"R2R connection error: {type(e).__name__}: {e!s}",
+            "error": "R2R connection error: Could not establish a connection to the service.",
         }
 
     results = data.get("results", {})
