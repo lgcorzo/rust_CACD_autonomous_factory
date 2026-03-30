@@ -37,6 +37,10 @@ spec:
                   name: litellm-keys
                   key: master-key
                   optional: true
+            - name: OPENCODE_MODEL
+              value: "litellm/minimax-m2.7:cloud"
+            - name: OPENCODE_CONFIG
+              value: "/app/opencode.json"
           volumeMounts:
             - name: config
               mountPath: /app/opencode.json
