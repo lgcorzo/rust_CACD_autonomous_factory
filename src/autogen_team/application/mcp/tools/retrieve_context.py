@@ -7,6 +7,7 @@ import typing as T
 from loguru import logger
 
 import httpx
+from loguru import logger
 
 from autogen_team.infrastructure.io.osvariables import Env
 
