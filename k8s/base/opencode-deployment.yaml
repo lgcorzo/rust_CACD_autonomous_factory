@@ -30,15 +30,15 @@ spec:
               value: "hatchet.orchestrators.svc.cluster.local:7077"
             - name: HATCHET_CLIENT_TLS_STRATEGY
               value: "none"
-            # LiteLLM API key (if required)
+            # LiteLLM API key
             - name: LITELLM_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: litellm-keys
-                  key: master-key
+                  name: litellm-secrets
+                  key: LITELLM_MASTER_KEY
                   optional: true
             - name: OPENCODE_MODEL
-              value: "minimax-m2.7:cloud"
+              value: "litellm/minimax-m2.7:cloud"
             - name: OPENCODE_CONFIG
               value: "/app/opencode.json"
           volumeMounts:
