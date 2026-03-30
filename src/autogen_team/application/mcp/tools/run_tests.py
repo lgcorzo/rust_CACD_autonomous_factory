@@ -10,6 +10,8 @@ import sys
 import tempfile
 import typing as T
 
+from loguru import logger
+
 from autogen_team.core.security import safe_join
 
 
@@ -79,11 +81,12 @@ class SubprocessSandbox(SandboxBackend):
                 "details": "Process killed due to timeout.",
                 "exit_code": -1,
             }
-        except Exception as e:
+        except Exception:
+            logger.exception("Test execution error")
             return {
                 "passed": False,
-                "summary": f"Test execution error: {type(e).__name__}",
-                "details": str(e),
+                "summary": "Test execution error",
+                "details": "An unexpected error occurred during test execution.",
                 "exit_code": -1,
             }
 
@@ -118,11 +121,12 @@ class FirecrackerSandbox(SandboxBackend):
                     "details": result.stdout + result.stderr,
                     "exit_code": result.exit_code,
                 }
-            except Exception as e:
+            except Exception:
+                logger.exception("Sandbox error")
                 return {
                     "passed": False,
-                    "summary": f"Sandbox error: {type(e).__name__}",
-                    "details": str(e),
+                    "summary": "Sandbox error",
+                    "details": "An unexpected error occurred in the sandbox.",
                     "exit_code": -1,
                 }
             finally:
@@ -141,11 +145,12 @@ class FirecrackerSandbox(SandboxBackend):
                 )
             else:
                 return loop.run_until_complete(_run())
-        except Exception as e:
+        except Exception:
+            logger.exception("Async execution failed in sandbox")
             return {
                 "passed": False,
                 "summary": "Async execution failed in sandbox",
-                "details": str(e),
+                "details": "An unexpected error occurred during async execution.",
                 "exit_code": -1,
             }
 
