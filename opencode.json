@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "litellm/minimax-m2.7:cloud",
+  "model": "minimax-m2.7:cloud",
   "provider": {
     "litellm": {
       "npm": "@ai-sdk/openai-compatible",
