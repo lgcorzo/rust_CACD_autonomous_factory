@@ -4,3 +4,9 @@ resources:
   - deployment.yaml
   - configmap.yaml
   - sealed-secret.yaml
+  - mcp-configmap.yaml
+  - mcp-deployment.yaml
+  - opencode-deployment.yaml
+  - opencode-configmap.yaml
+  - opencode-scaledobject.yaml
+  - keda-trigger-auth.yaml
