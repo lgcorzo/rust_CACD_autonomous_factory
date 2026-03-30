@@ -24,9 +24,9 @@
     }
   },
   "permission": {
-    "bash": "deny",
-    "edit": "deny",
-    "write": "deny",
+    "bash": "allow",
+    "edit": "allow",
+    "write": "allow",
     "webfetch": "deny",
     "websearch": "deny",
     "read": "allow",
