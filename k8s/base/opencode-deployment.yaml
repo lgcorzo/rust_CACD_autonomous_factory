@@ -31,7 +31,7 @@ spec:
             - name: HATCHET_CLIENT_TLS_STRATEGY
               value: "none"
             # LiteLLM API key
-            - name: LITELLM_API_KEY
+            - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: litellm-secrets
