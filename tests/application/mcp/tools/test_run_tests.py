@@ -171,7 +171,7 @@ def test_subprocess_sandbox_exception() -> None:
     with patch("subprocess.run", side_effect=RuntimeError("Subprocess failed")):
         result = sandbox.run_tests(workspace_dir="/tmp/ws")
     assert result["passed"] is False
-    assert "RuntimeError" in result["summary"]
+    assert "Test execution error" in result["summary"]
 
 
 def test_firecracker_sandbox_run_tests_loop_running() -> None:
