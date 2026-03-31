@@ -13,7 +13,8 @@ data:
           "npm": "@ai-sdk/openai-compatible",
           "name": "LiteLLM Gateway (Dark Gravity)",
           "options": {
-            "baseURL": "http://litellm.llm-apps.svc.cluster.local/v1"
+            "baseURL": "http://litellm.llm-apps.svc.cluster.local/v1",
+            "apiKey": "REPLACE_ME_LITELLM_API_KEY"
           },
           "models": {
             "minimax-m2.7:cloud": {
