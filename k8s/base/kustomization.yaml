@@ -4,6 +4,7 @@ resources:
   - deployment.yaml
   - configmap.yaml
   - sealed-secret.yaml
+  - sealed-secret-llm-apps.yaml
   - mcp-configmap.yaml
   - mcp-deployment.yaml
   - opencode-deployment.yaml

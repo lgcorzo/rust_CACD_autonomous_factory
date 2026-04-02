@@ -24,7 +24,7 @@ spec:
             - configMapRef:
                 name: opencode-mcp-config
             - secretRef:
-                name: llmops-secrets
+                name: litellm-secrets
           resources:
             limits:
               memory: "512Mi"
