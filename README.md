@@ -1,4 +1,4 @@
-# Autogen Team
+# Autogen Team: Autonomous Agentic Core
 
 [![check.yml](https://github.com/lgcorzo/llmops-python-package/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/llmops-python-package/actions/workflows/check.yml)
 [![publish.yml](https://github.com/lgcorzo/llmops-python-package/actions/workflows/publish.yml/badge.svg)](https://github.com/lgcorzo/llmops-python-package/actions/workflows/publish.yml)
@@ -6,33 +6,39 @@
 [![License](https://img.shields.io/github/license/lgcorzo/llmops-python-package)](https://github.com/lgcorzo/llmops-python-package/blob/main/LICENCE.txt)
 [![Release](https://img.shields.io/github/v/release/lgcorzo/llmops-python-package)](https://github.com/lgcorzo/llmops-python-package/releases)
 
-**Autogen Team** is a comprehensive MLOps and Agentic Framework Python package. It is designed to streamline the lifecycle of machine learning models and AI agents, supporting tasks such as training, tuning, evaluation, promotion, and inference (both batch and realtime).
+**Autogen Team** has evolved from an MLOps library into a **Long-Term Agentic System** serving as the intelligence core for the **Dark Gravity CA/CD Autonomous Agent Factory**.
 
-Key features include:
+Built upon strict **Domain-Driven Design (DDD)** standards and solid **LLMOps principles**, this Python package provides the robust architectural foundation required to orchestrate multi-agent autonomous workloads spanning long-running software development lifecycles.
 
-- **MLops Workflow:** Managed jobs for training, tuning, and promoting models.
-- **Inference:** Support for both batch inference (via CLI), asynchronous managed inference (via Hatchet), and realtime inference (via Kafka).
-- **Orchestration:** Integrated with [Hatchet](https://hatchet.run/) for managing distributed and long-running ML workflows with built-in retries and monitoring.
-- **Agent Framework:** Integration with [AutoGen Studio](https://microsoft.github.io/autogen/) for building and managing multi-agent workflows.
-- **Autonomous AI Tools:** Standardized [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server providing tools for mission planning, code generation, sandboxed testing, and security analysis.
-- **Configuration Driven:** flexible execution using YAML configuration files.
+## 🎯 Architecture & Guiding Principles
+
+### 1. Domain-Driven Design (DDD)
+The codebase enforces strict separation of concerns to handle the deep complexity of autonomous multi-agent interactions, ensuring absolute maintainability over the long term. 
+
+- **`core/`**: Shared kernel (schemas, business-independent exceptions, security protocols).
+- **`application/`**: Orchestrates use-cases without knowing infrastructure details. Includes Hatchet **Workflows** (e.g., `autonomous_mission.py`), the **Agents** themselves, and the **MCP Server**.
+- **`infrastructure/`**: The outermost layer connecting to the world. Encompasses A2A (Agent-to-Agent) Kafka messaging protocols, Hatchet API clients, MinIO connections, and Firecracker MicroVM Sandbox Services.
+- **Bounded Contexts**: Independent domains such as `models`, `data_access`, `registry`, and `evaluation` operate with dedicated Data Adapter and Repository patterns.
+
+### 2. Solid LLMOps Foundation
+While prioritizing long-term autonomous agents, the systemic backbone uses proven LLMOps pipelines. The factory natively supports offline evaluations, asynchronous inferences, and RAG context persistence via **R2R** and **pgvector**.
+
+### 3. CA/CD Autonomous Agent Factory Integration
+Within the Dark Gravity Zero-Trust Cluster, this package drives the `opencode` workers. 
+Missions are managed through **Hatchet** (yielding durable state and parallel "fan-out" execution), utilizing **Model Context Protocol (MCP)** tools for completely automated planning, code execution in sandboxes, testing, and security scanning.
+
+---
 
 ## Table of Contents
 
-- [Autogen Team](#autogen-team)
-  - [Table of Contents](#table-of-contents)
-  - [Install](#install)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-  - [Usage](#usage)
-    - [CLI (Batch Jobs)](#cli-batch-jobs)
-    - [Asynchronous Inference (Hatchet)](#asynchronous-inference-hatchet)
-    - [Realtime Inference (Kafka)](#realtime-inference-kafka)
-    - [CA/CD Autonomous Agent Factory (OpenCode + Hatchet)](#cacd-autonomous-agent-factory-opencode--hatchet)
-  - [Configuration](#configuration)
-  - [Development](#development)
-    - [Pre-commit Hooks](#pre-commit-hooks)
-  - [Project Structure](#project-structure)
+- [Install](#install)
+- [The Agentic CA/CD Factory](#the-agentic-cacd-factory)
+- [Legacy Batch & Realtime Inference](#legacy-batch--realtime-inference)
+- [Configuration](#configuration)
+- [Development Workflow](#development-workflow)
+- [Project Structure Map](#project-structure-map)
+
+---
 
 ## Install
 
@@ -44,7 +50,6 @@ Key features include:
 ### Installation
 
 1. Clone the repository:
-
    ```bash
    git clone https://github.com/lgcorzo/llmops-python-package
    cd llmops-python-package
@@ -55,228 +60,95 @@ Key features include:
    poetry install
    ```
 
-## Usage
+---
 
-### CLI (Batch Jobs)
+## The Agentic CA/CD Factory
 
-You can execute various MLOps jobs using the `autogen_team` CLI tool. The behavior is defined by configuration files located in the `confs/` directory.
+The flagship implementation of this package is the **Autonomous Mission Workflow** which transforms software requirements into fully reviewed, production-ready Pull Requests.
+
+**Core Agentic Components:**
+- **Hatchet Workflow DSL**: `AutonomousMissionWorkflow` handles task DAG planning, fan-out execution of worker tasks in parallel (using `aio_run_many`), and aggregation/review with durable execution state.
+- **OpenCode Workers**: Dynamically scaled by **KEDA** based on Kafka queues to act as robust edge-workers executing the Hatchet flows.
+- **MCP Server (Model Context Protocol)**: Exposes a standardized suite of deep integrations to the LLMs.
+- **Zero Trust Network**: All A2A (Agent to Agent) communication is encrypted and validated dynamically via OpenZiti APIs.
+
+### Available MCP Tools for Agents:
+Driven by configuration (`confs/mcp_prompts.yaml`), the MCP exposes:
+- `plan_mission`: Break down a goal into a Task DAG (Planner Agent).
+- `execute_code`: Generate and inject code changes securely within an ephemeral Sandbox (Coder Agent).
+- `run_tests`: Run isolated test suites over PR diffs in a MicroVM (Tester Agent).
+- `security_review`: Comprehensive OWASP & RAG-backed vulnerability analysis (Reviewer Agent).
+- `retrieve_context` & `index_code`: Semantic queries over the codebase via an R2R Knowledge Graph.
+
+### Running the Agent/MCP Ecosystem Locally:
 
 ```bash
-# Run a training job
-poetry run autogen_team confs/training.yaml
-
-# Run a hyperparameter tuning job
-poetry run autogen_team confs/tuning.yaml
-
-# Run a model promotion job
-poetry run autogen_team confs/promotion.yaml
-
-# Run a batch inference job
-poetry run autogen_team confs/inference.yaml
-
-# Run evaluations
-poetry run autogen_team confs/evaluations.yaml
-
-# Run explanations (SHAP)
-poetry run autogen_team confs/explanations.yaml
-
-# Run realtime inference (Kafka)
-poetry run invoke projects.kafka
-
-# Run MCP server
+# Start the MCP Server
 poetry run invoke projects.mcp
 
-# Run with a custom configuration
+# With custom system prompts for agents:
 poetry run invoke projects.mcp --prompts=confs/mcp_prompts.yaml
 ```
 
-To see the configuration schema:
+---
 
+## Legacy Batch & Realtime Inference
+
+The package still seamlessly supports legacy MLOps topologies managed by OmegaConf configurations. 
+
+### CLI (Batch Jobs)
+```bash
+poetry run autogen_team confs/training.yaml
+poetry run autogen_team confs/evaluations.yaml
+# etc.
+```
+
+### Asynchronous & Realtime Systems
+- **Hatchet Inference**: Offload batch inference asynchronously `poetry run invoke projects.run --job hatchet_inference`
+- **Kafka Streaming**: Realtime inference streams using Docker Compose stack. Run `docker-compose up -d` (Includes Kafka, MLflow, Inference Service UI on port 8081).
+
+---
+
+## Configuration
+
+We aggressively decouple configuration from code using [OmegaConf](https://omegaconf.readthedocs.io/) and [Pydantic](https://docs.pydantic.dev/). System prompts for the Autonomous team live in `confs/mcp_prompts.yaml`, and job logic in corresponding YAML files. 
+
+Access the JSON schema for configurations:
 ```bash
 poetry run autogen_team --schema
 ```
 
-### Asynchronous Inference (Hatchet)
+---
 
-For long-running inference tasks, you can use the Hatchet-powered asynchronous execution. This job triggers a workflow in the Hatchet engine and returns immediately, allowing for independent processing.
+## Development Workflow
 
-```bash
-# Run asynchronous inference
-poetry run invoke projects.run --job hatchet_inference
-```
+Task automation is heavily driven by [Invoke](https://www.pyinvoke.org/).
 
-**Requirements:**
+- **Format**: `inv format` (Ruff)
+- **Check (Lint/Type/Test)**: `inv checks` (Mypy, Pytest, Ruff)
+- **Comprehensive Lifecycle Test**: `inv all` (E2E job orchestration, Kafka, MCP test boot)
+- **List Tasks**: `inv --list`
 
-- Hatchet SDK configuration (`HATCHET_CLIENT_TOKEN`, `HATCHET_NAMESPACE`).
-- A running Hatchet worker listening for the `InferenceWorkflow`.
-
-### Realtime Inference (Kafka)
-
-For realtime inference, the project provides a Kafka-integrated service. This is best run using Docker Compose.
-
-The service listens to an input Kafka topic, runs predictions using the "Champion" model from MLflow, and publishes results to an output topic.
-
-```bash
-docker-compose up -d
-```
-
-This will start:
-
-- **Kafka Service:** For messaging.
-- **MLflow Service:** For model registry and tracking.
-- **Inference Service:** The `autogen_team` container running the Kafka consumer/producer.
-
-**Service Configuration (in `docker-compose.yml`):**
-
-- `DEFAULT_INPUT_TOPIC`: Topic to consume data from.
-- `DEFAULT_OUTPUT_TOPIC`: Topic to produce predictions to.
-- `MLFLOW_TRACKING_URI`: URL of the MLflow server.
-
-
-
-Access the UI at `http://localhost:8081`.
-
-### CA/CD Autonomous Agent Factory (OpenCode + Hatchet)
-
-The project includes an **Autonomous Agent Workforce** that transforms mission requests into production-ready pull requests, running entirely inside a Zero Trust cluster. This uses **OpenWebUI** for mission input, **Hatchet** as the durable workflow orchestrator, and **OpenCode** agents as scaled workers.
-
-**Core Components:**
-
-- **Hatchet Workflow:** The `AutonomousMissionWorkflow` handles mission planning, fan-out execution of agent tasks, and aggregation/review with durable state management.
-- **OpenCode Workers:** Go-based agentic coding engines (`ghcr.io/anomalyco/opencode:beta`) act as Hatchet workers, scaling dynamically via **KEDA** based on Kafaka queue depth (`mission-input` and `agent-thought` topics).
-- **MCP Server (Model Context Protocol):** A consolidated Python MCP server that provides tools for mission planning, code generation, sandboxed testing, and security analysis.
-- **Zero Trust:** All agent-to-agent (A2A) traffic is encapsulated via **OpenZiti**.
-- **Model Gateway:** **LiteLLM** provides unified access to models like **Gemini Pro 2.5**.
-- **RAG & Knowledge Graph:** **R2R** with **pgvector** stores code contexts and enables semantic search for the agents.
-
-**Available MCP Tools:**
-
-- `plan_mission`: Decompose goals into task DAGs via Planner Agent.
-- `execute_code`: Generate and validate code changes via Coder Agent in a Firecracker MicroVM sandbox.
-- `run_tests`: Run isolated pytest suites via Tester Agent.
-- `security_review`: OWASP & RAG-based security analysis via Reviewer Agent.
-- `retrieve_context`: Semantic search via R2R RAG system.
-- `index_code`: Index files into the R2R knowledge graph.
-
-**Running Locally:**
-
-```bash
-# Option 1: Using Invoke (Recommended)
-poetry run invoke projects.mcp
-# Run with a custom prompts config
-poetry run invoke projects.mcp --prompts=confs/custom_prompts.yaml
-
-# Option 2: Direct execution
-poetry run python -m autogen_team.application.mcp.mcp_server
-```
-
-**Customizing Prompts:**
-The agent's system prompts and instructions are configuration-driven and can be customized in **[confs/mcp_prompts.yaml](confs/mcp_prompts.yaml)**. This allows tuning the behavior of `plan_mission`, `execute_code`, and `security_review` without code changes.
-
-**Running in Kubernetes:**
-The workers and MCP Server are deployed in the `agents` namespace.
-OpenCode pods run the worker agent, while the MCP server provides the tools via SSE transport.
-
-```bash
-kubectl apply -k k8s/base/
-```
-
-## Configuration
-
-The project uses [OmegaConf](https://omegaconf.readthedocs.io/) and [Pydantic](https://docs.pydantic.dev/) for configuration management. Configuration files are located in `confs/`.
-
-**Example `confs/training.yaml`:**
-
-```yaml
-job:
-  KIND: TrainingJob
-  inputs:
-    KIND: ParquetReader
-    path: data/inputs_train.parquet
-  targets:
-    KIND: ParquetReader
-    path: data/targets_train.parquet
-```
-
-This configuration tells the application to run a `TrainingJob` using specified Parquet files for inputs and targets.
-
-## Development
-
-This project uses [Invoke](https://www.pyinvoke.org/) for task automation.
-
-**Common Tasks:**
-
-- **Check code quality:**
-
-  ```bash
-  inv checks
-  ```
-
-  This runs linting (Ruff), formatting (Ruff), type checking (Mypy), and testing (Pytest).
-
-- **Format code:**
-
-  ```bash
-  inv format
-  ```
-
-- **Run tests:**
-
-  ```bash
-  inv checks
-  ```
-
-- **List all tasks:**
-
-  ```bash
-  inv --list
-  ```
-
-- **Run all project tasks (Orchestration):**
-
-  ```bash
-  inv all
-  ```
-
-  This orchestrates the entire lifecycle: environment setup, MLOps jobs, evaluations, the **Kafka inference service**, and the **MCP server**.
-
-- **Run app (Kafka standalone):**
-
-  ```bash
-  poetry run python src/autogen_team/controller/kafka_app.py
-  ```
-
-### Pre-commit Hooks
-
-We use pre-commit hooks to ensure code quality before committing.
-
+Ensure you install pre-commit hooks before committing:
 ```bash
 poetry run pre-commit install
 ```
 
-## Project Structure
+---
 
-```
+## Project Structure Map
+
+```text
 .
-├── confs/                  # Configuration files (YAML)
+├── confs/                  # YAML configurations (Jobs, MCP Prompts)
 ├── data/                   # Data directory (inputs/targets)
 ├── src/
 │   └── autogen_team/       # Main package source code
-│       ├── application/    # Application layer (jobs and MCP server)
-│       │   └── mcp/        # MCP Server implementation and tools
-│       ├── core/           # Shared kernel (schemas, exceptions)
-│       ├── data_access/    # Data access domain (adapters, repositories)
-│       ├── evaluation/     # Evaluation domain (metrics, services)
-│       ├── infrastructure/ # Infrastructure layer (io, services, messaging)
-│       ├── models/         # Models domain (entities, repositories)
-│       ├── registry/       # Registry domain (adapters, repositories)
-│       ├── jobs/           # Backward compatibility re-exports
-│       ├── settings.py     # Application settings
-│       └── scripts.py      # CLI entry point
-├── tasks/                  # Invoke tasks definitions
-├── tests/                  # Unit and integration tests
-├── Dockerfile              # Docker image definition
-├── docker-compose.yml      # Docker Compose configuration
-├── pyproject.toml          # Project metadata and dependencies
-└── README.md               # Project documentation
+│       ├── application/    # Application Layer: Workflows, MCP Server, Agents, Jobs
+│       ├── core/           # Core Layer: Shared schemas, common security interfaces
+│       ├── data_access/    # Bounded Context: Data adapters & repositories
+│       ├── evaluation/     # Bounded Context: Eval metrics & services
+│       ├── infrastructure/ # Infrastructure Layer: Hatchet/Minio/Kafka Integrations, Sandbox
+│       ├── models/         # Bounded Context: Model registries & entities
+│       └── registry/       # Bounded Context: Loggers and state registry
 ```
