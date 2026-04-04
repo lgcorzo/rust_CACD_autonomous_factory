@@ -15,3 +15,6 @@ async-trait = "0.1"
 hatchet-sdk = { workspace = true }
 mockall = { workspace = true }
 tokio-test = { workspace = true }
+
+[dev-dependencies]
+factory-infrastructure = { path = "../factory-infrastructure", features = ["test-utils"] }

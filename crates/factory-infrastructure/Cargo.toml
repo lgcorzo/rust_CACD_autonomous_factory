@@ -3,6 +3,9 @@ name = "factory-infrastructure"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+test-utils = []
+
 [dependencies]
 factory-core = { path = "../factory-core" }
 serde = { workspace = true }
