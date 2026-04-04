@@ -1,0 +1,23 @@
+# Task: Rust Migration Phase 1 - 3
+
+- [x] Phase 1: Complete Infrastructure Implementations
+  - [x] Update `factory-infrastructure/Cargo.toml` dependencies
+  - [x] Implement `KafkaClient` in `kafka.rs` (Stubbed)
+  - [x] Implement `S3Storage` in `s3.rs`
+  - [x] Integrate modules in `lib.rs`
+- [x] Phase 2: Implement `plan_mission` Tool & Boilerplate
+  - [x] Add `async-openai` dependency to `factory-mcp-server`
+  - [x] Create `plan_mission.rs` and port logic
+  - [x] Create `execute_code.rs` stub
+  - [x] Implement `McpServer` protocol logic in `lib.rs`
+- [/] Phase 3: Autonomous Agents (`factory-application`)
+  - [ ] Implement `McpHttpClient` in `factory-infrastructure`
+  - [ ] Define `Agent` trait in `factory-application`
+  - [ ] Port `PlannerAgent` (Rust)
+  - [ ] Port `CoderAgent` (Rust)
+  - [ ] Port `ReviewerAgent` (Rust)
+  - [ ] Port `TesterAgent` (Rust)
+  - [ ] Port `DocAgent` (Rust)
+- [ ] Verification
+  - [ ] `cargo check --workspace`
+  - [ ] Unit tests for agents mimicking MCP server

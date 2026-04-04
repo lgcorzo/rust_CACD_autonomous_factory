@@ -62,10 +62,10 @@ direction LR
 
 ### **1. User Story: Configure Model Signer**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to configure a model signer to generate the model signatures, so that I can validate input and output formats after training.
 
-**Description:**  
+**Description:**
 The `Signer` abstract class allows for creating different signing strategies for models, enabling flexibility in how signatures are generated.
 
 **Acceptance Criteria:**
@@ -77,10 +77,10 @@ The `Signer` abstract class allows for creating different signing strategies for
 
 ### **2. User Story: Generate Model Signatures**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to generate model signatures based on the input and output structures, so that I can ensure the integrity of model interfaces.
 
-**Description:**  
+**Description:**
 The `sign` method of the `Signer` class generates a model signature using the provided inputs and outputs.
 
 **Acceptance Criteria:**
@@ -92,10 +92,10 @@ The `sign` method of the `Signer` class generates a model signature using the pr
 
 ### **3. User Story: Implement Signature Inference**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to use the built-in inference capabilities to automatically generate signatures from model inputs and outputs, so I can simplify the signature generation process.
 
-**Description:**  
+**Description:**
 The `InferSigner` class provides functionality that leverages the MLflow library to automatically infer signatures based on the model's data.
 
 **Acceptance Criteria:**

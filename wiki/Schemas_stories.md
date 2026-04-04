@@ -71,7 +71,7 @@ classDiagram
         +importance: papd.Series[padt.Float32]
     }
     Schema <|-- FeatureImportancesSchema
-    
+
     %% MetadataSchema
     class MetadataSchema {
       +timestamp: papd.Series[padt.String]

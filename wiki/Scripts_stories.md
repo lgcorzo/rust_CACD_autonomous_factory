@@ -75,10 +75,10 @@ direction LR
 
 ### **1. User Story: Parse Command-Line Arguments**
 
-**Title:**  
+**Title:**
 As a **user**, I want to provide job configuration files and options via command-line arguments, so that I can execute AI/ML jobs conveniently from the terminal.
 
-**Description:**  
+**Description:**
 The CLI script parses command-line arguments to take in configuration files and other options.
 
 **Acceptance Criteria:**
@@ -90,10 +90,10 @@ The CLI script parses command-line arguments to take in configuration files and 
 
 ### **2. User Story: Display Settings Schema**
 
-**Title:**  
+**Title:**
 As a **developer**, I want to view the settings schema, so that I can understand the structure and requirements of configuration files.
 
-**Description:**  
+**Description:**
 The CLI application can output the settings schema as JSON when the `--schema` flag is used.
 
 **Acceptance Criteria:**
@@ -105,10 +105,10 @@ The CLI application can output the settings schema as JSON when the `--schema` f
 
 ### **3. User Story: Read Configuration Files**
 
-**Title:**  
+**Title:**
 As a **user**, I want the application to read configuration files in YAML or JSON, so that I can specify my job settings in a structured format.
 
-**Description:**  
+**Description:**
 The CLI script reads specified configuration files and parses their contents to configure the job properly.
 
 **Acceptance Criteria:**
@@ -120,10 +120,10 @@ The CLI script reads specified configuration files and parses their contents to 
 
 ### **4. User Story: Merge Configuration Settings**
 
-**Title:**  
+**Title:**
 As a **user**, I want to combine settings from both files and command-line strings, so that I can customize my job configurations more flexibly.
 
-**Description:**  
+**Description:**
 The CLI application merges configurations from multiple sources (files and strings) into a single config object.
 
 **Acceptance Criteria:**
@@ -135,10 +135,10 @@ The CLI application merges configurations from multiple sources (files and strin
 
 ### **5. User Story: Validate Configuration Settings**
 
-**Title:**  
+**Title:**
 As a **user**, I want to validate my configuration settings, so I can ensure they conform to the expected structure before running a job.
 
-**Description:**  
+**Description:**
 The application validates the combined configuration settings against a predefined model.
 
 **Acceptance Criteria:**
@@ -150,10 +150,10 @@ The application validates the combined configuration settings against a predefin
 
 ### **6. User Story: Execute the Job**
 
-**Title:**  
+**Title:**
 As a **user**, I want the application to execute the AI/ML job based on the provided configurations, so that I can carry out the intended operations.
 
-**Description:**  
+**Description:**
 The CLI invokes the job runner, executing the task as described by the gathered configurations.
 
 **Acceptance Criteria:**
@@ -165,10 +165,10 @@ The CLI invokes the job runner, executing the task as described by the gathered 
 
 ### **7. User Story: Handle No Configuration Provided**
 
-**Title:**  
+**Title:**
 As a **user**, I want clear feedback if no configurations are provided, so that I can correct my input and try again.
 
-**Description:**  
+**Description:**
 The application checks if any configurations have been provided and raises an error if none are present.
 
 **Acceptance Criteria:**

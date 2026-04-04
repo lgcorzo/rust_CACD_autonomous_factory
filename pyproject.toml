@@ -20,6 +20,10 @@ documentation = "https://lgcorzo.github.io/llmops-python-package/"
 autogen_team = "autogen_team.scripts:main"
 
 [tool.poetry]
+name = "autogen_team"
+version = "2.1.0"
+description = "Predict the number of autogen_team available."
+authors = ["Admin <admin@example.com>"]
 packages = [{ include = "autogen_team", from = "src" }]
 
 # DEPENDENCIES

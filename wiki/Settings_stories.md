@@ -54,13 +54,13 @@ direction LR
 
 ### **1. User Story: Configure Application Settings**
 
-**Title:**  
+**Title:**
 As an **application administrator**, I want to configure application settings, so that I can adjust how the application behaves according to different execution contexts.
 
-**Description:**  
+**Description:**
 The `Settings` class encapsulates high-level preferences for the application, allowing configurable parameters that influence job execution.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The settings class can be instantiated with various configurations needed for the application.
 - Default values are handled correctly, and the settings can be overridden.
 
@@ -68,13 +68,13 @@ The `Settings` class encapsulates high-level preferences for the application, al
 
 ### **2. User Story: Define Job Settings**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to specify the job to run within the main settings, so that I can ensure the correct job is executed based on the application's context.
 
-**Description:**  
+**Description:**
 The `MainSettings` class holds the configuration for the job to be executed, ensuring that it is readily accessible when the application runs.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The job is specified within the `MainSettings` and reflects the expected type.
 - The job configuration can be validated against the expected structure before execution.
 
@@ -82,13 +82,13 @@ The `MainSettings` class holds the configuration for the job to be executed, ens
 
 ### **3. User Story: Validate Settings Structure**
 
-**Title:**  
+**Title:**
 As a **developer**, I want to validate the application settings structure, so that I can ensure all required parameters are present and correct before the application runs.
 
-**Description:**  
+**Description:**
 The settings classes use Pydantic to automatically validate the structure of the settings against predefined schemas.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - Validation occurs at instantiation, ensuring required parameters are not missing.
 - Clear error messages are raised for any discrepancies in the settings structure.
 
@@ -96,13 +96,13 @@ The settings classes use Pydantic to automatically validate the structure of the
 
 ### **4. User Story: Separate Settings from Provider**
 
-**Title:**  
+**Title:**
 As a **developer**, I want to keep settings separate from their providers (e.g., command-line interface), so that I can maintain a clean and organized codebase.
 
-**Description:**  
+**Description:**
 By defining settings as a distinct class, the application can cleanly interface with different configuration sources (e.g., CLI, files) while keeping the settings validation and application separate.
 
-**Acceptance Criteria:**  
+**Acceptance Criteria:**
 - The settings are decoupled from the underlying logic of the application so that changes in one do not directly impact the other.
 - The architecture allows for easy swapping of settings providers without extensive code changes.
 
@@ -128,7 +128,7 @@ By defining settings as a distinct class, the application can cleanly interface 
 
 ---
 
-### **Definition of Done (DoD):** 
+### **Definition of Done (DoD):**
 
 - The `Settings` and `MainSettings` classes are fully implemented with all respective functionalities.
 - All user stories are verified through testing and meet acceptance criteria.

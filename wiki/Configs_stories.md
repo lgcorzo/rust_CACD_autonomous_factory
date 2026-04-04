@@ -58,10 +58,10 @@ classDiagram
 
 ## **1. User Story: Parse Configuration File**
 
-**Title:**  
+**Title:**
 As a **developer**, I want to parse configuration files from a specified path so that I can load application settings dynamically.
 
-**Description:**  
+**Description:**
 The `parse_file` function allows developers to load a configuration file located at a given file path. This enables flexible management of settings across various environments.
 
 **Acceptance Criteria:**
@@ -74,10 +74,10 @@ The `parse_file` function allows developers to load a configuration file located
 
 ## **2. User Story: Parse Configuration String**
 
-**Title:**  
+**Title:**
 As a **developer**, I want to parse configuration strings so that I can dynamically create configuration objects from text.
 
-**Description:**  
+**Description:**
 The `parse_string` function allows developers to create a configuration object directly from a string input. This is useful for testing or dynamically generating configurations.
 
 **Acceptance Criteria:**
@@ -90,10 +90,10 @@ The `parse_string` function allows developers to create a configuration object d
 
 ## **3. User Story: Merge Multiple Configurations**
 
-**Title:**  
+**Title:**
 As a **developer**, I want to merge multiple configuration objects so that I can combine settings from different sources into a single configuration.
 
-**Description:**  
+**Description:**
 The `merge_configs` function merges a sequence of `OmegaConf` configuration objects into one, ensuring no conflicting or redundant settings across configurations.
 
 **Acceptance Criteria:**
@@ -107,10 +107,10 @@ The `merge_configs` function merges a sequence of `OmegaConf` configuration obje
 
 ## **4. User Story: Convert Configuration to Python Object**
 
-**Title:**  
+**Title:**
 As a **developer**, I want to convert configuration objects into Python-native data structures so that I can work with them directly in my code.
 
-**Description:**  
+**Description:**
 The `to_object` function converts an `OmegaConf` configuration object into standard Python data structures like dictionaries or lists, enabling easy interaction and manipulation.
 
 **Acceptance Criteria:**

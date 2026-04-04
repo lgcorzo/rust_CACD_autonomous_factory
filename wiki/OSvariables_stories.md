@@ -52,10 +52,10 @@ classDiagram
 
 ### **1. User Story: Centralized Environment Configuration**
 
-**Title:**  
+**Title:**
 As a **developer**, I want a centralized and reusable way to manage environment variables and configuration settings so that I can ensure consistent behavior across the application.
 
-**Description:**  
+**Description:**
 The `Env` class combines the Singleton pattern and Pydantic's `BaseSettings` to create a single shared instance for managing environment-specific configurations. It ensures that environment variables are accessible, validated, and loaded from a `.env` file if available.
 
 **Acceptance Criteria:**
@@ -77,10 +77,10 @@ The `Env` class combines the Singleton pattern and Pydantic's `BaseSettings` to 
 
 ### **2. User Story: Ensure Consistent MLflow Configuration**
 
-**Title:**  
+**Title:**
 As a **machine learning engineer**, I want to configure MLflow settings (tracking URI, registry URI, experiment name, etc.) in a single place so that I can easily manage and update them without code duplication.
 
-**Description:**  
+**Description:**
 The `Env` class provides default and customizable values for MLflow-related configurations. It ensures that all MLflow components use the same settings consistently, reducing potential misconfigurations.
 
 **Acceptance Criteria:**

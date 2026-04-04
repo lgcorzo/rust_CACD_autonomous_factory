@@ -212,7 +212,7 @@ class BaselineAutogenModel(Model):
 
         # Load the client
         self._model_client = OpenAIChatClient(
-            model_id=model_id,
+            model=model_id,
             api_key=api_key,
             base_url=api_base,
         )

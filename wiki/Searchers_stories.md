@@ -86,10 +86,10 @@ direction LR
 
 ### **1. User Story: Configure Searcher**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to configure a hyperparameter searcher with a parameter grid, so that I can optimize the performance of my machine learning model.
 
-**Description:**  
+**Description:**
 The `Searcher` class serves as a base for defining parameter grids used in hyperparameter tuning, allowing customization of search strategies.
 
 **Acceptance Criteria:**
@@ -101,10 +101,10 @@ The `Searcher` class serves as a base for defining parameter grids used in hyper
 
 ### **2. User Story: Execute Hyperparameter Search**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to execute a hyperparameter search using the configured searcher, so that I can find the optimal hyperparameters for my model.
 
-**Description:**  
+**Description:**
 The `search` method of a searcher class (e.g., `GridCVSearcher`) is called to perform the hyperparameter optimization process.
 
 **Acceptance Criteria:**
@@ -116,10 +116,10 @@ The `search` method of a searcher class (e.g., `GridCVSearcher`) is called to pe
 
 ### **3. User Story: Collect Search Results**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to collect the results from the hyperparameter search, so that I can analyze the performance of different hyperparameter configurations.
 
-**Description:**  
+**Description:**
 The results from the search include a DataFrame with cross-validation scores and other relevant metrics.
 
 **Acceptance Criteria:**
@@ -131,10 +131,10 @@ The results from the search include a DataFrame with cross-validation scores and
 
 ### **4. User Story: Identify Best Hyperparameters**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to identify the best-performing hyperparameters from the search results, so that I can finalize my model configuration.
 
-**Description:**  
+**Description:**
 The searcher should return the best score and the corresponding hyperparameters after completing the search.
 
 **Acceptance Criteria:**
