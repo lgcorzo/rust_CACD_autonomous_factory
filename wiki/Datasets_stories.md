@@ -82,10 +82,10 @@ classDiagram
 
 ### **1. User Story: Load Dataset into Memory**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to load datasets into memory using a standardized reader so that I can access the data for analysis and model training.
 
-**Description:**  
+**Description:**
 The `Reader` class provides a base implementation for loading datasets into a Pandas DataFrame from various sources (e.g., files, databases, or cloud storage). This ensures consistent data handling across the project.
 
 **Acceptance Criteria:**
@@ -99,10 +99,10 @@ The `Reader` class provides a base implementation for loading datasets into a Pa
 
 ### **2. User Story: Generate Lineage Information**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to generate lineage information for datasets so that I can track their origin and transformations for compliance and debugging purposes.
 
-**Description:**  
+**Description:**
 The `lineage` method generates metadata describing the dataset's origin, target columns, and prediction columns. This enables better tracking and reproducibility in the machine learning workflow.
 
 **Acceptance Criteria:**
@@ -155,10 +155,10 @@ The `lineage` method generates metadata describing the dataset's origin, target 
 
 ### **1. User Story: Load DataFrame from Parquet File**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to load datasets stored in Parquet format into a Pandas DataFrame so that I can analyze and process them in memory.
 
-**Description:**  
+**Description:**
 The `ParquetReader` class provides functionality to read data from Parquet files and return it as a Pandas DataFrame. It ensures compatibility with modern data storage formats and supports optional row limits.
 
 **Acceptance Criteria:**
@@ -172,10 +172,10 @@ The `ParquetReader` class provides functionality to read data from Parquet files
 
 ### **2. User Story: Generate Lineage Metadata for Parquet Datasets**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to generate lineage metadata for datasets read from Parquet files so that I can track their origin and ensure reproducibility.
 
-**Description:**  
+**Description:**
 The `lineage` method generates metadata describing the dataset's source, name, and optional target or prediction columns. This metadata integrates with lineage tracking tools for debugging and audit trails.
 
 **Acceptance Criteria:**
@@ -246,10 +246,10 @@ The `lineage` method generates metadata describing the dataset's source, name, a
 
 ### **1. User Story: Save DataFrame to Storage**
 
-**Title:**  
+**Title:**
 As a **data engineer**, I want to save a Pandas DataFrame to a specified location so that I can persist my data for later use or sharing.
 
-**Description:**  
+**Description:**
 The `Writer` base class defines an abstract interface for saving datasets to various storage backends (e.g., file systems, databases, cloud storage). Implementations of this class, like the `ParquetWriter`, provide specific functionality to save data in a defined format.
 
 **Acceptance Criteria:**
@@ -262,10 +262,10 @@ The `Writer` base class defines an abstract interface for saving datasets to var
 
 ### **2. User Story: Save DataFrame to Parquet Format**
 
-**Title:**  
+**Title:**
 As a **data scientist**, I want to save a Pandas DataFrame as a Parquet file so that I can efficiently store and retrieve large datasets.
 
-**Description:**  
+**Description:**
 The `ParquetWriter` class provides functionality to save a DataFrame in Parquet format to a local or remote path. This ensures compatibility with modern analytics workflows and data pipelines.
 
 **Acceptance Criteria:**

@@ -11,7 +11,7 @@ job:
   splitter:
     KIND: TimeSeriesSplitter
     n_splits: 2
-    test_size: 1 
+    test_size: 1
   model:
     KIND: BaselineAutogenModel
     model_config_path: "${tests_path:}/confs/valid/model_config.json"

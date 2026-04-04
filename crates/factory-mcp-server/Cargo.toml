@@ -1,0 +1,20 @@
+[package]
+name = "factory-mcp-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+factory-core = { path = "../factory-core" }
+axum = { version = "0.7" }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+async-trait = "0.1"
+reqwest = { version = "0.11", features = ["json"] }
+futures = "0.3"
+tower-http = { version = "0.5", features = ["cors"] }
+uuid = { workspace = true }
+dotenv = "0.15"
+async-openai = "0.23"

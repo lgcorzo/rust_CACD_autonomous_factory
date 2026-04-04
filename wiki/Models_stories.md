@@ -98,10 +98,10 @@ classDiagram
 
 ### **1. User Story: Configure Baseline Autogen Model**
 
-**Title:**  
+**Title:**
 As a **machine learning engineer**, I want to configure the `BaselineAutogenModel` with settings like maximum tokens and temperature, so that I can control the generation of text by the Autogen agent.
 
-**Description:**  
+**Description:**
 The `BaselineAutogenModel` class allows configuration of parameters such as `max_tokens` and `temperature`, influencing the text generation process of the Autogen agent.
 
 **Acceptance Criteria:**

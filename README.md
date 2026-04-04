@@ -13,7 +13,7 @@ Built upon strict **Domain-Driven Design (DDD)** standards and solid **LLMOps pr
 ## 🎯 Architecture & Guiding Principles
 
 ### 1. Domain-Driven Design (DDD)
-The codebase enforces strict separation of concerns to handle the deep complexity of autonomous multi-agent interactions, ensuring absolute maintainability over the long term. 
+The codebase enforces strict separation of concerns to handle the deep complexity of autonomous multi-agent interactions, ensuring absolute maintainability over the long term.
 
 - **`core/`**: Shared kernel (schemas, business-independent exceptions, security protocols).
 - **`application/`**: Orchestrates use-cases without knowing infrastructure details. Includes Hatchet **Workflows** (e.g., `autonomous_mission.py`), the **Agents** themselves, and the **MCP Server**.
@@ -24,7 +24,7 @@ The codebase enforces strict separation of concerns to handle the deep complexit
 While prioritizing long-term autonomous agents, the systemic backbone uses proven LLMOps pipelines. The factory natively supports offline evaluations, asynchronous inferences, and RAG context persistence via **R2R** and **pgvector**.
 
 ### 3. CA/CD Autonomous Agent Factory Integration
-Within the Dark Gravity Zero-Trust Cluster, this package drives the `opencode` workers. 
+Within the Dark Gravity Zero-Trust Cluster, this package drives the `opencode` workers.
 Missions are managed through **Hatchet** (yielding durable state and parallel "fan-out" execution), utilizing **Model Context Protocol (MCP)** tools for completely automated planning, code execution in sandboxes, testing, and security scanning.
 
 ---
@@ -94,7 +94,7 @@ poetry run invoke projects.mcp --prompts=confs/mcp_prompts.yaml
 
 ## Legacy Batch & Realtime Inference
 
-The package still seamlessly supports legacy MLOps topologies managed by OmegaConf configurations. 
+The package still seamlessly supports legacy MLOps topologies managed by OmegaConf configurations.
 
 ### CLI (Batch Jobs)
 ```bash
@@ -111,7 +111,7 @@ poetry run autogen_team confs/evaluations.yaml
 
 ## Configuration
 
-We aggressively decouple configuration from code using [OmegaConf](https://omegaconf.readthedocs.io/) and [Pydantic](https://docs.pydantic.dev/). System prompts for the Autonomous team live in `confs/mcp_prompts.yaml`, and job logic in corresponding YAML files. 
+We aggressively decouple configuration from code using [OmegaConf](https://omegaconf.readthedocs.io/) and [Pydantic](https://docs.pydantic.dev/). System prompts for the Autonomous team live in `confs/mcp_prompts.yaml`, and job logic in corresponding YAML files.
 
 Access the JSON schema for configurations:
 ```bash
