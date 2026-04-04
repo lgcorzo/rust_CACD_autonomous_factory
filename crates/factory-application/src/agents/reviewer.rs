@@ -1,14 +1,15 @@
 use async_trait::async_trait;
 use serde_json::{json, Value};
-use factory_infrastructure::McpHttpClient;
+use std::sync::Arc;
+use factory_infrastructure::McpClient;
 use crate::Agent;
 
 pub struct ReviewerAgent {
-    mcp_client: McpHttpClient,
+    mcp_client: Arc<dyn McpClient>,
 }
 
 impl ReviewerAgent {
-    pub fn new(mcp_client: McpHttpClient) -> Self {
+    pub fn new(mcp_client: Arc<dyn McpClient>) -> Self {
         Self { mcp_client }
     }
 }
@@ -20,12 +21,18 @@ impl Agent for ReviewerAgent {
     }
 
     async fn execute(&self, task_description: &str) -> anyhow::Result<Value> {
-        tracing::info!("[ReviewerAgent] Reviewing changes: {}", task_description);
+        self.review_changes(task_description).await
+    }
+}
+
+impl ReviewerAgent {
+    pub async fn review_changes(&self, diff: &str) -> anyhow::Result<Value> {
+        tracing::info!("[ReviewerAgent] Reviewing changes: {}", diff);
         
-        let result = self.mcp_client.call_tool(
+        let result = self.mcp_client.call_tool_json(
             "security_review",
             json!({ 
-                "diff": task_description 
+                "diff": diff 
             })
         ).await?;
         

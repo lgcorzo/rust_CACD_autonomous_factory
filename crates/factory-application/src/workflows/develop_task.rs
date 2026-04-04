@@ -2,7 +2,8 @@ use hatchet_sdk::workflow::Workflow;
 use hatchet_sdk::Context;
 use serde::{Deserialize, Serialize};
 use crate::agents::CoderAgent;
-use factory_infrastructure::McpHttpClient;
+use crate::Agent;
+use factory_infrastructure::{McpHttpClient, McpClient};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TaskInput {
@@ -30,10 +31,10 @@ impl DevelopTaskWorkflow {
 impl DevelopTaskWorkflow {
     #[hatchet_sdk::step(name = "execute_coding_task", timeout = "15m")]
     pub async fn execute_coding_task(&self, ctx: Context<TaskInput>) -> anyhow::Result<TaskOutput> {
-        let input = ctx.input();
+        let input = &ctx.workflow_input;
         tracing::info!("Workflow: executing task {}", input.task_id);
         
-        let mcp_client = McpHttpClient::new(self.mcp_url.clone());
+        let mcp_client = std::sync::Arc::new(McpHttpClient::new(self.mcp_url.clone()));
         let coder = CoderAgent::new(mcp_client);
         
         let result = coder.execute(&input.description).await?;

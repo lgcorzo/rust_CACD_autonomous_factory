@@ -84,3 +84,73 @@ impl McpServer {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tools::MockTool;
+    use crate::protocol::CallToolResult;
+
+    #[tokio::test]
+    async fn test_list_tools() {
+        let server = McpServer::new();
+        let mut mock_tool = MockTool::new();
+        mock_tool.expect_name().return_const("test_tool".to_string());
+        mock_tool.expect_description().return_const("A test tool".to_string());
+        mock_tool.expect_input_schema().return_const(json!({}));
+
+        server.add_tool(Box::new(mock_tool)).await;
+
+        let request = JsonRpcRequest {
+            jsonrpc: "2.0".to_string(),
+            method: "list_tools".to_string(),
+            params: None,
+            id: Some(json!(1)),
+        };
+
+        let response = server.handle_request(request).await;
+        assert!(response.result.is_some());
+        let result_val = response.result.unwrap();
+        let tools = result_val["tools"].as_array().unwrap();
+        assert_eq!(tools.len(), 1);
+        assert_eq!(tools[0]["name"], "test_tool");
+    }
+
+    #[tokio::test]
+    async fn test_call_tool_not_found() {
+        let server = McpServer::new();
+        let request = JsonRpcRequest {
+            jsonrpc: "2.0".to_string(),
+            method: "call_tool".to_string(),
+            params: Some(json!({ "name": "unknown" })),
+            id: Some(json!(1)),
+        };
+
+        let response = server.handle_request(request).await;
+        assert!(response.error.is_some());
+        assert_eq!(response.error.unwrap().message, "Tool not found");
+    }
+
+    #[tokio::test]
+    async fn test_call_tool_success() {
+        let server = McpServer::new();
+        let mut mock_tool = MockTool::new();
+        mock_tool.expect_name().return_const("test_tool".to_string());
+        mock_tool.expect_call().returning(|_| Ok(CallToolResult {
+            content: vec![],
+            is_error: false,
+        }));
+
+        server.add_tool(Box::new(mock_tool)).await;
+
+        let request = JsonRpcRequest {
+            jsonrpc: "2.0".to_string(),
+            method: "call_tool".to_string(),
+            params: Some(json!({ "name": "test_tool", "arguments": {} })),
+            id: Some(json!(1)),
+        };
+
+        let response = server.handle_request(request).await;
+        assert!(response.result.is_some());
+    }
+}

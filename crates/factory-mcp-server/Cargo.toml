@@ -18,3 +18,6 @@ tower-http = { version = "0.5", features = ["cors"] }
 uuid = { workspace = true }
 dotenv = "0.15"
 async-openai = "0.23"
+regex = "1.10"
+mockall = { workspace = true }
+tokio-test = { workspace = true }
