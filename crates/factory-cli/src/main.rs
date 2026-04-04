@@ -21,9 +21,7 @@ enum Commands {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
-        .init();
+    tracing_subscriber::fmt::init();
 
     let cli = Cli::parse();
 
@@ -31,15 +29,18 @@ async fn main() -> anyhow::Result<()> {
         Commands::Worker { mcp_url } => {
             tracing::info!("Starting Hatchet worker...");
             
-            let mut worker = Worker::new().await?;
+            let hatchet = hatchet_sdk::clients::hatchet::Hatchet::from_env().await?;
+            let mut worker = hatchet.worker("factory-worker")
+                .slots(10)
+                .build()
+                .unwrap();
             
             // Register workflows
-            let hatchet = worker.client.clone();
             let mission_wf = factory_application::workflows::create_mission_workflow(&hatchet, mcp_url.clone());
             let task_wf = factory_application::workflows::create_develop_task_workflow(&hatchet, mcp_url);
             
-            worker.add_task_or_workflow(&mission_wf);
-            worker.add_task_or_workflow(&task_wf);
+            worker = hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &mission_wf);
+            worker = hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &task_wf);
             
             worker.start().await?;
         }

@@ -39,7 +39,8 @@ pub fn create_mission_workflow(hatchet: &Hatchet, mcp_url: String) -> Workflow<M
         let mcp_url = mcp_url_clone.clone();
         let hatchet = hatchet_clone.clone();
         Box::pin(async move {
-            let plan: serde_json::Value = ctx.parent_output("plan").await?;
+            let plan_val: serde_json::Value = ctx.parent_output("plan").await?;
+            let plan: serde_json::Value = serde_json::from_value(plan_val)?;
             let tasks = plan["tasks"].as_array().ok_or(anyhow::anyhow!("No tasks in plan"))?;
             
             let dev_wf = create_develop_task_workflow(&hatchet, mcp_url);
@@ -59,16 +60,17 @@ pub fn create_mission_workflow(hatchet: &Hatchet, mcp_url: String) -> Workflow<M
             Ok(serde_json::Value::Array(results))
         })
     })
-    .add_parent(&plan_task)
     .build()
-    .unwrap();
+    .unwrap()
+    .add_parent(&plan_task);
 
     // 3. Review Task
     let mcp_url_clone = mcp_url.clone();
     let review_task = hatchet.task("review", move |_input: MissionInput, ctx| {
         let mcp_url = mcp_url_clone.clone();
         Box::pin(async move {
-            let results: serde_json::Value = ctx.parent_output("fan_out").await?;
+            let results_val: serde_json::Value = ctx.parent_output("fan_out").await?;
+            let results: serde_json::Value = serde_json::from_value(results_val)?;
             
             let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
             let tester = TesterAgent::new(mcp_client.clone());
@@ -89,16 +91,17 @@ pub fn create_mission_workflow(hatchet: &Hatchet, mcp_url: String) -> Workflow<M
             })
         })
     })
-    .add_parent(&fan_out_task)
     .build()
-    .unwrap();
+    .unwrap()
+    .add_parent(&fan_out_task);
 
     // 4. Documentation Task
     let mcp_url_clone = mcp_url.clone();
     let doc_task = hatchet.task("document", move |_input: MissionInput, ctx| {
         let mcp_url = mcp_url_clone.clone();
         Box::pin(async move {
-            let review_output: MissionOutput = ctx.parent_output("review").await?;
+            let review_val: serde_json::Value = ctx.parent_output("review").await?;
+            let review_output: MissionOutput = serde_json::from_value(review_val)?;
             
             let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
             let doc_agent = DocAgent::new(mcp_client);
@@ -108,16 +111,16 @@ pub fn create_mission_workflow(hatchet: &Hatchet, mcp_url: String) -> Workflow<M
             Ok(review_output)
         })
     })
-    .add_parent(&review_task)
     .build()
-    .unwrap();
+    .unwrap()
+    .add_parent(&review_task);
 
     // Build the workflow
     hatchet.workflow("AutonomousMission")
+        .build()
+        .unwrap()
         .add_task(&plan_task)
         .add_task(&fan_out_task)
         .add_task(&review_task)
         .add_task(&doc_task)
-        .build()
-        .unwrap()
 }

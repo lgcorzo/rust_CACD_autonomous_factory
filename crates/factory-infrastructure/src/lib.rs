@@ -18,5 +18,5 @@ pub mod mcp_client;
 pub use kafka::SimpleMockKafkaClient;
 pub use s3::AwsS3Storage;
 pub use mcp_client::{McpClient, McpHttpClient};
-#[cfg(test)]
+#[cfg(any(test, feature = "test-utils"))]
 pub use mcp_client::MockMcpClient;

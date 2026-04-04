@@ -3,7 +3,7 @@ use serde_json::{json, Value};
 use reqwest::Client;
 use anyhow::{anyhow, Result};
 
-#[cfg_attr(test, mockall::automock)]
+#[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait::async_trait]
 pub trait McpClient: Send + Sync {
     async fn call_tool_json(&self, name: &str, arguments: Value) -> anyhow::Result<Value>;

@@ -1,8 +1,0 @@
-# https://docs.pyinvoke.org/en/latest/index.html
-
-run:
-  echo: true
-project:
-  name: autogen_team
-  package: autogen_team
-  repository: autogen_team
