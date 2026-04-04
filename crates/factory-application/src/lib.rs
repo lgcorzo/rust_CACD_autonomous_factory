@@ -8,3 +8,4 @@ pub trait Agent: Send + Sync {
 }
 
 pub mod agents;
+pub mod workflows;
