@@ -2,7 +2,8 @@ use hatchet_sdk::workflow::Workflow;
 use hatchet_sdk::Context;
 use serde::{Deserialize, Serialize};
 use crate::agents::{PlannerAgent, ReviewerAgent, TesterAgent, DocAgent};
-use factory_infrastructure::McpHttpClient;
+use crate::Agent;
+use factory_infrastructure::{McpHttpClient, McpClient};
 use crate::workflows::develop_task::TaskInput;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -31,10 +32,10 @@ impl AutonomousMissionWorkflow {
 impl AutonomousMissionWorkflow {
     #[hatchet_sdk::step(name = "plan", timeout = "5m")]
     pub async fn plan(&self, ctx: Context<MissionInput>) -> anyhow::Result<serde_json::Value> {
-        let input = ctx.input();
+        let input = &ctx.workflow_input;
         tracing::info!("Workflow: planning mission for {}", input.goal);
         
-        let mcp_client = McpHttpClient::new(self.mcp_url.clone());
+        let mcp_client = std::sync::Arc::new(McpHttpClient::new(self.mcp_url.clone()));
         let planner = PlannerAgent::new(mcp_client);
         
         let plan = planner.execute(&input.goal).await?;
@@ -43,12 +44,13 @@ impl AutonomousMissionWorkflow {
 
     #[hatchet_sdk::step(name = "fan_out_tasks", parents = ["plan"], timeout = "30m")]
     pub async fn fan_out_tasks(&self, ctx: Context<MissionInput>) -> anyhow::Result<serde_json::Value> {
+        let input = &ctx.workflow_input;
         let plan: serde_json::Value = ctx.step_output("plan")?;
         let tasks = plan["tasks"].as_array().ok_or(anyhow::anyhow!("No tasks in plan"))?;
         
         tracing::info!("Workflow: fanning out {} tasks", tasks.len());
         
-        let mut child_runs = Vec::new();
+        let mut child_runs: Vec<hatchet_sdk::workflow_run::ChildRunHandle<serde_json::Value>> = Vec::new();
         for task in tasks {
             let child_input = TaskInput {
                 task_id: task["id"].as_str().unwrap_or("unknown").to_string(),
@@ -56,20 +58,18 @@ impl AutonomousMissionWorkflow {
                 relevant_files: vec![], // Simplified
             };
             
-            // In Rust SDK we use spawn_child equivalent
             let child_run = ctx.spawn_child::<TaskInput, serde_json::Value>(
                 "DevelopTaskWorkflow",
                 child_input,
-                None, // No key
+                None,
             ).await?;
             
             child_runs.push(child_run);
         }
         
-        // Wait for all child runs
         let mut results = Vec::new();
         for mut run in child_runs {
-            let result = run.result().await?;
+            let result: serde_json::Value = run.result().await?;
             results.push(result);
         }
         
@@ -78,10 +78,11 @@ impl AutonomousMissionWorkflow {
 
     #[hatchet_sdk::step(name = "aggregate_and_review", parents = ["fan_out_tasks"], timeout = "15m")]
     pub async fn aggregate_and_review(&self, ctx: Context<MissionInput>) -> anyhow::Result<MissionOutput> {
+        let input = &ctx.workflow_input;
         let results: serde_json::Value = ctx.step_output("fan_out_tasks")?;
         tracing::info!("Workflow: aggregating results and reviewing");
         
-        let mcp_client = McpHttpClient::new(self.mcp_url.clone());
+        let mcp_client = std::sync::Arc::new(McpHttpClient::new(self.mcp_url.clone()));
         let tester = TesterAgent::new(mcp_client.clone());
         let reviewer = ReviewerAgent::new(mcp_client);
         
@@ -102,10 +103,11 @@ impl AutonomousMissionWorkflow {
 
     #[hatchet_sdk::step(name = "document_mission", parents = ["aggregate_and_review"], timeout = "10m")]
     pub async fn document_mission(&self, ctx: Context<MissionInput>) -> anyhow::Result<MissionOutput> {
+        let input = &ctx.workflow_input;
         let review_output: MissionOutput = ctx.step_output("aggregate_and_review")?;
         tracing::info!("Workflow: documenting mission");
         
-        let mcp_client = McpHttpClient::new(self.mcp_url.clone());
+        let mcp_client = std::sync::Arc::new(McpHttpClient::new(self.mcp_url.clone()));
         let doc_agent = DocAgent::new(mcp_client);
         
         let _ = doc_agent.execute("Generate final report").await?;

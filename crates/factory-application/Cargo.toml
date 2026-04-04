@@ -12,3 +12,6 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 anyhow = { workspace = true }
 async-trait = "0.1"
+hatchet-sdk = { workspace = true }
+mockall = { workspace = true }
+tokio-test = { workspace = true }
