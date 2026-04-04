@@ -1,5 +1,6 @@
-use hatchet_sdk::workflow::Workflow;
-use hatchet_sdk::Context;
+use std::sync::Arc;
+use hatchet_sdk::Hatchet;
+use hatchet_sdk::runnables::Task;
 use serde::{Deserialize, Serialize};
 use crate::agents::CoderAgent;
 use crate::Agent;
@@ -17,28 +18,22 @@ pub struct TaskOutput {
     pub result: serde_json::Value,
 }
 
-pub struct DevelopTaskWorkflow {
-    mcp_url: String,
-}
-
-impl DevelopTaskWorkflow {
-    pub fn new(mcp_url: String) -> Self {
-        Self { mcp_url }
-    }
-}
-
-#[hatchet_sdk::workflow(name = "DevelopTaskWorkflow")]
-impl DevelopTaskWorkflow {
-    #[hatchet_sdk::step(name = "execute_coding_task", timeout = "15m")]
-    pub async fn execute_coding_task(&self, ctx: Context<TaskInput>) -> anyhow::Result<TaskOutput> {
-        let input = &ctx.workflow_input;
-        tracing::info!("Workflow: executing task {}", input.task_id);
-        
-        let mcp_client = std::sync::Arc::new(McpHttpClient::new(self.mcp_url.clone()));
-        let coder = CoderAgent::new(mcp_client);
-        
-        let result = coder.execute(&input.description).await?;
-        
-        Ok(TaskOutput { result })
-    }
+pub fn create_develop_task_workflow(hatchet: &Hatchet, mcp_url: String) -> Task<TaskInput, TaskOutput> {
+    let mcp_url_clone = mcp_url.clone();
+    
+    hatchet.task("execute_coding_task", move |input: TaskInput, _ctx| {
+        let mcp_url = mcp_url_clone.clone();
+        Box::pin(async move {
+            tracing::info!("Workflow: executing task {}", input.task_id);
+            
+            let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
+            let coder = CoderAgent::new(mcp_client);
+            
+            let result = coder.execute_task(&input.description).await?;
+            
+            Ok(TaskOutput { result })
+        })
+    })
+    .build()
+    .unwrap()
 }

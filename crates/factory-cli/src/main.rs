@@ -34,11 +34,12 @@ async fn main() -> anyhow::Result<()> {
             let mut worker = Worker::new().await?;
             
             // Register workflows
-            let mission_wf = AutonomousMissionWorkflow::new(mcp_url.clone());
-            let task_wf = DevelopTaskWorkflow::new(mcp_url);
+            let hatchet = worker.client.clone();
+            let mission_wf = factory_application::workflows::create_mission_workflow(&hatchet, mcp_url.clone());
+            let task_wf = factory_application::workflows::create_develop_task_workflow(&hatchet, mcp_url);
             
-            worker.register_workflow(mission_wf)?;
-            worker.register_workflow(task_wf)?;
+            worker.add_task_or_workflow(&mission_wf);
+            worker.add_task_or_workflow(&task_wf);
             
             worker.start().await?;
         }
