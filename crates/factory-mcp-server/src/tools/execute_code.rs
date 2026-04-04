@@ -1,7 +1,7 @@
+use crate::protocol::{CallToolResult, McpContent};
+use crate::tools::Tool;
 use async_trait::async_trait;
 use serde_json::{json, Value};
-use crate::tools::Tool;
-use crate::protocol::{CallToolResult, McpContent};
 
 pub struct ExecuteCodeTool;
 
@@ -29,7 +29,9 @@ impl Tool for ExecuteCodeTool {
     async fn call(&self, _params: Value) -> anyhow::Result<CallToolResult> {
         // TODO: Implement Firecracker/E2B logic
         Ok(CallToolResult {
-            content: vec![McpContent::Text { text: "Code execution not yet implemented in Rust.".to_string() }],
+            content: vec![McpContent::Text {
+                text: "Code execution not yet implemented in Rust.".to_string(),
+            }],
             is_error: true,
         })
     }

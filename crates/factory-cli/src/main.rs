@@ -1,7 +1,4 @@
 use clap::{Parser, Subcommand};
-use factory_application::workflows::{AutonomousMissionWorkflow, DevelopTaskWorkflow};
-use hatchet_sdk::worker::Worker;
-use tracing_subscriber::EnvFilter;
 
 #[derive(Parser)]
 #[command(name = "factory-cli", version = "0.1.0")]
@@ -28,20 +25,20 @@ async fn main() -> anyhow::Result<()> {
     match cli.command {
         Commands::Worker { mcp_url } => {
             tracing::info!("Starting Hatchet worker...");
-            
-            let hatchet = hatchet_sdk::clients::hatchet::Hatchet::from_env().await?;
-            let mut worker = hatchet.worker("factory-worker")
-                .slots(10)
-                .build()
-                .unwrap();
-            
+
+            let hatchet = hatchet_sdk::Hatchet::from_env().await?;
+            let mut worker = hatchet.worker("factory-worker").slots(10).build().unwrap();
+
             // Register workflows
-            let mission_wf = factory_application::workflows::create_mission_workflow(&hatchet, mcp_url.clone());
-            let task_wf = factory_application::workflows::create_develop_task_workflow(&hatchet, mcp_url);
-            
-            worker = hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &mission_wf);
+            let mission_wf =
+                factory_application::workflows::create_mission_workflow(&hatchet, mcp_url.clone());
+            let task_wf =
+                factory_application::workflows::create_develop_task_workflow(&hatchet, mcp_url);
+
+            worker =
+                hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &mission_wf);
             worker = hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &task_wf);
-            
+
             worker.start().await?;
         }
     }

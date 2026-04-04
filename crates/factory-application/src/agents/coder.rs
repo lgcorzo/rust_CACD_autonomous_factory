@@ -1,8 +1,8 @@
-use async_trait::async_trait;
-use serde_json::{json, Value};
-use std::sync::Arc;
-use factory_infrastructure::McpClient;
 use crate::Agent;
+use async_trait::async_trait;
+use factory_infrastructure::McpClient;
+use serde_json::{Value, json};
+use std::sync::Arc;
 
 pub struct CoderAgent {
     mcp_client: Arc<dyn McpClient>,
@@ -28,15 +28,18 @@ impl Agent for CoderAgent {
 impl CoderAgent {
     pub async fn execute_task(&self, description: &str) -> anyhow::Result<Value> {
         tracing::info!("[CoderAgent] Executing task: {}", description);
-        
-        let result = self.mcp_client.call_tool_json(
-            "execute_code",
-            json!({ 
-                "task": { "description": description },
-                "workspace_path": "/tmp/sandbox" 
-            })
-        ).await?;
-        
+
+        let result = self
+            .mcp_client
+            .call_tool_json(
+                "execute_code",
+                json!({
+                    "task": { "description": description },
+                    "workspace_path": "/tmp/sandbox"
+                }),
+            )
+            .await?;
+
         Ok(result)
     }
 }

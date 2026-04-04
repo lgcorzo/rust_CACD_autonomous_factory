@@ -1,7 +1,7 @@
+use crate::protocol::{CallToolResult, McpContent};
+use crate::tools::Tool;
 use async_trait::async_trait;
 use serde_json::{json, Value};
-use crate::tools::Tool;
-use crate::protocol::{CallToolResult, McpContent};
 
 pub struct RetrieveContextTool {
     r2r_base_url: String,
@@ -38,9 +38,13 @@ impl Tool for RetrieveContextTool {
     }
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
-        let query = params["query"].as_str().ok_or_else(|| anyhow::anyhow!("Query is required"))?;
-        
-        let response = self.http_client.post(format!("{}/v3/retrieval/search", self.r2r_base_url))
+        let query = params["query"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Query is required"))?;
+
+        let response = self
+            .http_client
+            .post(format!("{}/v3/retrieval/search", self.r2r_base_url))
             .json(&json!({
                 "query": query,
                 "search_settings": {
@@ -54,13 +58,17 @@ impl Tool for RetrieveContextTool {
 
         if !response.status().is_success() {
             return Ok(CallToolResult {
-                content: vec![McpContent::Text { text: format!("R2R API error: {}", response.status()) }],
+                content: vec![McpContent::Text {
+                    text: format!("R2R API error: {}", response.status()),
+                }],
                 is_error: true,
             });
         }
 
         let data: Value = response.json().await?;
-        let results = data["results"]["chunk_search_results"].as_array().ok_or_else(|| anyhow::anyhow!("Invalid response from R2R"))?;
+        let results = data["results"]["chunk_search_results"]
+            .as_array()
+            .ok_or_else(|| anyhow::anyhow!("Invalid response from R2R"))?;
 
         let mut output = String::new();
         for doc in results {

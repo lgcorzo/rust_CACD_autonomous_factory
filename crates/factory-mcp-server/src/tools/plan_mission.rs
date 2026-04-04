@@ -1,4 +1,5 @@
-use async_trait::async_trait;
+use crate::protocol::{CallToolResult, McpContent};
+use crate::tools::Tool;
 use async_openai::{
     types::{
         ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
@@ -7,9 +8,8 @@ use async_openai::{
     },
     Client,
 };
+use async_trait::async_trait;
 use serde_json::{json, Value};
-use crate::tools::Tool;
-use crate::protocol::{CallToolResult, McpContent};
 
 pub struct PlanMissionTool {
     client: Client<async_openai::config::OpenAIConfig>,
@@ -49,7 +49,8 @@ impl Tool for PlanMissionTool {
     }
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
-        let description = params["mission_description"].as_str()
+        let description = params["mission_description"]
+            .as_str()
             .ok_or_else(|| anyhow::anyhow!("mission_description is required"))?;
 
         let request = CreateChatCompletionRequestArgs::default()
@@ -70,7 +71,11 @@ impl Tool for PlanMissionTool {
             .build()?;
 
         let response = self.client.chat().create(request).await?;
-        let content = response.choices[0].message.content.clone().unwrap_or_default();
+        let content = response.choices[0]
+            .message
+            .content
+            .clone()
+            .unwrap_or_default();
 
         Ok(CallToolResult {
             content: vec![McpContent::Text { text: content }],

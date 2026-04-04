@@ -1,5 +1,5 @@
-use async_trait::async_trait;
 use crate::error::Result;
+use async_trait::async_trait;
 
 /// Trait for validating requests or agent responses.
 #[async_trait]

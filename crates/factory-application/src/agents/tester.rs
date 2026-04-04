@@ -1,8 +1,8 @@
-use async_trait::async_trait;
-use serde_json::{json, Value};
-use std::sync::Arc;
-use factory_infrastructure::McpClient;
 use crate::Agent;
+use async_trait::async_trait;
+use factory_infrastructure::McpClient;
+use serde_json::{Value, json};
+use std::sync::Arc;
 
 pub struct TesterAgent {
     mcp_client: Arc<dyn McpClient>,
@@ -28,15 +28,18 @@ impl Agent for TesterAgent {
 impl TesterAgent {
     pub async fn run_tests(&self, description: &str) -> anyhow::Result<Value> {
         tracing::info!("[TesterAgent] Running tests: {}", description);
-        
-        let result = self.mcp_client.call_tool_json(
-            "run_tests",
-            json!({ 
-                "changes": { "description": description },
-                "workspace_path": "/tmp/sandbox" 
-            })
-        ).await?;
-        
+
+        let result = self
+            .mcp_client
+            .call_tool_json(
+                "run_tests",
+                json!({
+                    "changes": { "description": description },
+                    "workspace_path": "/tmp/sandbox"
+                }),
+            )
+            .await?;
+
         Ok(result)
     }
 }

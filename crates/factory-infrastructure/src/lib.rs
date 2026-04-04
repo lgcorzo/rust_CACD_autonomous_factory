@@ -12,11 +12,11 @@ pub trait S3Storage {
 }
 
 pub mod kafka;
-pub mod s3;
 pub mod mcp_client;
+pub mod s3;
 
 pub use kafka::SimpleMockKafkaClient;
-pub use s3::AwsS3Storage;
-pub use mcp_client::{McpClient, McpHttpClient};
 #[cfg(any(test, feature = "test-utils"))]
 pub use mcp_client::MockMcpClient;
+pub use mcp_client::{McpClient, McpHttpClient};
+pub use s3::AwsS3Storage;

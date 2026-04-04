@@ -1,15 +1,21 @@
 pub mod protocol;
 pub mod tools;
 
+use crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool};
+use crate::tools::Tool;
+use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use serde_json::{json, Value};
-use crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool};
-use crate::tools::Tool;
 
 pub struct McpServer {
     tools: Arc<RwLock<HashMap<String, Box<dyn Tool>>>>,
+}
+
+impl Default for McpServer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl McpServer {
@@ -34,7 +40,8 @@ impl McpServer {
 
     async fn handle_list_tools(&self, id: Option<Value>) -> JsonRpcResponse {
         let tools = self.tools.read().await;
-        let mcp_tools: Vec<McpTool> = tools.values()
+        let mcp_tools: Vec<McpTool> = tools
+            .values()
             .map(|t| McpTool {
                 name: t.name(),
                 description: t.description(),
@@ -64,7 +71,9 @@ impl McpServer {
                     error: None,
                     id: request.id,
                 },
-                Err(e) => self.error_response(request.id, -32603, &format!("Tool execution error: {}", e)),
+                Err(e) => {
+                    self.error_response(request.id, -32603, &format!("Tool execution error: {}", e))
+                }
             }
         } else {
             self.error_response(request.id, -32602, "Tool not found")
@@ -88,15 +97,19 @@ impl McpServer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tools::MockTool;
     use crate::protocol::CallToolResult;
+    use crate::tools::MockTool;
 
     #[tokio::test]
     async fn test_list_tools() {
         let server = McpServer::new();
         let mut mock_tool = MockTool::new();
-        mock_tool.expect_name().return_const("test_tool".to_string());
-        mock_tool.expect_description().return_const("A test tool".to_string());
+        mock_tool
+            .expect_name()
+            .return_const("test_tool".to_string());
+        mock_tool
+            .expect_description()
+            .return_const("A test tool".to_string());
         mock_tool.expect_input_schema().return_const(json!({}));
 
         server.add_tool(Box::new(mock_tool)).await;
@@ -135,11 +148,15 @@ mod tests {
     async fn test_call_tool_success() {
         let server = McpServer::new();
         let mut mock_tool = MockTool::new();
-        mock_tool.expect_name().return_const("test_tool".to_string());
-        mock_tool.expect_call().returning(|_| Ok(CallToolResult {
-            content: vec![],
-            is_error: false,
-        }));
+        mock_tool
+            .expect_name()
+            .return_const("test_tool".to_string());
+        mock_tool.expect_call().returning(|_| {
+            Ok(CallToolResult {
+                content: vec![],
+                is_error: false,
+            })
+        });
 
         server.add_tool(Box::new(mock_tool)).await;
 
