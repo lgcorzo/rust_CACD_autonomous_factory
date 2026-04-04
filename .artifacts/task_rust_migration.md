@@ -1,4 +1,4 @@
-# Task: Rust Migration Phase 1 - 3
+# Task: Rust Migration Phase 1 - 4
 
 - [x] Phase 1: Complete Infrastructure Implementations
   - [x] Update `factory-infrastructure/Cargo.toml` dependencies
@@ -18,6 +18,11 @@
   - [x] Port `ReviewerAgent` (Rust)
   - [x] Port `TesterAgent` (Rust)
   - [x] Port `DocAgent` (Rust)
+- [x] Phase 4: Hatchet & Factory Orchestration
+  - [x] Add `hatchet-sdk` to workspace
+  - [x] Implement `develop_task` workflow
+  - [x] Implement `autonomous_mission` workflow
+  - [x] Implement Hatchet worker in `factory-cli`
 - [/] Verification
   - [/] `cargo check --workspace`
-  - [ ] Unit tests for agents mimicking MCP server
+  - [ ] End-to-end mission test with mocks
