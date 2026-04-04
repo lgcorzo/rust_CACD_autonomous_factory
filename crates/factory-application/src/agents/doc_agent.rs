@@ -1,8 +1,8 @@
-use async_trait::async_trait;
-use serde_json::{json, Value};
-use std::sync::Arc;
-use factory_infrastructure::McpClient;
 use crate::Agent;
+use async_trait::async_trait;
+use factory_infrastructure::McpClient;
+use serde_json::{Value, json};
+use std::sync::Arc;
 
 pub struct DocAgent {
     mcp_client: Arc<dyn McpClient>,
@@ -28,15 +28,18 @@ impl Agent for DocAgent {
 impl DocAgent {
     pub async fn generate_docs(&self, description: &str) -> anyhow::Result<Value> {
         tracing::info!("[DocAgent] Generating documentation: {}", description);
-        
-        let result = self.mcp_client.call_tool_json(
-            "generate_mission_docs",
-            json!({ 
-                "mission_id": "mission-01", 
-                "mission_context": { "description": description }
-            })
-        ).await?;
-        
+
+        let result = self
+            .mcp_client
+            .call_tool_json(
+                "generate_mission_docs",
+                json!({
+                    "mission_id": "mission-01",
+                    "mission_context": { "description": description }
+                }),
+            )
+            .await?;
+
         Ok(result)
     }
 }

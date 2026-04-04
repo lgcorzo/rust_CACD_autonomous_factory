@@ -1,8 +1,8 @@
-use async_trait::async_trait;
-use serde_json::{json, Value};
-use std::sync::Arc;
-use factory_infrastructure::McpClient;
 use crate::Agent;
+use async_trait::async_trait;
+use factory_infrastructure::McpClient;
+use serde_json::{Value, json};
+use std::sync::Arc;
 
 pub struct PlannerAgent {
     mcp_client: Arc<dyn McpClient>,
@@ -28,12 +28,12 @@ impl Agent for PlannerAgent {
 impl PlannerAgent {
     pub async fn create_plan(&self, goal: &str) -> anyhow::Result<Value> {
         tracing::info!("[PlannerAgent] Creating plan for goal: {}", goal);
-        
-        let result = self.mcp_client.call_tool_json(
-            "plan_mission",
-            json!({ "mission_description": goal })
-        ).await?;
-        
+
+        let result = self
+            .mcp_client
+            .call_tool_json("plan_mission", json!({ "mission_description": goal }))
+            .await?;
+
         Ok(result)
     }
 }
@@ -47,9 +47,13 @@ mod tests {
     async fn test_planner_agent_execute() {
         let mut mock_client = MockMcpClient::new();
         let expected_result = json!({ "tasks": [] });
-        
-        mock_client.expect_call_tool_json()
-            .with(mockall::predicate::eq("plan_mission"), mockall::predicate::always())
+
+        mock_client
+            .expect_call_tool_json()
+            .with(
+                mockall::predicate::eq("plan_mission"),
+                mockall::predicate::always(),
+            )
             .returning(move |_, _| {
                 let res = json!({ "tasks": [] });
                 Ok(res)
@@ -57,7 +61,7 @@ mod tests {
 
         let agent = PlannerAgent::new(Arc::new(mock_client));
         let result = agent.execute("Test goal").await.unwrap();
-        
+
         assert_eq!(result, expected_result);
     }
 }

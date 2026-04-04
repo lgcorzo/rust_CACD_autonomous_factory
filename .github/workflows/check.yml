@@ -5,14 +5,30 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
+
 concurrency:
   cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  checks:
+  rust-ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-      - run: poetry install --with checks
-      - run: poetry run invoke checks
+      
+      - name: Install Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
+          
+      - name: Check Formatting
+        run: cargo fmt --all -- --check
+        
+      - name: Lint with Clippy
+        run: cargo clippy --workspace -- -D warnings
+        
+      - name: Run Workspace Tests
+        run: cargo test --workspace

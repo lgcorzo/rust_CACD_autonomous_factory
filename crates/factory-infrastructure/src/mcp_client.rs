@@ -1,7 +1,6 @@
-use serde::Serialize;
-use serde_json::{json, Value};
+use anyhow::anyhow;
 use reqwest::Client;
-use anyhow::{anyhow, Result};
+use serde_json::{json, Value};
 
 #[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait::async_trait]
@@ -27,7 +26,8 @@ impl McpClient for McpHttpClient {
             "id": 1
         });
 
-        let response = self.client
+        let response = self
+            .client
             .post(format!("{}/sse", self.base_url))
             .json(&request)
             .send()
@@ -39,7 +39,8 @@ impl McpClient for McpHttpClient {
 
         let body: Value = response.json().await?;
         if let Some(error) = body.get("error") {
-            return Err(anyhow!("MCP Tool Error: {}", error["message"]));
+            let msg = error["message"].as_str().unwrap_or("Unknown error");
+            return Err(anyhow!("MCP Tool Error: {}", msg));
         }
 
         Ok(body["result"].clone())
@@ -58,8 +59,8 @@ impl McpHttpClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use wiremock::{MockServer, Mock, ResponseTemplate};
     use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     #[tokio::test]
     async fn test_call_tool_success() {
@@ -78,7 +79,7 @@ mod tests {
 
         let client = McpHttpClient::new(mock_server.uri());
         let result = client.call_tool_json("test_tool", json!({})).await.unwrap();
-        
+
         assert_eq!(result["output"], "success");
     }
 
@@ -99,8 +100,11 @@ mod tests {
 
         let client = McpHttpClient::new(mock_server.uri());
         let result: anyhow::Result<Value> = client.call_tool_json("test_tool", json!({})).await;
-        
+
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "MCP Tool Error: Tool failed");
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "MCP Tool Error: Tool failed"
+        );
     }
 }

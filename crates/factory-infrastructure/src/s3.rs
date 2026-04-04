@@ -1,7 +1,7 @@
-use async_trait::async_trait;
-use aws_sdk_s3::Client;
-use aws_sdk_s3::primitives::ByteStream;
 use crate::S3Storage;
+use async_trait::async_trait;
+use aws_sdk_s3::primitives::ByteStream;
+use aws_sdk_s3::Client;
 
 pub struct AwsS3Storage {
     client: Client,
@@ -29,13 +29,14 @@ impl S3Storage for AwsS3Storage {
     }
 
     async fn get_object(&self, bucket: &str, key: &str) -> anyhow::Result<Vec<u8>> {
-        let response = self.client
+        let response = self
+            .client
             .get_object()
             .bucket(bucket)
             .key(key)
             .send()
             .await?;
-            
+
         let data = response.body.collect().await?.into_bytes();
         Ok(data.to_vec())
     }
