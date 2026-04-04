@@ -10,14 +10,14 @@
   - [x] Create `plan_mission.rs` and port logic
   - [x] Create `execute_code.rs` stub
   - [x] Implement `McpServer` protocol logic in `lib.rs`
-- [/] Phase 3: Autonomous Agents (`factory-application`)
-  - [ ] Implement `McpHttpClient` in `factory-infrastructure`
-  - [ ] Define `Agent` trait in `factory-application`
-  - [ ] Port `PlannerAgent` (Rust)
-  - [ ] Port `CoderAgent` (Rust)
-  - [ ] Port `ReviewerAgent` (Rust)
-  - [ ] Port `TesterAgent` (Rust)
-  - [ ] Port `DocAgent` (Rust)
-- [ ] Verification
-  - [ ] `cargo check --workspace`
+- [x] Phase 3: Autonomous Agents (`factory-application`)
+  - [x] Implement `McpHttpClient` in `factory-infrastructure`
+  - [x] Define `Agent` trait in `factory-application`
+  - [x] Port `PlannerAgent` (Rust)
+  - [x] Port `CoderAgent` (Rust)
+  - [x] Port `ReviewerAgent` (Rust)
+  - [x] Port `TesterAgent` (Rust)
+  - [x] Port `DocAgent` (Rust)
+- [/] Verification
+  - [/] `cargo check --workspace`
   - [ ] Unit tests for agents mimicking MCP server
