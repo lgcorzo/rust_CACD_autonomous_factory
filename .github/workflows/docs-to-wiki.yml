@@ -17,6 +17,7 @@ env:
   GIT_AUTHOR_EMAIL: action@github.com
   SYNC_CHANGES_REPO_NAME: wiki-sync
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.WIKI_SYNC_SECRET || secrets.GITHUB_TOKEN }}
 
 permissions:
   contents: write
@@ -30,12 +31,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync repo wiki folder to wiki
         uses: newrelic/wiki-sync-action@v1.0.1
-        env:
-          GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.WIKI_SYNC_SECRET }}
         with:
           source: wiki
           destination: wiki
-          token: ${{ secrets.WIKI_SYNC_SECRET }}
+          token: ${{ secrets.WIKI_SYNC_SECRET || secrets.GITHUB_TOKEN }}
           gitAuthorName: ${{ env.GIT_AUTHOR_NAME }}
           gitAuthorEmail: ${{ env.GIT_AUTHOR_EMAIL }}
 
@@ -72,12 +71,10 @@ jobs:
         shell: bash
       - name: Sync Wiki to Repo
         uses: newrelic/wiki-sync-action@v1.0.1
-        env:
-          GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.WIKI_SYNC_SECRET }}
         with:
           source: wiki
           destination: wiki
-          token: ${{ secrets.WIKI_SYNC_SECRET }}
+          token: ${{ secrets.WIKI_SYNC_SECRET || secrets.GITHUB_TOKEN }}
           gitAuthorName: ${{ env.GIT_AUTHOR_NAME }}
           gitAuthorEmail: ${{ env.GIT_AUTHOR_EMAIL }}
           branch: ${{ env.SYNC_CHANGES_REPO_NAME }}
