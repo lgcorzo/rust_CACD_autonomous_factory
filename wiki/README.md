@@ -6,12 +6,12 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 
 | Section | Description | Key Topics |
 | :--- | :--- | :--- |
-| [**Business Understanding**](business_understanding.md) | The "Why" and "What" | ROI, KPIs, Mission Lifecycle. |
-| [**Architecture**](architecture.md) | Technical Blueprint | DDD Layers, Rust MCP, OpenCode. |
-| [**Execution Flows**](execution_flows.md) | How it Works | Sequence Diagrams, Agent Loops. |
-| [**Testing Strategy**](testing_strategy.md) | Quality Assurance | 95% Coverage, WireMock, LLM-Judge. |
-| [**Integrations**](integrations.md) | External Connectivity | **Jira**, **R2R Graph RAG**, LiteLLM. |
-| [**Deployment Guide**](deployment_guide.md) | Operations & Scaling | K8s Manifests, Sealed Secrets. |
+| [**Business Understanding**](business_understanding) | The "Why" and "What" | ROI, KPIs, Mission Lifecycle. |
+| [**Architecture**](architecture) | Technical Blueprint | DDD Layers, Rust MCP, OpenCode. |
+| [**Execution Flows**](execution_flows) | How it Works | Sequence Diagrams, Agent Loops. |
+| [**Testing Strategy**](testing_strategy) | Quality Assurance | 95% Coverage, WireMock, LLM-Judge. |
+| [**Integrations**](integrations) | External Connectivity | **Jira**, **R2R Graph RAG**, LiteLLM. |
+| [**Deployment Guide**](deployment_guide) | Operations & Scaling | K8s Manifests, Sealed Secrets. |
 
 ---
 
