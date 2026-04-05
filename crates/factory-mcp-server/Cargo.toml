@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 factory-core = { path = "../factory-core" }
+factory-infrastructure = { path = "../factory-infrastructure" }
 axum = { version = "0.7" }
 tokio = { workspace = true }
 serde = { workspace = true }

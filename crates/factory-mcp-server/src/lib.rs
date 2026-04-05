@@ -45,20 +45,32 @@ impl McpServer {
         use crate::tools::{
             execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             plan_mission::PlanMissionTool, retrieve_context::RetrieveContextTool,
-            run_tests::RunTestsTool, security_review::SecurityReviewTool,
+            run_tests::RunTestsTool, search_jira::SearchJiraTool,
+            security_review::SecurityReviewTool,
             update_mission_status::UpdateMissionStatusTool,
         };
+        use factory_infrastructure::{HttpJiraClient, HttpR2rClient};
 
         let sandbox_driver = Arc::new(crate::sandbox::SubprocessDriver);
         let litellm_api_key = std::env::var("LITELLM_API_KEY").unwrap_or_else(|_| "sk-placeholder".to_string());
         let litellm_base_url = std::env::var("LITELLM_BASE_URL").unwrap_or_else(|_| "http://litellm:4000/v1".to_string());
         let litellm_model = std::env::var("LITELLM_MODEL").unwrap_or_else(|_| "alibaba-cn/MiniMax/MiniMax-M2.7".to_string());
+        
         let r2r_base_url = std::env::var("R2R_BASE_URL").unwrap_or_else(|_| "http://r2r:8000".to_string());
+        let r2r_user = std::env::var("R2R_USER").unwrap_or_else(|_| "admin".to_string());
+        let r2r_pwd = std::env::var("R2R_PWD").unwrap_or_else(|_| "admin".to_string());
+        let r2r_client = Arc::new(HttpR2rClient::new(r2r_base_url.clone(), r2r_user, r2r_pwd));
+
+        let jira_url = std::env::var("JIRA_URL").unwrap_or_else(|_| "https://jira.example.com".to_string());
+        let jira_user = std::env::var("JIRA_USERNAME").unwrap_or_else(|_| "user".to_string());
+        let jira_token = std::env::var("JIRA_API_TOKEN").unwrap_or_else(|_| "token".to_string());
+        let jira_client = Arc::new(HttpJiraClient::new(jira_url, jira_user, jira_token));
 
         self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone()))).await;
         self.add_tool(Box::new(PlanMissionTool::new(litellm_api_key, litellm_base_url, litellm_model))).await;
-        self.add_tool(Box::new(RetrieveContextTool::new(r2r_base_url.clone()))).await;
+        self.add_tool(Box::new(RetrieveContextTool::new(r2r_client.clone()))).await;
         self.add_tool(Box::new(IndexCodeTool::new(r2r_base_url.clone()))).await;
+        self.add_tool(Box::new(SearchJiraTool::new(jira_client))).await;
         self.add_tool(Box::new(RunTestsTool::new(sandbox_driver))).await;
         self.add_tool(Box::new(SecurityReviewTool)).await;
         self.add_tool(Box::new(UpdateMissionStatusTool::new("docs".to_string()))).await;
