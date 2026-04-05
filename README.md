@@ -108,13 +108,13 @@ The following automated checks are active in this repository to maintain high en
 
 For a deep-dive into the factory's mechanics, follow the documentation roadmap:
 
-1. **[Architecture](docs/architecture.md)** — The high-level technical blueprint and Zero Trust ZTA patterns.
-2. **[Execution Flows](docs/execution_flows.md)** — Sequence diagrams for tool execution and SSE transport.
-3. **[Testing Strategy](docs/testing_strategy.md)** — Unit, integration, and LLMOps evaluation standards.
-4. **[External Integrations](docs/integrations.md)** — Connection details for **Jira** and **R2R Graph RAG**.
-5. **[Deployment Guide](docs/deployment_guide.md)** — Production operations via Kubernetes, KEDA, and Sealed Secrets.
+1. **[Architecture](wiki/architecture.md)** — The high-level technical blueprint and Zero Trust ZTA patterns.
+2. **[Execution Flows](wiki/execution_flows.md)** — Sequence diagrams for tool execution and SSE transport.
+3. **[Testing Strategy](wiki/testing_strategy.md)** — Unit, integration, and LLMOps evaluation standards.
+4. **[External Integrations](wiki/integrations.md)** — Connection details for **Jira** and **R2R Graph RAG**.
+5. **[Deployment Guide](wiki/deployment_guide.md)** — Production operations via Kubernetes, KEDA, and Sealed Secrets.
 
-Access the full **[Documentation Index](docs/README.md)** for business context and mission history.
+Access the full **[Documentation Index](wiki/README.md)** for business context and mission history.
 
 ---
 

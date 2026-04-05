@@ -58,7 +58,7 @@ impl Tool for UpdateMissionStatusTool {
 
         let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
 
-        // 1. Update docs/mission_history.md (Terminal-friendly table)
+        // 1. Update wiki/mission_history.md (Terminal-friendly table)
         let history_path = format!("{}/mission_history.md", self.docs_path);
         let mut file = OpenOptions::new().append(true).open(&history_path)?;
 

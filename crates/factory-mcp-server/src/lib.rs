@@ -87,7 +87,7 @@ impl McpServer {
         self.add_tool(Box::new(RunTestsTool::new(sandbox_driver)))
             .await;
         self.add_tool(Box::new(SecurityReviewTool)).await;
-        self.add_tool(Box::new(UpdateMissionStatusTool::new("docs".to_string())))
+        self.add_tool(Box::new(UpdateMissionStatusTool::new("wiki".to_string())))
             .await;
     }
 
