@@ -13,6 +13,20 @@ Our testing strategy ensures code quality and mission success through a tiered a
 
 ---
 
+## 📐 Testing Methodology
+
+The system uses a tiered testing approach to ensure 100% mission reliability and **95% code coverage** across all infrastructure components.
+
+### 🔌 Infrastructure Layer (Adapters)
+
+We use **`wiremock`** and **`mockall`** to verify external integrations without making real network calls.
+
+- **WireMock**: Used to spin up an HTTP server that mimics **Jira** or **R2R** responses. This validates our `reqwest` client logic and error handling (401, 404, 500).
+- **MockAll**: Used to generate trait-based mocks for unit tests in the `Application` and `Interface` layers.
+- **Coverage**: ALL infrastructure clients (`HttpJiraClient`, `HttpR2rClient`) MUST maintain **95%+ unit test coverage**.
+
+---
+
 ## 🔍 Unit & Integration Testing in Rust
 
 Each crate in `crates/` includes its own `tests/` directory or inline `#[cfg(test)]` modules.
@@ -44,10 +58,10 @@ Standard code tests are insufficient for measuring an autonomous factory's perfo
 
 ### 📏 Key Metrics
 
-1.  **Correctness**: Does the generated code fulfill all acceptance criteria from the Jira ticket?
-2.  **Faithfulness (RAG)**: Is the code generated based on the retrieved context, or is the model hallucinating new patterns?
-3.  **Security Score**: Does the `SecurityReviewTool` flag the mission?
-4.  **Token Efficiency**: Reaching the goal with the minimum number of LLM calls.
+1. **Correctness**: Does the generated code fulfill all acceptance criteria from the Jira ticket?
+2. **Faithfulness (RAG)**: Is the code generated based on the retrieved context, or is the model hallucinating new patterns?
+3. **Security Score**: Does the `SecurityReviewTool` flag the mission?
+4. **Token Efficiency**: Reaching the goal with the minimum number of LLM calls.
 
 ### 🗺️ Verification Workflow
 
@@ -65,6 +79,7 @@ graph TD
 ## 🛡️ Security Testing & Guardrails
 
 The `SecurityReviewTool` performs **Static Application Security Testing (SAST)** and uses LLM-based analysis to detect:
+
 - SQL Injection.
 - Command Injection.
 - Hardcoded Secrets.
@@ -86,11 +101,13 @@ sequenceDiagram
     SEC-->>MCP: Risk Score (0-10)
     MCP-->>OC: Result (Pass/Fail)
 ```
+
 ---
 
 ## 🚀 How to Run Tests
 
 ### 1. Local Rust Tests
+
 ```bash
 # Run all tests in the workspace
 cargo test
@@ -100,7 +117,9 @@ cargo test -p factory-mcp-server
 ```
 
 ### 2. Mocking Integration
+
 We provide a standalone mock service for local development:
+
 ```bash
 cargo run -p factory-cli -- mock-server --port 8080
 ```

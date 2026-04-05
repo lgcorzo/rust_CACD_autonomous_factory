@@ -53,23 +53,23 @@ graph TB
 
 ---
 
-## 🏗️ Rust Workspace Components
+## 🏗️ Rust Workspace Components (DDD Layers)
 
-The codebase is organized as a modular Rust workspace under `crates/`.
+The codebase follows the **Domain-Driven Design (DDD)** pattern, separating concerns into four logic layers. This ensures the **LLMOps** lifecycle—from mission planning to production-ready deployment—is both modular and resilient.
 
-| Crate | Responsibility | Key Dependencies |
-| :--- | :--- | :--- |
-| `factory-core` | Shared domain models, core types, and utility functions. | `serde`, `uuid` |
-| `factory-application` | High-level application logic and business workflows. | `factory-core` |
-| `factory-infrastructure` | External integrations: LiteLLM, R2R, Kafka, MinIO clients. | `reqwest`, `async-trait` |
-| `factory-mcp-server` | MCP (Model Context Protocol) server. Exposes tools via SSE/HTTP. | `axum`, `tokio`, `tokio-stream` |
-| `factory-cli` | Developer CLI for local testing and management. | `clap` |
+| Crate | DDD Layer | Responsibility | Key Dependencies |
+| :--- | :--- | :--- | :--- |
+| `factory-core` | **Domain** | Pure business logic, shared models, and security protocols. | `serde`, `uuid` |
+| `factory-application` | **Application** | Hatchet orchestration, agentic workflows, and task decomposition. | `factory-core` |
+| `factory-infrastructure` | **Infrastructure** | Concrete adapters for **Jira**, **R2R**, **LiteLLM**, and Kafka. | `reqwest`, `wiremock` |
+| `factory-mcp-server` | **Interface (RPC)** | MCP Server, SSE transport, and JSON-RPC tool registration. | `axum`, `tokio` |
+| `factory-cli` | **Interface (CLI)** | Command-line entry points for workers and local testing. | `clap` |
 
 ---
 
-## 🛠️ MCP Server & Tooling Lifecycle
+## 🛠️ MCP Server & Tooling Lifecycle (LLMOps)
 
-The `factory-mcp-server` is the "Hands" of the factory. It provides a standardized interface for agents to interact with the cluster and external services.
+The `factory-mcp-server` is the "Hands" of the factory. It provides a standardized interface for agents to interact with the cluster and external services, Closing the loop in the **LLMOps** lifecycle.
 
 ```mermaid
 classDiagram
@@ -108,6 +108,7 @@ classDiagram
 ```
 
 ### Key Tools
+
 1. **PlanMissionTool**: Uses LLM to decompose high-level goals into a Directed Acyclic Graph (DAG) of tasks.
 2. **ExecuteCodeTool**: Generates and executes code via a `SandboxDriver` (Local subprocess or Firecracker).
 3. **RetrieveContextTool**: Connects to the R2R Graph RAG system to fetch relevant code patterns.

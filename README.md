@@ -84,12 +84,18 @@ Automated checks are run on every Pull Request. See the [CI Pipeline Design](.ar
 
 ---
 
-## 📜 Documentation
+## 📜 Project Documentation
 
-- [Rust Migration Plan](.artifacts/migration_plan_rust.md)
-- [Testing Implementation](.artifacts/task_testing_implementation.md)
-- [Final Walkthrough](.artifacts/walkthrough_rust_migration.md)
-- [External Integrations (Jira/R2R)](docs/integrations.md)
+For a deep-dive into the factory's mechanics, follow the documentation roadmap:
+
+1. **[Architecture](docs/architecture.md)** — The high-level technical blueprint and Zero Trust ZTA patterns.
+2. **[Execution Flows](docs/execution_flows.md)** — Sequence diagrams for tool execution and SSE transport.
+3. **[Testing Strategy](docs/testing_strategy.md)** — Unit, integration, and LLMOps evaluation standards.
+4. **[External Integrations](docs/integrations.md)** — Connection details for **Jira** and **R2R Graph RAG**.
+5. **[Deployment Guide](docs/deployment_guide.md)** — Production operations via Kubernetes, KEDA, and Sealed Secrets.
+
+Access the full **[Documentation Index](docs/README.md)** for business context and mission history.
 
 ---
+
 *Dark Gravity - Engineering the Future of Autonomous Systems.*
