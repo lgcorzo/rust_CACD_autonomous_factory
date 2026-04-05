@@ -27,7 +27,7 @@
     "edit": "allow",
     "write": "allow",
     "webfetch": "deny",
-    "websearch": "deny",
+    "websearch": "allow",
     "read": "allow",
     "grep": "allow",
     "glob": "allow",
