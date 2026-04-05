@@ -30,6 +30,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync repo wiki folder to wiki
         uses: newrelic/wiki-sync-action@v1.0.1
+        env:
+          GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.WIKI_SYNC_SECRET }}
         with:
           source: wiki
           destination: wiki
@@ -70,6 +72,8 @@ jobs:
         shell: bash
       - name: Sync Wiki to Repo
         uses: newrelic/wiki-sync-action@v1.0.1
+        env:
+          GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.WIKI_SYNC_SECRET }}
         with:
           source: wiki
           destination: wiki
