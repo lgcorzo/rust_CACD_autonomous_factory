@@ -1,22 +1,22 @@
 pub mod protocol;
-pub mod tools;
 pub mod sandbox;
+pub mod tools;
 
+use crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool};
+use crate::tools::Tool;
 use axum::{
-    extract::{State, Query},
+    extract::{Query, State},
     response::sse::{Event, Sse},
     Json,
 };
-use crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool};
-use tokio_stream::{Stream, StreamExt};
-use tokio_stream::wrappers::UnboundedReceiverStream;
-use std::convert::Infallible;
-use std::time::Duration;
-use crate::tools::Tool;
 use serde_json::{json, Value};
 use std::collections::HashMap;
+use std::convert::Infallible;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::{mpsc, RwLock};
+use tokio_stream::wrappers::UnboundedReceiverStream;
+use tokio_stream::{Stream, StreamExt};
 
 pub struct McpServer {
     tools: Arc<RwLock<HashMap<String, Box<dyn Tool>>>>,
@@ -46,34 +46,49 @@ impl McpServer {
             execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             plan_mission::PlanMissionTool, retrieve_context::RetrieveContextTool,
             run_tests::RunTestsTool, search_jira::SearchJiraTool,
-            security_review::SecurityReviewTool,
-            update_mission_status::UpdateMissionStatusTool,
+            security_review::SecurityReviewTool, update_mission_status::UpdateMissionStatusTool,
         };
         use factory_infrastructure::{HttpJiraClient, HttpR2rClient};
 
         let sandbox_driver = Arc::new(crate::sandbox::SubprocessDriver);
-        let litellm_api_key = std::env::var("LITELLM_API_KEY").unwrap_or_else(|_| "sk-placeholder".to_string());
-        let litellm_base_url = std::env::var("LITELLM_BASE_URL").unwrap_or_else(|_| "http://litellm:4000/v1".to_string());
-        let litellm_model = std::env::var("LITELLM_MODEL").unwrap_or_else(|_| "alibaba-cn/MiniMax/MiniMax-M2.7".to_string());
-        
-        let r2r_base_url = std::env::var("R2R_BASE_URL").unwrap_or_else(|_| "http://r2r:8000".to_string());
+        let litellm_api_key =
+            std::env::var("LITELLM_API_KEY").unwrap_or_else(|_| "sk-placeholder".to_string());
+        let litellm_base_url = std::env::var("LITELLM_BASE_URL")
+            .unwrap_or_else(|_| "http://litellm:4000/v1".to_string());
+        let litellm_model = std::env::var("LITELLM_MODEL")
+            .unwrap_or_else(|_| "alibaba-cn/MiniMax/MiniMax-M2.7".to_string());
+
+        let r2r_base_url =
+            std::env::var("R2R_BASE_URL").unwrap_or_else(|_| "http://r2r:8000".to_string());
         let r2r_user = std::env::var("R2R_USER").unwrap_or_else(|_| "admin".to_string());
         let r2r_pwd = std::env::var("R2R_PWD").unwrap_or_else(|_| "admin".to_string());
         let r2r_client = Arc::new(HttpR2rClient::new(r2r_base_url.clone(), r2r_user, r2r_pwd));
 
-        let jira_url = std::env::var("JIRA_URL").unwrap_or_else(|_| "https://jira.example.com".to_string());
+        let jira_url =
+            std::env::var("JIRA_URL").unwrap_or_else(|_| "https://jira.example.com".to_string());
         let jira_user = std::env::var("JIRA_USERNAME").unwrap_or_else(|_| "user".to_string());
         let jira_token = std::env::var("JIRA_API_TOKEN").unwrap_or_else(|_| "token".to_string());
         let jira_client = Arc::new(HttpJiraClient::new(jira_url, jira_user, jira_token));
 
-        self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone()))).await;
-        self.add_tool(Box::new(PlanMissionTool::new(litellm_api_key, litellm_base_url, litellm_model))).await;
-        self.add_tool(Box::new(RetrieveContextTool::new(r2r_client.clone()))).await;
-        self.add_tool(Box::new(IndexCodeTool::new(r2r_base_url.clone()))).await;
-        self.add_tool(Box::new(SearchJiraTool::new(jira_client))).await;
-        self.add_tool(Box::new(RunTestsTool::new(sandbox_driver))).await;
+        self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone())))
+            .await;
+        self.add_tool(Box::new(PlanMissionTool::new(
+            litellm_api_key,
+            litellm_base_url,
+            litellm_model,
+        )))
+        .await;
+        self.add_tool(Box::new(RetrieveContextTool::new(r2r_client.clone())))
+            .await;
+        self.add_tool(Box::new(IndexCodeTool::new(r2r_base_url.clone())))
+            .await;
+        self.add_tool(Box::new(SearchJiraTool::new(jira_client)))
+            .await;
+        self.add_tool(Box::new(RunTestsTool::new(sandbox_driver)))
+            .await;
         self.add_tool(Box::new(SecurityReviewTool)).await;
-        self.add_tool(Box::new(UpdateMissionStatusTool::new("docs".to_string()))).await;
+        self.add_tool(Box::new(UpdateMissionStatusTool::new("docs".to_string())))
+            .await;
     }
 
     pub async fn handle_request(&self, request: JsonRpcRequest) -> JsonRpcResponse {
@@ -147,7 +162,7 @@ impl McpServer {
         // Send the initial endpoint event as per MCP spec (simplified)
         // In a real implementation, we'd send the URI the client should POST to.
         // For now, let's just send the session_id as a commentary.
-        
+
         Sse::new(stream).keep_alive(ax_keep_alive())
     }
 

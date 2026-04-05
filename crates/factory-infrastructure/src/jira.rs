@@ -1,5 +1,5 @@
-use async_trait::async_trait;
 use crate::JiraClient;
+use async_trait::async_trait;
 
 pub struct HttpJiraClient {
     url: String,
@@ -29,7 +29,8 @@ impl JiraClient for HttpJiraClient {
         );
 
         let search_url = format!("{}/rest/api/2/search", self.url.trim_end_matches('/'));
-        let res = self.client
+        let res = self
+            .client
             .get(&search_url)
             .basic_auth(&self.username, Some(&self.api_token))
             .query(&[("jql", &jql)])
@@ -65,18 +66,15 @@ impl JiraClient for HttpJiraClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::json;
     use wiremock::matchers::{method, path, query_param};
     use wiremock::{Mock, MockServer, ResponseTemplate};
-    use serde_json::json;
 
     #[tokio::test]
     async fn test_jira_search_success() {
         let mock_server = MockServer::start().await;
-        let client = HttpJiraClient::new(
-            mock_server.uri(),
-            "user".to_string(),
-            "token".to_string(),
-        );
+        let client =
+            HttpJiraClient::new(mock_server.uri(), "user".to_string(), "token".to_string());
 
         let response_body = json!({
             "issues": [
@@ -91,7 +89,10 @@ mod tests {
 
         Mock::given(method("GET"))
             .and(path("/rest/api/2/search"))
-            .and(query_param("jql", "summary ~ \"test\" OR description ~ \"test\""))
+            .and(query_param(
+                "jql",
+                "summary ~ \"test\" OR description ~ \"test\"",
+            ))
             .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
             .mount(&mock_server)
             .await;
@@ -103,11 +104,8 @@ mod tests {
     #[tokio::test]
     async fn test_jira_search_no_results() {
         let mock_server = MockServer::start().await;
-        let client = HttpJiraClient::new(
-            mock_server.uri(),
-            "user".to_string(),
-            "token".to_string(),
-        );
+        let client =
+            HttpJiraClient::new(mock_server.uri(), "user".to_string(), "token".to_string());
 
         let response_body = json!({
             "issues": []
@@ -126,11 +124,8 @@ mod tests {
     #[tokio::test]
     async fn test_jira_search_unauthorized() {
         let mock_server = MockServer::start().await;
-        let client = HttpJiraClient::new(
-            mock_server.uri(),
-            "user".to_string(),
-            "token".to_string(),
-        );
+        let client =
+            HttpJiraClient::new(mock_server.uri(), "user".to_string(), "token".to_string());
 
         Mock::given(method("GET"))
             .respond_with(ResponseTemplate::new(401).set_body_string("Unauthorized"))
@@ -145,11 +140,8 @@ mod tests {
     #[tokio::test]
     async fn test_jira_search_server_error() {
         let mock_server = MockServer::start().await;
-        let client = HttpJiraClient::new(
-            mock_server.uri(),
-            "user".to_string(),
-            "token".to_string(),
-        );
+        let client =
+            HttpJiraClient::new(mock_server.uri(), "user".to_string(), "token".to_string());
 
         Mock::given(method("GET"))
             .respond_with(ResponseTemplate::new(500).set_body_string("Server Error"))
@@ -158,6 +150,9 @@ mod tests {
 
         let result = client.search_issues("test").await;
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("500 Internal Server Error"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("500 Internal Server Error"));
     }
 }

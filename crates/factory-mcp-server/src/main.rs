@@ -1,10 +1,10 @@
-use std::net::SocketAddr;
-use std::sync::Arc;
 use axum::{
     routing::{get, post},
     Router,
 };
 use factory_mcp_server::McpServer;
+use std::net::SocketAddr;
+use std::sync::Arc;
 use tower_http::cors::CorsLayer;
 
 #[tokio::main]

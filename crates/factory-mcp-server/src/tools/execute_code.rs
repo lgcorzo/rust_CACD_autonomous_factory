@@ -1,6 +1,6 @@
 use crate::protocol::{CallToolResult, McpContent};
-use crate::tools::Tool;
 use crate::sandbox::SandboxDriver;
+use crate::tools::Tool;
 use async_trait::async_trait;
 use serde_json::{json, Value};
 use std::sync::Arc;
@@ -44,13 +44,18 @@ impl Tool for ExecuteCodeTool {
 
         if result.is_success {
             Ok(CallToolResult {
-                content: vec![McpContent::Text { text: result.stdout }],
+                content: vec![McpContent::Text {
+                    text: result.stdout,
+                }],
                 is_error: false,
             })
         } else {
             Ok(CallToolResult {
-                content: vec![McpContent::Text { 
-                    text: format!("Execution failed.\nStdout: {}\nStderr: {}", result.stdout, result.stderr) 
+                content: vec![McpContent::Text {
+                    text: format!(
+                        "Execution failed.\nStdout: {}\nStderr: {}",
+                        result.stdout, result.stderr
+                    ),
                 }],
                 is_error: true,
             })

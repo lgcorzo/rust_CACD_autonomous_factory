@@ -1,0 +1,10 @@
+target/
+.git/
+.github/
+.agents/
+docs/
+README.md
+!crates/
+!Cargo.toml
+!Cargo.lock
+!Dockerfile
