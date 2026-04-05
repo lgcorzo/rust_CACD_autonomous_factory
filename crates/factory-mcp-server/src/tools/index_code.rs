@@ -42,12 +42,15 @@ impl Tool for IndexCodeTool {
         let content = params["content"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Content is required"))?;
-        
+
         let metadata = params["metadata"].clone();
 
         let response = self
             .http_client
-            .post(format!("{}/v3/ingestion/ingest_documents", self.r2r_base_url))
+            .post(format!(
+                "{}/v3/ingestion/ingest_documents",
+                self.r2r_base_url
+            ))
             .json(&json!({
                 "documents": [{
                     "content": content,
@@ -68,7 +71,9 @@ impl Tool for IndexCodeTool {
         }
 
         Ok(CallToolResult {
-            content: vec![McpContent::Text { text: "Document indexed successfully".to_string() }],
+            content: vec![McpContent::Text {
+                text: "Document indexed successfully".to_string(),
+            }],
             is_error: false,
         })
     }

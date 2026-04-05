@@ -1,8 +1,8 @@
 use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_trait::async_trait;
-use serde_json::{json, Value};
 use factory_infrastructure::R2rClient;
+use serde_json::{json, Value};
 use std::sync::Arc;
 
 pub struct RetrieveContextTool {
