@@ -46,6 +46,7 @@ impl McpServer {
             execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             plan_mission::PlanMissionTool, retrieve_context::RetrieveContextTool,
             run_tests::RunTestsTool, security_review::SecurityReviewTool,
+            update_mission_status::UpdateMissionStatusTool,
         };
 
         let sandbox_driver = Arc::new(crate::sandbox::SubprocessDriver);
@@ -57,9 +58,10 @@ impl McpServer {
         self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone()))).await;
         self.add_tool(Box::new(PlanMissionTool::new(litellm_api_key, litellm_base_url, litellm_model))).await;
         self.add_tool(Box::new(RetrieveContextTool::new(r2r_base_url.clone()))).await;
-        self.add_tool(Box::new(IndexCodeTool::new(r2r_base_url))).await;
+        self.add_tool(Box::new(IndexCodeTool::new(r2r_base_url.clone()))).await;
         self.add_tool(Box::new(RunTestsTool::new(sandbox_driver))).await;
         self.add_tool(Box::new(SecurityReviewTool)).await;
+        self.add_tool(Box::new(UpdateMissionStatusTool::new("docs".to_string()))).await;
     }
 
     pub async fn handle_request(&self, request: JsonRpcRequest) -> JsonRpcResponse {
@@ -153,8 +155,6 @@ impl McpServer {
         }
 
         Json(response)
-    }
-
     }
 
     fn error_response(&self, id: Option<Value>, code: i32, message: &str) -> JsonRpcResponse {

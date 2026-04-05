@@ -18,3 +18,10 @@ pub mod plan_mission;
 pub mod retrieve_context;
 pub mod run_tests;
 pub mod security_review;
+pub mod update_mission_status;
+
+pub use execute_code::ExecuteCodeTool;
+pub use retrieve_context::RetrieveContextTool;
+pub use index_code::IndexCodeTool;
+pub use run_tests::RunTestsTool;
+pub use update_mission_status::UpdateMissionStatusTool;

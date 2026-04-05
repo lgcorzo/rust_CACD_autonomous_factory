@@ -13,9 +13,10 @@ tracing = { workspace = true }
 tracing-subscriber = "0.3"
 anyhow = { workspace = true }
 tokio-stream = { version = "0.1", features = ["net"] }
+chrono = "0.4"
 async-trait = "0.1"
 reqwest = { version = "0.11", features = ["json"] }
-futures = "0.3"
+futures = { version = "0.3" }
 tower-http = { version = "0.5", features = ["cors"] }
 uuid = { workspace = true }
 dotenv = "0.15"
