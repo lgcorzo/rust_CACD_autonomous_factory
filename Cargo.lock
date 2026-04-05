@@ -1348,6 +1348,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+ "tokio-stream",
  "tokio-test",
  "tower-http 0.5.2",
  "tracing",

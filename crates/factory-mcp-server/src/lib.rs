@@ -1,16 +1,26 @@
 pub mod protocol;
 pub mod tools;
+pub mod sandbox;
 
-use axum::{extract::State, Json};
+use axum::{
+    extract::{State, Query},
+    response::sse::{Event, Sse},
+    Json,
+};
 use crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool};
+use tokio_stream::{Stream, StreamExt};
+use tokio_stream::wrappers::UnboundedReceiverStream;
+use std::convert::Infallible;
+use std::time::Duration;
 use crate::tools::Tool;
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::RwLock;
+use tokio::sync::{mpsc, RwLock};
 
 pub struct McpServer {
     tools: Arc<RwLock<HashMap<String, Box<dyn Tool>>>>,
+    sessions: Arc<RwLock<HashMap<String, mpsc::UnboundedSender<JsonRpcResponse>>>>,
 }
 
 impl Default for McpServer {
@@ -23,6 +33,7 @@ impl McpServer {
     pub fn new() -> Self {
         Self {
             tools: Arc::new(RwLock::new(HashMap::new())),
+            sessions: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -30,21 +41,24 @@ impl McpServer {
         let mut tools = self.tools.write().await;
         tools.insert(tool.name(), tool);
     }
-
     pub async fn register_default_tools(&self) {
         use crate::tools::{
-            execute_code::ExecuteCodeTool, plan_mission::PlanMissionTool,
-            retrieve_context::RetrieveContextTool, security_review::SecurityReviewTool,
+            execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            plan_mission::PlanMissionTool, retrieve_context::RetrieveContextTool,
+            run_tests::RunTestsTool, security_review::SecurityReviewTool,
         };
 
+        let sandbox_driver = Arc::new(crate::sandbox::SubprocessDriver);
         let litellm_api_key = std::env::var("LITELLM_API_KEY").unwrap_or_else(|_| "sk-placeholder".to_string());
         let litellm_base_url = std::env::var("LITELLM_BASE_URL").unwrap_or_else(|_| "http://litellm:4000/v1".to_string());
         let litellm_model = std::env::var("LITELLM_MODEL").unwrap_or_else(|_| "alibaba-cn/MiniMax/MiniMax-M2.7".to_string());
         let r2r_base_url = std::env::var("R2R_BASE_URL").unwrap_or_else(|_| "http://r2r:8000".to_string());
 
-        self.add_tool(Box::new(ExecuteCodeTool)).await;
+        self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone()))).await;
         self.add_tool(Box::new(PlanMissionTool::new(litellm_api_key, litellm_base_url, litellm_model))).await;
-        self.add_tool(Box::new(RetrieveContextTool::new(r2r_base_url))).await;
+        self.add_tool(Box::new(RetrieveContextTool::new(r2r_base_url.clone()))).await;
+        self.add_tool(Box::new(IndexCodeTool::new(r2r_base_url))).await;
+        self.add_tool(Box::new(RunTestsTool::new(sandbox_driver))).await;
         self.add_tool(Box::new(SecurityReviewTool)).await;
     }
 
@@ -98,11 +112,49 @@ impl McpServer {
         }
     }
 
+    pub async fn sse_handler(
+        State(server): State<Arc<McpServer>>,
+    ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+        let session_id = uuid::Uuid::new_v4().to_string();
+        let (tx, rx) = mpsc::unbounded_channel::<JsonRpcResponse>();
+
+        {
+            let mut sessions = server.sessions.write().await;
+            sessions.insert(session_id.clone(), tx);
+        }
+
+        tracing::info!("New SSE session established: {}", session_id);
+
+        let stream = UnboundedReceiverStream::new(rx).map(|msg| {
+            let json = serde_json::to_string(&msg).unwrap();
+            Ok(Event::default().data(json))
+        });
+
+        // Send the initial endpoint event as per MCP spec (simplified)
+        // In a real implementation, we'd send the URI the client should POST to.
+        // For now, let's just send the session_id as a commentary.
+        
+        Sse::new(stream).keep_alive(ax_keep_alive())
+    }
+
     pub async fn post_handler(
         State(server): State<Arc<McpServer>>,
+        Query(params): Query<HashMap<String, String>>,
         Json(request): Json<JsonRpcRequest>,
     ) -> Json<JsonRpcResponse> {
-        Json(server.handle_request(request).await)
+        let session_id = params.get("session_id");
+        let response = server.handle_request(request).await;
+
+        if let Some(sid) = session_id {
+            let sessions = server.sessions.read().await;
+            if let Some(tx) = sessions.get(sid) {
+                let _ = tx.send(response.clone());
+            }
+        }
+
+        Json(response)
+    }
+
     }
 
     fn error_response(&self, id: Option<Value>, code: i32, message: &str) -> JsonRpcResponse {
@@ -117,6 +169,12 @@ impl McpServer {
             id,
         }
     }
+}
+
+fn ax_keep_alive() -> axum::response::sse::KeepAlive {
+    axum::response::sse::KeepAlive::new()
+        .interval(Duration::from_secs(15))
+        .text("keep-alive")
 }
 
 #[cfg(test)]
