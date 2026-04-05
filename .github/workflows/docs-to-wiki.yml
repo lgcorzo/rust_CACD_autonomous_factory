@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - main
+      - wiki-refactor-cleanup
     paths:
       - "wiki/**"
   repository_dispatch:
@@ -22,7 +23,7 @@ permissions:
 
 jobs:
   sync-content-to-wiki:
-    if: always() && format('refs/heads/{0}', github.event.repository.default_branch) == github.ref && github.event_name != 'gollum'
+    if: always() && github.event_name != 'gollum'
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
