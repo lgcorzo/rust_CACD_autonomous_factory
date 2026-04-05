@@ -16,6 +16,7 @@ env:
   GIT_AUTHOR_NAME: GitHub Action
   GIT_AUTHOR_EMAIL: action@github.com
   SYNC_CHANGES_REPO_NAME: docs-sync
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: write
