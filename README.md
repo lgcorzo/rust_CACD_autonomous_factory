@@ -7,9 +7,14 @@
 
 ---
 
-## 🎯 Architecture & Guiding Principles
+## 🏗 Standards & Architecture
 
-The codebase follows strict **Domain-Driven Design (DDD)** and is organized as a unified Rust workspace for maximum modularity and performance.
+This project strictly adheres to **LLMOps** and **Domain-Driven Design (DDD)** standards.
+
+- **LLMOps Lifecycle**: We follow a robust LLM application lifecycle, including automated prompt engineering, retrieval-augmented generation (RAG) evaluation, and model-in-the-loop security audits to ensure production-grade reliability and observability.
+- **DDD-based Structure**: The codebase is architected using DDD principles to maintain a clear separation of concerns. This ensures that the core domain logic remains isolated from infrastructure details and external service adapters (like Jira or R2R), allowing the system to scale and evolve without regression.
+
+The codebase is organized as a unified Rust workspace for maximum modularity and performance.
 
 ### 1. Workspace Crate Map
 
