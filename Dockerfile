@@ -22,7 +22,7 @@ WORKDIR /usr/local/bin
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    libssl1.1 \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the binaries from the builder
