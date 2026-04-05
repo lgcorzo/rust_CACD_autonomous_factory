@@ -1,10 +1,10 @@
 use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_trait::async_trait;
-use serde_json::{json, Value};
-use std::fs::{OpenOptions, File};
-use std::io::Write;
 use chrono::Local;
+use serde_json::{json, Value};
+use std::fs::{File, OpenOptions};
+use std::io::Write;
 
 pub struct UpdateMissionStatusTool {
     docs_path: String,
@@ -23,7 +23,8 @@ impl Tool for UpdateMissionStatusTool {
     }
 
     fn description(&self) -> String {
-        "Updates project documentation and mission history after a mission or testing phase.".to_string()
+        "Updates project documentation and mission history after a mission or testing phase."
+            .to_string()
     }
 
     fn input_schema(&self) -> Value {
@@ -45,17 +46,21 @@ impl Tool for UpdateMissionStatusTool {
         let status = params["status"].as_str().unwrap_or("Unknown");
         let summary = params["summary"].as_str().unwrap_or("");
         let agent_name = params["agent_name"].as_str().unwrap_or("OpenCodeAgent");
-        let artifacts = params["artifacts"].as_array()
-            .map(|a| a.iter().map(|v| v.as_str().unwrap_or("")).collect::<Vec<_>>().join(", "))
+        let artifacts = params["artifacts"]
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .map(|v| v.as_str().unwrap_or(""))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            })
             .unwrap_or_default();
 
         let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
 
         // 1. Update docs/mission_history.md (Terminal-friendly table)
         let history_path = format!("{}/mission_history.md", self.docs_path);
-        let mut file = OpenOptions::new()
-            .append(true)
-            .open(&history_path)?;
+        let mut file = OpenOptions::new().append(true).open(&history_path)?;
 
         let new_entry = format!(
             "| {} | {} | {} | {} | {} | (Agent: {}) |\n",

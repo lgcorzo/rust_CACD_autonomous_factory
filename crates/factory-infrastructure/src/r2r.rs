@@ -1,6 +1,6 @@
+use crate::R2rClient;
 use async_trait::async_trait;
 use serde_json::json;
-use crate::R2rClient;
 
 pub struct HttpR2rClient {
     url: String,
@@ -21,7 +21,8 @@ impl HttpR2rClient {
 
     async fn get_token(&self) -> anyhow::Result<String> {
         let login_url = format!("{}/v3/users/login", self.url.trim_end_matches('/'));
-        let login_res = self.client
+        let login_res = self
+            .client
             .post(&login_url)
             .form(&[("username", &self.user), ("password", &self.pwd)])
             .send()
@@ -66,7 +67,8 @@ impl R2rClient for HttpR2rClient {
         let token = self.get_token().await?;
 
         let search_url = format!("{}/v3/retrieval/search", self.url.trim_end_matches('/'));
-        let search_res = self.client
+        let search_res = self
+            .client
             .post(&search_url)
             .bearer_auth(token)
             .json(&json!({
@@ -123,18 +125,15 @@ impl R2rClient for HttpR2rClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::json;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
-    use serde_json::json;
 
     #[tokio::test]
     async fn test_r2r_search_success() {
         let mock_server = MockServer::start().await;
-        let client = HttpR2rClient::new(
-            mock_server.uri(),
-            "admin".to_string(),
-            "admin".to_string(),
-        );
+        let client =
+            HttpR2rClient::new(mock_server.uri(), "admin".to_string(), "admin".to_string());
 
         // Mock login
         Mock::given(method("POST"))
@@ -176,11 +175,8 @@ mod tests {
     #[tokio::test]
     async fn test_r2r_login_failure() {
         let mock_server = MockServer::start().await;
-        let client = HttpR2rClient::new(
-            mock_server.uri(),
-            "admin".to_string(),
-            "admin".to_string(),
-        );
+        let client =
+            HttpR2rClient::new(mock_server.uri(), "admin".to_string(), "admin".to_string());
 
         Mock::given(method("POST"))
             .and(path("/v3/users/login"))
@@ -196,11 +192,8 @@ mod tests {
     #[tokio::test]
     async fn test_r2r_search_failure_after_login() {
         let mock_server = MockServer::start().await;
-        let client = HttpR2rClient::new(
-            mock_server.uri(),
-            "admin".to_string(),
-            "admin".to_string(),
-        );
+        let client =
+            HttpR2rClient::new(mock_server.uri(), "admin".to_string(), "admin".to_string());
 
         // Mock login
         Mock::given(method("POST"))
@@ -220,6 +213,9 @@ mod tests {
 
         let result = client.search("test").await;
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("500 Internal Server Error"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("500 Internal Server Error"));
     }
 }

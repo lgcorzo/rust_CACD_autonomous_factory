@@ -22,8 +22,8 @@ pub mod security_review;
 pub mod update_mission_status;
 
 pub use execute_code::ExecuteCodeTool;
-pub use retrieve_context::RetrieveContextTool;
 pub use index_code::IndexCodeTool;
+pub use retrieve_context::RetrieveContextTool;
 pub use run_tests::RunTestsTool;
 pub use search_jira::SearchJiraTool;
 pub use update_mission_status::UpdateMissionStatusTool;

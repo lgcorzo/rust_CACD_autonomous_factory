@@ -1,9 +1,32 @@
-# https://docs.docker.com/engine/reference/builder/
+# Stage 1: Build the Rust workspace
+FROM rust:1.80-slim-bullseye AS builder
 
-FROM python:3.12
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-COPY dist/*.whl .
-RUN pip install *.whl
-ARG ENTRYPOINT_MODE='mcp'
-ENV ENTRYPOINT_MODE=${ENTRYPOINT_MODE}
-CMD ["sh", "-c", "if [ \"$ENTRYPOINT_MODE\" = 'mcp' ]; then python -m autogen_team.application.mcp.mcp_server; else python -m autogen_team.infrastructure.messaging.kafka_app; fi"]
+WORKDIR /usr/src/app
+COPY . .
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build all workspace members
+RUN cargo build --release --workspace
+
+# Stage 2: Final runtime image
+FROM debian:bullseye-slim
+
+WORKDIR /usr/local/bin
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl1.1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the binaries from the builder
+COPY --from=builder /usr/src/app/target/release/factory-cli .
+COPY --from=builder /usr/src/app/target/release/factory-mcp-server .
+
+# Default command
+CMD ["./factory-cli"]

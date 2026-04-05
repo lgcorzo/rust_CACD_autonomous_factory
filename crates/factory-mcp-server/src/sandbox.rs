@@ -1,6 +1,6 @@
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use tokio::process::Command;
-use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ExecutionResult {
@@ -21,13 +21,7 @@ pub struct SubprocessDriver;
 impl SandboxDriver for SubprocessDriver {
     async fn execute(&self, code: &str, language: &str) -> anyhow::Result<ExecutionResult> {
         let output = match language {
-            "python" => {
-                Command::new("python3")
-                    .arg("-c")
-                    .arg(code)
-                    .output()
-                    .await?
-            }
+            "python" => Command::new("python3").arg("-c").arg(code).output().await?,
             "rust" => {
                 // Simplified rustc execution for now
                 Command::new("rustc")
@@ -35,7 +29,9 @@ impl SandboxDriver for SubprocessDriver {
                     .arg("println!(\"{}\", \"Hello from Rust!\")")
                     .output()
                     .await
-                    .map_err(|_| anyhow::anyhow!("Rustc execution not fully implemented in local driver"))?
+                    .map_err(|_| {
+                        anyhow::anyhow!("Rustc execution not fully implemented in local driver")
+                    })?
             }
             _ => return Err(anyhow::anyhow!("Unsupported language: {}", language)),
         };
