@@ -24,6 +24,9 @@ jobs:
         with:
           components: rustfmt, clippy
           
+      - name: Install Protoc
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+          
       - name: Check Formatting
         run: cargo fmt --all -- --check
         
