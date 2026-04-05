@@ -8,6 +8,7 @@ COPY . .
 RUN apt-get update && apt-get install -y \
     pkg-config \
     libssl-dev \
+    protobuf-compiler \
     && rm -rf /var/lib/apt/lists/*
 
 # Build all workspace members
