@@ -1,6 +1,7 @@
 pub mod protocol;
 pub mod tools;
 
+use axum::{extract::State, Json};
 use crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool};
 use crate::tools::Tool;
 use serde_json::{json, Value};
@@ -28,6 +29,23 @@ impl McpServer {
     pub async fn add_tool(&self, tool: Box<dyn Tool>) {
         let mut tools = self.tools.write().await;
         tools.insert(tool.name(), tool);
+    }
+
+    pub async fn register_default_tools(&self) {
+        use crate::tools::{
+            execute_code::ExecuteCodeTool, plan_mission::PlanMissionTool,
+            retrieve_context::RetrieveContextTool, security_review::SecurityReviewTool,
+        };
+
+        let litellm_api_key = std::env::var("LITELLM_API_KEY").unwrap_or_else(|_| "sk-placeholder".to_string());
+        let litellm_base_url = std::env::var("LITELLM_BASE_URL").unwrap_or_else(|_| "http://litellm:4000/v1".to_string());
+        let litellm_model = std::env::var("LITELLM_MODEL").unwrap_or_else(|_| "alibaba-cn/MiniMax/MiniMax-M2.7".to_string());
+        let r2r_base_url = std::env::var("R2R_BASE_URL").unwrap_or_else(|_| "http://r2r:8000".to_string());
+
+        self.add_tool(Box::new(ExecuteCodeTool)).await;
+        self.add_tool(Box::new(PlanMissionTool::new(litellm_api_key, litellm_base_url, litellm_model))).await;
+        self.add_tool(Box::new(RetrieveContextTool::new(r2r_base_url))).await;
+        self.add_tool(Box::new(SecurityReviewTool)).await;
     }
 
     pub async fn handle_request(&self, request: JsonRpcRequest) -> JsonRpcResponse {
@@ -78,6 +96,13 @@ impl McpServer {
         } else {
             self.error_response(request.id, -32602, "Tool not found")
         }
+    }
+
+    pub async fn post_handler(
+        State(server): State<Arc<McpServer>>,
+        Json(request): Json<JsonRpcRequest>,
+    ) -> Json<JsonRpcResponse> {
+        Json(server.handle_request(request).await)
     }
 
     fn error_response(&self, id: Option<Value>, code: i32, message: &str) -> JsonRpcResponse {

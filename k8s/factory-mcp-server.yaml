@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factory-mcp-server
+  namespace: factory
+  labels:
+    app: factory-mcp-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: factory-mcp-server
+  template:
+    metadata:
+      labels:
+        app: factory-mcp-server
+    spec:
+      containers:
+      - name: mcp-server
+        image: ghcr.io/lgcorzo/factory-mcp-server:latest
+        ports:
+        - containerPort: 8100
+        env:
+        - name: PORT
+          value: "8100"
+        - name: LITELLM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: opencode-secrets
+              key: LITELLM_API_KEY
+        - name: LITELLM_BASE_URL
+          value: "http://litellm.factory.svc.cluster.local:4000/v1"
+        - name: R2R_BASE_URL
+          value: "http://r2r.factory.svc.cluster.local:8000"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: factory-mcp-server
+  namespace: factory
+spec:
+  selector:
+    app: factory-mcp-server
+  ports:
+  - protocol: TCP
+    port: 8100
+    targetPort: 8100
+  type: ClusterIP

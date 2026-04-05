@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencode-agent
+  namespace: factory
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencode-agent
+  template:
+    metadata:
+      labels:
+        app: opencode-agent
+    spec:
+      containers:
+      - name: agent
+        image: ghcr.io/opencode-ai/agent:latest
+        env:
+        - name: OPENCODE_CONFIG_PATH
+          value: "/etc/opencode/opencode.json"
+        - name: LITELLM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: opencode-secrets
+              key: LITELLM_API_KEY
+        - name: LITELLM_BASE_URL
+          value: "http://litellm.factory.svc.cluster.local:4000/v1"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/opencode
+          readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: opencode-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opencode-config
+  namespace: factory
+data:
+  opencode.json: |
+    {
+      "mcpServers": {
+        "factory-rust": {
+          "url": "http://factory-mcp-server.factory.svc.cluster.local:8100"
+        }
+      },
+      "modelProviders": {
+        "litellm": {
+          "baseURL": "http://litellm.factory.svc.cluster.local:4000/v1"
+        }
+      }
+    }
