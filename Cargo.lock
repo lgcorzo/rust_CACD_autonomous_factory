@@ -1342,6 +1342,7 @@ dependencies = [
  "chrono",
  "dotenv",
  "factory-core",
+ "factory-infrastructure",
  "futures",
  "mockall",
  "regex",

@@ -2,27 +2,27 @@ use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_trait::async_trait;
 use serde_json::{json, Value};
-use factory_infrastructure::R2rClient;
+use factory_infrastructure::JiraClient;
 use std::sync::Arc;
 
-pub struct RetrieveContextTool {
-    r2r_client: Arc<dyn R2rClient>,
+pub struct SearchJiraTool {
+    jira_client: Arc<dyn JiraClient>,
 }
 
-impl RetrieveContextTool {
-    pub fn new(r2r_client: Arc<dyn R2rClient>) -> Self {
-        Self { r2r_client }
+impl SearchJiraTool {
+    pub fn new(jira_client: Arc<dyn JiraClient>) -> Self {
+        Self { jira_client }
     }
 }
 
 #[async_trait]
-impl Tool for RetrieveContextTool {
+impl Tool for SearchJiraTool {
     fn name(&self) -> String {
-        "retrieve_context".to_string()
+        "search_jira".to_string()
     }
 
     fn description(&self) -> String {
-        "Queries R2R RAG for patterns.".to_string()
+        "Searches Jira issues for summaries or descriptions.".to_string()
     }
 
     fn input_schema(&self) -> Value {
@@ -40,14 +40,14 @@ impl Tool for RetrieveContextTool {
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Query is required"))?;
 
-        match self.r2r_client.search(query).await {
+        match self.jira_client.search_issues(query).await {
             Ok(output) => Ok(CallToolResult {
                 content: vec![McpContent::Text { text: output }],
                 is_error: false,
             }),
             Err(e) => Ok(CallToolResult {
                 content: vec![McpContent::Text {
-                    text: format!("R2R search error: {}", e),
+                    text: format!("Jira search error: {}", e),
                 }],
                 is_error: true,
             }),
@@ -59,44 +59,44 @@ impl Tool for RetrieveContextTool {
 mod tests {
     use super::*;
 
-    struct ManualMockR2rClient {
+    struct ManualMockJiraClient {
         should_fail: bool,
     }
 
     #[async_trait]
-    impl R2rClient for ManualMockR2rClient {
-        async fn search(&self, _query: &str) -> anyhow::Result<String> {
+    impl JiraClient for ManualMockJiraClient {
+        async fn search_issues(&self, _query: &str) -> anyhow::Result<String> {
             if self.should_fail {
-                Err(anyhow::anyhow!("R2R Failure"))
+                Err(anyhow::anyhow!("Internal Error"))
             } else {
-                Ok("pattern content".to_string())
+                Ok("found it".to_string())
             }
         }
     }
 
     #[tokio::test]
-    async fn test_retrieve_context_tool_success() {
-        let mock_client = ManualMockR2rClient { should_fail: false };
-        let tool = RetrieveContextTool::new(Arc::new(mock_client));
+    async fn test_search_jira_tool_success() {
+        let mock_client = ManualMockJiraClient { should_fail: false };
+        let tool = SearchJiraTool::new(Arc::new(mock_client));
         let params = json!({ "query": "test query" });
         let result = tool.call(params).await.unwrap();
 
         assert!(!result.is_error);
         if let McpContent::Text { text } = &result.content[0] {
-            assert_eq!(text, "pattern content");
+            assert_eq!(text, "found it");
         }
     }
 
     #[tokio::test]
-    async fn test_retrieve_context_tool_failure() {
-        let mock_client = ManualMockR2rClient { should_fail: true };
-        let tool = RetrieveContextTool::new(Arc::new(mock_client));
+    async fn test_search_jira_tool_failure() {
+        let mock_client = ManualMockJiraClient { should_fail: true };
+        let tool = SearchJiraTool::new(Arc::new(mock_client));
         let params = json!({ "query": "test query" });
         let result = tool.call(params).await.unwrap();
 
         assert!(result.is_error);
         if let McpContent::Text { text } = &result.content[0] {
-            assert!(text.contains("R2R search error: R2R Failure"));
+            assert!(text.contains("Jira search error: Internal Error"));
         }
     }
 }
