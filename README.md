@@ -1,7 +1,9 @@
 # Dark Gravity: CACD Autonomous Agent Factory
 
-[![Check CI](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/check.yml)
-[![License](https://img.shields.io/github/license/lgcorzo/rust_CACD_autonomous_factory)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/blob/main/LICENSE)
+[![CI/CD Pipeline](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/pipeline.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/pipeline.yml)
+[![Wiki Content Sync](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml)
+[![Docker Pulls](https://img.shields.io/docker/pulls/lgcorzo/dark-gravity-factory.svg)](https://hub.docker.com/r/lgcorzo/dark-gravity-factory)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 **Dark Gravity** is a high-performance, long-term agentic system serving as the core intelligence for the **CA/CD Autonomous Agent Factory**. Rebuilt from the ground up in **Rust**, it orchestrates complex multi-agent workflows with zero-trust security and durable task execution.
 
@@ -78,9 +80,27 @@ We enforce high source quality through automated CI pipelines.
 - **Static Analysis**: `cargo clippy --workspace -- -D warnings`
 - **Run Tests**: `cargo test --workspace`
 
-### CI/CD Status
+## ✅ Repository Checks
 
-Automated checks are run on every Pull Request. See the [CI Pipeline Design](.artifacts/ci_pipeline_design.md) for detailed verification standards.
+The following automated checks are active in this repository to maintain high engineering standards:
+
+### 1. CI/CD Pipeline (`pipeline.yml`)
+- **Linting**: Enforces strict `rustfmt` and `clippy` (warnings-as-errors) across the entire workspace.
+- **Testing**: Executes all unit and integration tests (excluding heavy smoke tests).
+- **Protoc Build**: Automated Protocol Buffers compilation verification for all service definitions.
+- **Docker Build**: Validates that a production-ready image can be built and pushed to Docker Hub upon merge to `main`.
+
+### 2. Wiki Content Sync (`docs-to-wiki.yml`)
+- Maintains bi-directional synchronization between the repo's `wiki/` folder and the GitHub Project Wiki.
+- Ensures documentation remains consistent and discoverable.
+
+### 3. Image Integrity & Deployment
+- Production images are published under `lgcorzo/dark-gravity-factory`.
+- Every release candidate is tagged with the specific `git SHA` for full auditability and rollback capability.
+
+### 4. Code Standards
+- **Edition 2024 Readiness**: The project uses modern Rust editions for safety and performance.
+- **Dependency Guard**: Automated monitoring of critical libraries (Hatchet, OpenZiti, the AWS SDK).
 
 ---
 
