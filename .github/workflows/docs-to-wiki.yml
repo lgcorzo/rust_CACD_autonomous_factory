@@ -15,7 +15,6 @@ on:
 env:
   GIT_AUTHOR_NAME: GitHub Action
   GIT_AUTHOR_EMAIL: action@github.com
-  SYNC_CHANGES_REPO_NAME: wiki-sync
 
 permissions:
   contents: write
@@ -28,14 +27,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Sync repo wiki folder to wiki
-        uses: newrelic/wiki-sync-action@v1.0.1
-        with:
-          source: wiki
-          destination: "."
-          token: ${{ secrets.WIKI_PERSONAL_ACCESS_TOKEN }}
-          branch: main
-          gitAuthorName: ${{ env.GIT_AUTHOR_NAME }}
-          gitAuthorEmail: ${{ env.GIT_AUTHOR_EMAIL }}
+        run: |
+          # 1. Prepare wiki repository URL
+          WIKI_URL="https://x-access-token:${{ secrets.WIKI_PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+          
+          # 2. Clone the wiki to a temporary directory
+          git clone "$WIKI_URL" wiki_temp
+          
+          # 3. Clean all files in wiki_temp (except .git)
+          find wiki_temp -mindepth 1 -maxdepth 1 -not -name ".git" -exec rm -rf {} +
+          
+          # 4. Copy everything from 'wiki/' folder to wiki_temp root
+          cp -r wiki/* wiki_temp/
+          
+          # 5. Commit and push changes
+          cd wiki_temp
+          git config user.name "${{ env.GIT_AUTHOR_NAME }}"
+          git config user.email "${{ env.GIT_AUTHOR_EMAIL }}"
+          git add .
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "chore: sync documentation to wiki [skip ci]"
+            # Targeting main or master depending on the wiki repo default
+            git push origin HEAD:main || git push origin HEAD:master
+          else
+            echo "No changes to sync."
+          fi
+        shell: bash
 
   job-sync-wiki-to-repo:
     if: github.event_name == 'gollum'
@@ -49,43 +67,53 @@ jobs:
       - name: Is this safe to do?
         id: safe
         run: |
-          # to check if the Home.md file exists locally already, is so we can assume a sync has been done, and bidirection can now run safely.
-          INDEX_EXISTS=$(find wiki/* -name "Home.md")
-
-          if [ ! -z $INDEX_EXISTS ]
-          then
-            echo "not a first time run"
+          # Check if wiki folder exists
+          if [ -d "wiki" ]; then
+            echo "Wiki directory found."
           else
-            OUTPUT="# Oopsy, we've hit a road block, but we're almost there \n
-            :rocket: - you are on your way, but first you need to sync content to the wiki first before the reverse can happen else you will lose data\n
-            this can be done by running this job manually on your default branch\n
-            create a md file in wiki named Home.md to pass this step"
-            echo -e $OUTPUT >> $GITHUB_STEP_SUMMARY
+            echo "wiki directory not found. Please sync to wiki first."
             exit 1
           fi
         shell: bash
-      - name: Create branch first
+      - name: Sync Wiki to Repo (Manual)
         run: |
-          git checkout -b $SYNC_CHANGES_REPO_NAME
+          # 1. Prepare wiki repository URL
+          WIKI_URL="https://x-access-token:${{ secrets.WIKI_PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+          
+          # 2. Clone the wiki
+          git clone "$WIKI_URL" wiki_temp
+          
+          # 3. Create a new branch for the changes
+          SYNC_BRANCH="wiki-sync-$(date +%s)"
+          git checkout -b "$SYNC_BRANCH"
+          
+          # 4. Sync contents from wiki_temp to the local wiki/ folder
+          rm -rf wiki/*
+          cp -r wiki_temp/* wiki/
+          rm -rf wiki/.git
+          
+          # 5. Push the new branch
+          git config user.name "${{ env.GIT_AUTHOR_NAME }}"
+          git config user.email "${{ env.GIT_AUTHOR_EMAIL }}"
+          git add wiki/
+          
+          if [ -n "$(git status --porcelain)" ]; then
+             git commit -m "chore: sync wiki changes back to repository"
+             git push origin "$SYNC_BRANCH"
+             echo "branch_name=$SYNC_BRANCH" >> $GITHUB_OUTPUT
+          else
+             echo "No changes found."
+             exit 0
+          fi
+        id: sync
         shell: bash
-      - name: Sync Wiki to Repo
-        uses: newrelic/wiki-sync-action@v1.0.1
-        with:
-          source: wiki
-          destination: "."
-          token: ${{ secrets.WIKI_PERSONAL_ACCESS_TOKEN }}
-          branch: ${{ env.SYNC_CHANGES_REPO_NAME }}
-          gitAuthorName: ${{ env.GIT_AUTHOR_NAME }}
-          gitAuthorEmail: ${{ env.GIT_AUTHOR_EMAIL }}
-
       - name: Create pull-request
+        if: steps.sync.outputs.branch_name != ''
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: ${{ env.SYNC_CHANGES_REPO_NAME }}
+          source_branch: ${{ steps.sync.outputs.branch_name }}
           destination_branch: ${{ github.event.repository.default_branch }}
-          pr_title: "[Chore] - Syncing Wiki changes in ${{ env.SYNC_CHANGES_REPO_NAME }} into default branch"
-          pr_body: ":crown: *An automated PR* This is an automated PR to sync this repository's wiki docs with your docs in the repo via a PR."
+          pr_title: "[Chore] - Syncing Wiki changes from Web UI into repository"
+          pr_body: ":crown: *An automated PR* This PR syncs changes made directly in the GitHub Wiki back to the repository's `wiki/` folder."
           pr_label: "wiki,automation"
-          pr_draft: false
-          pr_allow_empty: false
           github_token: ${{ secrets.WIKI_PERSONAL_ACCESS_TOKEN }}
