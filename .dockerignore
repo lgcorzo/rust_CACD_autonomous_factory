@@ -2,7 +2,7 @@ target/
 .git/
 .github/
 .agents/
-docs/
+wiki/
 README.md
 !crates/
 !Cargo.toml
