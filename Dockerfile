@@ -1,5 +1,5 @@
 # Stage 1: Build the Rust workspace
-FROM rust:1.80-slim-bullseye AS builder
+FROM rust:1.85-slim-bullseye AS builder
 
 WORKDIR /usr/src/app
 COPY . .
