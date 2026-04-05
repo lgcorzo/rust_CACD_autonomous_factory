@@ -30,3 +30,4 @@ Welcome to the official wiki for the **Dark Gravity CACD Autonomous Factory**. T
 
 ---
 *This wiki is synchronized automatically with the repository.*
+<!-- trigger sync -->
