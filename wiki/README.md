@@ -37,7 +37,7 @@ To get started with the factory, ensure you have the following prerequisites in 
 - `crates/`: Modular Rust workspace components.
 - `k8s/`: Kubernetes manifests for deployment.
 - `opencode.json`: Primary configuration for the OpenCode agent.
-- `docs/`: (You are here) Comprehensive project documentation.
+- `wiki/`: (You are here) Comprehensive project documentation.
 
 > [!TIP]
 > Each sub-crate in `crates/` contains its own internal documentation and tests. For deep-dives into specific logic, refer to the individual crate folders.
