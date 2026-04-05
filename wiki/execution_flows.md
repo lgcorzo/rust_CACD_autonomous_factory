@@ -53,6 +53,7 @@ sequenceDiagram
     Hatchet->>Kafka: Publish "mission-complete"
     Kafka->>n8n: Notify completion (DA-123)
     n8n->>Jira: Transition to "Done" + Post PR Link
+```
 
 ---
 
@@ -78,7 +79,6 @@ sequenceDiagram
     Sandbox-->>MCP: Stdout/Stderr
     MCP-->>Agent: event: message { jsonrpc: "2.0", result: { content: [...] } }
 ```
-```
 
 ---
 
@@ -103,12 +103,12 @@ graph TD
 
 No code reaches the `main` branch without surviving the **Verification Triad**:
 
-1.  **Logical Verification**:
+1. **Logical Verification**:
     - **Coder Agent**: Implements the logic.
     - **Tester Agent**: Verifies that the logic works.
-2.  **Architectural Verification**:
+2. **Architectural Verification**:
     - **Reviewer Agent**: Checks for design patterns and system alignment.
-3.  **Security Verification**:
+3. **Security Verification**:
     - **SecurityReviewTool**: Automated scanning of code for SQL injections, hardcoded secrets, and unsafe dependencies.
 
 ---
@@ -123,5 +123,6 @@ graph LR
     KE -->|Scale| D[OpenCode Deployment]
     D -->|N replicas| H[Hatchet Workers]
 ```
+
 > [!NOTE]
 > This ensures zero idling resource overhead while maintaining high throughput for large bursts of missions.
