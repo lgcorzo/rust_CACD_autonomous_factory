@@ -8,7 +8,7 @@ pub struct JsonRpcRequest {
     pub id: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JsonRpcResponse {
     pub jsonrpc: String,
     pub result: Option<serde_json::Value>,
@@ -16,7 +16,7 @@ pub struct JsonRpcResponse {
     pub id: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JsonRpcError {
     pub code: i32,
     pub message: String,
@@ -36,7 +36,7 @@ pub struct CallToolResult {
     pub is_error: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum McpContent {
     Text { text: String },
