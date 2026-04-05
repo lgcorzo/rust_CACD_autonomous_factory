@@ -53,6 +53,31 @@ sequenceDiagram
     Hatchet->>Kafka: Publish "mission-complete"
     Kafka->>n8n: Notify completion (DA-123)
     n8n->>Jira: Transition to "Done" + Post PR Link
+
+---
+
+## 🌩️ SSE Transport Flow (Unified Communication)
+
+The factory uses a persistent **SSE (Server-Sent Events)** stream for bidirectional tool execution. This ensures long-running tasks (like code generation or test suites) do not timeout and provide real-time feedback.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Agent as OpenCode Agent
+    participant MCP as Rust MCP Server (Axum)
+    participant Sandbox as Sandbox/Firecrate
+    
+    Agent->>MCP: GET /sse (Establish Connection)
+    MCP-->>Agent: 200 OK (Connection: keep-alive)
+    MCP-->>Agent: event: endpoint { session_id: "uuid-123" }
+    
+    Note over Agent,MCP: Persistent Session Established
+    
+    Agent->>MCP: POST /mcp?session_id=uuid-123 (JSON-RPC: call_tool)
+    MCP->>Sandbox: Execute Isolated Command
+    Sandbox-->>MCP: Stdout/Stderr
+    MCP-->>Agent: event: message { jsonrpc: "2.0", result: { content: [...] } }
+```
 ```
 
 ---

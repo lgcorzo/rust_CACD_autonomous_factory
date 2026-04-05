@@ -59,6 +59,24 @@ spec:
         topic: mission-input
         lagThreshold: "1"
         consumerGroup: opencode-workers
+
+---
+
+## 🛠️ MCP Server Configuration (Production)
+
+The **Rust MCP Server** requires several environment variables for proper tool registration and secure execution.
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `LITELLM_API_KEY` | Key for the LiteLLM gateway. | `sk-placeholder` |
+| `LITELLM_BASE_URL` | Base URL for LiteLLM. | `http://litellm:4000/v1` |
+| `R2R_BASE_URL` | Base URL for R2R Graph RAG. | `http://r2r:8000` |
+| `SANDBOX_DRIVER` | Mode for code execution (`local`, `firecracker`). | `local` |
+
+### 🌩️ SSE Connection
+Clients must use the **SSE (Server-Sent Events)** protocol to connect to the MCP server.
+- **Handshake**: `GET /sse` (generates a `session_id`).
+- **Invocations**: `POST /mcp?session_id=<UUID>` (asynchronous JSON-RPC).
 ```
 
 ---

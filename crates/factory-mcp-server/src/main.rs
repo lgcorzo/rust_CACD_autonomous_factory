@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 use axum::{
-    routing::post,
+    routing::{get, post},
     Router,
 };
 use factory_mcp_server::McpServer;
@@ -16,7 +16,8 @@ async fn main() -> anyhow::Result<()> {
     server.register_default_tools().await;
 
     let app = Router::new()
-        .route("/", post(McpServer::post_handler))
+        .route("/mcp", post(McpServer::post_handler))
+        .route("/sse", get(McpServer::sse_handler))
         .layer(CorsLayer::permissive())
         .with_state(server);
 
