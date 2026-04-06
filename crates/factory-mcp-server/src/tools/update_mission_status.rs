@@ -43,6 +43,17 @@ impl Tool for UpdateMissionStatusTool {
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
         let mission_id = params["mission_id"].as_str().unwrap_or("unknown");
+
+        // Security check: prevent path traversal
+        if mission_id.contains('/') || mission_id.contains('\\') || mission_id.contains("..") {
+            return Ok(CallToolResult {
+                content: vec![McpContent::Text {
+                    text: "Error: Invalid mission_id. Path traversal characters are not allowed.".to_string(),
+                }],
+                is_error: true,
+            });
+        }
+
         let status = params["status"].as_str().unwrap_or("Unknown");
         let summary = params["summary"].as_str().unwrap_or("");
         let agent_name = params["agent_name"].as_str().unwrap_or("OpenCodeAgent");
