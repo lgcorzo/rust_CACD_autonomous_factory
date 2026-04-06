@@ -21,9 +21,9 @@ The system uses a tiered testing approach to ensure 100% mission reliability and
 
 We use **`wiremock`** and **`mockall`** to verify external integrations without making real network calls.
 
-- **WireMock**: Used to spin up an HTTP server that mimics **Jira** or **R2R** responses. This validates our `reqwest` client logic and error handling (401, 404, 500).
+- **WireMock**: Used to spin up an HTTP server that mimics **GitHub/GitLab** or **R2R** responses. This validates our `reqwest` client logic and error handling (401, 404, 500).
 - **MockAll**: Used to generate trait-based mocks for unit tests in the `Application` and `Interface` layers.
-- **Coverage**: ALL infrastructure clients (`HttpJiraClient`, `HttpR2rClient`) MUST maintain **95%+ unit test coverage**.
+- **Coverage**: ALL infrastructure clients (`HttpGitHubClient`, `HttpGitLabClient`, `HttpR2rClient`) MUST maintain **95%+ unit test coverage**.
 
 ---
 
@@ -58,7 +58,7 @@ Standard code tests are insufficient for measuring an autonomous factory's perfo
 
 ### 📏 Key Metrics
 
-1. **Correctness**: Does the generated code fulfill all acceptance criteria from the Jira ticket?
+1. **Correctness**: Does the generated code fulfill all acceptance criteria from the GitHub mission issue?
 2. **Faithfulness (RAG)**: Is the code generated based on the retrieved context, or is the model hallucinating new patterns?
 3. **Security Score**: Does the `SecurityReviewTool` flag the mission?
 4. **Token Efficiency**: Reaching the goal with the minimum number of LLM calls.

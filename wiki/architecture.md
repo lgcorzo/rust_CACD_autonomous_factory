@@ -2,58 +2,53 @@
 
 ## 🛡️ Zero Trust Architecture (ZTA)
 
-The system operates strictly within a **Zero Trust** perimeter. No inbound traffic is allowed, and all outbound traffic to external APIs (Jira, GitHub) is strictly governed by **OpenZiti** and Kubernetes **NetworkPolicies**.
+The system operates strictly within a **Zero Trust** perimeter. No inbound traffic is allowed, and all outbound traffic to external APIs (GitHub, GitLab) is strictly governed by **OpenZiti** and Kubernetes **NetworkPolicies**.
 
 ### 🛠️ High-Level System Diagram
 
 ```mermaid
 graph TB
-    subgraph "External Services"
-        JIRA[Jira Cloud]
-        GIT[GitHub API]
+    subgraph "External Surface"
+        GH[GitHub Issues]
+        GL[GitLab Issues]
+        R2R[R2R Graph RAG]
     end
 
-    subgraph "Zero Trust Perimeter - OpenZiti"
-        subgraph "Internal Manager - llm-apps"
-            OWUI[OpenWebUI]
-        end
-
-        subgraph "Orchestration Layer - orchestrators"
-            n8n[n8n Outbound Poller]
-            HATCHET[Hatchet Engine]
-            KAFKA[Kafka Streams]
-        end
-
-        subgraph "Agentic Workers - agents"
-            RUSTANT[Rustant Pods]
-            ZEROCLAW[ZeroClaw Pods]
-            F_MCP[Rust MCP Server]
-        end
-
-        subgraph "Model & RAG"
-            LITELLM[LiteLLM Gateway]
-            R2R[R2R Graph RAG]
-        end
-
-        subgraph "Persistence"
-            PG[(CloudNativePG)]
-            MINIO[MinIO Workspace]
-        end
+    subgraph "DMZ (Outbound Only)"
+        NP[n8n Poller]
     end
 
-    n8n -->|Fetch| JIRA
-    n8n -->|Publish| KAFKA
-    KAFKA -->|Trigger| HATCHET
-    HATCHET -->|Assign| RUSTANT
-    HATCHET -->|Assign| ZEROCLAW
-    RUSTANT -->|Thought| KAFKA
-    ZEROCLAW -->|Thought| KAFKA
-    RUSTANT -->|SSE/POST| F_MCP
-    ZEROCLAW -->|SSE/POST| F_MCP
-    F_MCP -->|Model| LITELLM
-    F_MCP -->|Context| R2R
-    F_MCP -->|Isolated Exec| SANDBOX[Sandbox/Firecracker]
-    ZEROCLAW -->|Artifacts| MINIO
+    subgraph "Dark Kubernetes (Zero Trust)"
+        direction TB
+        K[Kafka: mission-events]
+        H[Hatchet Engine]
+        
+        subgraph "Autonomous Agents"
+            R[Rustant: Planner]
+            Z[ZeroClaw: Executor]
+            J[Jules: Remediator]
+        end
+
+        subgraph "Self-Healing Loop"
+            FC[FluxCD Alerts]
+            RW[Remediator Webhook]
+        end
+        
+        S[Sealed Secrets]
+        OZ[OpenZiti Identity]
+    end
+
+    GH -->|mission label| NP
+    GL -->|mission label| NP
+    NP -->|Produce| K
+    FC -->|Alert| RW
+    RW -->|Trigger| J
+    K -->|Consume| H
+    H -->|Execute| R
+    H -->|Execute| Z
+    R <-->|Context| R2R
+    Z <-->|Context| R2R
+    J <-->|Context| R2R
 ```
 
 ---
@@ -66,7 +61,7 @@ The codebase follows the **Domain-Driven Design (DDD)** pattern, separating conc
 | :--- | :--- | :--- | :--- |
 | `factory-core` | **Domain** | Pure business logic, shared models, and security protocols. | `serde`, `uuid` |
 | `factory-application` | **Application** | Hatchet orchestration via **6-Phase DAG**. Specialized workers: **Rustant** (Architect) & **ZeroClaw** (Executor). | `factory-core` |
-| `factory-infrastructure` | **Infrastructure** | Concrete adapters for **Jira**, **R2R**, **LiteLLM**, and **Kafka** (agent-thought). | `reqwest`, `rdkafka` |
+| `factory-infrastructure` | **Infrastructure** | Concrete adapters for **GitHub**, **GitLab**, **R2R**, and **LiteLLM**. | `reqwest`, `rdkafka` |
 | `factory-mcp-server` | **Interface (RPC)** | MCP Server, **SSE transport**, and integrated Skills (Context, Sandbox). | `axum`, `tokio` |
 | `factory-cli` | **Interface (CLI)** | Command-line entry points for workers and local testing. | `clap` |
 
@@ -126,5 +121,5 @@ classDiagram
 ## 🔐 Security & Governance
 
 - **OIDC Authentication**: All user access to **OpenWebUI** and **LiteLLM** is federated via Keycloak.
-- **Sealed Secrets**: API tokens (GitHub, Jira, LiteLLM) are NEVER stored in plain text. They are encrypted using the **Bitnami Sealed Secrets** controller before being committed to GitOps.
+- **Sealed Secrets**: API tokens (GitHub, GitLab, LiteLLM) are NEVER stored in plain text. They are encrypted using the **Bitnami Sealed Secrets** controller before being committed to GitOps.
 - **Micro-segmentation**: Only the `n8n` pods have internet egress. Agents are strictly internal-only.

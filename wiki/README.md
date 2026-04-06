@@ -11,7 +11,7 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 | [**Execution Flows**](execution_flows) | How it Works | 6-Phase DAG, Sequence Diagrams, Telemetry. |
 | [**Agent Specifications**](agents_specification) | Specialized Workers | **Rustant** (Architect), **ZeroClaw** (Executor). |
 | [**Testing Strategy**](testing_strategy) | Quality Assurance | 95% Coverage, Firecracker, LLM-Judge. |
-| [**Integrations**](integrations) | External Connectivity | **Jira**, **R2R Graph RAG**, **Kafka**. |
+| [**Integrations**](integrations) | External Connectivity | **GitHub/GitLab**, **R2R Graph RAG**, **Kafka**. |
 | [**Deployment Guide**](deployment_guide) | Operations & Scaling | K8s Manifests, Sealed Secrets. |
 
 ---
@@ -28,7 +28,7 @@ To get started with the factory, ensure you have the following prerequisites in 
 
 ### Core Stack
 
-- **Agents**: Specialized Rust-native workers (**Rustant**, **ZeroClaw**).
+- **Agents**: Specialized Rust-native workers (**Rustant**, **ZeroClaw**, **Jules**).
 - **Runtime**: Kubernetes (MicroK8s), Firecracker (Sandboxing).
 - **Transport**: JSON-RPC over **SSE (Server-Sent Events)**.
 
