@@ -15,10 +15,15 @@ impl ZeroClawAgent {
 
     pub async fn execute_task(
         &self,
+        mission_id: &str,
         task_description: &str,
         files: &[String],
     ) -> anyhow::Result<Value> {
-        tracing::info!("[ZeroClawAgent] Executing task: {}", task_description);
+        tracing::info!(
+            "[ZeroClawAgent:{}] Executing task: {}",
+            mission_id,
+            task_description
+        );
 
         // 1. Sandbox Orchestration (Skill)
         // 2. Call MCP tool for execution
@@ -27,11 +32,12 @@ impl ZeroClawAgent {
             .call_tool_json(
                 "execute_code",
                 json!({
+                    "mission_id": mission_id,
                     "task": {
                         "description": task_description,
                         "files": files
                     },
-                    "workspace_path": "/tmp/sandbox/zeroclaw"
+                    "workspace_path": format!("/tmp/sandbox/zeroclaw/{}", mission_id)
                 }),
             )
             .await?;
@@ -39,26 +45,40 @@ impl ZeroClawAgent {
         Ok(result)
     }
 
-    pub async fn validate_mission(&self, test_command: &str) -> anyhow::Result<Value> {
+    pub async fn validate_mission(
+        &self,
+        mission_id: &str,
+        test_command: &str,
+    ) -> anyhow::Result<Value> {
         tracing::info!(
-            "[ZeroClawAgent] Validating mission with tests: {}",
+            "[ZeroClawAgent:{}] Validating mission with tests: {}",
+            mission_id,
             test_command
         );
 
         let result = self
             .mcp_client
-            .call_tool_json("run_tests", json!({ "command": test_command }))
+            .call_tool_json(
+                "run_tests",
+                json!({
+                    "mission_id": mission_id,
+                    "command": test_command
+                }),
+            )
             .await?;
 
         Ok(result)
     }
 
-    pub async fn introspect_k8s(&self) -> anyhow::Result<Value> {
-        tracing::info!("[ZeroClawAgent] Performing K8s introspection skill");
+    pub async fn introspect_k8s(&self, mission_id: &str) -> anyhow::Result<Value> {
+        tracing::info!(
+            "[ZeroClawAgent:{}] Performing K8s introspection skill",
+            mission_id
+        );
 
         let result = self
             .mcp_client
-            .call_tool_json("introspect_k8s", json!({}))
+            .call_tool_json("introspect_k8s", json!({ "mission_id": mission_id }))
             .await?;
 
         Ok(result)
@@ -72,7 +92,7 @@ impl Agent for ZeroClawAgent {
     }
 
     async fn execute(&self, task_description: &str) -> anyhow::Result<Value> {
-        // Default to executing a general task if no action specified
-        self.execute_task(task_description, &[]).await
+        // Default to executing a general task with a temporary ID if no specific action specified
+        self.execute_task("default-id", task_description, &[]).await
     }
 }

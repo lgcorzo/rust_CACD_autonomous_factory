@@ -1,5 +1,10 @@
-use crate::JiraClient;
 use async_trait::async_trait;
+
+#[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
+#[async_trait]
+pub trait JiraClient: Send + Sync {
+    async fn search_issues(&self, query: &str) -> anyhow::Result<String>;
+}
 
 pub struct HttpJiraClient {
     url: String,

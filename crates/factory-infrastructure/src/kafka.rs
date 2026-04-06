@@ -4,9 +4,15 @@ use chrono::Utc;
 #[async_trait]
 pub trait KafkaClient: Send + Sync {
     async fn publish(&self, topic: &str, key: &str, payload: &[u8]) -> anyhow::Result<()>;
-    async fn publish_thought(&self, mission_id: &str, thought: &str) -> anyhow::Result<()> {
+    async fn publish_thought(
+        &self,
+        mission_id: &str,
+        thought: &str,
+        agent: &str,
+    ) -> anyhow::Result<()> {
         let payload = serde_json::json!({
             "mission_id": mission_id,
+            "agent": agent,
             "thought": thought,
             "timestamp": Utc::now().to_rfc3339()
         });
