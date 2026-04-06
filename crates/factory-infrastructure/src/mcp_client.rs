@@ -72,7 +72,7 @@ mod tests {
         });
 
         Mock::given(method("POST"))
-            .and(path("/sse"))
+            .and(path("/mcp"))
             .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
             .mount(&mock_server)
             .await;
@@ -93,7 +93,7 @@ mod tests {
         });
 
         Mock::given(method("POST"))
-            .and(path("/sse"))
+            .and(path("/mcp"))
             .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
             .mount(&mock_server)
             .await;

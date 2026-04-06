@@ -1,20 +1,4 @@
-use async_trait::async_trait;
-use chrono::Utc;
-
 #[cfg_attr(test, mockall::automock)]
-#[async_trait]
-pub trait KafkaClient: Send + Sync {
-    async fn publish(&self, topic: &str, key: &str, payload: &[u8]) -> anyhow::Result<()>;
-    async fn publish_thought(&self, mission_id: &str, thought: &str) -> anyhow::Result<()> {
-        let payload = serde_json::json!({
-            "mission_id": mission_id,
-            "thought": thought,
-            "timestamp": Utc::now().to_rfc3339()
-        });
-        self.publish("agent-thought", mission_id, &serde_json::to_vec(&payload)?).await
-    }
-}
-
 pub trait ZitiIdentity: Send + Sync {
     fn get_token(&self) -> anyhow::Result<String>;
     fn service_name(&self) -> String;
@@ -50,7 +34,7 @@ pub mod s3;
 pub mod ziti;
 
 pub use jira::HttpJiraClient;
-pub use kafka::SimpleMockKafkaClient;
+pub use kafka::{KafkaClient, SimpleMockKafkaClient};
 #[cfg(any(test, feature = "test-utils"))]
 pub use mcp_client::MockMcpClient;
 pub use mcp_client::{McpClient, McpHttpClient};

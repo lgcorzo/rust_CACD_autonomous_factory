@@ -11,7 +11,10 @@ pub struct RustantAgent {
 
 impl RustantAgent {
     pub fn new(mcp_client: Arc<dyn McpClient>, r2r_client: Arc<dyn R2rClient>) -> Self {
-        Self { mcp_client, r2r_client }
+        Self {
+            mcp_client,
+            r2r_client,
+        }
     }
 
     pub async fn plan_mission(&self, goal: &str) -> anyhow::Result<Value> {
@@ -19,14 +22,17 @@ impl RustantAgent {
 
         // 1. Context Pruning (Skill)
         let context = self.r2r_client.search(goal).await?;
-        
+
         // 2. Call MCP tool with pruned context
         let result = self
             .mcp_client
-            .call_tool_json("plan_mission", json!({ 
-                "mission_description": goal,
-                "context": context
-            }))
+            .call_tool_json(
+                "plan_mission",
+                json!({
+                    "mission_description": goal,
+                    "context": context
+                }),
+            )
             .await?;
 
         Ok(result)

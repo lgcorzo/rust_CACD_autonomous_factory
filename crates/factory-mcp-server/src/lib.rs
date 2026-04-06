@@ -156,14 +156,12 @@ impl McpServer {
 
         let stream = UnboundedReceiverStream::new(rx).map(|msg| {
             let json = serde_json::to_string(&msg).unwrap();
-            Event::default().data(json)
+            Ok::<Event, Infallible>(Event::default().data(json))
         });
 
         // Send the initial endpoint event as per MCP spec
         let endpoint_url = format!("/mcp?session_id={}", session_id);
-        let endpoint_event = Event::default()
-            .event("endpoint")
-            .data(endpoint_url);
+        let endpoint_event = Event::default().event("endpoint").data(endpoint_url);
 
         let initial_stream = tokio_stream::once(Ok(endpoint_event));
         let combined_stream = initial_stream.chain(stream);
