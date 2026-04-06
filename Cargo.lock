@@ -1283,6 +1283,7 @@ dependencies = [
  "tokio",
  "tokio-test",
  "tracing",
+ "uuid",
 ]
 
 [[package]]
@@ -1321,6 +1322,7 @@ dependencies = [
  "async-trait",
  "aws-config",
  "aws-sdk-s3",
+ "chrono",
  "factory-core",
  "mockall",
  "reqwest 0.11.27",

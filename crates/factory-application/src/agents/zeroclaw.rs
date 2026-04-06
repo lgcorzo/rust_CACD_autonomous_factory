@@ -13,7 +13,11 @@ impl ZeroClawAgent {
         Self { mcp_client }
     }
 
-    pub async fn execute_task(&self, task_description: &str, files: &[String]) -> anyhow::Result<Value> {
+    pub async fn execute_task(
+        &self,
+        task_description: &str,
+        files: &[String],
+    ) -> anyhow::Result<Value> {
         tracing::info!("[ZeroClawAgent] Executing task: {}", task_description);
 
         // 1. Sandbox Orchestration (Skill)
@@ -23,7 +27,7 @@ impl ZeroClawAgent {
             .call_tool_json(
                 "execute_code",
                 json!({
-                    "task": { 
+                    "task": {
                         "description": task_description,
                         "files": files
                     },
@@ -36,7 +40,10 @@ impl ZeroClawAgent {
     }
 
     pub async fn validate_mission(&self, test_command: &str) -> anyhow::Result<Value> {
-        tracing::info!("[ZeroClawAgent] Validating mission with tests: {}", test_command);
+        tracing::info!(
+            "[ZeroClawAgent] Validating mission with tests: {}",
+            test_command
+        );
 
         let result = self
             .mcp_client

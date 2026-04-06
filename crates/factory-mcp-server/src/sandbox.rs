@@ -49,6 +49,12 @@ pub struct FirecrackerDriver {
     kvm_enabled: bool,
 }
 
+impl Default for FirecrackerDriver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FirecrackerDriver {
     pub fn new() -> Self {
         Self { kvm_enabled: true }
@@ -58,13 +64,16 @@ impl FirecrackerDriver {
 #[async_trait]
 impl SandboxDriver for FirecrackerDriver {
     async fn execute(&self, code: &str, language: &str) -> anyhow::Result<ExecutionResult> {
-        tracing::info!("[FirecrackerDriver] Spawning micro-VM for {} execution", language);
-        
+        tracing::info!(
+            "[FirecrackerDriver] Spawning micro-VM for {} execution",
+            language
+        );
+
         if !self.kvm_enabled {
             anyhow::bail!("KVM not enabled, cannot spawn Firecracker VM");
         }
 
-        // Implementation detail: 
+        // Implementation detail:
         // 1. Create VM config (microvm.json)
         // 2. Start firecracker process
         // 3. Inyect code via API or vsock
@@ -72,7 +81,10 @@ impl SandboxDriver for FirecrackerDriver {
 
         // For now, we mock the success of the VM execution
         Ok(ExecutionResult {
-            stdout: format!("Simulation of {} executed in Firecracker VM: {}", language, code),
+            stdout: format!(
+                "Simulation of {} executed in Firecracker VM: {}",
+                language, code
+            ),
             stderr: "".to_string(),
             exit_code: Some(0),
             is_success: true,
