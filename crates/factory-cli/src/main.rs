@@ -13,6 +13,12 @@ enum Commands {
     Worker {
         #[arg(long, default_value = "http://localhost:8100")]
         mcp_url: String,
+
+        #[arg(long, default_value = "http://localhost:8000")]
+        r2r_url: String,
+
+        #[arg(long, default_value = "localhost:9092")]
+        kafka_brokers: String,
     },
 }
 
@@ -23,15 +29,23 @@ async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Worker { mcp_url } => {
+        Commands::Worker {
+            mcp_url,
+            r2r_url,
+            kafka_brokers,
+        } => {
             tracing::info!("Starting Hatchet worker...");
 
             let hatchet = hatchet_sdk::Hatchet::from_env().await?;
             let mut worker = hatchet.worker("factory-worker").slots(10).build()?;
 
             // Register workflows
-            let mission_wf =
-                factory_application::workflows::create_mission_workflow(&hatchet, mcp_url.clone());
+            let mission_wf = factory_application::workflows::create_mission_workflow(
+                &hatchet,
+                mcp_url.clone(),
+                r2r_url,
+                kafka_brokers,
+            );
             let task_wf =
                 factory_application::workflows::create_develop_task_workflow(&hatchet, mcp_url);
 

@@ -21,18 +21,20 @@ The codebase is organized as a unified Rust workspace for maximum modularity and
 ### 1. Workspace Crate Map
 
 - **`factory-core`**: Shared domain models, security protocols, and common kernel logic.
-- **`factory-application`**: Core agent logic (`Coder`, `Reviewer`, etc.) and Hatchet-driven functional workflows.
-- **`factory-mcp-server`**: High-concurrency Model Context Protocol server providing standardized tools to agents.
-- **`factory-infrastructure`**: Universal clients for Jira, R2R (RAG), S3, Kafka, and OpenZiti integration with built-in mocking support and 95%+ test coverage.
-- **`factory-cli`**: The unified binary entry point for workers and management.
+- **`factory-application`**: High-performance agent logic featuring **Rustant** (Architect/Planner) and **ZeroClaw** (Executor). Orchestrates specialized 6-phase Hatchet DAGs.
+- **`factory-mcp-server`**: High-concurrency Model Context Protocol server updated for **SSE transport** and integrated skills (Firecracker, R2R Context Pruning).
+- **`factory-infrastructure`**: Universal clients for Jira, R2R (RAG), Kafka (**agent-thought** telemetry), and OpenZiti integration.
 
-### 2. Durable Orchestration
+### 2. Durable Orchestration (Phase 12 State-Loop)
 
-Missions are orchestrated using **Hatchet** (via `hatchet-sdk` v0.2.7), ensuring that long-running agentic tasks are persistent, parallelized (fan-out/fan-in), and resilient to failures.
+Missions are orchestrated using a robust **6-phase DAG** in **Hatchet**:
+`Ingestion` → `Plan (Rustant)` → `Code (ZeroClaw)` → `Validation (ZeroClaw)` → `Review (Rustant)` → `Delivery (GitOps)`.
 
-### 3. Native Security Review & External Intelligence
+### 3. Integrated Intelligence & Security
 
-Built-in security agents perform automated OWASP Top 10 scanning, while integration with **Jira** and **R2R Graph RAG** provides deep contextual awareness and project tracking capabilities.
+- **Rustant**: Leverages **R2R Graph RAG** with a custom 3-level context pruning skill for high-precision planning.
+- **ZeroClaw**: Executes code in isolated **Firecracker micro-VMs** for maximum security and resource efficiency.
+- **Telemetry**: Real-time agent reasoning is published to **Kafka** for auditability and monitoring via OpenWebUI.
 
 ---
 
@@ -85,20 +87,24 @@ We enforce high source quality through automated CI pipelines.
 The following automated checks are active in this repository to maintain high engineering standards:
 
 ### 1. CI/CD Pipeline (`pipeline.yml`)
+
 - **Linting**: Enforces strict `rustfmt` and `clippy` (warnings-as-errors) across the entire workspace.
 - **Testing**: Executes all unit and integration tests (excluding heavy smoke tests).
 - **Protoc Build**: Automated Protocol Buffers compilation verification for all service definitions.
 - **Docker Build**: Validates that a production-ready image can be built and pushed to Docker Hub upon merge to `main`.
 
 ### 2. Wiki Content Sync (`docs-to-wiki.yml`)
+
 - Maintains bi-directional synchronization between the repo's `wiki/` folder and the GitHub Project Wiki.
 - Ensures documentation remains consistent and discoverable.
 
 ### 3. Image Integrity & Deployment
+
 - Production images are published under `lgcorzo/dark-gravity-factory`.
 - Every release candidate is tagged with the specific `git SHA` for full auditability and rollback capability.
 
 ### 4. Code Standards
+
 - **Edition 2024 Readiness**: The project uses modern Rust editions for safety and performance.
 - **Dependency Guard**: Automated monitoring of critical libraries (Hatchet, OpenZiti, the AWS SDK).
 

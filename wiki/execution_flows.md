@@ -11,10 +11,11 @@ sequenceDiagram
     participant n8n as n8n Poller
     participant Kafka as Kafka
     participant Hatchet as Hatchet Engine
-    participant OC as OpenCode Worker
+    participant RU as Rustant (Architect)
+    participant ZC as ZeroClaw (Executor)
     participant MCP as Rust MCP Server
     participant R2R as R2R Graph RAG
-    participant LLM as LiteLLM (Gemini 2.5)
+    participant LLM as LiteLLM (mnimax2.5)
 
     n8n->>Jira: Poll: JQL "Active" tasks
     Jira-->>n8n: Return Task (DA-123)
@@ -22,34 +23,36 @@ sequenceDiagram
     n8n->>Jira: Transition to "In Progress"
 
     Kafka->>Hatchet: Trigger autonomous-mission
-    Hatchet->>OC: Step 1: Plan Mission
-    OC->>MCP: invoke("retrieve_context", goal)
-    MCP->>R2R: Semantic Search
-    R2R-->>MCP: Contextual Code Patterns
-    OC->>MCP: invoke("plan_mission", goal + context)
-    MCP->>LLM: Decompose into Task DAG
-    LLM-->>MCP: Task DAG JSON
-    MCP-->>OC: Task List
-
-    rect rgb(240, 240, 240)
-    Note over Hatchet,OC: Parallel Task Execution
-    Hatchet->>OC: Step 2: Implement Task A (e.g. JWT utils)
-    OC->>MCP: invoke("execute_code", task_A)
-    MCP-->>OC: Code Changes & Results
-    Hatchet->>OC: Step 3: Implement Task B (e.g. middleware)
-    OC->>MCP: invoke("execute_code", task_B)
-    MCP-->>OC: Code Changes & Results
+    
+    rect rgb(230, 242, 255)
+    Note over Hatchet,RU: Phase 1: Planning
+    Hatchet->>RU: Action: plan_mission
+    RU->>Kafka: publish_thought("analyzing requirements")
+    RU->>MCP: invoke("context_pruning", goal)
+    MCP->>R2R: Vector Search
+    R2R-->>MCP: Pruned Context
+    RU->>LLM: Decompose into Strategy
+    LLM-->>RU: Strategy JSON
     end
 
-    Hatchet->>OC: Step 4: Run Tests
-    OC->>MCP: invoke("run_tests", changes)
-    MCP-->>OC: Success (10 tests passed)
+    rect rgb(230, 255, 230)
+    Note over Hatchet,ZC: Phase 2 & 3: Execution & Validation
+    Hatchet->>ZC: Action: code_task
+    ZC->>Kafka: publish_thought("implementing module X")
+    ZC->>MCP: invoke("execute_code", logic)
+    MCP->>ZC: Isolated Results
+    Hatchet->>ZC: Action: validate_task
+    ZC->>MCP: invoke("run_tests", logic)
+    end
 
-    Hatchet->>OC: Step 5: Security Review
-    OC->>MCP: invoke("security_review", code)
-    MCP-->>OC: Approved (No vulnerabilities)
+    rect rgb(255, 245, 230)
+    Note over Hatchet,RU: Phase 4: Review
+    Hatchet->>RU: Action: review_mission
+    RU->>Kafka: publish_thought("auditing security tokens")
+    RU->>MCP: invoke("security_review", artifacts)
+    end
 
-    Hatchet->>GIT: Create Pull Request (feature/da-123)
+    Hatchet->>GIT: Create PR (mission-da-123)
     Hatchet->>Kafka: Publish "mission-complete"
     Kafka->>n8n: Notify completion (DA-123)
     n8n->>Jira: Transition to "Done" + Post PR Link
@@ -64,20 +67,20 @@ The factory uses a persistent **SSE (Server-Sent Events)** stream for bidirectio
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Agent as OpenCode Agent
+    participant Agent as Rustant/ZeroClaw
     participant MCP as Rust MCP Server (Axum)
-    participant Sandbox as Sandbox/Firecrate
+    participant Sandbox as Sandbox/Firecracker
     
     Agent->>MCP: GET /sse (Establish Connection)
     MCP-->>Agent: 200 OK (Connection: keep-alive)
-    MCP-->>Agent: event: endpoint { session_id: "uuid-123" }
+    MCP-->>Agent: event: endpoint { uri: "http://.../mcp" }
     
     Note over Agent,MCP: Persistent Session Established
     
-    Agent->>MCP: POST /mcp?session_id=uuid-123 (JSON-RPC: call_tool)
-    MCP->>Sandbox: Execute Isolated Command
+    Agent->>MCP: POST /mcp (JSON-RPC: call_tool)
+    MCP->>Sandbox: Execute Micro-VM isolated task
     Sandbox-->>MCP: Stdout/Stderr
-    MCP-->>Agent: event: message { jsonrpc: "2.0", result: { content: [...] } }
+    MCP-->>Agent: event: message { jsonrpc: "2.0", result: [...] }
 ```
 
 ---
@@ -99,17 +102,16 @@ graph TD
 
 ---
 
-## 🏗️ Verification Loop
+## 🏗️ Verification Triad (Phase 12 Integration)
 
 No code reaches the `main` branch without surviving the **Verification Triad**:
 
-1. **Logical Verification**:
-    - **Coder Agent**: Implements the logic.
-    - **Tester Agent**: Verifies that the logic works.
-2. **Architectural Verification**:
-    - **Reviewer Agent**: Checks for design patterns and system alignment.
-3. **Security Verification**:
-    - **SecurityReviewTool**: Automated scanning of code for SQL injections, hardcoded secrets, and unsafe dependencies.
+1. **Logical Verification (ZeroClaw)**:
+    - **Executor**: Implements and validates logic in a Firecracker micro-VM.
+2. **Architectural Verification (Rustant)**:
+    - **Architect**: Checks for alignment with the R2R-retrieved patterns.
+3. **Security Verification (Rustant Tooling)**:
+    - **SecurityReview**: Automated scanning for vulnerabilities and compliance.
 
 ---
 
