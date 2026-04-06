@@ -28,7 +28,7 @@ impl McpClient for McpHttpClient {
 
         let response = self
             .client
-            .post(format!("{}/sse", self.base_url))
+            .post(format!("{}/mcp", self.base_url))
             .json(&request)
             .send()
             .await?;
