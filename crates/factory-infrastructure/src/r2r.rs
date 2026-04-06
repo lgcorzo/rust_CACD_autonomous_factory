@@ -1,6 +1,11 @@
-use crate::R2rClient;
 use async_trait::async_trait;
 use serde_json::json;
+
+#[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
+#[async_trait]
+pub trait R2rClient: Send + Sync {
+    async fn search(&self, query: &str) -> anyhow::Result<String>;
+}
 
 pub struct HttpR2rClient {
     url: String,
