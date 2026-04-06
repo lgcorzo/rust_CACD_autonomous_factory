@@ -11,9 +11,6 @@ pub trait S3Storage {
     async fn get_object(&self, bucket: &str, key: &str) -> anyhow::Result<Vec<u8>>;
 }
 
-#[cfg(test)]
-use mockall::automock;
-
 pub mod jira;
 pub mod kafka;
 pub mod mcp_client;
