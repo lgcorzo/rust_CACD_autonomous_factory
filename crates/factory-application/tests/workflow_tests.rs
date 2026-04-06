@@ -1,11 +1,17 @@
-use factory_application::agents::PlannerAgent;
-use factory_infrastructure::MockMcpClient;
+use factory_application::agents::RustantAgent;
+use factory_infrastructure::{MockMcpClient, MockR2rClient};
 use serde_json::json;
 use std::sync::Arc;
 
 #[tokio::test]
-async fn test_planner_agent_with_mock_mcp() {
+async fn test_rustant_agent_with_mock_mcp() {
     let mut mock_mcp = MockMcpClient::new();
+    let mut mock_r2r = MockR2rClient::new();
+
+    mock_r2r
+        .expect_search()
+        .with(mockall::predicate::eq("Create a web app"))
+        .returning(|_| Ok("Retrieved context for web app".to_string()));
 
     mock_mcp
         .expect_call_tool_json()
@@ -15,15 +21,8 @@ async fn test_planner_agent_with_mock_mcp() {
         )
         .returning(|_, _| Ok(json!({ "status": "planned", "tasks": [] })));
 
-    let planner = PlannerAgent::new(Arc::new(mock_mcp));
-    let result: serde_json::Value = planner.create_plan("Create a web app").await.unwrap();
+    let rustant = RustantAgent::new(Arc::new(mock_mcp), Arc::new(mock_r2r));
+    let result: serde_json::Value = rustant.plan_mission("test-id", "Create a web app").await.unwrap();
 
     assert_eq!(result["status"], "planned");
 }
-
-/*
-  Note: Full integration tests for Hatchet workflows usually require
-  a running Hatchet server or a complex mock of the Hatchet Context.
-  For this migration phase, we verify that our Agents (the primary workflow steps)
-  can be mocked and injected correctly via the MCP client.
-*/
