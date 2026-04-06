@@ -53,19 +53,16 @@ pub fn create_mission_workflow(
                     .ok_or(anyhow::anyhow!("No tasks in plan"))?;
 
                 let dev_wf = create_develop_task_workflow(&hatchet, mcp_url);
-                let mut futures = Vec::new();
-
-                for task in tasks {
-                    let child_input = TaskInput {
+                let inputs: Vec<TaskInput> = tasks
+                    .iter()
+                    .map(|task| TaskInput {
                         task_id: task["id"].as_str().unwrap_or("unknown").to_string(),
                         description: task["description"].as_str().unwrap_or("").to_string(),
                         relevant_files: vec![],
-                    };
-                    // In v0.2.7, run() returns a future that we can collect
-                    futures.push(dev_wf.run(child_input, None));
-                }
+                    })
+                    .collect();
 
-                let results = try_join_all(futures)
+                let results = try_join_all(inputs.iter().map(|input| dev_wf.run(input, None)))
                     .await?
                     .into_iter()
                     .map(|res| res.result)
