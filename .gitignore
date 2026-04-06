@@ -34,3 +34,6 @@ __pycache__/
 
 # rust
 target/
+
+# Wiki Sync
+/wiki_temp/
