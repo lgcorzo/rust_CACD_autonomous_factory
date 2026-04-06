@@ -17,8 +17,12 @@ impl RustantAgent {
         }
     }
 
-    pub async fn plan_mission(&self, goal: &str) -> anyhow::Result<Value> {
-        tracing::info!("[RustantAgent] Planning mission for goal: {}", goal);
+    pub async fn plan_mission(&self, mission_id: &str, goal: &str) -> anyhow::Result<Value> {
+        tracing::info!(
+            "[RustantAgent:{}] Planning mission for goal: {}",
+            mission_id,
+            goal
+        );
 
         // 1. Context Pruning (Skill)
         let context = self.r2r_client.search(goal).await?;
@@ -29,6 +33,7 @@ impl RustantAgent {
             .call_tool_json(
                 "plan_mission",
                 json!({
+                    "mission_id": mission_id,
                     "mission_description": goal,
                     "context": context
                 }),
@@ -38,12 +43,22 @@ impl RustantAgent {
         Ok(result)
     }
 
-    pub async fn review_mission(&self, mission_results: &str) -> anyhow::Result<Value> {
-        tracing::info!("[RustantAgent] Reviewing mission results");
+    pub async fn review_mission(
+        &self,
+        mission_id: &str,
+        mission_results: &str,
+    ) -> anyhow::Result<Value> {
+        tracing::info!("[RustantAgent:{}] Reviewing mission results", mission_id);
 
         let result = self
             .mcp_client
-            .call_tool_json("security_review", json!({ "artifacts": mission_results }))
+            .call_tool_json(
+                "security_review",
+                json!({
+                    "mission_id": mission_id,
+                    "artifacts": mission_results
+                }),
+            )
             .await?;
 
         Ok(result)
@@ -57,7 +72,7 @@ impl Agent for RustantAgent {
     }
 
     async fn execute(&self, task_description: &str) -> anyhow::Result<Value> {
-        // Default to planning if no specific action is provided
-        self.plan_mission(task_description).await
+        // Default to planning with a temporary ID if no specific action is provided
+        self.plan_mission("default-id", task_description).await
     }
 }

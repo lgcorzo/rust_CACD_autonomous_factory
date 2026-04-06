@@ -11,21 +11,6 @@ pub trait S3Storage {
     async fn get_object(&self, bucket: &str, key: &str) -> anyhow::Result<Vec<u8>>;
 }
 
-#[cfg(test)]
-use mockall::automock;
-
-#[async_trait::async_trait]
-#[cfg_attr(test, automock)]
-pub trait JiraClient: Send + Sync {
-    async fn search_issues(&self, query: &str) -> anyhow::Result<String>;
-}
-
-#[async_trait::async_trait]
-#[cfg_attr(test, automock)]
-pub trait R2rClient: Send + Sync {
-    async fn search(&self, query: &str) -> anyhow::Result<String>;
-}
-
 pub mod jira;
 pub mod kafka;
 pub mod mcp_client;
@@ -33,11 +18,19 @@ pub mod r2r;
 pub mod s3;
 pub mod ziti;
 
-pub use jira::HttpJiraClient;
+#[cfg(any(test, feature = "test-utils"))]
+pub use jira::MockJiraClient;
+pub use jira::{HttpJiraClient, JiraClient};
+
 pub use kafka::{KafkaClient, SimpleMockKafkaClient};
+
 #[cfg(any(test, feature = "test-utils"))]
 pub use mcp_client::MockMcpClient;
-pub use mcp_client::{McpClient, McpHttpClient};
-pub use r2r::HttpR2rClient;
+pub use mcp_client::{McpClient, McpHttpClient, McpSseClient};
+
+#[cfg(any(test, feature = "test-utils"))]
+pub use r2r::MockR2rClient;
+pub use r2r::{HttpR2rClient, R2rClient};
+
 pub use s3::AwsS3Storage;
 pub use ziti::OpenZitiIdentity;
