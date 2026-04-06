@@ -48,7 +48,10 @@ impl Tool for UpdateMissionStatusTool {
         if mission_id.contains('/') || mission_id.contains('\\') || mission_id.contains("..") {
             return Ok(CallToolResult {
                 content: vec![McpContent::Text {
-                    text: format!("Invalid mission_id: {}. It cannot contain path separators or '..'.", mission_id),
+                    text: format!(
+                        "Invalid mission_id: {}. It cannot contain path separators or '..'.",
+                        mission_id
+                    ),
                 }],
                 is_error: true,
             });
