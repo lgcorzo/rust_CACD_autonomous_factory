@@ -27,7 +27,7 @@ async fn main() -> anyhow::Result<()> {
             tracing::info!("Starting Hatchet worker...");
 
             let hatchet = hatchet_sdk::Hatchet::from_env().await?;
-            let mut worker = hatchet.worker("factory-worker").slots(10).build().unwrap();
+            let mut worker = hatchet.worker("factory-worker").slots(10).build()?;
 
             // Register workflows
             let mission_wf =
