@@ -92,12 +92,13 @@ jobs:
           cp -r wiki_temp/* wiki/
           rm -rf wiki/.git
           
-          # 5. Push the new branch
+          # 5. Cleanup wiki_temp and Push the new branch
+          rm -rf wiki_temp
           git config user.name "${{ env.GIT_AUTHOR_NAME }}"
           git config user.email "${{ env.GIT_AUTHOR_EMAIL }}"
           git add wiki/
           
-          if [ -n "$(git status --porcelain)" ]; then
+          if [ -n "$(git status --porcelain wiki/)" ]; then
              git commit -m "chore: sync wiki changes back to repository"
              git push origin "$SYNC_BRANCH"
              echo "branch_name=$SYNC_BRANCH" >> $GITHUB_OUTPUT
