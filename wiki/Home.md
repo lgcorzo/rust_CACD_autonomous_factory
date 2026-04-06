@@ -1,8 +1,14 @@
-# Dark Gravity CACD Autonomous Factory Wiki
+# 🏗️ Dark Gravity CACD Autonomous Factory Wiki
 
-Welcome to the official wiki for the **Dark Gravity CACD Autonomous Factory**. This repository manages the lifecycle and orchestration of autonomous agent factories, now migrated to a high-performance **Rust-native architecture (Phase 12)**.
+Welcome to the official wiki for the **Dark Gravity CACD Autonomous Factory**. This repository manages the lifecycle and orchestration of autonomous agent factories, now migrated to a high-performance **Rust-native architecture (Phase 12)** and integrated with **Project Aethelgard (Phase 13)** for self-healing infrastructure.
 
-The project currently operates under a **Mission-Oriented State Loop** driven by specialized workers: **Rustant** (The Architect) and **ZeroClaw** (The Executor).
+The project operates under a **Mission-Oriented State Loop** driven by specialized workers: **Rustant** (The Architect), **ZeroClaw** (The Executor), and **Jules** (The Remediator).
+
+## 🏢 Organizational Context (BUS/DU)
+
+> [!NOTE]
+> **Business Unit (BUS)**: `Autonomous Workforce Factory` — Engineering the next generation of agentic systems.
+> **Delivery Unit (DU)**: `Dark Gravity` — High-performance CA/CD and infrastructure remediation.
 
 ## 🚀 Getting Started
 
