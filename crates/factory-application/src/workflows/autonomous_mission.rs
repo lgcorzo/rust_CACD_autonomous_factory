@@ -173,7 +173,9 @@ pub fn create_mission_workflow(
                 kafka_client
                     .publish_thought(&mission_id, "Starting security review phase...", "rustant")
                     .await?;
-                let review = rustant.review_mission(&mission_id, &code_res.to_string()).await?;
+                let review = rustant
+                    .review_mission(&mission_id, &code_res.to_string())
+                    .await?;
                 kafka_client
                     .publish_thought(&mission_id, "Review completed", "rustant")
                     .await?;

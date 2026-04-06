@@ -175,12 +175,14 @@ mod tests {
     #[tokio::test]
     async fn test_call_tool_sse_success() {
         let mock_server: MockServer = MockServer::start().await;
-        
+
         // Mock SSE endpoint
         Mock::given(method("GET"))
             .and(path("/sse"))
-            .respond_with(ResponseTemplate::new(200)
-                .set_body_string(format!("event: endpoint\ndata: {}/mcp/session/1\n\n", mock_server.uri())))
+            .respond_with(ResponseTemplate::new(200).set_body_string(format!(
+                "event: endpoint\ndata: {}/mcp/session/1\n\n",
+                mock_server.uri()
+            )))
             .mount(&mock_server)
             .await;
 

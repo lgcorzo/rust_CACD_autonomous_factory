@@ -22,7 +22,10 @@ async fn test_rustant_agent_with_mock_mcp() {
         .returning(|_, _| Ok(json!({ "status": "planned", "tasks": [] })));
 
     let rustant = RustantAgent::new(Arc::new(mock_mcp), Arc::new(mock_r2r));
-    let result: serde_json::Value = rustant.plan_mission("test-id", "Create a web app").await.unwrap();
+    let result: serde_json::Value = rustant
+        .plan_mission("test-id", "Create a web app")
+        .await
+        .unwrap();
 
     assert_eq!(result["status"], "planned");
 }
