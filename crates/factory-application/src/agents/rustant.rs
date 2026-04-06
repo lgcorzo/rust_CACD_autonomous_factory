@@ -18,7 +18,11 @@ impl RustantAgent {
     }
 
     pub async fn plan_mission(&self, mission_id: &str, goal: &str) -> anyhow::Result<Value> {
-        tracing::info!("[RustantAgent:{}] Planning mission for goal: {}", mission_id, goal);
+        tracing::info!(
+            "[RustantAgent:{}] Planning mission for goal: {}",
+            mission_id,
+            goal
+        );
 
         // 1. Context Pruning (Skill)
         let context = self.r2r_client.search(goal).await?;
@@ -39,15 +43,22 @@ impl RustantAgent {
         Ok(result)
     }
 
-    pub async fn review_mission(&self, mission_id: &str, mission_results: &str) -> anyhow::Result<Value> {
+    pub async fn review_mission(
+        &self,
+        mission_id: &str,
+        mission_results: &str,
+    ) -> anyhow::Result<Value> {
         tracing::info!("[RustantAgent:{}] Reviewing mission results", mission_id);
 
         let result = self
             .mcp_client
-            .call_tool_json("security_review", json!({ 
-                "mission_id": mission_id,
-                "artifacts": mission_results 
-            }))
+            .call_tool_json(
+                "security_review",
+                json!({
+                    "mission_id": mission_id,
+                    "artifacts": mission_results
+                }),
+            )
             .await?;
 
         Ok(result)

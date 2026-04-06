@@ -18,9 +18,9 @@ pub mod r2r;
 pub mod s3;
 pub mod ziti;
 
-pub use jira::{HttpJiraClient, JiraClient};
 #[cfg(any(test, feature = "test-utils"))]
 pub use jira::MockJiraClient;
+pub use jira::{HttpJiraClient, JiraClient};
 
 pub use kafka::{KafkaClient, SimpleMockKafkaClient};
 
@@ -28,9 +28,9 @@ pub use kafka::{KafkaClient, SimpleMockKafkaClient};
 pub use mcp_client::MockMcpClient;
 pub use mcp_client::{McpClient, McpHttpClient, McpSseClient};
 
-pub use r2r::{HttpR2rClient, R2rClient};
 #[cfg(any(test, feature = "test-utils"))]
 pub use r2r::MockR2rClient;
+pub use r2r::{HttpR2rClient, R2rClient};
 
 pub use s3::AwsS3Storage;
 pub use ziti::OpenZitiIdentity;

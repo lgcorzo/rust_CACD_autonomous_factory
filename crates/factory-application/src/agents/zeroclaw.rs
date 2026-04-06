@@ -19,7 +19,11 @@ impl ZeroClawAgent {
         task_description: &str,
         files: &[String],
     ) -> anyhow::Result<Value> {
-        tracing::info!("[ZeroClawAgent:{}] Executing task: {}", mission_id, task_description);
+        tracing::info!(
+            "[ZeroClawAgent:{}] Executing task: {}",
+            mission_id,
+            task_description
+        );
 
         // 1. Sandbox Orchestration (Skill)
         // 2. Call MCP tool for execution
@@ -41,7 +45,11 @@ impl ZeroClawAgent {
         Ok(result)
     }
 
-    pub async fn validate_mission(&self, mission_id: &str, test_command: &str) -> anyhow::Result<Value> {
+    pub async fn validate_mission(
+        &self,
+        mission_id: &str,
+        test_command: &str,
+    ) -> anyhow::Result<Value> {
         tracing::info!(
             "[ZeroClawAgent:{}] Validating mission with tests: {}",
             mission_id,
@@ -50,17 +58,23 @@ impl ZeroClawAgent {
 
         let result = self
             .mcp_client
-            .call_tool_json("run_tests", json!({ 
-                "mission_id": mission_id,
-                "command": test_command 
-            }))
+            .call_tool_json(
+                "run_tests",
+                json!({
+                    "mission_id": mission_id,
+                    "command": test_command
+                }),
+            )
             .await?;
 
         Ok(result)
     }
 
     pub async fn introspect_k8s(&self, mission_id: &str) -> anyhow::Result<Value> {
-        tracing::info!("[ZeroClawAgent:{}] Performing K8s introspection skill", mission_id);
+        tracing::info!(
+            "[ZeroClawAgent:{}] Performing K8s introspection skill",
+            mission_id
+        );
 
         let result = self
             .mcp_client
