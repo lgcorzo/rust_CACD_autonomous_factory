@@ -96,3 +96,85 @@ impl Tool for UpdateMissionStatusTool {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    use std::fs;
+
+    #[tokio::test]
+    async fn test_update_mission_status_vulnerability() {
+        let temp_dir = std::env::temp_dir().join(uuid::Uuid::new_v4().to_string());
+        let docs_path_buf = temp_dir.join("docs");
+        fs::create_dir_all(&docs_path_buf).unwrap();
+
+        // Create a directory that allows us to go up
+        fs::create_dir_all(docs_path_buf.join("mission_foo")).unwrap();
+
+        let docs_path = docs_path_buf.to_str().unwrap().to_string();
+        let history_path = docs_path_buf.join("mission_history.md");
+        fs::write(&history_path, "").unwrap();
+
+        let tool = UpdateMissionStatusTool::new(docs_path.clone());
+
+        // This mission_id attempts to create a file outside the docs_path
+        let malicious_mission_id = "foo/../../pwned";
+        let params = json!({
+            "mission_id": malicious_mission_id,
+            "status": "Success",
+            "summary": "Evil summary",
+            "agent_name": "Attacker"
+        });
+
+        let result = tool.call(params).await;
+
+        // Now, this should return an error
+        assert!(result.is_ok());
+        let result = result.unwrap();
+        assert!(result.is_error);
+        if let McpContent::Text { text } = &result.content[0] {
+            assert!(text.contains("Invalid mission_id"));
+        } else {
+            panic!("Expected text content");
+        }
+
+        // Check that the file was NOT created
+        let pwned_file = temp_dir.join("pwned_summary.md");
+        assert!(!pwned_file.exists());
+
+        // Cleanup
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
+
+    #[tokio::test]
+    async fn test_update_mission_status_valid_id() {
+        let temp_dir = std::env::temp_dir().join(uuid::Uuid::new_v4().to_string());
+        let docs_path_buf = temp_dir.join("docs");
+        fs::create_dir_all(&docs_path_buf).unwrap();
+
+        let docs_path = docs_path_buf.to_str().unwrap().to_string();
+        let history_path = docs_path_buf.join("mission_history.md");
+        fs::write(&history_path, "").unwrap();
+
+        let tool = UpdateMissionStatusTool::new(docs_path.clone());
+
+        let valid_mission_id = "mission-123_abc";
+        let params = json!({
+            "mission_id": valid_mission_id,
+            "status": "Success",
+            "summary": "Valid summary"
+        });
+
+        let result = tool.call(params).await;
+        assert!(result.is_ok());
+        let result = result.unwrap();
+        assert!(!result.is_error);
+
+        let summary_file = docs_path_buf.join(format!("mission_{}_summary.md", valid_mission_id));
+        assert!(summary_file.exists());
+
+        // Cleanup
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
+}
