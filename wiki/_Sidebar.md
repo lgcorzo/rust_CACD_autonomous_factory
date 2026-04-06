@@ -15,6 +15,7 @@
 * [Deployment Guide](deployment_guide)
 * [Execution Flows](execution_flows)
 * [Integrations](integrations)
+* [Agent Specifications](agents_specification)
 
 ### Project
 

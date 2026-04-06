@@ -7,10 +7,11 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 | Section | Description | Key Topics |
 | :--- | :--- | :--- |
 | [**Business Understanding**](business_understanding) | The "Why" and "What" | ROI, KPIs, Mission Lifecycle. |
-| [**Architecture**](architecture) | Technical Blueprint | DDD Layers, Rust MCP, OpenCode. |
-| [**Execution Flows**](execution_flows) | How it Works | Sequence Diagrams, Agent Loops. |
-| [**Testing Strategy**](testing_strategy) | Quality Assurance | 95% Coverage, WireMock, LLM-Judge. |
-| [**Integrations**](integrations) | External Connectivity | **Jira**, **R2R Graph RAG**, LiteLLM. |
+| [**Architecture**](architecture) | Technical Blueprint | DDD Layers, Rust MCP, Rustant/ZeroClaw. |
+| [**Execution Flows**](execution_flows) | How it Works | 6-Phase DAG, Sequence Diagrams, Telemetry. |
+| [**Agent Specifications**](agents_specification) | Specialized Workers | **Rustant** (Architect), **ZeroClaw** (Executor). |
+| [**Testing Strategy**](testing_strategy) | Quality Assurance | 95% Coverage, Firecracker, LLM-Judge. |
+| [**Integrations**](integrations) | External Connectivity | **Jira**, **R2R Graph RAG**, **Kafka**. |
 | [**Deployment Guide**](deployment_guide) | Operations & Scaling | K8s Manifests, Sealed Secrets. |
 
 ---
@@ -20,15 +21,16 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 To get started with the factory, ensure you have the following prerequisites in your cluster:
 
 1. **Hatchet Engine**: Orchestration backbone.
-2. **LiteLLM Gateway**: Access to Gemini/MiniMax models.
-3. **R2R RAG**: Vector store for codebase context.
-4. **OpenZiti**: Zero Trust networking.
+2. **LiteLLM Gateway**: Access to `mnimax2.5` models.
+3. **R2R RAG**: Vector store for codebase context pruning.
+4. **Kafka**: Telemetry sink for agent reasoning flows.
+5. **OpenZiti**: Zero Trust mTLS networking.
 
 ### Core Stack
 
-- **Languages**: Rust (MCP Server), Go (OpenCode).
+- **Agents**: Specialized Rust-native workers (**Rustant**, **ZeroClaw**).
 - **Runtime**: Kubernetes (MicroK8s), Firecracker (Sandboxing).
-- **Transport**: JSON-RPC over HTTP/SSE.
+- **Transport**: JSON-RPC over **SSE (Server-Sent Events)**.
 
 ---
 

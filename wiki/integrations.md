@@ -8,16 +8,21 @@ The integration follows a clean architecture pattern separating the infrastructu
 
 ### Infrastructure Layer (`factory-infrastructure`)
 
-- **Traits**: Defines `JiraClient` and `R2rClient` interfaces to enable dependency injection and unit testing.
-- **Implementations**: `HttpJiraClient` and `HttpR2rClient` provide robust, asynchronous communication using `reqwest`.
+- **Traits**: Defines `JiraClient`, `R2rClient`, `KafkaClient`, and `McpClient` interfaces.
+- **Implementations**:
+  - `HttpJiraClient` / `HttpR2rClient`: Asynchronous REST communication via `reqwest`.
+  - `SimpleMockKafkaClient`: Publishing to the **agent-thought** topic for real-time reasoning telemetry.
+  - `McpHttpClient`: High-performance **SSE (Server-Sent Events)** transport for durable tool execution.
 - **Authentication**:
   - **Jira**: Basic Auth (Username + API Token).
   - **R2R**: Bearer Token (Self-refreshing login via `/v3/users/login`).
+  - **Kafka**: SASL/SCRAM via `rdkafka` (infrastructure specific).
 
 ### MCP Tool Layer (`factory-mcp-server`)
 
 - **`search_jira`**: Exposes JQL search capabilities to agents.
-- **`retrieve_context`**: Provides Graph RAG context retrieval using R2R's vector and graph search.
+- **`context_pruning`**: New skill for Rustant to refine R2R context results.
+- **`execute_code`**: Integrated with Firecracker Micro-VMs for isolated execution.
 
 ## Configuration
 
