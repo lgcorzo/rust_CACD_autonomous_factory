@@ -25,7 +25,7 @@ pub use jira::{HttpJiraClient, JiraClient};
 #[cfg(any(test, feature = "test-utils"))]
 pub use jira::MockJiraClient;
 
-pub use kafka::{KafkaClient, RealKafkaClient, SimpleMockKafkaClient};
+pub use kafka::{KafkaClient, SimpleMockKafkaClient};
 
 #[cfg(any(test, feature = "test-utils"))]
 pub use mcp_client::MockMcpClient;
