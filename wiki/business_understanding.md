@@ -9,7 +9,8 @@ Deploy a high-fidelity **Autonomous Agent Workforce** inside a Zero Trust Kubern
 In air-gapped or restricted (Zero Trust) environments, manual code development, testing, and deployment cycles are slow and prone to errors. Security requirements often create bottlenecks that prevent rapid iteration.
 
 **Dark Gravity** solves this by:
-- **Automating the Lifecycle**: From a Jira ticket to a Pull Request.
+
+- **Automating the Lifecycle**: From a GitHub Issue to a verified Pull Request.
 - **Ensuring Zero Trust**: All agents run with OpenZiti identities and strict Network Policies.
 - **Secure Sandboxing**: High-risk code execution occurs in Firecracker MicroVMs.
 
@@ -19,7 +20,7 @@ In air-gapped or restricted (Zero Trust) environments, manual code development, 
 
 | KPI | Metric | Target |
 | :--- | :--- | :--- |
-| **Cycle Time** | Time from Jira "Active" to PR creation | < 60 minutes |
+| **Cycle Time** | Time from GitHub Issue "mission" to PR creation | < 60 minutes |
 | **Test Coverage** | Percentage of missions resulting in increased coverage | > 95% |
 | **Success Rate** | Percentage of PRs merged without human intervention | > 70% |
 | **Security Compliance** | Zero critical vulnerabilities in generated code | 100% |
@@ -32,7 +33,7 @@ The following lifecycle represents the path of a single mission (e.g., "Add user
 
 ```mermaid
 graph TD
-    A[Jira Ticket: Active] -->|n8n Poller| B(Kafka: mission-input)
+    A[GitHub Issue: Mission] -->|n8n Poller| B(Kafka: mission-input)
     B -->|Trigger| C{Hatchet Workflow}
     C -->|Decompose| D[Plan Mission]
     D -->|Fan-out| E[Coding & Testing]
@@ -40,11 +41,11 @@ graph TD
     F -->|Result| G{Review Approval}
     G -->|Yes| H[Create Pull Request]
     G -->|No| I[Retry / Human Intervention]
-    H -->|Complete| J[Jira Ticket: Done]
+    H -->|Complete| J[GitHub Issue: Resolved]
 ```
 
 ### 1. Ingestion (Outbound Polling)
-Since the cluster is **Zero Trust** (no inbound internet), an outbound `n8n` poller proactively fetches active tasks from Jira Cloud and publishes them to an internal Kafka topic.
+Since the cluster is **Zero Trust** (no inbound internet), an outbound `n8n` poller proactively fetches labeled issues (e.g., `label:"mission"`) from GitHub/GitLab and publishes them to an internal Kafka topic.
 
 ### 2. Durable Orchestration
 **Hatchet** acts as the "Brain," ensuring that every mission is durable. If a node fails or an API call times out, Hatchet retries the specific step, preserving the entire workflow's state.

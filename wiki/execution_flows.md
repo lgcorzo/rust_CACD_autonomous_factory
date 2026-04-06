@@ -2,60 +2,71 @@
 
 ## 🗺️ Mission End-to-End Sequence Diagram
 
-This diagram visualizes a full cycle, from the initial Jira ticket to the final PR submission.
+This diagram visualizes a full cycle, from the initial GitHub Issue to the final PR submission, orchestrated via the **6-Phase Hatchet DAG**.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Jira as Jira Cloud
+    participant GH as GitHub Issue
     participant n8n as n8n Poller
-    participant Kafka as Kafka
+    participant Kafka as Kafka (mission-events)
     participant Hatchet as Hatchet Engine
-    participant RU as Rustant (Architect)
+    participant RU as Rustant (Planner)
     participant ZC as ZeroClaw (Executor)
-    participant MCP as Rust MCP Server
-    participant R2R as R2R Graph RAG
-    participant LLM as LiteLLM (mnimax2.5)
+    participant LLM as LiteLLM (minimax2.5)
+    participant R2R as R2R (Context)
 
-    n8n->>Jira: Poll: JQL "Active" tasks
-    Jira-->>n8n: Return Task (DA-123)
+    GH->>n8n: New Issue (label:mission)
     n8n->>Kafka: Publish "mission-input"
-    n8n->>Jira: Transition to "In Progress"
+    n8n->>GH: Add Label "in-progress"
 
-    Kafka->>Hatchet: Trigger autonomous-mission
+    Kafka->>Hatchet: Trigger 6-Phase DAG
     
     rect rgb(230, 242, 255)
-    Note over Hatchet,RU: Phase 1: Planning
+    Note over Hatchet,RU: Phase 1: Planning (Decomposition)
     Hatchet->>RU: Action: plan_mission
-    RU->>Kafka: publish_thought("analyzing requirements")
-    RU->>MCP: invoke("context_pruning", goal)
-    MCP->>R2R: Vector Search
-    R2R-->>MCP: Pruned Context
-    RU->>LLM: Decompose into Strategy
-    LLM-->>RU: Strategy JSON
+    RU->>R2R: Vector Search (Patterns)
+    RU->>LLM: Generate Strategy JSON
     end
 
     rect rgb(230, 255, 230)
-    Note over Hatchet,ZC: Phase 2 & 3: Execution & Validation
-    Hatchet->>ZC: Action: code_task
-    ZC->>Kafka: publish_thought("implementing module X")
-    ZC->>MCP: invoke("execute_code", logic)
-    MCP->>ZC: Isolated Results
-    Hatchet->>ZC: Action: validate_task
-    ZC->>MCP: invoke("run_tests", logic)
+    Note over Hatchet,ZC: Phase 2-4: Implementation & Test
+    Hatchet->>ZC: Action: execute_code
+    ZC->>ZC: Unit Test Loop
+    Hatchet->>ZC: Action: validate_integration
     end
 
     rect rgb(255, 245, 230)
-    Note over Hatchet,RU: Phase 4: Review
-    Hatchet->>RU: Action: review_mission
-    RU->>Kafka: publish_thought("auditing security tokens")
-    RU->>MCP: invoke("security_review", artifacts)
+    Note over Hatchet,RU: Phase 5-6: Review & Delivery
+    Hatchet->>RU: Action: security_review
+    Hatchet->>GH: Create Pull Request
+    n8n->>GH: Close Issue / Add PR Link
     end
+```
 
-    Hatchet->>GIT: Create PR (mission-da-123)
-    Hatchet->>Kafka: Publish "mission-complete"
-    Kafka->>n8n: Notify completion (DA-123)
-    n8n->>Jira: Transition to "Done" + Post PR Link
+---
+
+## 🛡️ Project Aethelgard: Self-Healing Loop
+
+Project Aethelgard implements an autonomous remediation loop for Kubernetes infrastructure errors, triggered by Cloud-native alerts (FluxCD).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Flux as FluxCD / K8s
+    participant RW as Remediator Webhook
+    participant ML as MLflow (Track)
+    participant Jules as Jules (Remediator)
+    participant Cluster as K8s Cluster
+
+    Flux->>RW: Alert: ImagePullBackOff / OOMKill
+    RW->>ML: Start Experiment Run
+    RW->>Jules: Trigger Remediation(alert_context)
+    Jules->>Jules: Classify Error
+    Jules->>Jules: Generate Fix (Patch/PR)
+    Jules->>Cluster: Apply Patch / Create PR
+    Cluster-->>Jules: Success/Failure
+    Jules->>ML: Log Metric (remediation_success)
 ```
 
 ---

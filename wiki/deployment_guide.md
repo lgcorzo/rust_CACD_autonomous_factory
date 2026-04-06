@@ -16,7 +16,7 @@ The factory is deployed across several namespaces to maximize service isolation 
 
 ## 🔐 Secret Management with Sealed Secrets
 
-We use **Bitnami Sealed Secrets** to securely manage sensitive API keys (e.g., GitHub, Jira, LiteLLM) in a GitOps workflow.
+We use **Bitnami Sealed Secrets** to securely manage sensitive API keys (e.g., GitHub, GitLab, LiteLLM) in a GitOps workflow.
 
 ### 🛠️ How to Seal a Secret
 
