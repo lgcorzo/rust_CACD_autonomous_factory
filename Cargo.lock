@@ -1275,6 +1275,7 @@ dependencies = [
  "async-trait",
  "factory-core",
  "factory-infrastructure",
+ "futures",
  "hatchet-sdk",
  "mockall",
  "serde",

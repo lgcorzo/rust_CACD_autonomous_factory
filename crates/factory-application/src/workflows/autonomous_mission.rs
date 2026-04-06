@@ -1,145 +1,196 @@
-use crate::agents::{DocAgent, PlannerAgent, ReviewerAgent, TesterAgent};
-use crate::workflows::develop_task::{TaskInput, create_develop_task_workflow};
-use factory_infrastructure::McpHttpClient;
-use futures::future::try_join_all;
+use crate::agents::{RustantAgent, ZeroClawAgent};
+use factory_infrastructure::{KafkaClient, McpHttpClient, HttpR2rClient};
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::runnables::{Runnable, Workflow};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MissionInput {
+    pub mission_id: Option<String>,
     pub goal: String,
     pub repository_path: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MissionOutput {
+    pub mission_id: String,
     pub status: String,
     pub summary: String,
+    pub pr_url: Option<String>,
 }
 
 pub fn create_mission_workflow(
     hatchet: &Hatchet,
     mcp_url: String,
+    r2r_url: String,
+    kafka_brokers: String,
 ) -> Workflow<MissionInput, MissionOutput> {
     let mcp_url_clone = mcp_url.clone();
+    let r2r_url_clone = r2r_url.clone();
+    let kafka_brokers_clone = kafka_brokers.clone();
 
-    // 1. Planning Task
+    // 1. Planning Phase (Rustant)
     let plan_task = hatchet
         .task("plan", move |input: MissionInput, _ctx| {
             let mcp_url = mcp_url_clone.clone();
+            let r2r_url = r2r_url_clone.clone();
+            let kafka_brokers = kafka_brokers_clone.clone();
+            let mission_id = input.mission_id.clone().unwrap_or_else(|| Uuid::new_v4().to_string());
+
             Box::pin(async move {
                 let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
-                let planner = PlannerAgent::new(mcp_client);
-                planner.create_plan(&input.goal).await
+                let r2r_client = Arc::new(HttpR2rClient::new(r2r_url, "admin".to_string(), "admin".to_string()));
+                let kafka_client = factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers)?;
+                
+                let rustant = RustantAgent::new(mcp_client, r2r_client);
+                
+                kafka_client.publish_thought(&mission_id, "Starting planning phase...").await?;
+                let plan = rustant.plan_mission(&input.goal).await?;
+                kafka_client.publish_thought(&mission_id, "Plan generated successfully").await?;
+
+                Ok(plan)
             })
         })
         .build()
         .unwrap();
 
-    // 2. Fan-out Task (Dynamic)
+    // 2. Coding Phase (ZeroClaw)
     let mcp_url_clone = mcp_url.clone();
-    let hatchet_clone = hatchet.clone();
-    let fan_out_task = hatchet
-        .task("fan_out", move |_input: MissionInput, ctx| {
+    let kafka_brokers_clone = kafka_brokers.clone();
+    let code_task = hatchet
+        .task("code", move |input: MissionInput, ctx| {
             let mcp_url = mcp_url_clone.clone();
-            let hatchet = hatchet_clone.clone();
+            let kafka_brokers = kafka_brokers_clone.clone();
+            let mission_id = input.mission_id.clone().unwrap_or_else(|| Uuid::new_v4().to_string());
+
             Box::pin(async move {
-                let plan_val: serde_json::Value = ctx.parent_output("plan").await?;
-                let plan: serde_json::Value = serde_json::from_value(plan_val)?;
-                let tasks = plan["tasks"]
-                    .as_array()
-                    .ok_or(anyhow::anyhow!("No tasks in plan"))?;
+                let plan: serde_json::Value = ctx.parent_output("plan").await?;
+                let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
+                let kafka_client = factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers)?;
+                
+                let zeroclaw = ZeroClawAgent::new(mcp_client);
 
-                let dev_wf = create_develop_task_workflow(&hatchet, mcp_url);
-                let inputs: Vec<TaskInput> = tasks
-                    .iter()
-                    .map(|task| TaskInput {
-                        task_id: task["id"].as_str().unwrap_or("unknown").to_string(),
-                        description: task["description"].as_str().unwrap_or("").to_string(),
-                        relevant_files: vec![],
-                    })
-                    .collect();
+                kafka_client.publish_thought(&mission_id, "Starting coding phase...").await?;
+                let result = zeroclaw.execute_task(&plan["summary"].as_str().unwrap_or(""), &[]).await?;
+                kafka_client.publish_thought(&mission_id, "Coding completed").await?;
 
-                let results = try_join_all(inputs.iter().map(|input| dev_wf.run(input, None)))
-                    .await?
-                    .into_iter()
-                    .map(|res| res.result)
-                    .collect();
-
-                Ok(serde_json::Value::Array(results))
+                Ok(result)
             })
         })
         .build()
         .unwrap()
         .add_parent(&plan_task);
 
-    // 3. Review Task
+    // 3. Validation Phase (ZeroClaw)
     let mcp_url_clone = mcp_url.clone();
-    let review_task = hatchet
-        .task("review", move |_input: MissionInput, ctx| {
+    let kafka_brokers_clone = kafka_brokers.clone();
+    let validation_task = hatchet
+        .task("validation", move |input: MissionInput, _ctx| {
             let mcp_url = mcp_url_clone.clone();
+            let kafka_brokers = kafka_brokers_clone.clone();
+            let mission_id = input.mission_id.clone().unwrap_or_else(|| Uuid::new_v4().to_string());
+
             Box::pin(async move {
-                let results_val: serde_json::Value = ctx.parent_output("fan_out").await?;
-                let results: serde_json::Value = serde_json::from_value(results_val)?;
-
                 let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
-                let tester = TesterAgent::new(mcp_client.clone());
-                let reviewer = ReviewerAgent::new(mcp_client);
+                let kafka_client = factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers)?;
+                
+                let zeroclaw = ZeroClawAgent::new(mcp_client);
 
-                let test_res = tester.run_tests("Run all tests").await?;
-                let review_res = reviewer.review_changes(&results.to_string()).await?;
+                kafka_client.publish_thought(&mission_id, "Starting validation phase...").await?;
+                let test_res = zeroclaw.validate_mission("cargo test").await?;
+                kafka_client.publish_thought(&mission_id, &format!("Validation finished: {}", test_res["status"])).await?;
 
-                let status = if test_res["status"] == "passed"
-                    && review_res["approved"].as_bool().unwrap_or(false)
-                {
-                    "success"
-                } else {
-                    "failed"
-                };
-
-                Ok(MissionOutput {
-                    status: status.to_string(),
-                    summary: format!(
-                        "Mission {}. Tests passed: {}. Review approved: {}",
-                        status, test_res["status"], review_res["approved"]
-                    ),
-                })
+                Ok(test_res)
             })
         })
         .build()
         .unwrap()
-        .add_parent(&fan_out_task);
+        .add_parent(&code_task);
 
-    // 4. Documentation Task
+    // 4. Review Phase (Rustant)
     let mcp_url_clone = mcp_url.clone();
-    let doc_task = hatchet
-        .task("document", move |_input: MissionInput, ctx| {
+    let r2r_url_clone = r2r_url.clone();
+    let kafka_brokers_clone = kafka_brokers.clone();
+    let review_task = hatchet
+        .task("review", move |input: MissionInput, ctx| {
             let mcp_url = mcp_url_clone.clone();
+            let r2r_url = r2r_url_clone.clone();
+            let kafka_brokers = kafka_brokers_clone.clone();
+            let mission_id = input.mission_id.clone().unwrap_or_else(|| Uuid::new_v4().to_string());
+
             Box::pin(async move {
-                let review_val: serde_json::Value = ctx.parent_output("review").await?;
-                let review_output: MissionOutput = serde_json::from_value(review_val)?;
-
+                let code_res: serde_json::Value = ctx.parent_output("code").await?;
                 let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
-                let doc_agent = DocAgent::new(mcp_client);
+                let r2r_client = Arc::new(HttpR2rClient::new(r2r_url, "admin".to_string(), "admin".to_string()));
+                let kafka_client = factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers)?;
+                
+                let rustant = RustantAgent::new(mcp_client, r2r_client);
 
-                let _ = doc_agent.generate_docs("Generate final report").await?;
+                kafka_client.publish_thought(&mission_id, "Starting security review phase...").await?;
+                let review = rustant.review_mission(&code_res.to_string()).await?;
+                kafka_client.publish_thought(&mission_id, "Review completed").await?;
 
-                Ok(review_output)
+                Ok(review)
+            })
+        })
+        .build()
+        .unwrap()
+        .add_parent(&validation_task);
+
+    // 5. Delivery Phase (PR Creation)
+    let mcp_url_clone = mcp_url.clone();
+    let kafka_brokers_clone = kafka_brokers.clone();
+    let delivery_task = hatchet
+        .task("delivery", move |input: MissionInput, ctx| {
+            let mcp_url = mcp_url_clone.clone();
+            let kafka_brokers = kafka_brokers_clone.clone();
+            let mission_id = input.mission_id.clone().unwrap_or_else(|| Uuid::new_v4().to_string());
+
+            Box::pin(async move {
+                let review_res: serde_json::Value = ctx.parent_output("review").await?;
+                let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
+                let kafka_client = factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers)?;
+
+                if review_res["approved"].as_bool().unwrap_or(false) {
+                    kafka_client.publish_thought(&mission_id, "Review approved. Creating PR...").await?;
+                    
+                    let branch_name = format!("mission-{}", mission_id);
+                    let pr_res = mcp_client.call_tool_json("create_pull_request", serde_json::json!({
+                        "branch_name": branch_name,
+                        "title": format!("Mission Delivery: {}", mission_id),
+                        "body": "Automatically generated by Dark Gravity Mission Factory"
+                    })).await?;
+
+                    Ok(MissionOutput {
+                        mission_id: mission_id.clone(),
+                        status: "completed".to_string(),
+                        summary: "Mission successful and PR created".to_string(),
+                        pr_url: Some(pr_res["url"].as_str().unwrap_or("").to_string()),
+                    })
+                } else {
+                    kafka_client.publish_thought(&mission_id, "Review REJECTED. Mission failed.").await?;
+                    Ok(MissionOutput {
+                        mission_id: mission_id.clone(),
+                        status: "failed".to_string(),
+                        summary: "Security review rejected".to_string(),
+                        pr_url: None,
+                    })
+                }
             })
         })
         .build()
         .unwrap()
         .add_parent(&review_task);
 
-    // Build the workflow
     hatchet
-        .workflow("AutonomousMission")
+        .workflow("DarkGravityMission")
         .build()
         .unwrap()
         .add_task(&plan_task)
-        .add_task(&fan_out_task)
+        .add_task(&code_task)
+        .add_task(&validation_task)
         .add_task(&review_task)
-        .add_task(&doc_task)
+        .add_task(&delivery_task)
 }
