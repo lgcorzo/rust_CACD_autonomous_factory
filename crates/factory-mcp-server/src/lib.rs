@@ -156,14 +156,17 @@ impl McpServer {
 
         let stream = UnboundedReceiverStream::new(rx).map(|msg| {
             let json = serde_json::to_string(&msg).unwrap();
-            Ok(Event::default().data(json))
+            Ok::<Event, Infallible>(Event::default().data(json))
         });
 
-        // Send the initial endpoint event as per MCP spec (simplified)
-        // In a real implementation, we'd send the URI the client should POST to.
-        // For now, let's just send the session_id as a commentary.
+        // Send the initial endpoint event as per MCP spec
+        let endpoint_url = format!("/mcp?session_id={}", session_id);
+        let endpoint_event = Event::default().event("endpoint").data(endpoint_url);
 
-        Sse::new(stream).keep_alive(ax_keep_alive())
+        let initial_stream = tokio_stream::once(Ok(endpoint_event));
+        let combined_stream = initial_stream.chain(stream);
+
+        Sse::new(combined_stream).keep_alive(ax_keep_alive())
     }
 
     pub async fn post_handler(

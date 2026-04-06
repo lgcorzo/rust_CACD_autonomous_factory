@@ -25,7 +25,8 @@ graph TB
         end
 
         subgraph "Agentic Workers - agents"
-            OC_WORKER[OpenCode Pods]
+            RUSTANT[Rustant Pods]
+            ZEROCLAW[ZeroClaw Pods]
             F_MCP[Rust MCP Server]
         end
 
@@ -43,12 +44,16 @@ graph TB
     n8n -->|Fetch| JIRA
     n8n -->|Publish| KAFKA
     KAFKA -->|Trigger| HATCHET
-    HATCHET -->|Assign| OC_WORKER
-    OC_WORKER -->|SSE/POST| F_MCP
+    HATCHET -->|Assign| RUSTANT
+    HATCHET -->|Assign| ZEROCLAW
+    RUSTANT -->|Thought| KAFKA
+    ZEROCLAW -->|Thought| KAFKA
+    RUSTANT -->|SSE/POST| F_MCP
+    ZEROCLAW -->|SSE/POST| F_MCP
     F_MCP -->|Model| LITELLM
     F_MCP -->|Context| R2R
     F_MCP -->|Isolated Exec| SANDBOX[Sandbox/Firecracker]
-    OC_WORKER -->|Artifacts| MINIO
+    ZEROCLAW -->|Artifacts| MINIO
 ```
 
 ---
@@ -60,9 +65,9 @@ The codebase follows the **Domain-Driven Design (DDD)** pattern, separating conc
 | Crate | DDD Layer | Responsibility | Key Dependencies |
 | :--- | :--- | :--- | :--- |
 | `factory-core` | **Domain** | Pure business logic, shared models, and security protocols. | `serde`, `uuid` |
-| `factory-application` | **Application** | Hatchet orchestration, agentic workflows, and task decomposition. | `factory-core` |
-| `factory-infrastructure` | **Infrastructure** | Concrete adapters for **Jira**, **R2R**, **LiteLLM**, and Kafka. | `reqwest`, `wiremock` |
-| `factory-mcp-server` | **Interface (RPC)** | MCP Server, SSE transport, and JSON-RPC tool registration. | `axum`, `tokio` |
+| `factory-application` | **Application** | Hatchet orchestration via **6-Phase DAG**. Specialized workers: **Rustant** (Architect) & **ZeroClaw** (Executor). | `factory-core` |
+| `factory-infrastructure` | **Infrastructure** | Concrete adapters for **Jira**, **R2R**, **LiteLLM**, and **Kafka** (agent-thought). | `reqwest`, `rdkafka` |
+| `factory-mcp-server` | **Interface (RPC)** | MCP Server, **SSE transport**, and integrated Skills (Context, Sandbox). | `axum`, `tokio` |
 | `factory-cli` | **Interface (CLI)** | Command-line entry points for workers and local testing. | `clap` |
 
 ---

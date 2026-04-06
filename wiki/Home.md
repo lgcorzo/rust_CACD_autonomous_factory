@@ -1,6 +1,8 @@
 # Dark Gravity CACD Autonomous Factory Wiki
 
-Welcome to the official wiki for the **Dark Gravity CACD Autonomous Factory**. This repository manages the lifecycle and orchestration of autonomous agent factories, now migrated to a high-performance Rust architecture.
+Welcome to the official wiki for the **Dark Gravity CACD Autonomous Factory**. This repository manages the lifecycle and orchestration of autonomous agent factories, now migrated to a high-performance **Rust-native architecture (Phase 12)**.
+
+The project currently operates under a **Mission-Oriented State Loop** driven by specialized workers: **Rustant** (The Architect) and **ZeroClaw** (The Executor).
 
 ## 🚀 Getting Started
 

@@ -28,7 +28,7 @@ impl McpClient for McpHttpClient {
 
         let response = self
             .client
-            .post(format!("{}/sse", self.base_url))
+            .post(format!("{}/mcp", self.base_url))
             .json(&request)
             .send()
             .await?;
@@ -72,7 +72,7 @@ mod tests {
         });
 
         Mock::given(method("POST"))
-            .and(path("/sse"))
+            .and(path("/mcp"))
             .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
             .mount(&mock_server)
             .await;
@@ -93,7 +93,7 @@ mod tests {
         });
 
         Mock::given(method("POST"))
-            .and(path("/sse"))
+            .and(path("/mcp"))
             .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
             .mount(&mock_server)
             .await;

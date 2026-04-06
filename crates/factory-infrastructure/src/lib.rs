@@ -1,7 +1,7 @@
 #[cfg_attr(test, mockall::automock)]
-#[async_trait::async_trait]
-pub trait KafkaClient {
-    async fn publish(&self, topic: &str, key: &str, payload: &[u8]) -> anyhow::Result<()>;
+pub trait ZitiIdentity: Send + Sync {
+    fn get_token(&self) -> anyhow::Result<String>;
+    fn service_name(&self) -> String;
 }
 
 #[cfg_attr(test, mockall::automock)]
@@ -31,11 +31,13 @@ pub mod kafka;
 pub mod mcp_client;
 pub mod r2r;
 pub mod s3;
+pub mod ziti;
 
 pub use jira::HttpJiraClient;
-pub use kafka::SimpleMockKafkaClient;
+pub use kafka::{KafkaClient, SimpleMockKafkaClient};
 #[cfg(any(test, feature = "test-utils"))]
 pub use mcp_client::MockMcpClient;
 pub use mcp_client::{McpClient, McpHttpClient};
 pub use r2r::HttpR2rClient;
 pub use s3::AwsS3Storage;
+pub use ziti::OpenZitiIdentity;
