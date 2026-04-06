@@ -1,6 +1,6 @@
-# External Integrations: Jira and R2R (Graph RAG)
+# External Integrations: GitHub/GitLab and R2R (Graph RAG)
 
-This document describes the integration architecture and configuration for Jira and R2R within the Dark Gravity Autonomous Agent Factory.
+This document describes the integration architecture and configuration for GitHub, GitLab, and R2R within the Dark Gravity Autonomous Agent Factory.
 
 ## Architecture
 
@@ -8,19 +8,20 @@ The integration follows a clean architecture pattern separating the infrastructu
 
 ### Infrastructure Layer (`factory-infrastructure`)
 
-- **Traits**: Defines `JiraClient`, `R2rClient`, `KafkaClient`, and `McpClient` interfaces.
+- **Traits**: Defines `GitHubClient`, `GitLabClient`, `R2rClient`, `KafkaClient`, and `McpClient` interfaces.
 - **Implementations**:
-  - `HttpJiraClient` / `HttpR2rClient`: Asynchronous REST communication via `reqwest`.
+  - `HttpGitHubClient` / `HttpGitLabClient` / `HttpR2rClient`: Asynchronous REST communication via `reqwest`.
   - `SimpleMockKafkaClient`: Publishing to the **agent-thought** topic for real-time reasoning telemetry.
   - `McpHttpClient`: High-performance **SSE (Server-Sent Events)** transport for durable tool execution.
 - **Authentication**:
-  - **Jira**: Basic Auth (Username + API Token).
+  - **GitHub**: Personal Access Token (PAT) via `Authorization: Bearer`.
+  - **GitLab**: Project Access Token via `PRIVATE-TOKEN`.
   - **R2R**: Bearer Token (Self-refreshing login via `/v3/users/login`).
   - **Kafka**: SASL/SCRAM via `rdkafka` (infrastructure specific).
 
 ### MCP Tool Layer (`factory-mcp-server`)
 
-- **`search_jira`**: Exposes JQL search capabilities to agents.
+- **`search_github_issues`**: Exposes cross-repository issue searches to agents.
 - **`context_pruning`**: New skill for Rustant to refine R2R context results.
 - **`execute_code`**: Integrated with Firecracker Micro-VMs for isolated execution.
 
@@ -28,11 +29,12 @@ The integration follows a clean architecture pattern separating the infrastructu
 
 The following environment variables are required for the integrations to function:
 
-### Jira Configuration
+### GitHub / GitLab Configuration
 
-- `JIRA_URL`: The base URL of your Jira instance (e.g., `https://your-site.atlassian.net`).
-- `JIRA_USERNAME`: The email address associated with your Jira API token.
-- `JIRA_API_TOKEN`: Your Atlassian API token.
+- `GITHUB_REPO`: The target repository (e.g., `owner/repo`).
+- `GITHUB_TOKEN`: Your Personal Access Token.
+- `GITLAB_URL`: (Optional) Custom GitLab instance URL.
+- `GITLAB_TOKEN`: (Optional) GitLab Access Token.
 
 ### R2R Configuration
 
@@ -56,11 +58,11 @@ Agents can use the `retrieve_context` tool to find relevant documentation:
 }
 ```
 
-And `search_jira` to track project tasks:
+And `search_github_issues` to track project tasks:
 
 ```javascript
 // Example tool call payload
 {
-  "query": "project = DG AND status = 'In Progress' ORDER BY updated DESC"
+  "query": "is:open label:mission author:lgcorzo"
 }
 ```
