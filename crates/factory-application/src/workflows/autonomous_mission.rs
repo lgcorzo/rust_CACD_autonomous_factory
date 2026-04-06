@@ -1,6 +1,7 @@
 use crate::agents::{DocAgent, PlannerAgent, ReviewerAgent, TesterAgent};
 use crate::workflows::develop_task::{TaskInput, create_develop_task_workflow};
 use factory_infrastructure::McpHttpClient;
+use futures::future::try_join_all;
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::runnables::{Runnable, Workflow};
 use serde::{Deserialize, Serialize};
@@ -52,7 +53,7 @@ pub fn create_mission_workflow(
                     .ok_or(anyhow::anyhow!("No tasks in plan"))?;
 
                 let dev_wf = create_develop_task_workflow(&hatchet, mcp_url);
-                let mut results = Vec::new();
+                let mut futures = Vec::new();
 
                 for task in tasks {
                     let child_input = TaskInput {
@@ -60,10 +61,15 @@ pub fn create_mission_workflow(
                         description: task["description"].as_str().unwrap_or("").to_string(),
                         relevant_files: vec![],
                     };
-                    // In v0.2.7, run() waits for completion
-                    let res = dev_wf.run(&child_input, None).await?;
-                    results.push(res.result);
+                    // In v0.2.7, run() returns a future that we can collect
+                    futures.push(dev_wf.run(child_input, None));
                 }
+
+                let results = try_join_all(futures)
+                    .await?
+                    .into_iter()
+                    .map(|res| res.result)
+                    .collect();
 
                 Ok(serde_json::Value::Array(results))
             })
