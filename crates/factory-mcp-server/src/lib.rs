@@ -265,9 +265,9 @@ mod tests {
         mock_tool
             .expect_name()
             .return_const("test_tool".to_string());
-        mock_tool.expect_call().returning(|_| {
-            Err(anyhow::anyhow!("Sensitive internal error details"))
-        });
+        mock_tool
+            .expect_call()
+            .returning(|_| Err(anyhow::anyhow!("Sensitive internal error details")));
 
         server.add_tool(Box::new(mock_tool)).await;
 

@@ -152,7 +152,9 @@ mod tests {
             HttpJiraClient::new(mock_server.uri(), "user".to_string(), "token".to_string());
 
         Mock::given(method("GET"))
-            .respond_with(ResponseTemplate::new(500).set_body_string("INTERNAL_SERVER_ERROR_DETAILS"))
+            .respond_with(
+                ResponseTemplate::new(500).set_body_string("INTERNAL_SERVER_ERROR_DETAILS"),
+            )
             .mount(&mock_server)
             .await;
 
