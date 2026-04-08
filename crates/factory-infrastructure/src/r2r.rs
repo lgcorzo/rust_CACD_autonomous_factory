@@ -37,29 +37,32 @@ impl HttpR2rClient {
         let login_body = login_res.text().await?;
 
         if !login_status.is_success() {
-            anyhow::bail!(
+            tracing::error!(
                 "R2R login failed with status {}. Body: {}",
                 login_status,
                 login_body
             );
+            anyhow::bail!("R2R login failed with status {}", login_status);
         }
 
         let login_data: serde_json::Value = serde_json::from_str(&login_body).map_err(|e| {
-            anyhow::anyhow!(
+            tracing::error!(
                 "Failed to decode R2R login response: {}. Body: {}",
                 e,
                 login_body
-            )
+            );
+            anyhow::anyhow!("Failed to decode R2R login response")
         })?;
 
         let token = login_data["results"]["access_token"]
             .as_str()
             .or_else(|| login_data["results"]["access_token"]["token"].as_str())
             .ok_or_else(|| {
-                anyhow::anyhow!(
+                tracing::error!(
                     "Failed to retrieve access token from R2R. Response was: {}",
                     login_data
-                )
+                );
+                anyhow::anyhow!("Failed to retrieve access token from R2R")
             })?;
 
         Ok(token.to_string())
@@ -92,19 +95,21 @@ impl R2rClient for HttpR2rClient {
         let body_text = search_res.text().await?;
 
         if !status.is_success() {
-            anyhow::bail!(
+            tracing::error!(
                 "R2R search query failed with status {}. Body: {}",
                 status,
                 body_text
             );
+            anyhow::bail!("R2R search query failed with status {}", status);
         }
 
         let search_data: serde_json::Value = serde_json::from_str(&body_text).map_err(|e| {
-            anyhow::anyhow!(
+            tracing::error!(
                 "Failed to decode R2R search response: {}. Body: {}",
                 e,
                 body_text
-            )
+            );
+            anyhow::anyhow!("Failed to decode R2R search response")
         })?;
 
         let mut combined_results = String::new();
@@ -191,7 +196,9 @@ mod tests {
 
         let result = client.search("test").await;
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("401 Unauthorized"));
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("401 Unauthorized"));
+        assert!(!err_msg.contains("Invalid credentials"));
     }
 
     #[tokio::test]
@@ -218,9 +225,8 @@ mod tests {
 
         let result = client.search("test").await;
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("500 Internal Server Error"));
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("500 Internal Server Error"));
+        assert!(!err_msg.contains("Internal error"));
     }
 }

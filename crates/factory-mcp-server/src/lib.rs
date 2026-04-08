@@ -133,7 +133,8 @@ impl McpServer {
                     id: request.id,
                 },
                 Err(e) => {
-                    self.error_response(request.id, -32603, &format!("Tool execution error: {}", e))
+                    tracing::error!("Tool execution error for {}: {}", name, e);
+                    self.error_response(request.id, -32603, "Tool execution error")
                 }
             }
         } else {
@@ -255,6 +256,33 @@ mod tests {
         let response = server.handle_request(request).await;
         assert!(response.error.is_some());
         assert_eq!(response.error.unwrap().message, "Tool not found");
+    }
+
+    #[tokio::test]
+    async fn test_call_tool_error_sanitization() {
+        let server = McpServer::new();
+        let mut mock_tool = MockTool::new();
+        mock_tool
+            .expect_name()
+            .return_const("test_tool".to_string());
+        mock_tool
+            .expect_call()
+            .returning(|_| Err(anyhow::anyhow!("Sensitive internal error details")));
+
+        server.add_tool(Box::new(mock_tool)).await;
+
+        let request = JsonRpcRequest {
+            jsonrpc: "2.0".to_string(),
+            method: "call_tool".to_string(),
+            params: Some(json!({ "name": "test_tool", "arguments": {} })),
+            id: Some(json!(1)),
+        };
+
+        let response = server.handle_request(request).await;
+        assert!(response.error.is_some());
+        let err = response.error.unwrap();
+        assert_eq!(err.message, "Tool execution error");
+        assert!(!format!("{:?}", err.data).contains("Sensitive"));
     }
 
     #[tokio::test]

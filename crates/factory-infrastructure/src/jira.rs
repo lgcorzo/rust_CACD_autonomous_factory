@@ -45,7 +45,8 @@ impl JiraClient for HttpJiraClient {
         if !res.status().is_success() {
             let status = res.status();
             let body = res.text().await.unwrap_or_default();
-            anyhow::bail!("Jira search failed with status {}. Body: {}", status, body);
+            tracing::error!("Jira search failed with status {}. Body: {}", status, body);
+            anyhow::bail!("Jira search failed with status {}", status);
         }
 
         let data: serde_json::Value = res.json().await?;
@@ -133,13 +134,15 @@ mod tests {
             HttpJiraClient::new(mock_server.uri(), "user".to_string(), "token".to_string());
 
         Mock::given(method("GET"))
-            .respond_with(ResponseTemplate::new(401).set_body_string("Unauthorized"))
+            .respond_with(ResponseTemplate::new(401).set_body_string("DETAILED_SECRET_ERROR"))
             .mount(&mock_server)
             .await;
 
         let result = client.search_issues("test").await;
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("401 Unauthorized"));
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("401 Unauthorized"));
+        assert!(!err_msg.contains("DETAILED_SECRET_ERROR")); // The body should NOT be present
     }
 
     #[tokio::test]
@@ -149,15 +152,16 @@ mod tests {
             HttpJiraClient::new(mock_server.uri(), "user".to_string(), "token".to_string());
 
         Mock::given(method("GET"))
-            .respond_with(ResponseTemplate::new(500).set_body_string("Server Error"))
+            .respond_with(
+                ResponseTemplate::new(500).set_body_string("INTERNAL_SERVER_ERROR_DETAILS"),
+            )
             .mount(&mock_server)
             .await;
 
         let result = client.search_issues("test").await;
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("500 Internal Server Error"));
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("500 Internal Server Error"));
+        assert!(!err_msg.contains("INTERNAL_SERVER_ERROR_DETAILS")); // The body should NOT be present
     }
 }
