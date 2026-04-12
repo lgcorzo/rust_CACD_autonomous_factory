@@ -15,7 +15,9 @@ on:
       - "wiki/**"
       - "README.md"
       - ".gitignore"
+  workflow_dispatch:
   release:
+
     types:
       - published
       - edited
