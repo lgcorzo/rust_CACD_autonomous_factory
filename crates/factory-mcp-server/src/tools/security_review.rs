@@ -3,8 +3,44 @@ use crate::tools::Tool;
 use async_trait::async_trait;
 use regex::Regex;
 use serde_json::{json, Value};
+use std::sync::LazyLock;
 
 pub struct SecurityReviewTool;
+
+struct SecurityRule {
+    rule: &'static str,
+    re: Regex,
+    severity: &'static str,
+    description: &'static str,
+}
+
+static SECURITY_RULES: LazyLock<Vec<SecurityRule>> = LazyLock::new(|| {
+    vec![
+        SecurityRule {
+            rule: "A03:Injection - SQL",
+            re: Regex::new(
+                r#"(?i)(?:execute|cursor\.execute|raw\s*\()(?s:.*?)(?:%s|format\(|f["']|\+\s*[a-zA-Z_]|\,\s*[a-zA-Z_])"#,
+            )
+            .unwrap(),
+            severity: "high",
+            description: "Potential SQL injection.",
+        },
+        SecurityRule {
+            rule: "A03:Injection - Command",
+            re: Regex::new(r#"(?i)(?:os\.system|subprocess\.call|subprocess\.Popen)\s*\(\s*[f"']"#)
+                .unwrap(),
+            severity: "high",
+            description: "Potential command injection.",
+        },
+        SecurityRule {
+            rule: "A02:Crypto - Hardcoded Secret",
+            re: Regex::new(r#"(?i)(?:password|secret|api_key|token)\s*=\s*["'][^"']{8,}["']"#)
+                .unwrap(),
+            severity: "medium",
+            description: "Possible hardcoded secret.",
+        },
+    ]
+});
 
 #[async_trait]
 impl Tool for SecurityReviewTool {
@@ -51,35 +87,13 @@ impl Tool for SecurityReviewTool {
 
 impl SecurityReviewTool {
     fn scan_owasp_patterns(&self, diff: &str) -> Vec<Value> {
-        let patterns = vec![
-            (
-                "A03:Injection - SQL",
-                r#"(?i)(?:execute|cursor\.execute|raw\s*\()(?s:.*?)(?:%s|format\(|f["']|\+\s*[a-zA-Z_]|\,\s*[a-zA-Z_])"#,
-                "high",
-                "Potential SQL injection.",
-            ),
-            (
-                "A03:Injection - Command",
-                r#"(?i)(?:os\.system|subprocess\.call|subprocess\.Popen)\s*\(\s*[f"']"#,
-                "high",
-                "Potential command injection.",
-            ),
-            (
-                "A02:Crypto - Hardcoded Secret",
-                r#"(?i)(?:password|secret|api_key|token)\s*=\s*["'][^"']{8,}["']"#,
-                "medium",
-                "Possible hardcoded secret.",
-            ),
-        ];
-
         let mut findings = Vec::new();
-        for (rule, pattern, severity, description) in patterns {
-            let re = Regex::new(pattern).unwrap();
-            if re.is_match(diff) {
+        for rule in SECURITY_RULES.iter() {
+            if rule.re.is_match(diff) {
                 findings.push(json!({
-                    "rule": rule,
-                    "severity": severity,
-                    "description": description
+                    "rule": rule.rule,
+                    "severity": rule.severity,
+                    "description": rule.description
                 }));
             }
         }
