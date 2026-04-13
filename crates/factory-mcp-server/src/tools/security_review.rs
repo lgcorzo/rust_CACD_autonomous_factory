@@ -2,7 +2,7 @@ use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_trait::async_trait;
 use regex::Regex;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::sync::LazyLock;
 
 pub struct SecurityReviewTool;
