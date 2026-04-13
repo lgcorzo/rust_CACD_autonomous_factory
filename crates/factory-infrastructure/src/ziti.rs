@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait]
 pub trait ZitiIdentity: Send + Sync {
     async fn get_token(&self) -> anyhow::Result<String>;
@@ -34,5 +35,32 @@ impl ZitiIdentity for OpenZitiIdentity {
 
     fn service_name(&self) -> String {
         self.service.clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_open_ziti_identity_new() {
+        let service = "test-service";
+        let identity_file = "test-identity.json";
+        let identity = OpenZitiIdentity::new(service, identity_file);
+
+        assert_eq!(identity.service, service);
+        assert_eq!(identity.identity_file, identity_file);
+    }
+
+    #[tokio::test]
+    async fn test_open_ziti_identity_trait_methods() {
+        let service = "test-service";
+        let identity_file = "test-identity.json";
+        let identity = OpenZitiIdentity::new(service, identity_file);
+
+        assert_eq!(identity.service_name(), service);
+
+        let token = identity.get_token().await.unwrap();
+        assert_eq!(token, "ziti-v1-token-placeholder");
     }
 }
