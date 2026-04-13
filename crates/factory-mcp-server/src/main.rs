@@ -13,7 +13,7 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Initializing MCP Server...");
     let server = Arc::new(McpServer::new());
-    server.register_default_tools().await;
+    server.register_default_tools().await?;
 
     let app = Router::new()
         .route("/mcp", post(McpServer::post_handler))
