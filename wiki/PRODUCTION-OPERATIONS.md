@@ -1,6 +1,6 @@
 # 🚀 PRODUCTION-OPERATIONS: Deployment & Scaling
 
-This document details the **GitOps** and **Kubernetes** operations for the **[PROJECT_NAME]** autonomous factory.
+This document details the **GitOps** and **Kubernetes** operations for the **Dark Gravity** autonomous factory.
 
 ---
 

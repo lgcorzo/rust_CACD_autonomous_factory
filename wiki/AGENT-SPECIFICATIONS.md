@@ -1,6 +1,6 @@
 # 🤖 AGENT-SPECIFICATIONS: Autonomous Workforce
 
-This document specifies the roles, responsibilities, and evaluation metrics for the **[PROJECT_NAME]** autonomous agents.
+This document specifies the roles, responsibilities, and evaluation metrics for the **Dark Gravity** autonomous agents.
 
 ---
 

@@ -1,6 +1,6 @@
 # 🛡️ VERIFICATION-TRIAD: Quality Assurance
 
-This document defines the **Verification Triad** standard for the **[PROJECT_NAME]** autonomous factory: Logical, Architectural, and Security verification.
+This document defines the **Verification Triad** standard for the **Dark Gravity** autonomous factory: Logical, Architectural, and Security verification.
 
 ---
 
