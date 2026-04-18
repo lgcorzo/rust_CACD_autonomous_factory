@@ -1,6 +1,6 @@
-# 🏗️ [PROJECT_NAME]: Autonomous Workforce Factory
+# 🏗️ Dark Gravity: Autonomous Workforce Factory
 
-Welcome to the official wiki for **[PROJECT_NAME]**. This repository manages the lifecycle and orchestration of an autonomous agent factory, following the **Onion Architecture** and **LLMOps 2026** standards.
+Welcome to the official wiki for **Dark Gravity**. This repository manages the lifecycle and orchestration of an autonomous agent factory, following the **Onion Architecture** and **LLMOps 2026** standards.
 
 The project operates under a **Mission-Oriented State Loop** driven by a specialized autonomous workforce.
 
@@ -35,4 +35,4 @@ The project operates under a **Mission-Oriented State Loop** driven by a special
 > This wiki is designed as a **Reusable Template**. To clone this factory for a new domain, follow the instructions in **[PRODUCTION-OPERATIONS](PRODUCTION-OPERATIONS)**.
 
 ---
-*Last Updated: 2026-04-18 — [PROJECT_NAME] Autonomous Workforce*
+*Last Updated: 2026-04-18 — Dark Gravity Autonomous Workforce*
