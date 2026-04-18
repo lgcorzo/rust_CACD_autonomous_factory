@@ -1,6 +1,6 @@
 # 📖 GLOSSARY: Ubiquitous Language
 
-This document defines the common terminology used throughout the **[PROJECT_NAME]** ecosystem. Adhering to this language ensures consistency between business requirements, system architecture, and agent reasoning.
+This document defines the common terminology used throughout the **Dark Gravity** ecosystem. Adhering to this language ensures consistency between business requirements, system architecture, and agent reasoning.
 
 ---
 

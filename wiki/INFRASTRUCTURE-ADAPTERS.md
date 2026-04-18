@@ -1,4 +1,4 @@
-# 🔌 INFRASTRUCTURE-ADAPTERS: [PROJECT_NAME] Connectors
+# 🔌 INFRASTRUCTURE-ADAPTERS: Dark Gravity Connectors
 
 This document details the **Adapters** that connect the autonomous factory to external ecosystems and internal infrastructure.
 
