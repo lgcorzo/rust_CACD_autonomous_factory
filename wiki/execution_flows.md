@@ -13,7 +13,7 @@ sequenceDiagram
     participant Hatchet as Hatchet Engine
     participant RU as Rustant (Planner)
     participant ZC as ZeroClaw (Executor)
-    participant LLM as LiteLLM (minimax2.5)
+    participant LLM as LiteLLM (minimax-m2.7:cloud)
     participant R2R as R2R (Context)
 
     GH->>n8n: New Issue (label:mission)

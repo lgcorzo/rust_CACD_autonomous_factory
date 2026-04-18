@@ -15,7 +15,7 @@ Rustant is the primary intelligence behind the factory's planning and review pha
 ### Rustant Skills
 
 - **R2R Integration**: Direct interface with the vector store for context retrieval.
-- **Strategic Reasoning**: Optimized for the `mnimax2.5` model.
+- **Strategic Reasoning**: Optimized for the `minimax-m2.7:cloud` model.
 - **Thought Publishing**: Real-time telemetry via Kafka.
 
 ---
