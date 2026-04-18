@@ -1,4 +1,4 @@
-# 🏭 BUSINESS-CONTEXT: [PROJECT_NAME]
+# 🏭 BUSINESS-CONTEXT: Dark Gravity
 
 ## 🎯 Goal Description
 
@@ -8,7 +8,7 @@ Deploy an **Autonomous Agent Workforce** inside a Zero Trust environment. This f
 
 In restricted (Zero Trust) environments, manual code development, testing, and deployment cycles are slow and prone to errors. Security requirements often create bottlenecks that prevent rapid iteration.
 
-**[PROJECT_NAME]** solves this by:
+**Dark Gravity** solves this by:
 
 - **Automated Mission Lifecycle**: End-to-end automation from an external trigger to a verified delivery.
 - **Zero Trust Sovereignty**: All activities occur within secured network perimeters with strict identity-based access.

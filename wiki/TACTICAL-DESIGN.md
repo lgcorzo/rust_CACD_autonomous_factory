@@ -1,4 +1,4 @@
-# 🛠️ TACTICAL-DESIGN: [PROJECT_NAME] Components
+# 🛠️ TACTICAL-DESIGN: Dark Gravity Components
 
 This document details the **Tactical Design** of the autonomous factory, mapping the domain logic to specific software components, crates, and data schemas.
 

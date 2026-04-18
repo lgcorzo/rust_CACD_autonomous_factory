@@ -1,6 +1,6 @@
-# 🏗️ STRATEGIC-DESIGN: [PROJECT_NAME] Architecture
+# 🏗️ STRATEGIC-DESIGN: Dark Gravity Architecture
 
-This document defines the **Strategic Design** of the [PROJECT_NAME] autonomous factory, focusing on **Bounded Contexts**, **Context Maps**, and the **Onion Architecture** layers.
+This document defines the **Strategic Design** of the Dark Gravity autonomous factory, focusing on **Bounded Contexts**, **Context Maps**, and the **Onion Architecture** layers.
 
 ---
 
