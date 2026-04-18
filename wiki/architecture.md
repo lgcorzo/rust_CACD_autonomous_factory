@@ -24,8 +24,10 @@ graph TB
         H[Hatchet Engine]
         
         subgraph "Autonomous Agents"
+            direction TB
             R[Rustant: Planner]
             Z[ZeroClaw: Executor]
+            G["GravityRunner: Direct Action (GH)"]
             J[Jules: Remediator]
         end
 
@@ -60,10 +62,16 @@ The codebase follows the **Domain-Driven Design (DDD)** pattern, separating conc
 | Crate | DDD Layer | Responsibility | Key Dependencies |
 | :--- | :--- | :--- | :--- |
 | `factory-core` | **Domain** | Pure business logic, shared models, and security protocols. | `serde`, `uuid` |
-| `factory-application` | **Application** | Hatchet orchestration via **6-Phase DAG**. Specialized workers: **Rustant** (Architect) & **ZeroClaw** (Executor). | `factory-core` |
-| `factory-infrastructure` | **Infrastructure** | Concrete adapters for **GitHub**, **GitLab**, **R2R**, and **LiteLLM**. | `reqwest`, `rdkafka` |
+| `factory-application` | **Application** | Hatchet orchestration via **6-Phase DAG**. Specialized workers: **Rustant**, **ZeroClaw**, and **GravityRunner**. | `factory-core` |
+| `factory-infrastructure` | **Infrastructure** | Concrete adapters for **GitHub (App)**, **GitLab**, **R2R**, and **LiteLLM**. | `reqwest`, `rdkafka`, `jsonwebtoken` |
 | `factory-mcp-server` | **Interface (RPC)** | MCP Server, **SSE transport**, and integrated Skills (Context, Sandbox). | `axum`, `tokio` |
 | `factory-cli` | **Interface (CLI)** | Command-line entry points for workers and local testing. | `clap` |
+
+### 🧩 DDD Pattern Application
+- **Domain**: Ownership of core logic (PR status, Commit integrity). Framework-agnostic.
+- **Application**: The "Orchestrator" (Hatchet Workflows, Agent Logic).
+- **Infrastructure**: The "Adapters" (GitHub Apps, Kafka Producers, Firecracker micro-VMs).
+- **Interface**: The "Entrypoints" (CLI, MCP Server, SSE Stream).
 
 ---
 
@@ -90,9 +98,12 @@ classDiagram
     McpTool <|-- SecurityReviewTool
     McpTool <|-- IndexCodeTool
     McpTool <|-- RunTestsTool
+    McpTool <|-- FixPRCommitTool
+    McpTool <|-- GitHubWorkflowTool
 
     ExecuteCodeTool ..> SandboxDriver : uses
     RunTestsTool ..> SandboxDriver : uses
+    FixPRCommitTool ..> GitHubClient : uses
     
     class SandboxDriver {
         <<Interface>>

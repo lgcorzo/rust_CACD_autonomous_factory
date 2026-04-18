@@ -1,19 +1,24 @@
 # Solution Architecture Report (SAR): LLMOps Autogen Team
 
-## 1. Architectural Style
-
 The project follows **Domain-Driven Design (DDD)** and **Onion Architecture** to ensure modularity and maintainability.
+
+## 2. MLOps 2026 Lifecycle
+Every mission is managed as a **MLflow Experiment**. Metrics tracked include:
+- `remediation_success`: Binary (0/1) for cluster fixes.
+- `commit_latency`: Time from code change to PR creation.
+- `resource_usage`: CPU/Memory consumption of the Runner sidecar.
+- `token_cost`: Financial cost based on LiteLLM telemetry.
 
 ## 2. REPOSITORY STRUCTURE & LINKS
 
 > [!IMPORTANT]
 > Map the repository layers to the architecture.
 
-- **Root Directory**: [Root](file:///mnt/F024B17C24B145FE/Repos/llmops-python-package)
-- **Application Layer**: [Application](file:///mnt/F024B17C24B145FE/Repos/llmops-python-package/src/autogen_team/application) -> Coordinators and Use Cases.
-- **Domain Layer**: [Domain](file:///mnt/F024B17C24B145FE/Repos/llmops-python-package/src/autogen_team/models) -> Business Logic and Entities.
-- **Infrastructure Layer**: [Infrastructure](file:///mnt/F024B17C24B145FE/Repos/llmops-python-package/src/autogen_team/infrastructure) -> Technical concerns and External Adapters.
-- **Data Access Layer**: [Data Access](file:///mnt/F024B17C24B145FE/Repos/llmops-python-package/src/autogen_team/data_access) -> Persistence and Datasets.
+- **Root Directory**: [Root](file:///mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory)
+- **Application Layer**: [factory-application](file:///mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-application) -> Hatchet Workflows, Agents (Rustant, ZeroClaw, GravityRunner).
+- **Domain Layer**: [factory-core](file:///mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-core) -> Pure Business Logic, Shared Models, Security Protocols.
+- **Infrastructure Layer**: [factory-infrastructure](file:///mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-infrastructure) -> Adapters for GitHub, R2R, Kafka, Jira, OpenZiti.
+- **Interface Layer**: [factory-mcp-server](file:///mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server) -> MCP Server, Tools, SSE Transport.
 
 ## 3. Layer Detail
 
@@ -25,14 +30,14 @@ The project follows **Domain-Driven Design (DDD)** and **Onion Architecture** to
 
 ### 3.2 Application Layer
 
-- **Jobs/Use Cases**: TrainingJob, InferenceJob, HatchetInferenceJob, EvaluationJob, TuningJob.
-- **MCP Server**: Autonomous tool coordinator (MCP Server Bootstrap).
-- **DTOs**: Job Contexts, Request/Response schemas, MCP TextContent.
+- **Jobs/Use Cases**: AutonomousMission (6-Phase DAG), DevelopTask, RemediateError.
+- **MCP Server**: Autonomous tool coordinator (factory-mcp-server).
+- **DTOs**: MissionInput, MissionOutput, CallToolRequest/Response.
 
 ### 3.3 Infrastructure Layer
 
-- **External Services**: MLflow (for tracking and registry), Hatchet (for orchestration), Kafka (optional messaging), LiteLLM (LLM provider), R2R (RAG engine).
-- **Adapters**: Searchers, Splitters, Signers, Orchestration Workflows, MCP Tools (plan_mission, execute_code, run_tests, security_review, retrieve_context, index_code).
+- **External Services**: MLflow (for tracking), Hatchet (for orchestration), Kafka (telemetry), LiteLLM (LLM gateway), R2R (RAG engine), GitHub (Direct Actions).
+- **Adapters**: JiraClient, R2rClient, GitHubClient, KafkaClient, MCP Tools (plan_mission, execute_code, fix_pr_commit, security_review, retrieve_context).
 
 ### 3.4 Data Access Layer
 

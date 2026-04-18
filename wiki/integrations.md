@@ -14,7 +14,7 @@ The integration follows a clean architecture pattern separating the infrastructu
   - `SimpleMockKafkaClient`: Publishing to the **agent-thought** topic for real-time reasoning telemetry.
   - `McpHttpClient`: High-performance **SSE (Server-Sent Events)** transport for durable tool execution.
 - **Authentication**:
-  - **GitHub**: Personal Access Token (PAT) via `Authorization: Bearer`.
+  - **GitHub**: **GitHub App** integration using JWT/Installation tokens (preferred) or PAT for legacy repos.
   - **GitLab**: Project Access Token via `PRIVATE-TOKEN`.
   - **R2R**: Bearer Token (Self-refreshing login via `/v3/users/login`).
   - **Kafka**: SASL/SCRAM via `rdkafka` (infrastructure specific).
@@ -22,7 +22,8 @@ The integration follows a clean architecture pattern separating the infrastructu
 ### MCP Tool Layer (`factory-mcp-server`)
 
 - **`search_github_issues`**: Exposes cross-repository issue searches to agents.
-- **`context_pruning`**: New skill for Rustant to refine R2R context results.
+- **`create_pull_request`**: Foundation for the Delivery phase, automating the transition from local fix to remote PR.
+- **`fix_pr_commit`**: (NEW) Specialized tool for GravityRunner to apply direct patches to existing PR branches.
 - **`execute_code`**: Integrated with Firecracker Micro-VMs for isolated execution.
 
 ## Configuration
@@ -31,8 +32,10 @@ The following environment variables are required for the integrations to functio
 
 ### GitHub / GitLab Configuration
 
+- `GITHUB_APP_ID`: The ID of the GitHub App used for authentication.
+- `GITHUB_PRIVATE_KEY`: The RSA private key for the GitHub App (managed via **Sealed Secrets**).
+- `GITHUB_INSTALLATION_ID`: The installation ID for the target organization.
 - `GITHUB_REPO`: The target repository (e.g., `owner/repo`).
-- `GITHUB_TOKEN`: Your Personal Access Token.
 - `GITLAB_URL`: (Optional) Custom GitLab instance URL.
 - `GITLAB_TOKEN`: (Optional) GitLab Access Token.
 

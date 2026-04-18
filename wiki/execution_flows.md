@@ -71,6 +71,30 @@ sequenceDiagram
 
 ---
 
+## 👻 Direct PR Correction Sequence (GravityRunner)
+
+This flow illustrates how `GravityRunner` bypasses the full sandbox lifecycle for trivial fixes or real-time PR adjustments.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant ZC as ZeroClaw (Executor)
+    participant GR as GravityRunner (Runner)
+    participant GH as GitHub API / Actions
+    
+    ZC->>ZC: Identifies trivial lint/format error
+    ZC->>GR: Trigger: fix_pr_commit(branch, patch)
+    GR->>GH: POST /repos/:owner/:repo/contents/:path
+    GH-->>GR: 201 Created (Commit Added)
+    
+    Note over GR,GH: Trigger Validation Workflow
+    GR->>GH: POST /repos/:owner/:repo/actions/workflows/:id/dispatches
+    GH->>GR: Execute Workflow on Self-Hosted Runner
+    GR-->>GH: Report Status (Check Run)
+```
+
+---
+
 ## 🌩️ SSE Transport Flow (Unified Communication)
 
 The factory uses a persistent **SSE (Server-Sent Events)** stream for bidirectional tool execution. This ensures long-running tasks (like code generation or test suites) do not timeout and provide real-time feedback.
@@ -121,21 +145,27 @@ No code reaches the `main` branch without surviving the **Verification Triad**:
     - **Executor**: Implements and validates logic in a Firecracker micro-VM.
 2. **Architectural Verification (Rustant)**:
     - **Architect**: Checks for alignment with the R2R-retrieved patterns.
-3. **Security Verification (Rustant Tooling)**:
-    - **SecurityReview**: Automated scanning for vulnerabilities and compliance.
+| **SecurityVerification**: Automated scanning for vulnerabilities and compliance.
 
 ---
 
-## 🌩️ KEDA Autoscaling
+## 📈 MLOps 2026: The "Experiment" Trace
 
-The factory scales horizontally based on mission demand (Kafka lag).
+The factory treats every mission lifecycle as an **MLflow Run**.
 
 ```mermaid
 graph LR
-    K[Kafka mission-input] -->|Queue Lag| KE[KEDA ScaledObject]
-    KE -->|Scale| D[OpenCode Deployment]
-    D -->|N replicas| H[Hatchet Workers]
+    S[Start Mission] --> Run[Start MLflow Run]
+    Run --> P[Phase 1: Planning]
+    P --> C[Phase 2: Coding]
+    C --> V[Phase 3: Validation]
+    V --> R[Phase 4: Review]
+    R --> D[Phase 5: Delivery]
+    D --> Log[Log Metrics & Artifacts]
+    Log --> End[End Experiment]
+    
+    P -.->|Log Token Usage| ML((MLflow))
+    C -.->|Log Accuracy| ML
+    V -.->|Log Latency| ML
+    D -.->|Log PR URL| ML
 ```
-
-> [!NOTE]
-> This ensures zero idling resource overhead while maintaining high throughput for large bursts of missions.
