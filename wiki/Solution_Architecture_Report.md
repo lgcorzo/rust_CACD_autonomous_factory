@@ -47,7 +47,7 @@ Every mission is managed as a **MLflow Experiment**. Metrics tracked include:
 ## 4. LLM Component Interactions
 
 - **Vector Database**: R2R RAG (Knowledge Graph + Vector)
-- **LLM Provider**: Autogen (Microsoft), LiteLLM (Gemini Pro)
+- **LLM Provider**: Autogen (Microsoft), LiteLLM (minimax-m2.7:cloud)
 - **Embedding Model**: Managed by R2R
 
 ## 5. Design Diagrams
