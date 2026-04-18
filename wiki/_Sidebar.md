@@ -2,26 +2,24 @@
 
 ## [Home](Home)
 
-### Lifecycle
+### 🧭 Strategic Context
+* [0. Glossary](GLOSSARY)
+* [1. Business Context](BUSINESS-CONTEXT)
 
-* [Business Understanding](business_understanding)
-* [Solution Architecture](Solution_Architecture_Report)
-* [Architecture Detail](architecture)
-* [Testing Strategy](testing_strategy)
-* [Test Plan](Test_Plan_Report)
+### 🏗 Architecture
+* [2. Strategic Design](STRATEGIC-DESIGN)
+* [3. Tactical Design](TACTICAL-DESIGN)
 
-### Guides
+### 🤖 Workforce
+* [4. Agent Specs](AGENT-SPECIFICATIONS)
+* [5. Experiment Lifecycle](EXPERIMENT-LIFECYCLE)
 
-* [Deployment Guide](deployment_guide)
-* [Execution Flows](execution_flows)
-* [Integrations](integrations)
-* [Agent Specifications](agents_specification)
+### 🔌 Operations
+* [6. Adapters](INFRASTRUCTURE-ADAPTERS)
+* [7. Verification Triad](VERIFICATION-TRIAD)
+* [8. Production Ops](PRODUCTION-OPERATIONS)
 
-### Project
-
-* [Mission History](mission_history)
+### 📋 Project
+* [Mission History](EXPERIMENT-LOGS)
 * [README](README)
-
-### Legacy
-
-* [Backlog Archive](backlog_llmops_autogen)
+* [Legacy Backlog](backlog_llmops_autogen)
