@@ -1,5 +1,5 @@
 use crate::agents::ZeroClawAgent;
-use factory_infrastructure::McpHttpClient;
+use factory_infrastructure::{McpClient, McpHttpClient};
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::runnables::Task;
 use serde::{Deserialize, Serialize};
@@ -21,17 +21,17 @@ pub fn create_develop_task_workflow(
     hatchet: &Hatchet,
     mcp_url: String,
 ) -> Task<TaskInput, TaskOutput> {
-    let mcp_url_clone = mcp_url.clone();
+    let mcp_client: Arc<dyn McpClient> = Arc::new(McpHttpClient::new(mcp_url));
 
+    let mcp_client_clone = mcp_client.clone();
     hatchet
         .task(
             "zeroclaw:execute_coding_task",
             move |input: TaskInput, _ctx| {
-                let mcp_url = mcp_url_clone.clone();
+                let mcp_client = mcp_client_clone.clone();
                 Box::pin(async move {
                     tracing::info!("Workflow: executing task {}", input.task_id);
 
-                    let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
                     let zeroclaw = ZeroClawAgent::new(mcp_client);
 
                     // Use the execute_task method from ZeroClawAgent
