@@ -78,3 +78,18 @@ impl Tool for IndexCodeTool {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_index_code_tool_missing_content() {
+        let tool = IndexCodeTool::new("http://localhost:8000".to_string());
+        let params = json!({});
+        let result = tool.call(params).await;
+
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), "Content is required");
+    }
+}
