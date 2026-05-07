@@ -77,3 +77,8 @@
 **Vulnerability:** The FastAPI application was not setting Content-Security-Policy and Cache-Control headers, leaving it vulnerable to sensitive data caching and lacking defense-in-depth against XSS.
 **Learning:** Just setting `X-Content-Type-Options`, `X-Frame-Options`, and `Strict-Transport-Security` is incomplete for full protection. Cache-Control prevents caching of APIs returning sensitive/private info.
 **Prevention:** Ensure `Content-Security-Policy` and `Cache-Control` are always included in security HTTP middlewares.
+
+## 2025-05-15 - Permissive CORS in Rust Axum Server
+**Vulnerability:** The MCP server was using `CorsLayer::permissive()`, which allowed all origins, methods, and headers.
+**Learning:** While `permissive()` is useful for initial development, it violates the principle of least privilege and increases the attack surface for CSRF and data leakage.
+**Prevention:** Always configure `CorsLayer` with explicit `allow_origin` (from environment variables), `allow_methods`, and `allow_headers`. Default to a restrictive policy if the configuration is missing.
