@@ -10,12 +10,15 @@ Every mission follows a deterministic path of execution to ensure durability and
 
 ```mermaid
 sequenceDiagram
-    participant GH as External Source (GitHub/GitLab)
-    participant Hatchet as Hatchet Engine
-    participant RU as Rustant (Planner)
-    participant ZC as ZeroClaw (Executor)
-    participant LLM as LiteLLM (minimax-m2.7:cloud)
-    participant R2R as R2R (Context)
+    participant GH as "External Source (GitHub/GitLab)"
+    participant Kafka as "Kafka"
+    participant Hatchet as "Hatchet Engine"
+    participant RU as "Rustant (Planner)"
+    participant ZC as "ZeroClaw (Executor)"
+    participant LLM as "LiteLLM (minimax-m2.7:cloud)"
+    participant R2R as "R2R (Context)"
+    participant Sandbox as "Sandbox"
+    participant Delivery as "Delivery"
 
     GH->>Kafka: New Mission (Input Topic)
     Kafka->>Hatchet: Trigger Workflow
@@ -64,6 +67,6 @@ The factory scales based on mission demand (message lag in the input topic).
 
 ```mermaid
 graph LR
-    K[Kafka mission-input] -->|Queue Lag| KE[KEDA ScaledObject]
-    KE -->|Scale| D[OpenCode Agent Pods]
+    K["Kafka mission-input"] -->|Queue Lag| KE["KEDA ScaledObject"]
+    KE -->|Scale| D["OpenCode Agent Pods"]
 ```
