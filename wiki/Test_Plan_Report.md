@@ -35,8 +35,8 @@ This report details the verification steps taken to ensure the generated LLMOps 
 > [!IMPORTANT]
 > Link to the generated documentation for final review.
 
-- **Main Index**: [SRS_Index.md](SRS_Index.md)
-- **Solution Architecture**: [Solution_Architecture_Report.md](Solution_Architecture_Report.md)
+- **Main Index**: [Home.md](Home.md)
+- **Solution Architecture**: [STRATEGIC-DESIGN.md](STRATEGIC-DESIGN.md)
 
 ## 6. Conclusion
 

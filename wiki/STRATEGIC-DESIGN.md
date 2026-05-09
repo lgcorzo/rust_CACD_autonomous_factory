@@ -24,14 +24,14 @@ The project follows a strict **Onion Architecture** within each crate to maintai
 ```mermaid
 graph TD
     subgraph "Core Package"
-        D[Domain Layer]
+        D["Domain Layer"]
     end
     subgraph "Logic Package"
-        A[Application Layer]
+        A["Application Layer"]
     end
     subgraph "Adapter Package"
-        I[Infrastructure Layer]
-        F[Interface Layer]
+        I["Infrastructure Layer"]
+        F["Interface Layer"]
     end
 
     F --> A
