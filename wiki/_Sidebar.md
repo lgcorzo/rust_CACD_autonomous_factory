@@ -22,4 +22,3 @@
 ### 📋 Project
 * [Mission History](EXPERIMENT-LOGS)
 * [README](README)
-* [Legacy Backlog](backlog_llmops_autogen)

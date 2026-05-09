@@ -33,15 +33,15 @@ The following lifecycle represents the logical path of a single **Mission** thro
 
 ```mermaid
 graph TD
-    A[External Trigger: Mission] -->|Ingestion Adapter| B(Kafka: mission-input)
-    B -->|Trigger| C{Hatchet Workflow}
-    C -->|Decompose| D[Phase 1: Planning]
-    D -->|Fan-out| E[Phase 2: Execution & Testing]
-    E -->|Aggregate| F[Phase 3: Security & Architecture Review]
-    F -->|Result| G{Review Approval}
-    G -->|Yes| H[Phase 4: Delivery]
-    G -->|No| I[Retry / Failure Feedback Loop]
-    H -->|Complete| J[Mission: Resolved]
+    A["External Trigger: Mission"] -->|Ingestion Adapter| B("Kafka: mission-input")
+    B -->|Trigger| C{"Hatchet Workflow"}
+    C -->|Decompose| D["Phase 1: Planning"]
+    D -->|Fan-out| E["Phase 2: Execution & Testing"]
+    E -->|Aggregate| F["Phase 3: Security & Architecture Review"]
+    F -->|Result| G{"Review Approval"}
+    G -->|Yes| H["Phase 4: Delivery"]
+    G -->|No| I["Retry / Failure Feedback Loop"]
+    H -->|Complete| J["Mission: Resolved"]
 ```
 
 ### 1. Ingestion Area
