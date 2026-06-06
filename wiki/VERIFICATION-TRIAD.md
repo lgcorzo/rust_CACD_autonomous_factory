@@ -20,12 +20,14 @@ Our strategy ensures artifact quality through three simultaneous validation pill
 
 We ensure 100% mission reliability via **Sandbox Execution**.
 
-- **Environment**: Isolated Firecracker MicroVMs.
+- **Environment**: Isolated Firecracker MicroVMs using KVM hardware virtualization.
+- **Communication Protocol**: Connection between the agent and host is handled strictly via **`AF_VSOCK`** (host-level TCP bridges are prohibited).
+- **Resource Footprint**: The sandbox is micro-clamped to a **15–30 Mi RAM limit** to enforce strict containment.
 - **Workflow**:
     1. Agent generates code + unit tests.
-    2. Sidecar triggers `cargo test` inside the Sandbox.
+    2. Sidecar triggers `cargo test` inside the isolated Sandbox.
     3. Feedback (stdout/stderr) is streamed back to the agent for self-correction.
-- **Requirement**: ALL delivery-phase artifacts MUST pass their generated test suite.
+- **Requirement**: ALL delivery-phase artifacts MUST pass their generated test suite within the clamped VM.
 
 ---
 
@@ -42,8 +44,11 @@ Automated linting and architectural reviews ensure the code remains maintainable
 
 The final gate before delivery. Any artifact with a security score below 8.0/10 is rejected and regressed to the planning phase.
 
-- **Automated Scanning**: Checking for hardcoded secrets and unsafe dependencies.
-- **LLM-as-a-Judge**: A security-tuned LLM analyzes the diff for logic-based vulnerabilities (e.g., bypass bugs).
+- **Automated Scanning & Code Analysis**: Checked by the `security_review` tool which executes SAST scans and audits libraries.
+- **Forensic Memory Wiping**: To secure Just-In-Time (JIT) credentials in RAM, the **`zeroize`** crate must be integrated into all structs handling secrets.
+  - **SLA Threshold**: Secrets must be completely wiped from RAM in less than **`4.33 microseconds`**.
+  - **Verification**: Zeroize timings are evaluated via **Criterion** benchmarks in the CI pipeline; any commit exceeding this threshold is blocked.
+- **LLM-as-a-Judge**: A security-tuned LLM analyzes the diff via the `security_review` tool for logical vulnerabilities, acting as the final gating auditor. A minimum security score of **8.0/10.0** is required.
 
 ---
 

@@ -8,17 +8,22 @@ Following **Domain-Driven Design (DDD)**, `factory-application` uses services fr
 
 ### Key Responsibilities
 
-- **Workflow Orchestration**: Directing the flow for **Coder**, **Reviewer**, and **Security** missions.
-- **Hatchet Servicing**: Concrete implementation of Hatchet worker tasks and parallel fan-out logic.
-- **Task Decomposition**: Translating Jira-born goals into actionable task DAGs for the agents.
+- **Durable Orchestration (Hatchet DAG)**: Directing the 6-phase state loop (`Ingestion` → `Plan (Rustant)` → `Code (ZeroClaw)` → `Validation (ZeroClaw)` → `Review (Rustant)` → `Delivery (GitOps)`) using Hatchet's orchestrator.
+- **State Checkpointing**: Persisting step checkpoints (`StepCheckpoint`) to Hatchet's PostgreSQL backend, enabling crash-resilient mission execution and automated state recovery.
+- **Spec-Kit Integration**: Enforcing spec-driven development via `Spec-Kit` which empowers the Product Owner (PO) agent to compile design specifications, run structural validation rules, and verify plan alignment prior to ZeroClaw execution.
+- **Task Decomposition**: Parsing complex, high-level Jira requirements into direct, dependency-resolved task graphs.
 
 ## 🛠️ Key Components
 
-- **`agents/`**: Specialized logic for **Coder**, **Reviewer**, **Tester**, and **Architect**.
-- **`missions/`**: Definition of the **autonomous-mission** workflow and its failure modes.
-- **`workflows/`**: Integration points with external schedulers and triggers.
+- **`agents/`**: Core agent logic:
+  - **`rustant.rs`**: The architect and planner agent utilizing semantic context pruning.
+  - **`zeroclaw.rs`**: The code generator and executor agent operating in isolated environments.
+- **`workflows/`**: Hatchet step definitions and orchestration hooks:
+  - **`autonomous_mission.rs`**: The primary 6-phase mission orchestrator managing state transitions.
+  - **`develop_task.rs`**: Granular task execution, validation loops, and git delivery handlers.
 
-## 🧪 Testing
+## 🧪 Testing & Verification
 
-- **Business Logic Tests**: Mocking infrastructure dependencies to verify workflow branching.
-- **BPMN Verification**: (Planned) Visual validation of the mission state machine.
+- **State Transition Testing**: Validating branching logic, failure scenarios, and rollback paths within the mission state machine.
+- **Spec Validation Checks**: Verifying that `Spec-Kit` correctly parses, checks, and validates requirements against structured domain constraints.
+- **Checkpoint Recovery Verification**: Unit tests asserting that transient failures trigger automatic resume workflows from the last successfully stored `StepCheckpoint`.
