@@ -1,64 +1,108 @@
-# 🤖 AGENT-SPECIFICATIONS: Autonomous Workforce
+# AGENT-SPECIFICATIONS: Autonomous Workforce
 
-This document specifies the roles, responsibilities, and evaluation metrics for the **Dark Gravity** autonomous agents.
-
----
-
-## 🧭 The Planning Agent (e.g., Rustant)
-
-The Planner is the "Captain" of the mission. It is responsible for architectural integrity and strategic decomposition.
-
-### Responsibilities
-- **Mission Planning**: Decomposing high-level goals into actionable task sequences.
-- **Context Pruning**: Analyzing RAG results to extract precise patterns.
-- **Architectural Review**: Auditing code artifacts for alignment with the **Strategic Design**.
-
-### Evaluation (MLEval Metrics)
-- **Strategy Score**: Accuracy of the plan against the domain rules.
-- **Token Efficiency**: Minimizing calls while maintaining plan quality.
+This document specifies the roles, responsibilities, and tooling for the **Dark Gravity** autonomous agents.
 
 ---
 
-## 🛠️ The Execution Agent (e.g., ZeroClaw)
+## Rustant (Product Owner Agent)
 
-The Executor is the "Muscle" of the system, responsible for implementation and functional validation.
+The "Captain" of the mission. Governs the **Intelligence Context**.
 
 ### Responsibilities
-- **Code Implementation**: Translating task descriptions into high-quality source code.
-- **Verification**: Generating and running automated test suites in a secured sandbox.
-- **Self-Correction**: Iterating on code based on test failure feedback.
+- **Spec-Driven Planning**: Uses Spec-Kit SDD pipeline (`/speckit-constitution` → `/speckit-specify` → `/speckit-clarify` → `/speckit-plan` → `/speckit-tasks`) to create version-controlled specifications.
+- **Context Pruning**: Queries R2R GraphRAG via `retrieve_context` before planning.
+- **Architectural & Security Review**: Audits code via `security_review` MCP tool (OWASP SAST + LLM-as-a-Judge).
 
-### Evaluation (MLEval Metrics)
-- **Test Pass Rate**: Percentage of generated tests that pass.
-- **Execution Latency**: Time taken to implement and verify a task.
+### Implementation
+- **File**: `crates/factory-application/src/agents/rustant.rs`
+- **Dependencies**: `McpClient`, `R2rClient`
+- **Spec-Kit Tool**: `spec_kit_tool` MCP endpoint for pipeline commands
+- **Evaluation**: Strategy Score, Token Efficiency
 
 ---
 
-## 👻 The Delivery Agent (e.g., GravityRunner)
+## ZeroClaw (Developer Agent)
 
-The Delivery agent is the "Ghost in the Machine" that interfaces with version control systems and CI/CD pipelines.
+The "Muscle" of the system. Operates within the **Execution Context**.
 
 ### Responsibilities
-- **PR Management**: Creating and updating Pull Requests with structured descriptions.
-- **Action Triggering**: Initiating `workflow_dispatch` calls to verify the build in the real environment.
-- **Direct Commit Fixes**: Applying emergency patches to commits directly from the cluster.
+- **Code Implementation**: Translates spec-driven tasks into source code via `execute_code` (Aider CLI for SEARCH/REPLACE mutations).
+- **Verification**: Runs test suites via `run_tests` inside isolated sandbox (gVisor/Firecracker).
+- **Self-Correction**: Iterates on code based on test failure feedback (max 3 retries before Agent-Stuck escalation).
 
-### Evaluation (MLEval Metrics)
+### Implementation
+- **File**: `crates/factory-application/src/agents/zeroclaw.rs`
+- **Dependencies**: `McpClient`
+- **Sandbox Drivers**: `SubprocessDriver` (local), `FirecrackerDriver` (micro-VM via KVM/AF_VSOCK)
+- **Evaluation**: Test Pass Rate, Execution Latency
+
+---
+
+## DevOps Agent (Aethelgard Loop)
+
+The "Immune System". Governs the **Remediation Context**.
+
+### Responsibilities
+- **CI/CD Auto-Remediation**: Parses pipeline failures, queries R2R GraphRAG for historical fixes, directs Developer Agent to apply patches.
+- **Circuit Breaker**: Maximum 3 consecutive auto-remediation attempts before setting `Agent-Stuck` and escalating to humans.
+- **Production Incident Polling**: Polls Sentry API every 15 minutes for new exceptions.
+- **Backlog Automation**: Auto-grades severity and creates backlog issues from production errors.
+
+### Evaluation
 - **Action Success Rate**: Reliability of external API calls.
-- **Correction Frequency**: Number of self-correction cycles needed for a merge-ready PR.
+- **Correction Frequency**: Number of self-correction cycles needed.
 
 ---
 
-## 📊 Evaluation Hierarchy
+## Documentation Agent (Superpowers)
 
-| Agent | Core LLM Model | Isolation Level | Telemetry Stream |
-| :--- | :--- | :--- | :--- |
-| **Planner** | `minimax-m2.7:cloud` | Containerized | Agent-Thought (Kafka) |
-| **Executor** | `minimax-m2.7:cloud` | Micro-VM (KVM) | Agent-Thought (Kafka) |
-| **Delivery** | `minimax-m2.7:cloud` | Secured Pod | Agent-Thought (Kafka) |
+The "Memory Keeper". Manages the **Infrastructure Context** for documentation.
+
+### Responsibilities
+- **AST Delta Sync**: `deepwiki-rs` parses git merge deltas via Tree-sitter, extracts AST deltas, upserts embeddings to pgvector.
+- **Wiki Regeneration**: Uses Superpowers skills (`writing-plans`, `subagent-driven-development`, `verification-before-completion`) to update Wiki pages in parallel.
+- **OSR Gate**: Verifies Orphan Symbol Rate < 5% before any Wiki commit.
+- **R&D Grant Packaging**: Auto-compiles telemetry, hours, and git deltas into Hazitek/SPRI European grant schemas.
+
+### Superpowers Skills Loaded
+| Skill | Purpose |
+| :--- | :--- |
+| `writing-plans` | Decompose documentation into atomic tasks |
+| `dispatching-parallel-agents` | Spawn isolated subagents per independent task |
+| `subagent-driven-development` | Execute each subagent with focused context |
+| `verification-before-completion` | OSR check before Wiki commit |
+| `requesting-code-review` | Validate C4 diagram syntax and Markdown style |
+| `finishing-a-development-branch` | Commit verified docs and close Epic |
 
 ---
 
-## 📈 MLOps 2026: Experiment Lifecycle
+## Agent Interface
 
-Every mission is an experiment. Agents log their activities to **MLflow** via the `Infrastructure Layer`. Failures at any phase are ingested into the **Feedback Registry** to allow the system to learn from historical mistakes.
+All agents implement the `Agent` trait in `crates/factory-application/src/lib.rs`:
+
+```rust
+#[async_trait]
+pub trait Agent: Send + Sync {
+    fn name(&self) -> String;
+    async fn execute(&self, task_description: &str) -> anyhow::Result<Value>;
+}
+```
+
+---
+
+## LLM Configuration
+
+All agents route through the **LiteLLM Gateway**:
+
+| Model | Provider | Tool Calling |
+| :--- | :--- | :--- |
+| `ollama/qwen2.5-coder:7b` | LiteLLM (Ollama) | Yes |
+| `ollama/qwen2.5:7b` | LiteLLM (Ollama) | No |
+| `gemini-3-pro` | LiteLLM (Gemini) | No |
+| `gemma4:31b-cloud` | LiteLLM (Ollama) | No |
+
+---
+
+## Deliverable Agent
+
+The 5th DAG phase (`factory:deliver`) is handled by Hatchet Engine directly. Upon security review approval (`approved: true`), it invokes `create_pull_request` via MCP to create a GitHub PR with mission artifacts.
