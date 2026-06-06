@@ -9,7 +9,7 @@ This document details the **Tactical Design** of the autonomous factory, mapping
 | Crate | Layer | Responsibility |
 | :--- | :--- | :--- |
 | `factory-core` | **Domain** | Pure logic: `Mission`, `Task`, `MissionStatus`, `TaskStatus`, `SecurityValidator` (Ed25519 NHI), `FactoryError` |
-| `factory-application` | **Application** | Hatchet Workflows (6-phase DAG), Agent Logic (Rustant, ZeroClaw, DevOps, Documentation) |
+| `factory-application` | **Application** | Hatchet Workflows (6-phase DAG), Agent Logic (Rustant, ZeroClaw; DevOps & Documentation planned) |
 | `factory-infrastructure` | **Infrastructure** | Clients: Kafka (`rdkafka`), R2R GraphRAG, S3 (AWS SDK), Jira (HTTP), OpenZiti, Sentry, GitHub |
 | `factory-mcp-server` | **Interface** | Axum-based MCP Server with SSE transport, 9+ tools |
 | `factory-cli` | **Interface** | Hatchet worker CLI entry point |
@@ -59,7 +59,7 @@ sequenceDiagram
 | `security_review` | `tools/security_review.rs` | `{diff, llm_judge_model}` | `{score, findings[]}` | Done |
 | `search_jira` | `tools/search_jira.rs` | `{jql_query}` | `{issues[]}` | Done |
 | `update_mission_status` | `tools/update_mission_status.rs` | `{mission_id, status, message}` | `{updated: bool}` | Done |
-| `spec_kit_tool` | `tools/spec_kit_tool.rs` | `{command, feature_name, epic_context}` | `{artifacts_path, stdout}` | Done |
+| `spec_kit_tool` | `tools/spec_kit_tool.rs` | `{command, feature_name, epic_context}` | `{artifacts_path, stdout}` | Planned |
 
 ---
 
