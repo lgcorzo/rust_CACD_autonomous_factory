@@ -9,14 +9,12 @@ This document specifies the roles, responsibilities, and tooling for the **Dark 
 The "Captain" of the mission. Governs the **Intelligence Context**.
 
 ### Responsibilities
-- **Spec-Driven Planning**: Uses Spec-Kit SDD pipeline (`/speckit-constitution` → `/speckit-specify` → `/speckit-clarify` → `/speckit-plan` → `/speckit-tasks`) to create version-controlled specifications.
-- **Context Pruning**: Queries R2R GraphRAG via `retrieve_context` before planning.
-- **Architectural & Security Review**: Audits code via `security_review` MCP tool (OWASP SAST + LLM-as-a-Judge).
+- **Spec-Driven Planning**: Queries R2R GraphRAG directly via `R2rClient` for context pruning, then calls `plan_mission` via MCP to plan the mission.
+- **Architectural & Security Review**: Audits code via `security_review` MCP tool.
 
 ### Implementation
 - **File**: `crates/factory-application/src/agents/rustant.rs`
 - **Dependencies**: `McpClient`, `R2rClient`
-- **Spec-Kit Tool**: `spec_kit_tool` MCP endpoint for pipeline commands
 - **Evaluation**: Strategy Score, Token Efficiency
 
 ---
@@ -40,6 +38,8 @@ The "Muscle" of the system. Operates within the **Execution Context**.
 
 ## DevOps Agent (Aethelgard Loop)
 
+> **Status: Planned (Not yet implemented)**
+
 The "Immune System". Governs the **Remediation Context**.
 
 ### Responsibilities
@@ -55,6 +55,8 @@ The "Immune System". Governs the **Remediation Context**.
 ---
 
 ## Documentation Agent (Superpowers)
+
+> **Status: Planned (Not yet implemented)**
 
 The "Memory Keeper". Manages the **Infrastructure Context** for documentation.
 

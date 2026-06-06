@@ -22,7 +22,7 @@ This document details the **Adapters** that connect the autonomous factory to ex
 ### Cryptographic Non-Human Identities (NHI)
 - **Mechanism**: Every agent assigned a unique NHI backed by **Verifiable Credentials (VC)**.
 - **Verification**: Actions signed with Ed25519 keypair — ensures auditability for SOC 2 & EU AI Act.
-- **GitHub Integration**: GitHub App (RSA Private Keys) stored as **Sealed Secrets**, JWT for ephemeral installation tokens.
+- **GitHub Integration (Planned)**: GitHub App (RSA Private Keys) stored as **Sealed Secrets**, JWT for ephemeral installation tokens.
 
 ### OpenZiti Dark-Network Overlay
 - **Mesh**: All inter-service communication via OpenZiti mTLS 1.3 tunnels.
@@ -53,7 +53,7 @@ This document details the **Adapters** that connect the autonomous factory to ex
 | `security_review` | `factory-mcp-server` | JSON-RPC over SSE |
 | `search_jira` | `factory-infrastructure` / Jira REST | JSON-RPC over SSE |
 | `update_mission_status` | `factory-mcp-server` | JSON-RPC over SSE |
-| `spec_kit_tool` | `factory-mcp-server` | JSON-RPC over SSE |
+| `spec_kit_tool` | `factory-mcp-server` | JSON-RPC over SSE (Planned) |
 
 ---
 
@@ -79,7 +79,7 @@ This document details the **Adapters** that connect the autonomous factory to ex
 
 ---
 
-## Closed-Loop QA (Sentry Integration)
+## Closed-Loop QA (Sentry Integration) - Planned
 
 1. **Sentry Polling**: Background poller queries Sentry API every 15 minutes.
 2. **Severity Grading**: Auto-grades incoming alerts, filters benign warnings.
