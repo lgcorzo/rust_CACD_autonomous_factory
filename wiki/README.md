@@ -1,45 +1,49 @@
-# 🏗️ Dark Gravity — Autonomous Agent Factory (CA/CD)
+# Dark Gravity — Autonomous Agent Factory (CA/CD)
 
-Welcome to the official documentation for the **Dark Gravity Autonomous Agent Factory**. This project implements a **Continuous Agentic / Continuous Deployment (CA/CD)** pipeline following **LLMOps** and **Domain-Driven Design (DDD)** standards.
+Welcome to the official documentation for the **Dark Gravity Autonomous Agent Factory**. This project implements a **Continuous Agentic / Continuous Deployment (CA/CD)** pipeline following **Spec-Driven Development (SDD)**, **Domain-Driven Design (DDD)**, and **Onion Architecture** standards.
 
-## 📖 Documentation Index
+---
+
+## Documentation Index
 
 | Section | Description | Key Topics |
 | :--- | :--- | :--- |
-| [**Business Understanding**](BUSINESS-CONTEXT) | The "Why" and "What" | ROI, KPIs, Mission Lifecycle. |
-| [**Architecture**](STRATEGIC-DESIGN) | Technical Blueprint | DDD Layers, Rust MCP, Rustant/ZeroClaw. |
-| [**Execution Flows**](EXPERIMENT-LIFECYCLE) | How it Works | 6-Phase DAG, Sequence Diagrams, Telemetry. |
-| [**Agent Specifications**](AGENT-SPECIFICATIONS) | Specialized Workers | **Rustant** (Architect), **ZeroClaw** (Executor). |
-| [**Testing Strategy**](VERIFICATION-TRIAD) | Quality Assurance | 95% Coverage, Firecracker, LLM-Judge. |
-| [**Integrations**](INFRASTRUCTURE-ADAPTERS) | External Connectivity | **GitHub/GitLab**, **R2R Graph RAG**, **Kafka**. |
-| [**Deployment Guide**](PRODUCTION-OPERATIONS) | Operations & Scaling | K8s Manifests, Sealed Secrets. |
+| [**Business Understanding**](BUSINESS-CONTEXT) | The "Why" and "What" | ROI, KPIs, Workforce, Mission Lifecycle. |
+| [**Architecture**](STRATEGIC-DESIGN) | Technical Blueprint | DDD Layers, ADRs, Bounded Contexts, Zero Trust. |
+| [**Execution Flows**](EXPERIMENT-LIFECYCLE) | How it Works | 6-Phase DAG, Spec-Kit Pipeline, Aethelgard Loop. |
+| [**Agent Specifications**](AGENT-SPECIFICATIONS) | Specialized Workers | **Rustant** (PO), **ZeroClaw** (Dev), **DevOps**, **Documentation**. |
+| [**Testing Strategy**](VERIFICATION-TRIAD) | Quality Assurance | Logical, Architectural, Security Validation. |
+| [**Integrations**](INFRASTRUCTURE-ADAPTERS) | External Connectivity | **Kafka**, **R2R GraphRAG**, **OpenZiti**, **Jira**, **S3**, **Sentry**. |
+| [**Deployment Guide**](PRODUCTION-OPERATIONS) | Operations & Scaling | GitOps (FluxCD), K8s Manifests, KEDA, Sealed Secrets. |
 
 ---
-
-### Quick Launch
-
-To get started with the factory, ensure you have the following prerequisites in your cluster:
-
-1. **Hatchet Engine**: Orchestration backbone.
-2. **LiteLLM Gateway**: Access to `mnimax2.5` models.
-3. **R2R RAG**: Vector store for codebase context pruning.
-4. **Kafka**: Telemetry sink for agent reasoning flows.
-5. **OpenZiti**: Zero Trust mTLS networking.
 
 ### Core Stack
 
-- **Agents**: Specialized Rust-native workers (**Rustant**, **ZeroClaw**, **Jules**).
-- **Runtime**: Kubernetes (MicroK8s), Firecracker (Sandboxing).
-- **Transport**: JSON-RPC over **SSE (Server-Sent Events)**.
+| Component | Technology |
+| :--- | :--- |
+| **Language** | Rust (edition 2021/2024) |
+| **Async Runtime** | Tokio (full features) |
+| **HTTP Server** | Axum 0.7 |
+| **Serialization** | Serde + Serde JSON |
+| **Workflow Engine** | Hatchet SDK (Rust) |
+| **MCP Protocol** | JSON-RPC over SSE |
+| **SDD Framework** | GitHub Spec-Kit |
+| **Skill Framework** | Superpowers (obra/superpowers) |
+| **LLM Gateway** | LiteLLM (OpenAI-compatible) |
+| **Vector Store** | R2R GraphRAG + pgvector |
+| **Event Bus** | Confluent Kafka (rdkafka) |
+| **Zero Trust** | OpenZiti (mTLS 1.3) |
+| **Sandbox** | gVisor + Firecracker micro-VM |
+| **Container Orchestration** | Kubernetes + KEDA |
+| **Secrets** | Bitnami SealedSecrets |
+| **CI/CD** | GitHub Actions |
 
 ---
 
-## 🛠️ Repository Structure
+## Repository Structure
 
-- `crates/`: Modular Rust workspace components.
+- `crates/`: Modular Rust workspace (5 crates: core, application, mcp-server, infrastructure, cli).
 - `k8s/`: Kubernetes manifests for deployment.
-- `opencode.json`: Primary configuration for the OpenCode agent.
+- `.agents/skills/`: Superpowers skills for Documentation Agent.
 - `wiki/`: (You are here) Comprehensive project documentation.
-
-> [!TIP]
-> Each sub-crate in `crates/` contains its own internal documentation and tests. For deep-dives into specific logic, refer to the individual crate folders.

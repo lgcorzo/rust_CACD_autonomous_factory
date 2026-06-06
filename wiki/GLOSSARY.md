@@ -1,32 +1,56 @@
-# 📖 GLOSSARY: Ubiquitous Language
+# GLOSSARY: Ubiquitous Language
 
-This document defines the common terminology used throughout the **Dark Gravity** ecosystem. Adhering to this language ensures consistency between business requirements, system architecture, and agent reasoning.
+This document defines the common terminology used throughout the **Dark Gravity** ecosystem.
 
 ---
 
-## 🏗️ Core Entities
+## Core Entities
 
 | Term | Definition | DDD Context |
 | :--- | :--- | :--- |
-| **Mission** | A high-level goal or problem statement (e.g., a GitHub Issue) that the factory must resolve. | **Aggregate Root** |
-| **Phase** | A distinct logical stage in the mission execution DAG (e.g., Planning, Coding, Validation). | **Domain Event** |
-| **Agent** | An autonomous entity with specific roles and tools (e.g., Rustant, ZeroClaw). | **Domain Service** |
+| **Mission** | A high-level goal or problem statement the factory must resolve. | **Aggregate Root** |
+| **Task** | A unit of work within a mission, assigned to an agent. | **Entity** |
+| **Phase** | A distinct stage in the Hatchet execution DAG (6 phases). | **Domain Event** |
+| **Agent** | An autonomous entity with specific roles and tools (Rustant, ZeroClaw, DevOps, Documentation). | **Domain Service** |
 | **Thought** | A structured reasoning artifact produced by an agent before taking an action. | **Value Object** |
-| **Artifact** | Any tangible output produced during a mission (Code, Tests, PRs, Reports). | **Entity** |
+| **Artifact** | Any tangible output produced during a mission (spec.md, code, tests, PRs). | **Entity** |
 
-## 🛠️ Infrastructure Terms
-
-| Term | Definition |
-| :--- | :--- |
-| **Tool** | A specific MCP (Model Context Protocol) capability exposed to an agent (e.g., `read_file`, `execute_test`). |
-| **Sandbox** | A secured, isolated environment (e.g., Firecracker MicroVM) where untrusted code is executed. |
-| **Backbone** | The durable orchestration engine (Hatchet) that manages mission state and retries. |
-| **Adapter** | An infrastructure-layer component that connects the factory to external services (GitHub, Kafka). |
-
-## 📈 MLOps Terms
+## Architecture Terms
 
 | Term | Definition |
 | :--- | :--- |
-| **Experiment** | A single mission execution tracked in **MLflow**. |
-| **Telemetry** | Real-time streams of agent thoughts and system metrics published to **Kafka**. |
-| **Verification Triad** | The three-pillar validation strategy: Logical, Architectural, and Security. |
+| **Spec-Kit** | GitHub's Spec-Driven Development toolkit; mandatory planning protocol for the PO Agent. |
+| **Superpowers** | Agentic skill framework for the Documentation Agent; provides `writing-plans`, `subagent-driven-development`, `verification-before-completion`, etc. |
+| **superspec** | Orchestrator bridging Spec-Kit (planning) with Superpowers (execution) via state machine and checkpointing. |
+| **MCP** | Model Context Protocol — JSON-RPC over SSE/HTTP for agent-tool communication. |
+| **Hatchet Engine** | Durable workflow engine; orchestrates the 6-phase DAG with PostgreSQL-backed state persistence. |
+| **Onion Architecture** | The layered architecture pattern organizing the 5-crate Rust workspace. |
+
+## Infrastructure Terms
+
+| Term | Definition |
+| :--- | :--- |
+| **Sandbox** | Isolated execution environment — gVisor (K8s runtime class) or Firecracker (KVM micro-VM). |
+| **gVisor** | Application-level kernel sandbox (`runsc` runtime class); RAM ≤ 30Mi, CPU ≤ 250m. |
+| **Firecracker** | Hardware-virtualized micro-VM via KVM; uses `AF_VSOCK` for host-guest communication. |
+| **OpenZiti** | Zero Trust networking overlay; mTLS 1.3 tunnels with zero public ports. |
+| **NHI** | Non-Human Identity; Ed25519 Verifiable Credentials for every agent action. |
+| **R2R GraphRAG** | Graph-based Retrieval-Augmented Generation; backed by pgvector for semantic codebase memory. |
+| **deepwiki-rs** | Native AST parser (Tree-sitter) that extracts code deltas and syncs embeddings to pgvector. |
+| **Aethelgard Loop** | CI/CD auto-remediation loop; max 3 retries before `Agent-Stuck` escalation. |
+
+## Verification Terms
+
+| Term | Definition |
+| :--- | :--- |
+| **Verification Triad** | Three-pillar validation: Logical (tests), Architectural (Spec-Kit + linters), Security (SAST + LLM-as-a-Judge). |
+| **OSR** | Orphan Symbol Rate; documentation quality metric — must stay < 5%. |
+| **LLM-as-a-Judge** | Security-tuned LLM analyzing code diffs; minimum score 8.0/10 required. |
+
+## Governance Terms
+
+| Term | Definition |
+| :--- | :--- |
+| **Vtags** | Virtual Tags for per-Epic LLM cost attribution (StackSpend/Finout). |
+| **Closed-Loop QA** | Sentry error → severity grade → GraphRAG mapping → backlog issue. |
+| **Hazitek/SPRI** | European R&D grant schemas auto-compiled by the Documentation Agent. |
