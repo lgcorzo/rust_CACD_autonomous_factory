@@ -11,7 +11,7 @@
 
 ## 🏗 Standards & Architecture
 
-This project strictly adheres to **LLMOps** and **Domain-Driven Design (DDD)** standards.
+This project strictly adheres to **LLMOps** and **Domain-Driven Design (DDD)** standards, elevated to the production-grade **Version 7 (V7) Architecture** for autonomous operations.
 
 - **LLMOps Lifecycle**: We follow a robust LLM application lifecycle, including automated prompt engineering, retrieval-augmented generation (RAG) evaluation, and model-in-the-loop security audits to ensure production-grade reliability and observability.
 - **DDD-based Structure**: The codebase is architected using DDD principles to maintain a clear separation of concerns. This ensures that the core domain logic remains isolated from infrastructure details and external service adapters (like Jira or R2R), allowing the system to scale and evolve without regression.
@@ -20,21 +20,23 @@ The codebase is organized as a unified Rust workspace for maximum modularity and
 
 ### 1. Workspace Crate Map
 
-- **`factory-core`**: Shared domain models, security protocols, and common kernel logic.
-- **`factory-application`**: High-performance agent logic featuring **Rustant** (Architect/Planner) and **ZeroClaw** (Executor). Orchestrates specialized 6-phase Hatchet DAGs.
-- **`factory-mcp-server`**: High-concurrency Model Context Protocol server updated for **SSE transport** and integrated skills (Firecracker, R2R Context Pruning).
-- **`factory-infrastructure`**: Universal clients for Jira, R2R (RAG), Kafka (**agent-thought** telemetry), and OpenZiti integration.
+- **`factory-core`**: Innermost domain layer. Manages domain entities, memory zeroization (`zeroize` crate) for secrets purging in < 4.33 microseconds, and Ed25519-signed Verifiable Credentials (VC) for agent validation.
+- **`factory-application`**: Workflow orchestration layer. Leverages **Rustant** (Planner) and **ZeroClaw** (Executor) to process task workflows. Integrates `Spec-Kit` for PO design assertions and maintains durably checkpointed state via `StepCheckpoint`s.
+- **`factory-mcp-server`**: Presentation layer. Axum-based Model Context Protocol server exposing tools over Server-Sent Events (SSE) transport with isolated Firecracker execution interfaces.
+- **`factory-infrastructure`**: Adapter layer. Concrete clients for Jira, R2R (RAG), MinIO/AWS S3, OpenZiti (Zero Trust overlay networks), and Confluent Cloud Kafka (via `rdkafka` client).
+- **`factory-cli`**: Interface entry point. Contains the Hatchet worker initializer and Kafka telemetry querying utilities.
 
 ### 2. Durable Orchestration (Phase 12 State-Loop)
 
-Missions are orchestrated using a robust **6-phase DAG** in **Hatchet**:
+Missions are orchestrated using a robust **6-phase DAG** in **Hatchet** with database-backed `StepCheckpoint` recovery:
 `Ingestion` → `Plan (Rustant)` → `Code (ZeroClaw)` → `Validation (ZeroClaw)` → `Review (Rustant)` → `Delivery (GitOps)`.
 
 ### 3. Integrated Intelligence & Security
 
-- **Rustant**: Leverages **R2R Graph RAG** with a custom 3-level context pruning skill for high-precision planning.
-- **ZeroClaw**: Executes code in isolated **Firecracker micro-VMs** for maximum security and resource efficiency.
-- **Telemetry**: Real-time agent reasoning is published to **Kafka** for auditability and monitoring via OpenWebUI.
+- **Rustant**: Leverages **R2R Graph RAG** with custom 3-level context pruning for precise specification design and planning.
+- **ZeroClaw**: Compiles and executes code in secure **Firecracker micro-VMs** (AF_VSOCK communication, 15-30Mi RAM clamping).
+- **Zero Trust Mesh**: Agent-to-agent communication is fully encrypted and bound to identity namespaces using **OpenZiti mTLS 1.3** overlays.
+- **Telemetry**: Reasoning logs and Operational Sovereignty Ratio (OSR) metrics (`push_osr_metric`) are published to **Confluent Cloud Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`).
 
 ---
 
@@ -114,11 +116,11 @@ The following automated checks are active in this repository to maintain high en
 
 For a deep-dive into the factory's mechanics, follow the documentation roadmap:
 
-1. **[Architecture](wiki/architecture.md)** — The high-level technical blueprint and Zero Trust ZTA patterns.
-2. **[Execution Flows](wiki/execution_flows.md)** — Sequence diagrams for tool execution and SSE transport.
-3. **[Testing Strategy](wiki/testing_strategy.md)** — Unit, integration, and LLMOps evaluation standards.
-4. **[External Integrations](wiki/integrations.md)** — Connection details for **Jira** and **R2R Graph RAG**.
-5. **[Deployment Guide](wiki/deployment_guide.md)** — Production operations via Kubernetes, KEDA, and Sealed Secrets.
+1. **[Strategic Design](wiki/STRATEGIC-DESIGN.md)** — Bounded contexts, Onion Architecture layers, and Zero Trust ZTA patterns.
+2. **[Execution Flows & Lifecycle](wiki/EXPERIMENT-LIFECYCLE.md)** — Hatchet 6-phase DAG logic, step checkpointing, and real-time Kafka telemetry.
+3. **[Verification Triad](wiki/VERIFICATION-TRIAD.md)** — Strict testing strategy (logic, architecture, and security) with sandboxed execution.
+4. **[Infrastructure Adapters](wiki/INFRASTRUCTURE-ADAPTERS.md)** — Production connectors for Jira, R2R Graph RAG, and live rdkafka Kafka adapters.
+5. **[Production Operations](wiki/PRODUCTION-OPERATIONS.md)** — Operational scaling, Kubernetes, KEDA, OpenZiti overlays, and zeroize-based memory cleanup.
 
 Access the full **[Documentation Index](wiki/README.md)** for business context and mission history.
 
