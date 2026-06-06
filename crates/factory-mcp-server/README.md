@@ -8,17 +8,23 @@ Following **Domain-Driven Design (DDD)**, `factory-mcp-server` translates techni
 
 ### Key Responsibilities
 
-- **MCP Protocol Implementation**: Full support for tool discovery, execution, and resources.
-- **SSE Transport**: Persistent Server-Sent Events (SSE) for long-running tool execution (e.g., code generation, unit tests).
-- **Tool Registry**: Central point for registering and invoking `search_jira`, `retrieve_context`, `execute_code`, etc.
+- **MCP Protocol Implementation**: Supporting the Model Context Protocol (MCP) spec, enabling seamless integration with LLM client runtimes.
+- **SSE Transport**: Providing a high-concurrency, asynchronous transport using Server-Sent Events (SSE) via `Axum` to stream live execution status and handle long-running operations.
+- **`spec_kit_tool` Integration**: Standardizing the execution of Spec-Kit design reviews and planning assertions as a callable MCP tool for client agents.
+- **Unified Tool Registry**: Routing tool execution requests for codebase indexing, Graph RAG queries, code execution in Firecracker, and Jira updates.
 
 ## 🛠️ Key Components
 
-- **`tools/`**: Concrete implementations of `McpTool` with structural documentation.
-- **`router/`**: Axum routes for SSE handlers and POST tool invocations.
-- **`server/`**: Core MCP server lifecycle management.
+- **`src/tools/`**: MCP-compliant tool handlers:
+  - **`plan_mission.rs`**: Integrates `spec_kit_tool` validation for structural specification planning.
+  - **`execute_code.rs`**: Directs code compilation and running in Firecracker sandboxes.
+  - **`retrieve_context.rs`**: Queries R2R Graph RAG for semantic codebase context.
+  - **`search_jira.rs`** & **`update_mission_status.rs`**: Syncs tasks and epics.
+- **`src/protocol.rs`**: Defines JSON-RPC request/response payloads over SSE.
+- **`src/sandbox.rs`**: Integrates Firecracker isolation via direct `AF_VSOCK` communication.
 
-## 🧪 Testing
+## 🧪 Testing & Verification
 
-- **Tool Unit Tests**: Exhaustive testing of tool logic using manual and trait-based mocks.
-- **Protocol Conformance**: (Planned) MCP SDK verification suite.
+- **Tool Execution Testing**: Mocking inner infrastructure dependencies to assert correct JSON-RPC output formatting.
+- **SSE Connection Resilience**: Validating SSE heartbeat, chunked response streaming, and auto-reconnection flows.
+- **Spec-Kit Integration Verification**: Ensuring that spec constraints are properly parsed and error responses conform to the MCP protocol format.

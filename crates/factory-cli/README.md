@@ -8,17 +8,26 @@ Following **Domain-Driven Design (DDD)**, `factory-cli` is the entry point for e
 
 ### Key Responsibilities
 
-- **Worker Launch**: Command to start a Hatchet worker and connect to the factory's workflow engine.
-- **Local Testing**: Commands for simulating mission inputs, testing MCP tools locally, and verifying integrations.
-- **Management**: CLI-based inspection of mission status, Kafka history, and MinIO artifacts.
+- **Worker Execution**: Initializing the long-running Hatchet worker to listen for and execute autonomous agent workflows.
+- **Dependency Integration**: Configuring client paths for the Model Context Protocol (MCP) server, R2R Graph RAG server, and live Confluent Kafka bootstrap brokers.
+- **Telemetry Auditing**: Verifying telemetry pipelines by querying and reading events directly from Kafka topics.
 
 ## 🛠️ Commands
 
-- **`worker`**: Start the long-running worker process.
-- **`test-tool`**: Locally invoke any MCP tool without starting the full server.
-- **`mock-server`**: Run the Axum-based API mock server for development and CI.
+- **`worker`**: Run the worker process with custom endpoints:
+  ```bash
+  cargo run -p factory-cli -- worker \
+    --mcp-url http://localhost:8100 \
+    --r2r-url http://localhost:8000 \
+    --kafka-brokers localhost:9092
+  ```
+- **Telemetry Querying**: Auditing active missions and agent thinking patterns via Confluent Kafka CLI tools or scripts:
+  - **Query Mission Inputs**: Consuming from the `mission-input` topic to verify initial task specs.
+  - **Query Agent Thoughts**: Tracking real-time agent reasoning by reading the `agent-thought` topic.
+  - **Query Mission Artifacts**: Reading the `mission-artifact` topic to verify final generated files and metadata.
 
-## 🧪 Testing
+## 🧪 Testing & Verification
 
-- **CLI Integration Tests**: Verifying argument parsing with `clap` and core execution flows.
-- **E2E (End-to-End)**: (Planned) Full mission lifecycle testing from the CLI.
+- **Command Parsing Tests**: Validating `clap` arguments, defaults, and error output patterns.
+- **Telemetry Loop Verification**: E2E testing of message generation on `agent-thought` and consumer consumption logic.
+- **Worker Workflow Integration**: Confirming that registered workflows (`mission-workflow` and `develop-task-workflow`) register correctly with the local Hatchet engine instance.
