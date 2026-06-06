@@ -58,11 +58,35 @@ All sensitive data is encrypted using **Sealed Secrets**.
 
 ---
 
-## 📈 Monitoring & Logging
+## 📈 Monitoring, Logging & Remediation
 
 | Component | Focus | Tooling |
 | :--- | :--- | :--- |
 | **System Health** | CPU, Memory, Pod Status | Prometheus / Grafana |
-| **Agent Thought** | Reasoning & Strategies | Kafka Consumer / Web UI |
+| **Agent Thought** | Reasoning & Strategies | Kafka Consumer (`agent-thought` stream) |
 | **MLOps Metrics** | Success & Latency Experiments | MLflow Dashboard |
-| **Logs** | STDOUT / STDERR | Loki / Fluentbit |
+| **Application Logs** | STDOUT / STDERR streams | Loki / Fluentbit |
+| **Error Tracking** | Production Exception Capturing | Sentry |
+| **Auto-Remediator** | Error Mapping & Auto-backlogging | DevOps Agent Poller / `deepwiki-rs` / GraphRAG |
+
+---
+
+## 🔄 Closed-Loop DevOps (Sentry Integration)
+
+To achieve autonomous self-healing, the DevOps Agent implements a proactive closed-loop remediation flow:
+
+1. **Sentry Polling**: A background poller queries the Sentry API every 15 minutes for new exceptions in production.
+2. **Event Severity Grading**: The system grades the severity of incoming alerts to filter out benign warnings and prevent backlog noise.
+3. **AST Delta Extraction**: For high-priority exceptions, **`deepwiki-rs`** extracts the abstract syntax tree (AST) delta from recent codebase commits.
+4. **GraphRAG Mapping**: R2R GraphRAG maps the AST delta and exception trace directly to the responsible microservice.
+5. **Backlog Automation**: The system automatically creates a GitLab Issue in the repository backlog, tagged with `autonomous-plan`. This triggers the PO Agent's planning workflow to resolve the issue without human intervention.
+
+```mermaid
+graph TD
+    A[Production Exception / Sentry Event] -->|Every 15 min| B(DevOps Agent Poller)
+    B --> C{Event Severity Grading}
+    C -->|Auto-graded Error| D[deepwiki-rs AST Delta Extraction]
+    D --> E[R2R GraphRAG Mapping to Microservice]
+    E --> F[Auto-generate GitLab Issue]
+    F -->|Tagged autonomous-plan| G[PO Agent Planning Workflow]
+```

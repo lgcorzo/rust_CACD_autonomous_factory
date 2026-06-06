@@ -6,12 +6,17 @@ This document details the **Adapters** that connect the autonomous factory to ex
 
 ## 🔐 Authentication & Identity (Project Sovereignty)
 
-The factory is a **Zero Trust** environment. No external secret (PAT, API Key) should be stored in plain text.
+The factory is a **Zero Trust** environment. Access is granted through cryptographic identities, and no external secret is stored in plain text.
 
-### GitHub / GitLab Integration
-- **Mechanism**: GitHub Apps (RSA Private Keys).
-- **Storage**: **Sealed Secrets** decrypted via Bitnami/Sealed Secrets Controller inside the cluster.
-- **Protocol**: JWT (JSON Web Tokens) used to request ephemeral installation tokens.
+### Cryptographic Non-Human Identities (NHI)
+- **Mechanism**: Every agent is assigned a unique Non-Human Identity (NHI) backed by **Verifiable Credentials (VC)**.
+- **Verification**: Actions performed against pgvector, Kafka, and Kubernetes must be signed with the agent's unique **Ed25519** keypair, ensuring auditability and compliance (SOC 2, EU AI Act).
+- **GitHub / GitLab Integration**: GitHub Apps (RSA Private Keys) stored as **Sealed Secrets** decrypted via the Bitnami controller. JWT (JSON Web Tokens) are used to request ephemeral installation tokens.
+
+### OpenZiti Dark-Network Overlay
+- **Mesh Integration**: Inter-service communication is routed via the **OpenZiti** overlay network mesh (mTLS 1.3).
+- **Implementation**: Handled by the Ziti intercept adapter at `factory-infrastructure/src/ziti.rs` using intercept policies v1.
+- **Dark Architecture**: Services do not expose any public listening ports; communication is only accessible via encrypted tunnels authenticated with the agent's NHI.
 
 ---
 
@@ -24,17 +29,23 @@ Agents interact with the world via the **Model Context Protocol**. Every tool is
 | `github_client` | Commits, PRs, Comments | `factory-infrastructure` |
 | `r2r_client` | Retrieval & Knowledge Graph | `factory-infrastructure` |
 | `kafka_producer` | Telemetry & Events | `factory-infrastructure` |
-| `sandbox_client` | Micro-VM orchestrator | `factory-mcp-server` |
+| `sandbox_client` | Firecracker Micro-VM sandbox | `factory-mcp-server` |
+
+> [!NOTE]
+> The `sandbox_client` executes untrusted code in single-mission **Firecracker Micro-VMs** (KVM hardware virtualization). Host-guest communication is handled via `AF_VSOCK` to bypass TCP bridges, with RAM footprints clamped strictly to **15–30 Mi** for security isolation.
 
 ---
 
 ## 📡 Messaging & Telemetry (The Nervous System)
 
-**Kafka** is the durable message bus for all agentic internal communication.
+The simulated `SimpleMockKafkaClient` is deprecated in favor of a production-grade adapter using the **`rdkafka` (v0.30)** crate.
 
-- **Topic: mission-input**: High-priority ingestion point for external triggers.
-- **Topic: agent-thoughts**: Real-time stream of what agents are thinking (consumed by metrics agents).
-- **Topic: mission-logs**: Audit trail for all artifact generation.
+- **Broker Address**: `my-kafka-cluster-bootstrap.confluent.svc.cluster.local:9092` (located in the `confluent` namespace).
+- **V7 Triple-Topic Architecture**:
+  - **`mission-input`**: High-priority ingestion topic for incoming payloads/triggers.
+  - **`agent-thought`**: Real-time telemetry streaming of agent thoughts and reasoning chains.
+  - **`mission-artifact`**: Delivery topic for final verified outputs and deliverables.
+- **Serialization**: Schema integrity on the bus is enforced using Protobuf definitions compiled via `prost` and `tonic-build` (generating Rust types like `MissionInput`).
 
 ---
 
@@ -42,7 +53,8 @@ Agents interact with the world via the **Model Context Protocol**. Every tool is
 
 | Variable | Description | Source |
 | :--- | :--- | :--- |
-| `KAFKA_BOOTSTRAP_SERVERS` | Internal Kafka broker address | ConfigMap |
-| `HATCHET_CLIENT_TOKEN` | Auth for the backbone engine | SealedSecret |
-| `GITHUB_APP_PRIVATE_KEY` | Private key for App Auth | SealedSecret |
+| `KAFKA_BOOTSTRAP_SERVERS` | Confluent Kafka broker address (`my-kafka-cluster-...`) | ConfigMap |
+| `HATCHET_CLIENT_TOKEN` | Auth token for the Hatchet orchestration engine | SealedSecret |
+| `GITHUB_APP_PRIVATE_KEY` | Private key for GitHub App authentication | SealedSecret |
 | `LITELLM_API_BASE` | Internal gateway to LLM models | ConfigMap |
+| `ZITI_IDENTITY_FILE` | Path to the OpenZiti network identity profile | SealedSecret |
