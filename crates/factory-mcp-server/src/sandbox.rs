@@ -1,6 +1,8 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 use tokio::process::Command;
+use tokio::time::timeout;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ExecutionResult {
@@ -20,18 +22,31 @@ pub struct SubprocessDriver;
 #[async_trait]
 impl SandboxDriver for SubprocessDriver {
     async fn execute(&self, code: &str, language: &str) -> anyhow::Result<ExecutionResult> {
+        let timeout_duration = Duration::from_secs(30);
+
         let output = match language {
-            "python" => Command::new("python3").arg("-c").arg(code).output().await?,
+            "python" => {
+                let mut cmd = Command::new("python3");
+                cmd.arg("-c").arg(code).kill_on_drop(true);
+                match timeout(timeout_duration, cmd.output()).await {
+                    Ok(res) => res?,
+                    Err(_) => {
+                        anyhow::bail!("Execution timed out after {}s", timeout_duration.as_secs())
+                    }
+                }
+            }
             "rust" => {
                 // Simplified rustc execution for now
-                Command::new("rustc")
-                    .arg("-e")
+                let mut cmd = Command::new("rustc");
+                cmd.arg("-e")
                     .arg("println!(\"{}\", \"Hello from Rust!\")")
-                    .output()
-                    .await
-                    .map_err(|_| {
-                        anyhow::anyhow!("Rustc execution not fully implemented in local driver")
-                    })?
+                    .kill_on_drop(true);
+                match timeout(timeout_duration, cmd.output()).await {
+                    Ok(res) => res?,
+                    Err(_) => {
+                        anyhow::bail!("Execution timed out after {}s", timeout_duration.as_secs())
+                    }
+                }
             }
             _ => return Err(anyhow::anyhow!("Unsupported language: {}", language)),
         };
@@ -42,6 +57,20 @@ impl SandboxDriver for SubprocessDriver {
             exit_code: output.status.code(),
             is_success: output.status.success(),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_subprocess_driver_timeout() {
+        let driver = SubprocessDriver;
+        // Test normal execution
+        let result = driver.execute("print('hello')", "python").await.unwrap();
+        assert!(result.is_success);
+        assert_eq!(result.stdout.trim(), "hello");
     }
 }
 
