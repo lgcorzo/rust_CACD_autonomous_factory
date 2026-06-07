@@ -1,60 +1,97 @@
-# 🔌 INFRASTRUCTURE-ADAPTERS: Dark Gravity Connectors
+# INFRASTRUCTURE-ADAPTERS: Dark Gravity Connectors
 
 This document details the **Adapters** that connect the autonomous factory to external ecosystems and internal infrastructure.
 
 ---
 
-## 🔐 Authentication & Identity (Project Sovereignty)
+## Messaging & Telemetry (The Nervous System)
 
-The factory is a **Zero Trust** environment. Access is granted through cryptographic identities, and no external secret is stored in plain text.
+### Kafka Event Bus
+- **Broker**: Confluent Kafka (`my-kafka-cluster-bootstrap.confluent.svc.cluster.local:9092`)
+- **Client**: Production-grade `rdkafka` (v0.30) adapter in `factory-infrastructure/src/kafka.rs`
+- **V7 Triple-Topic Architecture**:
+  - `mission-input` — High-priority ingestion topic for incoming payloads/triggers
+  - `agent-thought` — Real-time telemetry streaming of agent reasoning chains
+  - `mission-artifact` — Delivery topic for final verified outputs
+- **Serialization**: Protobuf schemas compiled via `prost` + `tonic-build`
+
+---
+
+## Authentication & Identity (Zero Trust)
 
 ### Cryptographic Non-Human Identities (NHI)
-- **Mechanism**: Every agent is assigned a unique Non-Human Identity (NHI) backed by **Verifiable Credentials (VC)**.
-- **Verification**: Actions performed against pgvector, Kafka, and Kubernetes must be signed with the agent's unique **Ed25519** keypair, ensuring auditability and compliance (SOC 2, EU AI Act).
-- **GitHub / GitLab Integration**: GitHub Apps (RSA Private Keys) stored as **Sealed Secrets** decrypted via the Bitnami controller. JWT (JSON Web Tokens) are used to request ephemeral installation tokens.
+- **Mechanism**: Every agent assigned a unique NHI backed by **Verifiable Credentials (VC)**.
+- **Verification**: Actions signed with Ed25519 keypair — ensures auditability for SOC 2 & EU AI Act.
+- **GitHub Integration (Planned)**: GitHub App (RSA Private Keys) stored as **Sealed Secrets**, JWT for ephemeral installation tokens.
 
 ### OpenZiti Dark-Network Overlay
-- **Mesh Integration**: Inter-service communication is routed via the **OpenZiti** overlay network mesh (mTLS 1.3).
-- **Implementation**: Handled by the Ziti intercept adapter at `factory-infrastructure/src/ziti.rs` using intercept policies v1.
-- **Dark Architecture**: Services do not expose any public listening ports; communication is only accessible via encrypted tunnels authenticated with the agent's NHI.
+- **Mesh**: All inter-service communication via OpenZiti mTLS 1.3 tunnels.
+- **Integration**: `factory-infrastructure/src/ziti.rs` — Ziti intercept adapter with Edge Router enforce policies.
+- **Dark Architecture**: Zero public listening ports; all ingress via encrypted tunnels authenticated with agent NHI.
 
 ---
 
-## 🛠️ MCP Tools (The Interface)
+## Vector Store & Corporate Memory
 
-Agents interact with the world via the **Model Context Protocol**. Every tool is an infrastructure-layer implementation of a domain requirement.
+### R2R GraphRAG + pgvector
+- **Platform**: CloudNativePG PostgreSQL 16 with pgvector extension.
+- **Client**: `HttpR2rClient` — authenticates via `/v3/users/login`, searches via `/v3/retrieval/search`.
+- **Context Pruning**: 3-level pruning (semantic filtering → structural pruning → token budget enforcement) via `context.rs`.
+- **deepwiki-rs**: Native AST parser using Tree-sitter; extracts AST deltas from git diffs and upserts embeddings to pgvector.
 
-| Tool | Focus | Crate / Provider |
+---
+
+## MCP Tools (The Interface)
+
+| Tool | Crate / Provider | Transport |
 | :--- | :--- | :--- |
-| `github_client` | Commits, PRs, Comments | `factory-infrastructure` |
-| `r2r_client` | Retrieval & Knowledge Graph | `factory-infrastructure` |
-| `kafka_producer` | Telemetry & Events | `factory-infrastructure` |
-| `sandbox_client` | Firecracker Micro-VM sandbox | `factory-mcp-server` |
-
-> [!NOTE]
-> The `sandbox_client` executes untrusted code in single-mission **Firecracker Micro-VMs** (KVM hardware virtualization). Host-guest communication is handled via `AF_VSOCK` to bypass TCP bridges, with RAM footprints clamped strictly to **15–30 Mi** for security isolation.
-
----
-
-## 📡 Messaging & Telemetry (The Nervous System)
-
-The simulated `SimpleMockKafkaClient` is deprecated in favor of a production-grade adapter using the **`rdkafka` (v0.30)** crate.
-
-- **Broker Address**: `my-kafka-cluster-bootstrap.confluent.svc.cluster.local:9092` (located in the `confluent` namespace).
-- **V7 Triple-Topic Architecture**:
-  - **`mission-input`**: High-priority ingestion topic for incoming payloads/triggers.
-  - **`agent-thought`**: Real-time telemetry streaming of agent thoughts and reasoning chains.
-  - **`mission-artifact`**: Delivery topic for final verified outputs and deliverables.
-- **Serialization**: Schema integrity on the bus is enforced using Protobuf definitions compiled via `prost` and `tonic-build` (generating Rust types like `MissionInput`).
+| `plan_mission` | `factory-mcp-server` | JSON-RPC over SSE |
+| `execute_code` | `factory-mcp-server` / Sandbox | JSON-RPC over SSE |
+| `run_tests` | `factory-mcp-server` / Sandbox | JSON-RPC over SSE |
+| `retrieve_context` | `factory-infrastructure` / R2R | JSON-RPC over SSE |
+| `index_code` | `factory-mcp-server` | JSON-RPC over SSE |
+| `security_review` | `factory-mcp-server` | JSON-RPC over SSE |
+| `search_jira` | `factory-infrastructure` / Jira REST | JSON-RPC over SSE |
+| `update_mission_status` | `factory-mcp-server` | JSON-RPC over SSE |
+| `spec_kit_tool` | `factory-mcp-server` | JSON-RPC over SSE (Planned) |
 
 ---
 
-## 🏗️ Environment Configuration
+## Execution Sandbox
+
+| Driver | Isolation | RAM | CPU | Communication |
+| :--- | :--- | :--- | :--- | :--- |
+| `SubprocessDriver` | gVisor (`runtimeClassName: gvisor`) | ≤ 30 Mi | ≤ 250m | tokio stdin/stdout |
+| `FirecrackerDriver` | KVM hardware micro-VM | ≤ 30 Mi | ≤ 250m | AF_VSOCK |
+
+---
+
+## Environment Configuration
 
 | Variable | Description | Source |
 | :--- | :--- | :--- |
-| `KAFKA_BOOTSTRAP_SERVERS` | Confluent Kafka broker address (`my-kafka-cluster-...`) | ConfigMap |
-| `HATCHET_CLIENT_TOKEN` | Auth token for the Hatchet orchestration engine | SealedSecret |
-| `GITHUB_APP_PRIVATE_KEY` | Private key for GitHub App authentication | SealedSecret |
+| `KAFKA_BOOTSTRAP_SERVERS` | Confluent Kafka broker address | ConfigMap |
+| `HATCHET_CLIENT_TOKEN` | Auth for Hatchet engine | SealedSecret |
+| `GITHUB_APP_PRIVATE_KEY` | GitHub App RSA key | SealedSecret |
 | `LITELLM_API_BASE` | Internal gateway to LLM models | ConfigMap |
-| `ZITI_IDENTITY_FILE` | Path to the OpenZiti network identity profile | SealedSecret |
+| `ZITI_IDENTITY_FILE` | OpenZiti network identity profile | SealedSecret |
+| `SENTRY_DSN` | Sentry error tracking DSN | SealedSecret |
+
+---
+
+## Closed-Loop QA (Sentry Integration) - Planned
+
+1. **Sentry Polling**: Background poller queries Sentry API every 15 minutes.
+2. **Severity Grading**: Auto-grades incoming alerts, filters benign warnings.
+3. **GraphRAG Mapping**: Maps exception trace to responsible microservice via R2R.
+4. **Backlog Automation**: Auto-creates prioritized issue (tagged `autonomous-plan`) to trigger PO Agent workflow.
+
+---
+
+## Governance & FinOps
+
+| Capability | Tool | Purpose |
+| :--- | :--- | :--- |
+| Cost Attribution | StackSpend/Finout (Vtags) | Per-Epic LLM token cost tracking |
+| Budget Control | Predictive Circuit Breakers | Token velocity monitoring |
+| R&D Grants | Hazitek/SPRI Packager | Auto-compile audit templates |

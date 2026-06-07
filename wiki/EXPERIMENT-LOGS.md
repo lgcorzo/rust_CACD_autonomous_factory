@@ -1,20 +1,21 @@
-# 📋 EXPERIMENT-LOGS: Historical Audit
+# EXPERIMENT-LOGS: Historical Audit
 
-This document is a formal audit trail of all factory activities. It records every mission's outcome, providing data for the **LLMOps Feedback Loop**.
+This document is a formal audit trail of all factory activities. It records every mission's outcome.
 
 ---
 
-| Mission ID | Run ID (MLflow) | Status | Summary | Artifacts |
+## Mission History
+
+| Mission ID | Goal | Status | Summary | Artifacts |
 | :--- | :--- | :--- | :--- | :--- |
-| **[MISSION_ID]** | `[MLFLOW_RUN_ID]` | `SUCCESS` / `FAIL` | High-level outcome description. | [PR_URL](...) |
+| *(No missions executed yet)* | | | | |
 
 ---
 
-## 📈 Aggregated Insights
+## Aggregated Insights
 
-*   **Total Missions**: [COUNT]
-*   **Average Success Rate**: [PERCENTAGE]%
-*   **Mean Latency**: [TIME] min
+- **Total Missions**: 0
+- **Average Success Rate**: N/A
+- **Mean Latency**: N/A
 
-> [!NOTE]
-> This log is intended for periodic review by Human-in-the-Loop (HITL) supervisors to identify systematic failures in the **Autonomous Workforce**.
+> This log will be populated as missions are executed by the factory. Each mission creates a GitHub PR upon successful delivery.
