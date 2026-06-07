@@ -82,3 +82,8 @@
 **Vulnerability:** The MCP server was using `CorsLayer::permissive()`, which allowed all origins, methods, and headers.
 **Learning:** While `permissive()` is useful for initial development, it violates the principle of least privilege and increases the attack surface for CSRF and data leakage.
 **Prevention:** Always configure `CorsLayer` with explicit `allow_origin` (from environment variables), `allow_methods`, and `allow_headers`. Default to a restrictive policy if the configuration is missing.
+
+## 2026-02-15 - Unbounded Code Execution in SubprocessDriver
+**Vulnerability:** The `SubprocessDriver` was executing Python and Rust code without any timeouts or orphan process management. An attacker could submit code that hangs indefinitely or spawns many processes, leading to resource exhaustion and Denial of Service (DoS).
+**Learning:** Using `tokio::process::Command` without `kill_on_drop(true)` and a wrapper timeout can leave orphan processes running on the host system even if the parent task is cancelled.
+**Prevention:** Always wrap external command execution in `tokio::time::timeout` and configure child processes to be killed on drop. For code execution, define a strict maximum runtime (e.g., 30s) to bound resource usage.
