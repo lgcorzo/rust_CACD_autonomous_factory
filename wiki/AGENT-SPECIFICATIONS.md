@@ -4,35 +4,38 @@ This document specifies the roles, responsibilities, and tooling for the **Dark 
 
 ---
 
-## Rustant (Product Owner Agent)
+## Rustant (Planner Agent)
 
 The "Captain" of the mission. Governs the **Intelligence Context**.
 
 ### Responsibilities
-- **Spec-Driven Planning**: Queries R2R GraphRAG directly via `R2rClient` for context pruning, then calls `plan_mission` via MCP to plan the mission.
-- **Architectural & Security Review**: Audits code via `security_review` MCP tool.
+- **Context-Driven Planning**: Queries R2R GraphRAG via `R2rClient` for semantic context retrieval, then calls `plan_mission` via MCP to plan the mission.
+- **Security Review**: Audits code via `security_review` MCP tool using LLM-as-a-Judge.
+- **Review**: Reviews execution results and provides feedback for iteration.
 
 ### Implementation
-- **File**: `crates/factory-application/src/agents/rustant.rs`
+- **File**: `crates/factory-application/src/agents/rustant.rs` (lines 12-78)
+- **Key Methods**: `new()`, `plan_mission()`, `review_mission()`
 - **Dependencies**: `McpClient`, `R2rClient`
-- **Evaluation**: Strategy Score, Token Efficiency
+- **Agent trait**: Implements `Agent` (`name`, `execute`)
 
 ---
 
-## ZeroClaw (Developer Agent)
+## ZeroClaw (Executor Agent)
 
 The "Muscle" of the system. Operates within the **Execution Context**.
 
 ### Responsibilities
-- **Code Implementation**: Translates spec-driven tasks into source code via `execute_code` (Aider CLI for SEARCH/REPLACE mutations).
-- **Verification**: Runs test suites via `run_tests` inside isolated sandbox (gVisor/Firecracker).
-- **Self-Correction**: Iterates on code based on test failure feedback (max 3 retries before Agent-Stuck escalation).
+- **Code Implementation**: Translates tasks into source code via `execute_code` MCP tool.
+- **Verification**: Runs test suites via `run_tests` inside isolated sandbox.
+- **Self-Correction**: Iterates on code based on test failure feedback.
 
 ### Implementation
-- **File**: `crates/factory-application/src/agents/zeroclaw.rs`
+- **File**: `crates/factory-application/src/agents/zeroclaw.rs` (lines 11-98)
+- **Key Methods**: `new()`, `execute_task()`, `validate_mission()`, `introspect_k8s()`
 - **Dependencies**: `McpClient`
-- **Sandbox Drivers**: `SubprocessDriver` (local), `FirecrackerDriver` (micro-VM via KVM/AF_VSOCK)
-- **Evaluation**: Test Pass Rate, Execution Latency
+- **Sandbox Drivers**: `SubprocessDriver` (local), `FirecrackerDriver` (micro-VM via KVM)
+- **Agent trait**: Implements `Agent` (`name`, `execute`)
 
 ---
 
@@ -44,43 +47,34 @@ The "Immune System". Governs the **Remediation Context**.
 
 ### Responsibilities
 - **CI/CD Auto-Remediation**: Parses pipeline failures, queries R2R GraphRAG for historical fixes, directs Developer Agent to apply patches.
-- **Circuit Breaker**: Maximum 3 consecutive auto-remediation attempts before setting `Agent-Stuck` and escalating to humans.
-- **Production Incident Polling**: Polls Sentry API every 15 minutes for new exceptions.
-- **Backlog Automation**: Auto-grades severity and creates backlog issues from production errors.
-
-### Evaluation
-- **Action Success Rate**: Reliability of external API calls.
-- **Correction Frequency**: Number of self-correction cycles needed.
+- **Circuit Breaker**: Maximum 3 consecutive auto-remediation attempts before escalating.
+- **Backlog Automation**: Auto-grades severity and creates backlog issues.
 
 ---
 
 ## Documentation Agent (Superpowers)
 
-> **Status: Planned (Not yet implemented)**
+> **Status: Active (Partially implemented)**
 
 The "Memory Keeper". Manages the **Infrastructure Context** for documentation.
 
 ### Responsibilities
-- **AST Delta Sync**: `deepwiki-rs` parses git merge deltas via Tree-sitter, extracts AST deltas, upserts embeddings to pgvector.
-- **Wiki Regeneration**: Uses Superpowers skills (`writing-plans`, `subagent-driven-development`, `verification-before-completion`) to update Wiki pages in parallel.
-- **OSR Gate**: Verifies Orphan Symbol Rate < 5% before any Wiki commit.
-- **R&D Grant Packaging**: Auto-compiles telemetry, hours, and git deltas into Hazitek/SPRI European grant schemas.
+- **CRG Wiki Generation**: Uses `code-review-graph wiki` to generate auto-documented wiki pages from AST analysis.
+- **Graphify Integration**: Maintains `graphify-out/` with code structure graphs and reports.
+- **Wiki Refinement**: Uses Superpowers skills to keep documentation accurate.
 
 ### Superpowers Skills Loaded
 | Skill | Purpose |
 | :--- | :--- |
 | `writing-plans` | Decompose documentation into atomic tasks |
-| `dispatching-parallel-agents` | Spawn isolated subagents per independent task |
 | `subagent-driven-development` | Execute each subagent with focused context |
-| `verification-before-completion` | OSR check before Wiki commit |
-| `requesting-code-review` | Validate C4 diagram syntax and Markdown style |
-| `finishing-a-development-branch` | Commit verified docs and close Epic |
+| `verification-before-completion` | Verify before marking tasks complete |
 
 ---
 
 ## Agent Interface
 
-All agents implement the `Agent` trait in `crates/factory-application/src/lib.rs`:
+All agents implement the `Agent` trait in `crates/factory-application/src/agents/`:
 
 ```rust
 #[async_trait]
@@ -98,13 +92,21 @@ All agents route through the **LiteLLM Gateway**:
 
 | Model | Provider | Tool Calling |
 | :--- | :--- | :--- |
+| `gemma4:12b` | LiteLLM (OpenAI-compatible) | Yes |
 | `ollama/qwen2.5-coder:7b` | LiteLLM (Ollama) | Yes |
 | `ollama/qwen2.5:7b` | LiteLLM (Ollama) | No |
-| `gemini-3-pro` | LiteLLM (Gemini) | No |
-| `gemma4:31b-cloud` | LiteLLM (Ollama) | No |
 
 ---
 
-## Deliverable Agent
+## CRG-Verified Agent Dependencies
 
-The 5th DAG phase (`factory:deliver`) is handled by Hatchet Engine directly. Upon security review approval (`approved: true`), it invokes `create_pull_request` via MCP to create a GitHub PR with mission artifacts.
+Based on `code-review-graph` edge analysis:
+
+- **Rustant** → Outgoing edges: `r2r_client.search()`, `mcp_client.call_tool_json()`, `tracing::info`
+- **ZeroClaw** → Outgoing edges: `mcp_client.call_tool_json()`, `tracing::info`
+- **Mission Workflow** → Orchestrates: Rustant (plan) → ZeroClaw (code) → Rustant (review) → Delivery
+- **Task Workflow** → Individual task execution with `StepCheckpoint` recovery
+
+---
+
+*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*

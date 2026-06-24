@@ -37,3 +37,10 @@ target/
 
 # Wiki Sync
 /wiki_temp/
+# Added by code-review-graph
+.code-review-graph/
+
+# Graphify
+graphify-out/
+.graphify_labels.json
+.graphify_root
