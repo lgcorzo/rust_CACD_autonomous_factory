@@ -10,10 +10,10 @@ The system is partitioned into four bounded contexts to ensure isolation and cle
 
 | Context | Responsibility | Key Entities | Agent |
 | :--- | :--- | :--- | :--- |
-| **Intelligence** | Strategic mission planning and reasoning. | `Spec`, `Plan`, `Task`, `Strategy` | Rustant (PO Agent) |
-| **Execution** | Code implementation and sandbox validation. | `Artifact`, `TestResult`, `Diff` | ZeroClaw (Developer Agent) |
-| **Remediation** | Detecting and reacting to CI/CD or production failures. | `Alert`, `Symptom`, `Fix` | DevOps Agent (Aethelgard Loop) |
-| **Infrastructure** | Adapters for external services, documentation, and secured connectivity. | `Client`, `Credential`, `Stream`, `Wiki` | Documentation Agent |
+| **Intelligence** | Strategic mission planning via R2R context retrieval. | `Mission`, `Goal`, `Context`, `Plan` | Rustant (Planner Agent) |
+| **Execution** | Code implementation and sandbox validation. | `Task`, `TestResult`, `Artifact` | ZeroClaw (Executor Agent) |
+| **Remediation** | Detecting and reacting to CI/CD or production failures. | `Alert`, `Symptom`, `Fix` | DevOps Agent (Auto-Remediation) |
+| **Infrastructure** | Adapters for external services and secured connectivity. | `Client`, `Credential`, `Stream` | Documentation Agent |
 
 ---
 
@@ -43,10 +43,10 @@ graph TD
 
 | Layer | Crate / Responsibility | Focus |
 | :--- | :--- | :--- |
-| **Domain** | `factory-core` | Business entities, aggregate roots, and domain logic. `Mission`, `Task`, `MissionStatus`, `SecurityValidator`, `FactoryError`. |
-| **Application** | `factory-application` | Orchestrates use cases. Hatchet Workflows (6-phase DAG including Ingestion), Agent Logic. |
-| **Infrastructure** | `factory-infrastructure` | External adapters (Kafka, R2R GraphRAG, Jira, S3, OpenZiti, Sentry). |
-| **Interface** | `factory-mcp-server` / `factory-cli` | External entry points (Axum MCP server with SSE, CLI Hatchet worker). |
+| **Domain** | `factory-core` | Business entities, aggregate roots, and domain logic. `Mission`, `Task`, `MissionStatus`, `SecurityValidator` trait, `FactoryError`. |
+| **Application** | `factory-application` | Orchestrates use cases. Hatchet Workflows (6-phase DAG), Rustant & ZeroClaw agent logic. |
+| **Infrastructure** | `factory-infrastructure` | External adapters (Kafka, R2R GraphRAG, Jira, S3, OpenZiti, MCP client). |
+| **Interface** | `factory-mcp-server` / `factory-cli` | External entry points (Axum MCP server with SSE/HTTP, CLI Hatchet worker). |
 
 ---
 
@@ -54,32 +54,59 @@ graph TD
 
 Security is baked into the strategic design of every context:
 
-- **Identity-First**: Non-Human Identities (NHI) with Ed25519 Verifiable Credentials for every agent action.
+- **Identity-First**: `SecurityValidator` trait for content auditing and signature verification.
 - **Dark Network**: All inter-service communication routed through **OpenZiti** mTLS 1.3 tunnels — zero publicly routable ports.
-- **Hardware-Isolated Sandbox**: Untrusted code executes in **gVisor** (K8s `runtimeClassName: gvisor`) or **Firecracker** micro-VMs with `AF_VSOCK` communication.
-- **Forensic Memory**: JIT credentials wiped from RAM within 4.33 μs via `zeroize`.
+- **Sandbox Execution**: Untrusted code executes in **Firecracker** micro-VMs or via a `SubprocessDriver` for isolated sandboxing.
+- **Credential Management**: API keys and tokens loaded via environment variables, never hardcoded.
 
 ---
 
 ## Autonomous Workforce
 
-| Agent | Context | Primary Toolchain | DAG Step |
+| Agent | Context | Primary Tools | DAG Step |
 | :--- | :--- | :--- | :--- |
-| **Rustant** (PO Agent) | Intelligence | Spec-Kit SDD (`speckit-specify`, `speckit-plan`, `speckit-tasks`) | Planning, Review |
-| **ZeroClaw** (Developer Agent) | Execution | Aider CLI, `execute_code`, `run_tests` | Code, Validate |
-| **DevOps Agent** | Remediation | Aethelgard Auto-Remediation Loop, Sentry poller | CI/CD Healing |
-| **Documentation Agent** | Infrastructure | Superpowers skills (`writing-plans`, `subagent-driven-development`, `verification-before-completion`) | Wiki Sync |
+| **Rustant** (Planner Agent) | Intelligence | R2rClient for semantic context search, `plan_mission` MCP tool | Planning, Review |
+| **ZeroClaw** (Executor Agent) | Execution | `execute_code` MCP tool, `run_tests` MCP tool, Firecracker sandbox | Code, Validate |
+| **DevOps Agent** | Remediation | Auto-Remediation Loop, Sentry integration | CI/CD Healing |
+| **Documentation Agent** | Infrastructure | Superpowers skills (`writing-plans`, `subagent-driven-development`) | Wiki Sync |
 
 ---
 
-## Agentic Pipeline (Spec-Kit + Superpowers Bridge)
+## Agentic Pipeline
 
-The **superspec** orchestrator bridges Spec-Kit (planning) with Superpowers (execution):
+The system orchestrates missions through a durable **6-phase Hatchet DAG**:
 
-1. **Spec-Kit Pipeline**: `constitution → specify → clarify → plan → tasks → implement → taskstoissues`
-2. **State Transfer**: `superspec` parses Spec-Kit artifacts (`spec.md`, `plan.md`, `tasks.md`) into `BridgeState` with `StepCheckpoint`s
-3. **Durable Execution**: Hatchet DAG executes steps; crashed workers resume from last checkpoint via `superspec`
-4. **Verification Feedback**: Superpowers' `verification-before-completion` feeds OSR < 5% results back into Spec-Kit validation
+1. **Ingestion** → Parse Jira requirements into structured tasks
+2. **Plan (Rustant)** → Use R2rClient for semantic context retrieval and mission planning
+3. **Code (ZeroClaw)** → Generate and execute code in sandboxed environment
+4. **Validation (ZeroClaw)** → Run tests and validate outputs
+5. **Review (Rustant)** → Review results and provide feedback
+6. **Delivery (GitOps)** → Commit and push changes
+
+State is managed via `StepCheckpoint`s persisted to Hatchet's PostgreSQL backend, enabling crash-resilient mission execution.
+
+---
+
+## CRG-Verified Structure
+
+Based on `code-review-graph` analysis, the actual codebase structure is:
+
+### Workspace Crates
+
+| Crate | Nodes | Edges | Role |
+|-------|-------|-------|------|
+| `factory-core` | 12 | — | Domain models (`Mission`, `Task`, `SecurityValidator`) |
+| `factory-application` | 21 | — | Agents (Rustant, ZeroClaw) + Workflows |
+| `factory-mcp-server` | 101 | — | MCP server, tools (8 tools), sandbox drivers |
+| `factory-infrastructure` | 42 | — | Service clients (Jira, R2R, Kafka, MCP, S3, Ziti) |
+| `factory-cli` | 3 | — | CLI entry point |
+
+### Agent Relationships (CRG Edge Graph)
+
+- **Rustant** → calls `r2r_client.search()` + `mcp_client.call_tool_json()`
+- **ZeroClaw** → calls `mcp_client.call_tool_json()` for code execution + validation
+- **Mission Workflow** → orchestrates Rustant (plan) → ZeroClaw (code) → Rustant (review)
+- **Task Workflow** → handles individual task execution with checkpointing
 
 ---
 
@@ -87,11 +114,14 @@ The **superspec** orchestrator bridges Spec-Kit (planning) with Superpowers (exe
 
 | ADR | Title | Status |
 | :--- | :--- | :--- |
-| ADR-001 | Hardware-Virtualized Sandboxing (gVisor / Firecracker) | Implemented |
+| ADR-001 | Hardware-Virtualized Sandboxing (Firecracker) | Implemented |
 | ADR-002 | Durable Orchestration via Hatchet DAG | Implemented |
-| ADR-003 | Semantic Corporate Memory via pgvector & R2R GraphRAG | Implemented |
-| ADR-004 | Spec-Kit SDD as PO Agent Planning Protocol | Implemented |
-| ADR-005 | Superpowers Framework as Documentation Agent's Skill Engine | Implemented |
+| ADR-003 | Semantic Memory via R2R GraphRAG | Implemented |
+| ADR-004 | Agent-Driven Development (Rustant + ZeroClaw) | Implemented |
+| ADR-005 | Superpowers Framework for Agent Skills | Implemented |
 | ADR-006 | Zero Trust Network with OpenZiti Dark Overlay | Implemented |
-| ADR-007 | Spec-Kit + Superpowers Bridging (superspec) | Implemented |
-| ADR-008 | NHI, FinOps, Closed-Loop QA, R&D Packaging | Implemented |
+| ADR-007 | LiteLLM Gateway for Model Routing | Implemented |
+
+---
+
+*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
