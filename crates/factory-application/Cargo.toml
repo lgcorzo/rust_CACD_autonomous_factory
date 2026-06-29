@@ -16,6 +16,8 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 futures = "0.3"
 hatchet-sdk = { workspace = true }
 mockall = { workspace = true }
+prost = { workspace = true }
+
 tokio-test = { workspace = true }
 
 [dev-dependencies]

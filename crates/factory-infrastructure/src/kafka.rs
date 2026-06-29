@@ -1,5 +1,8 @@
 use async_trait::async_trait;
 use chrono::Utc;
+use rdkafka::config::ClientConfig;
+use rdkafka::producer::{FutureProducer, FutureRecord};
+use std::time::Duration;
 
 #[async_trait]
 pub trait KafkaClient: Send + Sync {
@@ -18,6 +21,34 @@ pub trait KafkaClient: Send + Sync {
         });
         self.publish("agent-thought", mission_id, &serde_json::to_vec(&payload)?)
             .await
+    }
+}
+
+pub struct RdKafkaClient {
+    producer: FutureProducer,
+}
+
+impl RdKafkaClient {
+    pub fn new(brokers: &str) -> anyhow::Result<Self> {
+        let producer: FutureProducer = ClientConfig::new()
+            .set("bootstrap.servers", brokers)
+            .set("message.timeout.ms", "5000")
+            .create()?;
+        Ok(RdKafkaClient { producer })
+    }
+}
+
+#[async_trait]
+impl KafkaClient for RdKafkaClient {
+    async fn publish(&self, topic: &str, key: &str, payload: &[u8]) -> anyhow::Result<()> {
+        let record = FutureRecord::to(topic)
+            .payload(payload)
+            .key(key);
+        self.producer
+            .send(record, Duration::from_secs(5))
+            .await
+            .map_err(|(err, _)| anyhow::anyhow!("Kafka publish failed: {:?}", err))?;
+        Ok(())
     }
 }
 
@@ -41,3 +72,4 @@ impl KafkaClient for SimpleMockKafkaClient {
         Ok(())
     }
 }
+

@@ -17,9 +17,10 @@ enum Commands {
         #[arg(long, default_value = "http://localhost:8000")]
         r2r_url: String,
 
-        #[arg(long, default_value = "localhost:9092")]
+        #[arg(long, env = "KAFKA_BROKERS", default_value = "localhost:9092")]
         kafka_brokers: String,
     },
+
 }
 
 #[tokio::main]
@@ -34,6 +35,10 @@ async fn main() -> anyhow::Result<()> {
             r2r_url,
             kafka_brokers,
         } => {
+            if kafka_brokers.trim().is_empty() {
+                anyhow::bail!("Invalid configuration: KAFKA_BROKERS must not be empty.");
+            }
+
             tracing::info!("Starting Hatchet worker...");
 
             let hatchet = hatchet_sdk::Hatchet::from_env().await?;

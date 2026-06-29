@@ -89,3 +89,10 @@ pub struct FeatureImportances {
     pub feature: String,
     pub importance: f32,
 }
+
+pub mod proto {
+    pub mod v1 {
+        include!(concat!(env!("OUT_DIR"), "/dark_gravity.factory.v1.rs"));
+    }
+}
+

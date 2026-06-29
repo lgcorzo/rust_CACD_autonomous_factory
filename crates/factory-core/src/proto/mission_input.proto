@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package dark_gravity.factory.v1;
+
+message MissionInput {
+  string mission_id = 1;
+  string epic_title = 2;
+  string epic_description = 3;
+  repeated string labels = 4;
+}
