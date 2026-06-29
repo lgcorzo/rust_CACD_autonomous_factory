@@ -60,20 +60,6 @@ impl SandboxDriver for SubprocessDriver {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn test_subprocess_driver_timeout() {
-        let driver = SubprocessDriver;
-        // Test normal execution
-        let result = driver.execute("print('hello')", "python").await.unwrap();
-        assert!(result.is_success);
-        assert_eq!(result.stdout.trim(), "hello");
-    }
-}
-
 pub struct FirecrackerDriver {
     kvm_enabled: bool,
 }
@@ -118,5 +104,19 @@ impl SandboxDriver for FirecrackerDriver {
             exit_code: Some(0),
             is_success: true,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_subprocess_driver_timeout() {
+        let driver = SubprocessDriver;
+        // Test normal execution
+        let result = driver.execute("print('hello')", "python").await.unwrap();
+        assert!(result.is_success);
+        assert_eq!(result.stdout.trim(), "hello");
     }
 }
