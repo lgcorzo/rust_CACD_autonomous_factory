@@ -16,7 +16,7 @@ pub mod ziti;
 pub use jira::MockJiraClient;
 pub use jira::{HttpJiraClient, JiraClient};
 
-pub use kafka::{KafkaClient, SimpleMockKafkaClient, RdKafkaClient};
+pub use kafka::{KafkaClient, RdKafkaClient, SimpleMockKafkaClient};
 
 #[cfg(any(test, feature = "test-utils"))]
 pub use mcp_client::MockMcpClient;

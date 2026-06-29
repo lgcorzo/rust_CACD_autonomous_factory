@@ -95,4 +95,3 @@ pub mod proto {
         include!(concat!(env!("OUT_DIR"), "/dark_gravity.factory.v1.rs"));
     }
 }
-
