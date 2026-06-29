@@ -9,7 +9,12 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     libssl-dev \
     protobuf-compiler \
+    build-essential \
+    cmake \
+    perl-modules \
+    libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Build all workspace members
 RUN cargo build --release --workspace
