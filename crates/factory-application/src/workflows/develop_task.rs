@@ -25,7 +25,7 @@ pub fn create_develop_task_workflow(
 
     let mcp_client_clone = mcp_client.clone();
     hatchet
-        .task("zeroclaw:code", move |input: TaskInput, _ctx| {
+        .task("code", move |input: TaskInput, _ctx| {
             let mcp_client = mcp_client_clone.clone();
             Box::pin(async move {
                 tracing::info!("Workflow: executing task {}", input.task_id);
