@@ -42,7 +42,8 @@ jobs:
           components: rustfmt, clippy
           
       - name: Install Protoc
-        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler libcurl4-openssl-dev
+
           
       - name: Check Formatting
         run: cargo fmt --all -- --check

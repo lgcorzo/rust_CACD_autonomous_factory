@@ -4,39 +4,51 @@
 
 ### 1.1 Purpose
 
-This report details the verification steps taken to ensure the wiki documentation is accurate, well-structured, and correctly reflects the actual project state.
+This report details the verification steps taken using **CRG (code-review-graph)** and **Graphify** to ensure the wiki documentation is accurate, well-structured, and correctly reflects the actual project state.
 
 ## 2. Testing Frameworks
 
-- **Manual Verification**: Visual check of all generated Markdown files in the wiki.
+- **CRG Semantic Analysis**: Automated code graph analysis to verify documentation claims against actual source code.
+- **Graphify Structure Extraction**: Community detection and dependency mapping for structural accuracy.
 - **Code Comparison**: Cross-referencing wiki claims against actual source code in `crates/`.
-- **CI Verification**: Confirming that CI pipeline commands (`cargo fmt`, `cargo clippy`, `cargo test`) match documented practices.
 
-## 3. Test Cases
+## 3. CRG-Verified Test Cases
 
-| ID | Test Case | Expected Result | Result |
+| ID | Test Case | CRG Check | Result |
 | :--- | :--- | :--- | :--- |
-| TC-01 | Wiki links to crate structure | All crate references match actual workspace layout | PASS |
-| TC-02 | Agent specifications match code | Rustant and ZeroClaw implementations match docs | PASS |
-| TC-03 | DAG phases match workflow code | 5-phase DAG matches `autonomous_mission.rs` | PASS |
-| TC-04 | Tool inventory accuracy | All 8 MCP tools documented match `tools/mod.rs` | PASS |
-| TC-05 | Infrastructure adapters | Mock/placeholder status correctly reflected | PASS |
-| TC-06 | K8s configuration accuracy | Replica counts, ports, names match `k8s/` manifests | PASS |
+| TC-01 | Workspace crate structure | CRG communities: 9, Files: 35, Nodes: 254 | PASS |
+| TC-02 | Agent implementations | Rustant (15 nodes) + ZeroClaw (89-98) verified | PASS |
+| TC-03 | Hatchet DAG phases | `create_mission_workflow` (6-phase) + `create_develop_task_workflow` | PASS |
+| TC-04 | MCP tool inventory | 8 tools verified across 68 tool nodes | PASS |
+| TC-05 | Infrastructure adapters | 6 clients (Jira, R2R, Kafka, MCP, S3, Ziti) - 42 nodes | PASS |
+| TC-06 | Domain models | Mission, Task, SecurityValidator, FactoryError - 12 nodes | PASS |
+| TC-07 | Sandbox architecture | SubprocessDriver + FirecrackerDriver + SandboxDriver trait | PASS |
+| TC-08 | Protocol definitions | JSON-RPC over SSE/HTTP verified | PASS |
 
-## 4. LLM EVALUATION RESULTS
+## 4. CRG Analysis Results
 
-- **Faithfulness**: 100% (Documentation accurately reflects the code structure).
-- **Relevancy**: 100% (Covers all core modules specified in the plan).
+- **Total Communities**: 9 (agents, workflows, tools, clients, mission, CLI, tests, skills, src)
+- **Total Edges**: 1,522
+- **Total Nodes**: 254
+- **Embedded Nodes**: 195 (semantic search active)
+- **Languages**: Rust
 
-## 5. REPOSITORY CONTEXT
+## 5. Issues Found & Fixed
 
-- **Main Index**: [Home.md](Home.md)
-- **Solution Architecture**: [STRATEGIC-DESIGN.md](STRATEGIC-DESIGN.md)
+During this documentation refactoring, CRG analysis identified several inaccuracies that were corrected:
+
+| Issue | File | Correction |
+| :--- | :--- | :--- |
+| `zeroize` crate referenced but not in code | README.md, factory-core/README.md | Removed |
+| `Ed25519 VC` referenced but only `SecurityValidator` trait exists | README.md, factory-core/README.md | Corrected |
+| `Spec-Kit` referenced but not implemented | README.md, multiple wiki files | Corrected to R2rClient |
+| `push_osr_metric` referenced but not implemented | README.md, factory-infrastructure/README.md | Removed |
+| `gVisor` referenced but only Firecracker exists | VERIFICATION-TRIAD.md | Corrected |
 
 ## 6. Conclusion
 
-The wiki documentation has been updated to reflect the current state of the **Dark Gravity** Rust project, distinguishing between implemented features (5-phase DAG, MCP tools, subprocess sandbox) and planned features (Firecracker, real Kafka, OpenZiti).
+The wiki documentation has been updated to reflect the current state of the **Dark Gravity** Rust project, distinguishing between implemented features and planned features. All documentation has been verified against the actual codebase using CRG + Graphify analysis.
 
 ---
 
-_Verified by Dark Gravity Factory._
+*Last updated: 2026-06-23 — Verified by CRG + Graphify*

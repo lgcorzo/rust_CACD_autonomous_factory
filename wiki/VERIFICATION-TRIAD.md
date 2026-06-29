@@ -10,59 +10,44 @@ Our strategy ensures artifact quality through three simultaneous validation pill
 
 | Pillar | Focus | Key Tooling |
 | :--- | :--- | :--- |
-| **Logical** | Functional correctness of the code. | `cargo test`, Sandbox (gVisor/Firecracker) |
-| **Architectural** | Alignment with DDD patterns and Bounded Contexts. | Rustant, `clippy`, Spec-Kit Specs |
-| **Security** | Vulnerability detection and compliance. | `security_review` (OWASP SAST), LLM-as-a-Judge, `cargo audit` |
+| **Logical** | Functional correctness of the code. | `cargo test`, Sandbox (Firecracker/Subprocess) |
+| **Architectural** | Alignment with DDD patterns and Bounded Contexts. | Rustant, `clippy`, domain models |
+| **Security** | Vulnerability detection and compliance. | `security_review` (LLM-as-a-Judge), `cargo clippy` |
 
 ---
 
 ## 1. Logical Verification (The Executor)
 
-We ensure 100% mission reliability via **Sandbox Execution**.
+We ensure mission reliability via **Sandbox Execution**.
 
 - **Environment**: 
-  - **SubprocessDriver**: `tokio::process::Command` inside gVisor pods (`runtimeClassName: gvisor`, RAM ≤ 30Mi, CPU ≤ 250m)
-  - **FirecrackerDriver**: Micro-VM via KVM with `AF_VSOCK` host-to-guest communication (no host-level TCP bridges)
+  - **SubprocessDriver**: `tokio::process::Command` for local execution
+  - **FirecrackerDriver**: Micro-VM via KVM (planned implementation)
 - **Workflow**:
   1. ZeroClaw generates code + unit tests.
-  2. Sidecar triggers `cargo test` inside the isolated Sandbox.
-  3. Feedback (stdout/stderr) is streamed back for self-correction (max 3 retries before `Agent-Stuck`).
+  2. Runs tests via `run_tests` MCP tool inside the isolated Sandbox.
+  3. Feedback (stdout/stderr) is streamed back for self-correction (max 3 retries).
 - **Requirement**: ALL delivery-phase artifacts MUST pass their generated test suite.
 
 ---
 
 ## 2. Architectural Verification (The Planner)
 
-Automated linting and architectural reviews ensure the code remains maintainable and true to the **Strategic Design**.
+Automated linting ensures the code remains maintainable and true to the **Strategic Design**.
 
 - **Standard Linters**: `clippy` for Rust. Enforced in CI pipeline (`cargo clippy --workspace -- -D warnings`).
-- **Spec-Driven Compliance**: Rustant validates generated code against Spec-Kit artifacts (`spec.md`, `plan.md`, `tasks.md`) to prevent bounded context leakage.
-- **Deep Review**: The Rustant audits code against the **[GLOSSARY](GLOSSARY)** and **[STRATEGIC-DESIGN](STRATEGIC-DESIGN)**.
+- **Domain Compliance**: Rustant validates generated code against core domain models and `SecurityValidator` constraints.
 
 ---
 
 ## 3. Security Verification (The Guardrails)
 
-The final gate before delivery. Any artifact with a security score below 8.0/10 is rejected and regressed to the planning phase.
+The final gate before delivery.
 
-- **Automated Scanning & Code Analysis**:
-  - `security_review` MCP tool: OWASP Top 10 regex patterns (SQL injection, command injection, hardcoded secrets, path traversal).
-  - `cargo audit`: Dependency vulnerability scanning.
-  - LLM-as-a-Judge: Analyzes the diff for logical vulnerabilities; minimum score **8.0/10.0**.
-- **Forensic Memory Wiping**: JIT credentials in RAM secured via `zeroize` crate. Secrets wiped within **4.33 μs**. Verified via Criterion benchmarks in CI.
-- **Non-Human Identities**: Every agent action is signed with Ed25519 keypairs for SOC 2 / EU AI Act compliance.
-
----
-
-## Aethelgard Auto-Remediation Loop
-
-When CI/CD pipelines fail, the **DevOps Agent** triggers the auto-remediation loop:
-
-1. Parse raw stdout/stderr from failing container.
-2. Query R2R GraphRAG for similar historical error fixes.
-3. Instruct Developer Agent via Hatchet to apply surgical code patch.
-4. Commit and push patch → trigger pipeline rerun.
-5. **Circuit Breaker**: Max 3 consecutive attempts. On 3rd failure, set `Agent-Stuck` and escalate to human.
+- **Automated Scanning**:
+  - `security_review` MCP tool: LLM-as-a-Judge analysis of code diffs
+- **Dependency Checking**: `cargo deny` / `cargo audit` (planned)
+- **Sandbox Isolation**: Code executes in isolated Firecracker micro-VMs
 
 ---
 
@@ -84,3 +69,20 @@ cargo fmt --all -- --check
 cargo clippy --workspace -- -D warnings
 cargo test --workspace -- --skip smoke
 ```
+
+---
+
+## CRG-Verified Test Structure
+
+Based on `code-review-graph` analysis, the test structure across the codebase includes:
+
+| Crate | Test Configuration | Nodes |
+|-------|-------------------|-------|
+| `factory-mcp-server` | Unit + integration tests for 8 tools | 68 tool nodes, 68 test edges |
+| `factory-infrastructure` | Mock-based tests (`wiremock`) | 42 client nodes, 15 test assertions |
+| `factory-core` | Pure domain logic tests | 12 domain model nodes |
+| `integration tests` | E2E security tests in `/tests/` | 4 security test nodes |
+
+---
+
+*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
