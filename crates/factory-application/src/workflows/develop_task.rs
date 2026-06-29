@@ -25,24 +25,21 @@ pub fn create_develop_task_workflow(
 
     let mcp_client_clone = mcp_client.clone();
     hatchet
-        .task(
-            "zeroclaw:code",
-            move |input: TaskInput, _ctx| {
-                let mcp_client = mcp_client_clone.clone();
-                Box::pin(async move {
-                    tracing::info!("Workflow: executing task {}", input.task_id);
+        .task("zeroclaw:code", move |input: TaskInput, _ctx| {
+            let mcp_client = mcp_client_clone.clone();
+            Box::pin(async move {
+                tracing::info!("Workflow: executing task {}", input.task_id);
 
-                    let zeroclaw = ZeroClawAgent::new(mcp_client);
+                let zeroclaw = ZeroClawAgent::new(mcp_client);
 
-                    // Use the execute_task method from ZeroClawAgent
-                    let result = zeroclaw
-                        .execute_task(&input.task_id, &input.description, &input.relevant_files)
-                        .await?;
+                // Use the execute_task method from ZeroClawAgent
+                let result = zeroclaw
+                    .execute_task(&input.task_id, &input.description, &input.relevant_files)
+                    .await?;
 
-                    Ok(TaskOutput { result })
-                })
-            },
-        )
+                Ok(TaskOutput { result })
+            })
+        })
         .build()
         .unwrap()
 }
