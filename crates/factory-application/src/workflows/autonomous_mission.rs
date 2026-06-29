@@ -15,12 +15,16 @@ pub struct MissionInput {
 
 impl MissionInput {
     pub fn from_protobuf(bytes: &[u8]) -> Result<Self, prost::DecodeError> {
-        use prost::Message;
         use factory_core::proto::v1::MissionInput as ProtoInput;
-        
+        use prost::Message;
+
         let proto = ProtoInput::decode(bytes)?;
         Ok(MissionInput {
-            mission_id: if proto.mission_id.is_empty() { None } else { Some(proto.mission_id) },
+            mission_id: if proto.mission_id.is_empty() {
+                None
+            } else {
+                Some(proto.mission_id)
+            },
             goal: format!(
                 "Title: {}\nDescription: {}\nLabels: {:?}",
                 proto.epic_title, proto.epic_description, proto.labels
@@ -29,7 +33,6 @@ impl MissionInput {
         })
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MissionOutput {
@@ -51,12 +54,12 @@ pub fn create_mission_workflow(
         "admin".to_string(),
         "admin".to_string(),
     ));
-    let kafka_client: Arc<dyn KafkaClient> = if kafka_brokers == "mock" || kafka_brokers.is_empty() {
+    let kafka_client: Arc<dyn KafkaClient> = if kafka_brokers == "mock" || kafka_brokers.is_empty()
+    {
         Arc::new(factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
     } else {
         Arc::new(factory_infrastructure::RdKafkaClient::new(&kafka_brokers).unwrap())
     };
-
 
     // 1. Planning Phase (Rustant)
     let mcp_client_clone = mcp_client.clone();
@@ -260,8 +263,8 @@ pub fn create_mission_workflow(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use prost::Message;
     use factory_core::proto::v1::MissionInput as ProtoInput;
+    use prost::Message;
 
     #[test]
     fn test_mission_input_from_protobuf() {
@@ -282,4 +285,3 @@ mod tests {
         assert!(input.goal.contains("p0"));
     }
 }
-

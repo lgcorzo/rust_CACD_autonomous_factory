@@ -20,7 +20,6 @@ enum Commands {
         #[arg(long, env = "KAFKA_BROKERS", default_value = "localhost:9092")]
         kafka_brokers: String,
     },
-
 }
 
 #[tokio::main]

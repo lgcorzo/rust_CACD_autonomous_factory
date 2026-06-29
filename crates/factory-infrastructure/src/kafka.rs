@@ -41,9 +41,7 @@ impl RdKafkaClient {
 #[async_trait]
 impl KafkaClient for RdKafkaClient {
     async fn publish(&self, topic: &str, key: &str, payload: &[u8]) -> anyhow::Result<()> {
-        let record = FutureRecord::to(topic)
-            .payload(payload)
-            .key(key);
+        let record = FutureRecord::to(topic).payload(payload).key(key);
         self.producer
             .send(record, Duration::from_secs(5))
             .await
@@ -72,4 +70,3 @@ impl KafkaClient for SimpleMockKafkaClient {
         Ok(())
     }
 }
-
