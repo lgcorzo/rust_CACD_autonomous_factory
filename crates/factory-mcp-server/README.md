@@ -10,13 +10,13 @@ Following **Domain-Driven Design (DDD)**, `factory-mcp-server` translates techni
 
 - **MCP Protocol Implementation**: Supporting the Model Context Protocol (MCP) spec, enabling seamless integration with LLM client runtimes.
 - **SSE Transport**: Providing a high-concurrency, asynchronous transport using Server-Sent Events (SSE) via `Axum` to stream live execution status and handle long-running operations.
-- **`spec_kit_tool` Integration**: Standardizing the execution of Spec-Kit design reviews and planning assertions as a callable MCP tool for client agents.
+- **OpenAI-compatible Tool Integration**: Using `async_openai` to power LLM-driven tools like `plan_mission` with flexible model routing.
 - **Unified Tool Registry**: Routing tool execution requests for codebase indexing, Graph RAG queries, code execution in Firecracker, and Jira updates.
 
 ## 🛠️ Key Components
 
 - **`src/tools/`**: MCP-compliant tool handlers:
-  - **`plan_mission.rs`**: Integrates `spec_kit_tool` validation for structural specification planning.
+  - **`plan_mission.rs`**: Uses `async_openai` LLM client to generate mission plans from high-level goals.
   - **`execute_code.rs`**: Directs code compilation and running in Firecracker sandboxes.
   - **`retrieve_context.rs`**: Queries R2R Graph RAG for semantic codebase context.
   - **`search_jira.rs`** & **`update_mission_status.rs`**: Syncs tasks and epics.
@@ -27,4 +27,4 @@ Following **Domain-Driven Design (DDD)**, `factory-mcp-server` translates techni
 
 - **Tool Execution Testing**: Mocking inner infrastructure dependencies to assert correct JSON-RPC output formatting.
 - **SSE Connection Resilience**: Validating SSE heartbeat, chunked response streaming, and auto-reconnection flows.
-- **Spec-Kit Integration Verification**: Ensuring that spec constraints are properly parsed and error responses conform to the MCP protocol format.
+- **LLM Integration Check**: Verifying that `plan_mission` correctly invokes the async OpenAI client and handles response/error cases.

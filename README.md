@@ -20,8 +20,8 @@ The codebase is organized as a unified Rust workspace for maximum modularity and
 
 ### 1. Workspace Crate Map
 
-- **`factory-core`**: Innermost domain layer. Manages domain entities, memory zeroization (`zeroize` crate) for secrets purging in < 4.33 microseconds, and Ed25519-signed Verifiable Credentials (VC) for agent validation.
-- **`factory-application`**: Workflow orchestration layer. Leverages **Rustant** (Planner) and **ZeroClaw** (Executor) to process task workflows. Integrates `Spec-Kit` for PO design assertions and maintains durably checkpointed state via `StepCheckpoint`s.
+- **`factory-core`**: Innermost domain layer. Manages domain entities (`Mission`, `Task`), a `SecurityValidator` trait for agent output auditing, and unified error handling via `FactoryError`.
+- **`factory-application`**: Workflow orchestration layer. Leverages **Rustant** (Planner) and **ZeroClaw** (Executor) to process task workflows. Maintains durably checkpointed state via `StepCheckpoint`s using Hatchet's PostgreSQL backend.
 - **`factory-mcp-server`**: Presentation layer. Axum-based Model Context Protocol server exposing tools over Server-Sent Events (SSE) transport with isolated Firecracker execution interfaces.
 - **`factory-infrastructure`**: Adapter layer. Concrete clients for Jira, R2R (RAG), MinIO/AWS S3, OpenZiti (Zero Trust overlay networks), and Confluent Cloud Kafka (via `rdkafka` client).
 - **`factory-cli`**: Interface entry point. Contains the Hatchet worker initializer and Kafka telemetry querying utilities.
@@ -33,10 +33,10 @@ Missions are orchestrated using a robust **6-phase DAG** in **Hatchet** with dat
 
 ### 3. Integrated Intelligence & Security
 
-- **Rustant**: Leverages **R2R Graph RAG** with custom 3-level context pruning for precise specification design and planning.
-- **ZeroClaw**: Compiles and executes code in secure **Firecracker micro-VMs** (AF_VSOCK communication, 15-30Mi RAM clamping).
+- **Rustant**: Leverages **R2rClient** for semantic code search and context retrieval to inform specification design and planning.
+- **ZeroClaw**: Compiles and executes code in secure **Firecracker micro-VMs** via a sandboxed executor driver.
 - **Zero Trust Mesh**: Agent-to-agent communication is fully encrypted and bound to identity namespaces using **OpenZiti mTLS 1.3** overlays.
-- **Telemetry**: Reasoning logs and Operational Sovereignty Ratio (OSR) metrics (`push_osr_metric`) are published to **Confluent Cloud Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`).
+- **Telemetry**: Reasoning logs are published to **Confluent Cloud Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`) for real-time observability.
 
 ---
 
@@ -120,7 +120,7 @@ For a deep-dive into the factory's mechanics, follow the documentation roadmap:
 2. **[Execution Flows & Lifecycle](wiki/EXPERIMENT-LIFECYCLE.md)** — Hatchet 6-phase DAG logic, step checkpointing, and real-time Kafka telemetry.
 3. **[Verification Triad](wiki/VERIFICATION-TRIAD.md)** — Strict testing strategy (logic, architecture, and security) with sandboxed execution.
 4. **[Infrastructure Adapters](wiki/INFRASTRUCTURE-ADAPTERS.md)** — Production connectors for Jira, R2R Graph RAG, and live rdkafka Kafka adapters.
-5. **[Production Operations](wiki/PRODUCTION-OPERATIONS.md)** — Operational scaling, Kubernetes, KEDA, OpenZiti overlays, and zeroize-based memory cleanup.
+5. **[Production Operations](wiki/PRODUCTION-OPERATIONS.md)** — Operational scaling, Kubernetes, KEDA, OpenZiti overlays, and secure memory management.
 
 Access the full **[Documentation Index](wiki/README.md)** for business context and mission history.
 

@@ -1,0 +1,4 @@
+# Graphify output files
+graphify-out/
+.graphify_labels.json
+.graphify_root
