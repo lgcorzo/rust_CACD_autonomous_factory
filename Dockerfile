@@ -20,7 +20,8 @@ RUN apt-get update && apt-get install -y \
 RUN cargo build --release --workspace
 
 # Stage 2: Final runtime image
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
+
 
 WORKDIR /usr/local/bin
 
