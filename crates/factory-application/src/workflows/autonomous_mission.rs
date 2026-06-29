@@ -13,6 +13,24 @@ pub struct MissionInput {
     pub repository_path: String,
 }
 
+impl MissionInput {
+    pub fn from_protobuf(bytes: &[u8]) -> Result<Self, prost::DecodeError> {
+        use prost::Message;
+        use factory_core::proto::v1::MissionInput as ProtoInput;
+        
+        let proto = ProtoInput::decode(bytes)?;
+        Ok(MissionInput {
+            mission_id: if proto.mission_id.is_empty() { None } else { Some(proto.mission_id) },
+            goal: format!(
+                "Title: {}\nDescription: {}\nLabels: {:?}",
+                proto.epic_title, proto.epic_description, proto.labels
+            ),
+            repository_path: String::new(),
+        })
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MissionOutput {
     pub mission_id: String,
@@ -33,8 +51,12 @@ pub fn create_mission_workflow(
         "admin".to_string(),
         "admin".to_string(),
     ));
-    let kafka_client: Arc<dyn KafkaClient> =
-        Arc::new(factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers).unwrap());
+    let kafka_client: Arc<dyn KafkaClient> = if kafka_brokers == "mock" || kafka_brokers.is_empty() {
+        Arc::new(factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
+    } else {
+        Arc::new(factory_infrastructure::RdKafkaClient::new(&kafka_brokers).unwrap())
+    };
+
 
     // 1. Planning Phase (Rustant)
     let mcp_client_clone = mcp_client.clone();
@@ -234,3 +256,30 @@ pub fn create_mission_workflow(
         .add_task(&review_task)
         .add_task(&delivery_task)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use prost::Message;
+    use factory_core::proto::v1::MissionInput as ProtoInput;
+
+    #[test]
+    fn test_mission_input_from_protobuf() {
+        let proto = ProtoInput {
+            mission_id: "test-uuid".to_string(),
+            epic_title: "Implement Kafka".to_string(),
+            epic_description: "Real Kafka Client adapter".to_string(),
+            labels: vec!["p0".to_string(), "sprint1".to_string()],
+        };
+
+        let mut bytes = Vec::new();
+        proto.encode(&mut bytes).unwrap();
+
+        let input = MissionInput::from_protobuf(&bytes).unwrap();
+        assert_eq!(input.mission_id, Some("test-uuid".to_string()));
+        assert!(input.goal.contains("Implement Kafka"));
+        assert!(input.goal.contains("Real Kafka Client adapter"));
+        assert!(input.goal.contains("p0"));
+    }
+}
+
