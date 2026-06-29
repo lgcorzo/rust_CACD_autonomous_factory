@@ -66,7 +66,7 @@ pub fn create_mission_workflow(
     let r2r_client_clone = r2r_client.clone();
     let kafka_client_clone = kafka_client.clone();
     let plan_task = hatchet
-        .task("rustant:plan", move |input: MissionInput, _ctx| {
+        .task("rustant-plan", move |input: MissionInput, _ctx| {
             let mcp_client = mcp_client_clone.clone();
             let r2r_client = r2r_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
@@ -96,7 +96,7 @@ pub fn create_mission_workflow(
     let mcp_client_clone = mcp_client.clone();
     let kafka_client_clone = kafka_client.clone();
     let code_task = hatchet
-        .task("zeroclaw:execute", move |input: MissionInput, ctx| {
+        .task("zeroclaw-execute", move |input: MissionInput, ctx| {
             let mcp_client = mcp_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
             let mission_id = input
@@ -105,7 +105,7 @@ pub fn create_mission_workflow(
                 .unwrap_or_else(|| Uuid::new_v4().to_string());
 
             Box::pin(async move {
-                let plan: serde_json::Value = ctx.parent_output("rustant:plan").await?;
+                let plan: serde_json::Value = ctx.parent_output("rustant-plan").await?;
                 let zeroclaw = ZeroClawAgent::new(mcp_client);
 
                 kafka_client
@@ -129,7 +129,7 @@ pub fn create_mission_workflow(
     let mcp_client_clone = mcp_client.clone();
     let kafka_client_clone = kafka_client.clone();
     let validation_task = hatchet
-        .task("zeroclaw:validate", move |input: MissionInput, _ctx| {
+        .task("zeroclaw-validate", move |input: MissionInput, _ctx| {
             let mcp_client = mcp_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
             let mission_id = input
@@ -164,7 +164,7 @@ pub fn create_mission_workflow(
     let r2r_client_clone = r2r_client.clone();
     let kafka_client_clone = kafka_client.clone();
     let review_task = hatchet
-        .task("rustant:review", move |input: MissionInput, ctx| {
+        .task("rustant-review", move |input: MissionInput, ctx| {
             let mcp_client = mcp_client_clone.clone();
             let r2r_client = r2r_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
@@ -174,7 +174,7 @@ pub fn create_mission_workflow(
                 .unwrap_or_else(|| Uuid::new_v4().to_string());
 
             Box::pin(async move {
-                let code_res: serde_json::Value = ctx.parent_output("zeroclaw:execute").await?;
+                let code_res: serde_json::Value = ctx.parent_output("zeroclaw-execute").await?;
                 let rustant = RustantAgent::new(mcp_client, r2r_client);
 
                 kafka_client
@@ -198,7 +198,7 @@ pub fn create_mission_workflow(
     let mcp_client_clone = mcp_client.clone();
     let kafka_client_clone = kafka_client.clone();
     let delivery_task = hatchet
-        .task("factory:deliver", move |input: MissionInput, ctx| {
+        .task("factory-deliver", move |input: MissionInput, ctx| {
             let mcp_client = mcp_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
             let mission_id = input
@@ -207,7 +207,7 @@ pub fn create_mission_workflow(
                 .unwrap_or_else(|| Uuid::new_v4().to_string());
 
             Box::pin(async move {
-                let review_res: serde_json::Value = ctx.parent_output("rustant:review").await?;
+                let review_res: serde_json::Value = ctx.parent_output("rustant-review").await?;
 
                 if review_res["approved"].as_bool().unwrap_or(false) {
                     kafka_client
