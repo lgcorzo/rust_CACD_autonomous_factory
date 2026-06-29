@@ -26,7 +26,7 @@ pub fn create_develop_task_workflow(
     let mcp_client_clone = mcp_client.clone();
     hatchet
         .task(
-            "zeroclaw:execute_coding_task",
+            "zeroclaw:execute-coding-task",
             move |input: TaskInput, _ctx| {
                 let mcp_client = mcp_client_clone.clone();
                 Box::pin(async move {
