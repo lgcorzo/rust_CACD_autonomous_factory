@@ -250,7 +250,7 @@ pub fn create_mission_workflow(
         .add_parent(&review_task);
 
     hatchet
-        .workflow("DarkGravityMission")
+        .workflow("darkgravitymission")
         .build()
         .unwrap()
         .add_task(&plan_task)
