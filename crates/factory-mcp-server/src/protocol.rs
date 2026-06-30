@@ -24,6 +24,7 @@ pub struct JsonRpcError {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct McpTool {
     pub name: String,
     pub description: String,
@@ -31,8 +32,10 @@ pub struct McpTool {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CallToolResult {
     pub content: Vec<McpContent>,
+    #[serde(default)]
     pub is_error: bool,
 }
 
