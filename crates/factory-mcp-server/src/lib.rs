@@ -90,8 +90,33 @@ impl McpServer {
 
     pub async fn handle_request(&self, request: JsonRpcRequest) -> JsonRpcResponse {
         match request.method.as_str() {
-            "list_tools" => self.handle_list_tools(request.id).await,
-            "call_tool" => self.handle_call_tool(request).await,
+            "initialize" => JsonRpcResponse {
+                jsonrpc: "2.0".to_string(),
+                result: Some(serde_json::json!({
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {},
+                    "serverInfo": {
+                        "name": "factory-mcp-server",
+                        "version": "1.0.0"
+                    }
+                })),
+                error: None,
+                id: request.id,
+            },
+            "notifications/initialized" => JsonRpcResponse {
+                jsonrpc: "2.0".to_string(),
+                result: Some(serde_json::json!({})),
+                error: None,
+                id: request.id,
+            },
+            "ping" => JsonRpcResponse {
+                jsonrpc: "2.0".to_string(),
+                result: Some(serde_json::json!({})),
+                error: None,
+                id: request.id,
+            },
+            "list_tools" | "tools/list" => self.handle_list_tools(request.id).await,
+            "call_tool" | "tools/call" => self.handle_call_tool(request).await,
             _ => self.error_response(request.id, -32601, "Method not found"),
         }
     }
@@ -154,7 +179,7 @@ impl McpServer {
 
         let stream = UnboundedReceiverStream::new(rx).map(|msg| {
             let json = serde_json::to_string(&msg).unwrap();
-            Ok::<Event, Infallible>(Event::default().data(json))
+            Ok::<Event, Infallible>(Event::default().event("message").data(json))
         });
 
         // Send the initial endpoint event as per MCP spec
