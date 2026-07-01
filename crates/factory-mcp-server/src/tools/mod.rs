@@ -14,6 +14,7 @@ pub trait Tool: Send + Sync {
 
 pub mod execute_code;
 pub mod index_code;
+pub mod launch_sandbox_pod;
 pub mod plan_mission;
 pub mod retrieve_context;
 pub mod run_tests;
