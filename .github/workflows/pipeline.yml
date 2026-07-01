@@ -2,15 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - '**'
     paths-ignore:
       - "Wiki/**"
       - "README.md"
       - ".gitignore"
   pull_request:
-    branches:
-      - '**'
     paths-ignore:
       - "Wiki/**"
       - "README.md"
