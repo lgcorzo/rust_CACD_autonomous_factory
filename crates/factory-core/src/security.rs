@@ -13,3 +13,20 @@ pub struct AuditResult {
     pub is_safe: bool,
     pub findings: Vec<String>,
 }
+
+#[derive(
+    Debug, Clone, serde::Serialize, serde::Deserialize, zeroize::Zeroize, zeroize::ZeroizeOnDrop,
+)]
+pub struct JitToken {
+    pub token: String,
+}
+
+#[async_trait]
+pub trait SecurityBounds: Send + Sync {
+    async fn validate_token(&self, token: &JitToken) -> Result<bool>;
+    async fn issue_jit_token(&self, audience: &str) -> Result<JitToken>;
+    fn wipe_token_from_memory(&self, token: &mut JitToken) {
+        use zeroize::Zeroize;
+        token.zeroize();
+    }
+}
