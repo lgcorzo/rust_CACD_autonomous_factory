@@ -72,6 +72,10 @@ mod tests {
                 Ok("pattern content".to_string())
             }
         }
+
+        async fn push_osr_metric(&self, _osr_value: f32) -> anyhow::Result<()> {
+            Ok(())
+        }
     }
 
     #[tokio::test]
