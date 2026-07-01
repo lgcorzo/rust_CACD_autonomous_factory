@@ -20,7 +20,11 @@ enum Commands {
         #[arg(long, env = "KAFKA_BROKERS", default_value = "localhost:9092")]
         kafka_brokers: String,
 
-        #[arg(long, env = "AETHALGARD_WEBHOOK_URL", default_value = "http://jules-cloud-vm.internal:8080/mcp")]
+        #[arg(
+            long,
+            env = "AETHALGARD_WEBHOOK_URL",
+            default_value = "http://jules-cloud-vm.internal:8080/mcp"
+        )]
         aethalgard_webhook_url: String,
     },
 }
