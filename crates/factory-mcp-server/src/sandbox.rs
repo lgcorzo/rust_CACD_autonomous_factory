@@ -60,22 +60,32 @@ impl SandboxDriver for SubprocessDriver {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SandboxMode {
+    Subprocess,
+    GvisorK8s,
+}
+
+#[cfg(feature = "firecracker")]
 pub struct FirecrackerDriver {
     kvm_enabled: bool,
 }
 
+#[cfg(feature = "firecracker")]
 impl Default for FirecrackerDriver {
     fn default() -> Self {
         Self::new()
     }
 }
 
+#[cfg(feature = "firecracker")]
 impl FirecrackerDriver {
     pub fn new() -> Self {
         Self { kvm_enabled: true }
     }
 }
 
+#[cfg(feature = "firecracker")]
 #[async_trait]
 impl SandboxDriver for FirecrackerDriver {
     async fn execute(&self, code: &str, language: &str) -> anyhow::Result<ExecutionResult> {
@@ -103,6 +113,64 @@ impl SandboxDriver for FirecrackerDriver {
             stderr: "".to_string(),
             exit_code: Some(0),
             is_success: true,
+        })
+    }
+}
+
+pub struct GvisorK8sDriver;
+
+#[async_trait]
+impl SandboxDriver for GvisorK8sDriver {
+    async fn execute(&self, code: &str, language: &str) -> anyhow::Result<ExecutionResult> {
+        use crate::tools::launch_sandbox_pod::LaunchSandboxPodTool;
+        use crate::tools::Tool;
+        use serde_json::json;
+
+        let tool = LaunchSandboxPodTool::new();
+        let params = json!({
+            "code": code,
+            "language": language
+        });
+
+        // We reuse the new tool we are creating to run the job
+        let result = tool.call(params).await?;
+
+        // Parse the result
+        let output_text = if result.is_error {
+            result
+                .content
+                .iter()
+                .map(|c| match c {
+                    crate::protocol::McpContent::Text { text } => text.clone(),
+                    _ => String::new(),
+                })
+                .collect::<Vec<_>>()
+                .join("\n")
+        } else {
+            result
+                .content
+                .iter()
+                .map(|c| match c {
+                    crate::protocol::McpContent::Text { text } => text.clone(),
+                    _ => String::new(),
+                })
+                .collect::<Vec<_>>()
+                .join("\n")
+        };
+
+        Ok(ExecutionResult {
+            stdout: if !result.is_error {
+                output_text.clone()
+            } else {
+                String::new()
+            },
+            stderr: if result.is_error {
+                output_text
+            } else {
+                String::new()
+            },
+            exit_code: if result.is_error { Some(1) } else { Some(0) },
+            is_success: !result.is_error,
         })
     }
 }

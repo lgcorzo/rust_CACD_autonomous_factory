@@ -25,6 +25,8 @@ openssl = { version = "0.10", features = ["vendored"] }
 rdkafka = { version = "0.30" }
 prost = "0.13"
 prost-build = "0.13"
+kube = { version = "0.96", features = ["runtime"] }
+k8s-openapi = { version = "0.23", features = ["v1_30"] }
 
 
 
