@@ -50,7 +50,9 @@ jobs:
           ./scripts/verify-osr.sh
 
       - name: Install cargo-audit
-        uses: taiki-e/install-action@cargo-audit
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
 
       - name: Cargo Audit
         run: cargo audit -D warnings
