@@ -28,6 +28,7 @@ tokio-test = { workspace = true }
 kube = { workspace = true }
 k8s-openapi = { workspace = true }
 serde_yaml = "0.9"
+lazy_static = "1.5.0"
 
 [features]
 default = []
