@@ -27,8 +27,40 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+  governance-gates:
+    name: Governance Gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify Spec Artifacts
+        if: startsWith(github.head_ref, 'specs/') || startsWith(github.ref, 'refs/heads/specs/')
+        run: |
+          echo "Verifying Spec Artifacts for Spec-Driven Development..."
+          # Ensure there is at least one spec.md, plan.md, and tasks.md in the specs/ directory
+          if [ -z "$(find specs -name 'spec.md' 2>/dev/null)" ] || [ -z "$(find specs -name 'plan.md' 2>/dev/null)" ] || [ -z "$(find specs -name 'tasks.md' 2>/dev/null)" ]; then
+            echo "::error::Missing required spec artifacts (spec.md, plan.md, tasks.md) on a specs/ branch."
+            exit 1
+          fi
+          echo "Spec artifacts verified."
+
+      - name: Verify OSR Threshold
+        run: |
+          chmod +x scripts/verify-osr.sh || true
+          ./scripts/verify-osr.sh
+
+      - name: Install cargo-audit
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-audit
+
+      - name: Cargo Audit
+        run: cargo audit -D warnings
+
   rust-ci:
     name: Rust CI (Lint & Test)
+    needs: governance-gates
     runs-on: ubuntu-latest
     permissions:
       contents: read
