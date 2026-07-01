@@ -30,12 +30,34 @@ pub fn create_develop_task_workflow(
             Box::pin(async move {
                 tracing::info!("Workflow: executing task {}", input.task_id);
 
+                // Crash Resilience: Load checkpoint if exists
+                let mut state = crate::bridge::BridgeState::load_checkpoint(&input.task_id)?
+                    .unwrap_or_else(|| crate::bridge::BridgeState::new(input.task_id.clone()));
+
+                // Example: If task was already completed in the checkpoint, we skip execution
+                if state.superpowers.completed_tasks.contains(&input.task_id) {
+                    tracing::info!(
+                        "Task {} already completed in checkpoint. Skipping.",
+                        input.task_id
+                    );
+                    return Ok(TaskOutput {
+                        result: serde_json::json!({"status": "already_done"}),
+                    });
+                }
+
                 let zeroclaw = ZeroClawAgent::new(mcp_client);
 
                 // Use the execute_task method from ZeroClawAgent
                 let result = zeroclaw
                     .execute_task(&input.task_id, &input.description, &input.relevant_files)
                     .await?;
+
+                // Crash Resilience: Update and save checkpoint after successful execution
+                state
+                    .superpowers
+                    .completed_tasks
+                    .push(input.task_id.clone());
+                state.save_checkpoint()?;
 
                 Ok(TaskOutput { result })
             })

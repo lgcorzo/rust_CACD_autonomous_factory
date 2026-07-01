@@ -43,7 +43,7 @@ impl McpServer {
     }
     pub async fn register_default_tools(&self) -> anyhow::Result<()> {
         use crate::tools::{
-            execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
@@ -94,6 +94,7 @@ impl McpServer {
         self.add_tool(Box::new(RunTestsTool::new(sandbox_driver)))
             .await;
         self.add_tool(Box::new(SecurityReviewTool)).await;
+        self.add_tool(Box::new(BridgeTool)).await;
         self.add_tool(Box::new(UpdateMissionStatusTool::new("wiki".to_string())))
             .await;
         self.add_tool(Box::new(SpecKitTool::new(specify_cli_path)))

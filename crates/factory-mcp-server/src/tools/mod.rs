@@ -12,6 +12,7 @@ pub trait Tool: Send + Sync {
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult>;
 }
 
+pub mod bridge;
 pub mod execute_code;
 pub mod index_code;
 pub mod launch_sandbox_pod;
@@ -23,10 +24,14 @@ pub mod security_review;
 pub mod spec_kit_tool;
 pub mod update_mission_status;
 
+pub use bridge::BridgeTool;
 pub use execute_code::ExecuteCodeTool;
 pub use index_code::IndexCodeTool;
+pub use launch_sandbox_pod::LaunchSandboxPodTool;
+pub use plan_mission::PlanMissionTool;
 pub use retrieve_context::RetrieveContextTool;
 pub use run_tests::RunTestsTool;
 pub use search_jira::SearchJiraTool;
+pub use security_review::SecurityReviewTool;
 pub use spec_kit_tool::SpecKitTool;
 pub use update_mission_status::UpdateMissionStatusTool;
