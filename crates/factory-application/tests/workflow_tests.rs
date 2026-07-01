@@ -16,10 +16,11 @@ async fn test_rustant_agent_with_mock_mcp() {
     mock_mcp
         .expect_call_tool_json()
         .with(
-            mockall::predicate::eq("plan_mission"),
+            mockall::predicate::eq("invoke_spec_kit"),
             mockall::predicate::always(),
         )
-        .returning(|_, _| Ok(json!({ "status": "planned", "tasks": [] })));
+        .times(6)
+        .returning(|_, _| Ok(json!({ "status": "success" })));
 
     let rustant = RustantAgent::new(Arc::new(mock_mcp), Arc::new(mock_r2r));
     let result: serde_json::Value = rustant
@@ -27,5 +28,5 @@ async fn test_rustant_agent_with_mock_mcp() {
         .await
         .unwrap();
 
-    assert_eq!(result["status"], "planned");
+    assert_eq!(result["status"], "spec_kit_planning_complete");
 }

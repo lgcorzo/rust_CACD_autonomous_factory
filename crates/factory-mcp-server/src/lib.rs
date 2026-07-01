@@ -47,7 +47,7 @@ impl McpServer {
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
-            update_mission_status::UpdateMissionStatusTool,
+            spec_kit_tool::SpecKitTool, update_mission_status::UpdateMissionStatusTool,
         };
         use factory_infrastructure::{HttpJiraClient, HttpR2rClient};
 
@@ -59,6 +59,9 @@ impl McpServer {
             } else {
                 Arc::new(crate::sandbox::SubprocessDriver)
             };
+
+        let specify_cli_path =
+            std::env::var("SPECIFY_CLI_PATH").unwrap_or_else(|_| "specify".to_string());
         let litellm_api_key = std::env::var("LITELLM_API_KEY")?;
         let litellm_base_url = std::env::var("LITELLM_BASE_URL")?;
         let litellm_model = std::env::var("LITELLM_MODEL")?;
@@ -92,6 +95,8 @@ impl McpServer {
             .await;
         self.add_tool(Box::new(SecurityReviewTool)).await;
         self.add_tool(Box::new(UpdateMissionStatusTool::new("wiki".to_string())))
+            .await;
+        self.add_tool(Box::new(SpecKitTool::new(specify_cli_path)))
             .await;
 
         Ok(())
