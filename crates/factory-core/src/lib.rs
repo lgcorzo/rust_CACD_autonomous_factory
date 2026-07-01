@@ -90,6 +90,34 @@ pub struct FeatureImportances {
     pub importance: f32,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SpecArtifact {
+    pub id: Uuid,
+    pub name: String,
+    pub data: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct OsrMetric {
+    pub metric_name: String,
+    pub value: f64,
+    pub timestamp: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FinOpsTag {
+    pub cost_center: String,
+    pub project_code: String,
+    pub owner: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ComplianceReport {
+    pub report_id: Uuid,
+    pub status: String,
+    pub findings: Vec<String>,
+}
+
 pub mod proto {
     pub mod v1 {
         include!(concat!(env!("OUT_DIR"), "/dark_gravity.factory.v1.rs"));
