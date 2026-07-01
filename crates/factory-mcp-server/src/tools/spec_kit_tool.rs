@@ -50,7 +50,7 @@ impl SpecKitTool {
 
         let mut cmd = Command::new(&self.specify_cli_path);
         cmd.arg(&command_str);
-        
+
         for arg in args {
             cmd.arg(arg);
         }
@@ -119,7 +119,9 @@ impl Tool for SpecKitTool {
                 is_error: false,
             }),
             Err(e) => Ok(CallToolResult {
-                content: vec![crate::protocol::McpContent::Text { text: e.to_string() }],
+                content: vec![crate::protocol::McpContent::Text {
+                    text: e.to_string(),
+                }],
                 is_error: true,
             }),
         }

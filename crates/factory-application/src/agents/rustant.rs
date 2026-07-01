@@ -29,15 +29,15 @@ impl RustantAgent {
 
         // 2. 6-Phase Spec-Kit sequence via MCP
         let phases = vec!["init", "specify", "plan", "execute", "verify", "git-commit"];
-        
+
         for phase in phases {
             let mut args = vec![];
-            
+
             // Inject R2R context into specify
             if phase == "specify" {
                 args.push(format!("--context={}", context));
             }
-            
+
             self.mcp_client
                 .call_tool_json(
                     "invoke_spec_kit",
