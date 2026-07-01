@@ -1,6 +1,15 @@
 use crate::error::Result;
 use async_trait::async_trait;
 
+pub mod nhi;
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SandboxConstraint {
+    pub max_memory_mb: u32,
+    pub max_cpu_cores: f32,
+    pub network_egress_allowed: bool,
+}
+
 /// Trait for validating requests or agent responses.
 #[async_trait]
 pub trait SecurityValidator {
