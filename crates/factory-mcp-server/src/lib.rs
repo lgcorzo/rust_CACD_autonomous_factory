@@ -44,13 +44,21 @@ impl McpServer {
     pub async fn register_default_tools(&self) -> anyhow::Result<()> {
         use crate::tools::{
             execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
-            plan_mission::PlanMissionTool, retrieve_context::RetrieveContextTool,
-            run_tests::RunTestsTool, search_jira::SearchJiraTool,
-            security_review::SecurityReviewTool, update_mission_status::UpdateMissionStatusTool,
+            launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
+            retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
+            search_jira::SearchJiraTool, security_review::SecurityReviewTool,
+            update_mission_status::UpdateMissionStatusTool,
         };
         use factory_infrastructure::{HttpJiraClient, HttpR2rClient};
 
-        let sandbox_driver = Arc::new(crate::sandbox::SubprocessDriver);
+        let sandbox_mode =
+            std::env::var("SANDBOX_MODE").unwrap_or_else(|_| "subprocess".to_string());
+        let sandbox_driver: Arc<dyn crate::sandbox::SandboxDriver> =
+            if sandbox_mode.to_lowercase() == "gvisork8s" {
+                Arc::new(crate::sandbox::GvisorK8sDriver)
+            } else {
+                Arc::new(crate::sandbox::SubprocessDriver)
+            };
         let litellm_api_key = std::env::var("LITELLM_API_KEY")?;
         let litellm_base_url = std::env::var("LITELLM_BASE_URL")?;
         let litellm_model = std::env::var("LITELLM_MODEL")?;
@@ -67,6 +75,7 @@ impl McpServer {
 
         self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone())))
             .await;
+        self.add_tool(Box::new(LaunchSandboxPodTool::new())).await;
         self.add_tool(Box::new(PlanMissionTool::new(
             litellm_api_key,
             litellm_base_url,

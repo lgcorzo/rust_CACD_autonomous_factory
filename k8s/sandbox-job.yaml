@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{JOB_NAME}}
+  namespace: development
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        job-name: {{JOB_NAME}}
+    spec:
+      runtimeClassName: gvisor
+      restartPolicy: Never
+      containers:
+      - name: sandbox
+        image: python:3.11-slim
+        command: ["/bin/sh", "-c"]
+        args: ["{{COMMAND}}"]
+        resources:
+          limits:
+            memory: "30Mi"
+            cpu: "100m"
+          requests:
+            memory: "10Mi"
+            cpu: "50m"
