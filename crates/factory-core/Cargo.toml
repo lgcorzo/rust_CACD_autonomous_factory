@@ -13,7 +13,14 @@ chrono = { workspace = true }
 uuid = { workspace = true }
 async-trait = "0.1"
 prost = { workspace = true }
+zeroize = { version = "1.7", features = ["derive"] }
+
+[dev-dependencies]
+criterion = "0.5"
 
 [build-dependencies]
 prost-build = { workspace = true }
 
+[[bench]]
+name = "zeroize_benchmark"
+harness = false
