@@ -65,12 +65,16 @@ mod tests {
 
     #[async_trait]
     impl R2rClient for ManualMockR2rClient {
-        async fn search(&self, _query: &str) -> anyhow::Result<String> {
+        async fn search(&self, query: &str) -> anyhow::Result<String> {
             if self.should_fail {
                 Err(anyhow::anyhow!("R2R Failure"))
             } else {
                 Ok("pattern content".to_string())
             }
+        }
+
+        async fn push_osr_metric(&self, _osr_value: f32) -> anyhow::Result<()> {
+            Ok(())
         }
     }
 

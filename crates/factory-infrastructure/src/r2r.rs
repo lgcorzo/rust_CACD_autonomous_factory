@@ -5,6 +5,7 @@ use serde_json::json;
 #[async_trait]
 pub trait R2rClient: Send + Sync {
     async fn search(&self, query: &str) -> anyhow::Result<String>;
+    async fn push_osr_metric(&self, osr_value: f32) -> anyhow::Result<()>;
 }
 
 pub struct HttpR2rClient {
@@ -129,6 +130,39 @@ impl R2rClient for HttpR2rClient {
         }
 
         Ok(combined_results)
+    }
+
+    async fn push_osr_metric(&self, osr_value: f32) -> anyhow::Result<()> {
+        let token = self.get_token().await?;
+        let metrics_url = format!("{}/v3/observability/metrics", self.url.trim_end_matches('/'));
+
+        let payload = json!({
+            "metric": "osr",
+            "value": osr_value
+        });
+
+        let metrics_res = self
+            .client
+            .post(&metrics_url)
+            .bearer_auth(token)
+            .json(&payload)
+            .send()
+            .await?;
+
+        let status = metrics_res.status();
+        let body_text = metrics_res.text().await?;
+
+        if !status.is_success() {
+            tracing::error!(
+                "Failed to push OSR metric to R2R. Status: {}. Body: {}",
+                status,
+                body_text
+            );
+            anyhow::bail!("Failed to push OSR metric with status {}", status);
+        }
+
+        tracing::info!("Successfully pushed OSR metric: {}", osr_value);
+        Ok(())
     }
 }
 
