@@ -50,7 +50,7 @@ jobs:
           cargo binstall -y cargo-audit
 
       - name: Cargo Audit
-        run: cargo audit -D warnings
+        run: cargo audit -D warnings -c audit.toml
 
   rust-ci:
     name: Rust CI (Lint & Test)
