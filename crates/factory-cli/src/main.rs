@@ -19,6 +19,9 @@ enum Commands {
 
         #[arg(long, env = "KAFKA_BROKERS", default_value = "localhost:9092")]
         kafka_brokers: String,
+
+        #[arg(long, env = "AETHALGARD_WEBHOOK_URL", default_value = "http://jules-cloud-vm.internal:8080/mcp")]
+        aethalgard_webhook_url: String,
     },
 }
 
@@ -33,6 +36,7 @@ async fn main() -> anyhow::Result<()> {
             mcp_url,
             r2r_url,
             kafka_brokers,
+            aethalgard_webhook_url,
         } => {
             if kafka_brokers.trim().is_empty() {
                 anyhow::bail!("Invalid configuration: KAFKA_BROKERS must not be empty.");
@@ -58,6 +62,7 @@ async fn main() -> anyhow::Result<()> {
                 mcp_url.clone(),
                 r2r_url,
                 kafka_brokers,
+                aethalgard_webhook_url,
             );
             let task_wf =
                 factory_application::workflows::create_develop_task_workflow(&hatchet, mcp_url);

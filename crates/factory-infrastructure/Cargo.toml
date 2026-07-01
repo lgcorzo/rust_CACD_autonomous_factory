@@ -24,5 +24,6 @@ tokio-test = { workspace = true }
 wiremock = { workspace = true }
 openssl = { workspace = true }
 rdkafka = { workspace = true, features = ["cmake-build"] }
+uuid = { workspace = true, features = ["v4"] }
 
 

@@ -5,12 +5,17 @@ pub trait S3Storage {
     async fn get_object(&self, bucket: &str, key: &str) -> anyhow::Result<Vec<u8>>;
 }
 
+pub mod aethalgard;
 pub mod jira;
 pub mod kafka;
 pub mod mcp_client;
 pub mod r2r;
 pub mod s3;
 pub mod ziti;
+
+#[cfg(any(test, feature = "test-utils"))]
+pub use aethalgard::MockAethalgardClient;
+pub use aethalgard::{AethalgardClient, HttpAethalgardClient};
 
 #[cfg(any(test, feature = "test-utils"))]
 pub use jira::MockJiraClient;
