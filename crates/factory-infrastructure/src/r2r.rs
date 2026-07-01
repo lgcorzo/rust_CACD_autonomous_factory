@@ -134,7 +134,10 @@ impl R2rClient for HttpR2rClient {
 
     async fn push_osr_metric(&self, osr_value: f32) -> anyhow::Result<()> {
         let token = self.get_token().await?;
-        let metrics_url = format!("{}/v3/observability/metrics", self.url.trim_end_matches('/'));
+        let metrics_url = format!(
+            "{}/v3/observability/metrics",
+            self.url.trim_end_matches('/')
+        );
 
         let payload = json!({
             "metric": "osr",
