@@ -24,23 +24,33 @@ impl RustantAgent {
             goal
         );
 
-        // 1. Context Pruning (Skill)
+        // 1. Context Pruning (R2R)
         let context = self.r2r_client.search(goal).await?;
 
-        // 2. Call MCP tool with pruned context
-        let result = self
-            .mcp_client
-            .call_tool_json(
-                "plan_mission",
-                json!({
-                    "mission_id": mission_id,
-                    "mission_description": goal,
-                    "context": context
-                }),
-            )
-            .await?;
+        // 2. 6-Phase Spec-Kit sequence via MCP
+        let phases = vec!["init", "specify", "plan", "execute", "verify", "git-commit"];
 
-        Ok(result)
+        for phase in phases {
+            let mut args = vec![];
+
+            // Inject R2R context into specify
+            if phase == "specify" {
+                args.push(format!("--context={}", context));
+            }
+
+            self.mcp_client
+                .call_tool_json(
+                    "invoke_spec_kit",
+                    json!({
+                        "command": phase,
+                        "args": args
+                    }),
+                )
+                .await?;
+        }
+
+        // Return a mock result to conform to legacy requirements (could be populated from tasks.md)
+        Ok(json!({ "status": "spec_kit_planning_complete" }))
     }
 
     pub async fn review_mission(
