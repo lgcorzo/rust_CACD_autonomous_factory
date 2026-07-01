@@ -2,22 +2,17 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
     paths-ignore:
-      - "wiki/**"
+      - "Wiki/**"
       - "README.md"
       - ".gitignore"
   pull_request:
-    branches:
-      - main
     paths-ignore:
-      - "wiki/**"
+      - "Wiki/**"
       - "README.md"
       - ".gitignore"
   workflow_dispatch:
   release:
-
     types:
       - published
       - edited
@@ -50,10 +45,9 @@ jobs:
           ./scripts/verify-osr.sh
 
       - name: Install cargo-audit
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: cargo-audit
+        run: |
+          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+          cargo binstall -y cargo-audit
 
       - name: Cargo Audit
         run: cargo audit -D warnings
