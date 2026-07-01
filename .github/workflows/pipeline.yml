@@ -3,16 +3,16 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - '**'
     paths-ignore:
-      - "wiki/**"
+      - "Wiki/**"
       - "README.md"
       - ".gitignore"
   pull_request:
     branches:
-      - main
+      - '**'
     paths-ignore:
-      - "wiki/**"
+      - "Wiki/**"
       - "README.md"
       - ".gitignore"
   workflow_dispatch:
@@ -50,10 +50,7 @@ jobs:
           ./scripts/verify-osr.sh
 
       - name: Install cargo-audit
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: cargo-audit
+        uses: taiki-e/install-action@cargo-audit
 
       - name: Cargo Audit
         run: cargo audit -D warnings
