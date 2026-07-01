@@ -1,5 +1,8 @@
 use crate::agents::{RustantAgent, ZeroClawAgent};
-use factory_infrastructure::{HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient};
+use factory_infrastructure::{
+    aethalgard::{AethalgardClient, HttpAethalgardClient},
+    HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+};
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::runnables::Workflow;
 use serde::{Deserialize, Serialize};
@@ -47,6 +50,7 @@ pub fn create_mission_workflow(
     mcp_url: String,
     r2r_url: String,
     kafka_brokers: String,
+    aethalgard_webhook_url: String,
 ) -> Workflow<MissionInput, MissionOutput> {
     let mcp_client: Arc<dyn McpClient> = Arc::new(McpHttpClient::new(mcp_url));
     let r2r_client: Arc<dyn R2rClient> = Arc::new(HttpR2rClient::new(
@@ -125,13 +129,18 @@ pub fn create_mission_workflow(
         .unwrap()
         .add_parent(&plan_task);
 
+    let aethalgard_client: Arc<dyn AethalgardClient> =
+        Arc::new(HttpAethalgardClient::new(aethalgard_webhook_url));
+
     // 3. Validation Phase (ZeroClaw)
     let mcp_client_clone = mcp_client.clone();
     let kafka_client_clone = kafka_client.clone();
+    let aethalgard_client_clone = aethalgard_client.clone();
     let validation_task = hatchet
         .task("zeroclaw-validate", move |input: MissionInput, _ctx| {
             let mcp_client = mcp_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
+            let aethalgard_client = aethalgard_client_clone.clone();
             let mission_id = input
                 .mission_id
                 .clone()
@@ -143,16 +152,50 @@ pub fn create_mission_workflow(
                 kafka_client
                     .publish_thought(&mission_id, "Starting validation phase...", "zeroclaw")
                     .await?;
-                let test_res = zeroclaw.validate_mission(&mission_id, "cargo test").await?;
-                kafka_client
-                    .publish_thought(
-                        &mission_id,
-                        &format!("Validation finished: {}", test_res["status"]),
-                        "zeroclaw",
-                    )
-                    .await?;
 
-                Ok(test_res)
+                let mut attempt = 0;
+                let max_retries = 3;
+                let mut last_error = "Unknown initial error".to_string();
+
+                loop {
+                    attempt += 1;
+                    match zeroclaw.validate_mission(&mission_id, "cargo test").await {
+                        Ok(test_res) => {
+                            if test_res["status"].as_str().unwrap_or("") == "success" {
+                                kafka_client
+                                    .publish_thought(&mission_id, "Validation passed", "zeroclaw")
+                                    .await?;
+                                return Ok(test_res);
+                            } else {
+                                last_error = test_res["error"]
+                                    .as_str()
+                                    .unwrap_or("Unknown test failure")
+                                    .to_string();
+                            }
+                        }
+                        Err(e) => {
+                            last_error = e.to_string();
+                        }
+                    }
+
+                    if attempt >= max_retries {
+                        kafka_client.publish_thought(&mission_id, "Validation failed after 3 attempts. Escalating to Aethalgard...", "zeroclaw").await?;
+                        aethalgard_client
+                            .notify_remediation(&mission_id, &last_error)
+                            .await?;
+                        anyhow::bail!("Validation failed permanently. Escalated to Jules Remediator.");
+                    }
+
+                    kafka_client
+                        .publish_thought(
+                            &mission_id,
+                            &format!("Validation attempt {} failed. Retrying...", attempt),
+                            "zeroclaw",
+                        )
+                        .await?;
+                    // Simulate fixing code before retry
+                    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                }
             })
         })
         .build()
