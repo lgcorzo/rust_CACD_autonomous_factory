@@ -38,7 +38,11 @@ impl DocumentationAgent {
 
         loop {
             attempt += 1;
-            tracing::info!("Documentation pipeline attempt {}/{}", attempt, max_retries + 1);
+            tracing::info!(
+                "Documentation pipeline attempt {}/{}",
+                attempt,
+                max_retries + 1
+            );
 
             for skill in &skills {
                 self.mcp_client
@@ -53,7 +57,7 @@ impl DocumentationAgent {
             }
 
             let osr_value = self.verify_osr().await?;
-            
+
             // Push metric to R2R
             if let Err(e) = self.r2r_client.push_osr_metric(osr_value).await {
                 tracing::warn!("Failed to push OSR metric: {}", e);
@@ -68,10 +72,16 @@ impl DocumentationAgent {
             } else {
                 tracing::warn!("OSR validation failed with {}%", osr_value * 100.0);
                 if attempt > max_retries {
-                    tracing::error!("HITL Escalation: OSR remained > 5% after {} retries", max_retries);
-                    anyhow::bail!("HITL Escalation: Documentation remains out of sync (OSR: {})", osr_value);
+                    tracing::error!(
+                        "HITL Escalation: OSR remained > 5% after {} retries",
+                        max_retries
+                    );
+                    anyhow::bail!(
+                        "HITL Escalation: Documentation remains out of sync (OSR: {})",
+                        osr_value
+                    );
                 }
-                
+
                 // Simulate wait before retry
                 tokio::time::sleep(Duration::from_millis(500)).await;
             }
@@ -81,12 +91,12 @@ impl DocumentationAgent {
     async fn verify_osr(&self) -> anyhow::Result<f32> {
         // Retrieve context to simulate a diff calculation
         let _context = self.r2r_client.search("documentation sync state").await?;
-        
+
         // In a real implementation, we would compare the R2R context with local wiki files.
         // For now, we mock a successful OSR value under the 5% threshold.
         // E.g., if we returned 0.06, it would trigger the retry loop.
-        let mock_osr = 0.03; 
-        
+        let mock_osr = 0.03;
+
         Ok(mock_osr)
     }
 }
