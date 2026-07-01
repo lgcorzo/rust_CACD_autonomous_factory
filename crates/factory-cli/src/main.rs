@@ -38,9 +38,13 @@ async fn main() -> anyhow::Result<()> {
                 anyhow::bail!("Invalid configuration: KAFKA_BROKERS must not be empty.");
             }
 
-            let specify_cli_path = std::env::var("SPECIFY_CLI_PATH").unwrap_or_else(|_| "specify".to_string());
+            let specify_cli_path =
+                std::env::var("SPECIFY_CLI_PATH").unwrap_or_else(|_| "specify".to_string());
             if !std::path::Path::new(&specify_cli_path).exists() {
-                anyhow::bail!("Invalid configuration: SPECIFY_CLI_PATH '{}' does not exist or is not an executable.", specify_cli_path);
+                anyhow::bail!(
+                    "Invalid configuration: SPECIFY_CLI_PATH '{}' does not exist or is not an executable.",
+                    specify_cli_path
+                );
             }
 
             tracing::info!("Starting Hatchet worker...");
