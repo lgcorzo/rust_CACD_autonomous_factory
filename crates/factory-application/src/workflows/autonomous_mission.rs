@@ -1,7 +1,7 @@
 use crate::agents::{RustantAgent, ZeroClawAgent};
 use factory_infrastructure::{
-    aethalgard::{AethalgardClient, HttpAethalgardClient},
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+    aethalgard::{AethalgardClient, HttpAethalgardClient},
 };
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::runnables::Workflow;
@@ -155,7 +155,7 @@ pub fn create_mission_workflow(
 
                 let mut attempt = 0;
                 let max_retries = 3;
-                let mut last_error = "Unknown initial error".to_string();
+                let mut last_error;
 
                 loop {
                     attempt += 1;
@@ -179,11 +179,19 @@ pub fn create_mission_workflow(
                     }
 
                     if attempt >= max_retries {
-                        kafka_client.publish_thought(&mission_id, "Validation failed after 3 attempts. Escalating to Aethalgard...", "zeroclaw").await?;
+                        kafka_client
+                            .publish_thought(
+                                &mission_id,
+                                "Validation failed after 3 attempts. Escalating to Aethalgard...",
+                                "zeroclaw",
+                            )
+                            .await?;
                         aethalgard_client
                             .notify_remediation(&mission_id, &last_error)
                             .await?;
-                        anyhow::bail!("Validation failed permanently. Escalated to Jules Remediator.");
+                        anyhow::bail!(
+                            "Validation failed permanently. Escalated to Jules Remediator."
+                        );
                     }
 
                     kafka_client
