@@ -65,6 +65,12 @@ impl McpServer {
         let litellm_api_key = std::env::var("LITELLM_API_KEY")?;
         let litellm_base_url = std::env::var("LITELLM_BASE_URL")?;
         let litellm_model = std::env::var("LITELLM_MODEL")?;
+        
+        let finops_tag = factory_core::FinOpsTag {
+            cost_center: std::env::var("FINOPS_COST_CENTER").unwrap_or_else(|_| "engineering".to_string()),
+            project_code: std::env::var("FINOPS_PROJECT_CODE").unwrap_or_else(|_| "dg-factory".to_string()),
+            owner: std::env::var("FINOPS_OWNER").unwrap_or_else(|_| "ai-agent".to_string()),
+        };
 
         let r2r_base_url = std::env::var("R2R_BASE_URL")?;
         let r2r_user = std::env::var("R2R_USER")?;
@@ -83,6 +89,7 @@ impl McpServer {
             litellm_api_key,
             litellm_base_url,
             litellm_model,
+            finops_tag,
         )))
         .await;
         self.add_tool(Box::new(RetrieveContextTool::new(r2r_client.clone())))

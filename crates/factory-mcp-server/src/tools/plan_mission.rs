@@ -11,18 +11,34 @@ use async_openai::{
 use async_trait::async_trait;
 use serde_json::{json, Value};
 
+use factory_core::FinOpsTag;
+use reqwest::header::{HeaderMap, HeaderValue};
+
 pub struct PlanMissionTool {
     client: Client<async_openai::config::OpenAIConfig>,
     model: String,
 }
 
 impl PlanMissionTool {
-    pub fn new(api_key: String, base_url: String, model: String) -> Self {
+    pub fn new(api_key: String, base_url: String, model: String, finops_tag: FinOpsTag) -> Self {
         let config = async_openai::config::OpenAIConfig::new()
             .with_api_key(api_key)
             .with_api_base(base_url);
+
+        let mut headers = HeaderMap::new();
+        if let Ok(tag_json) = serde_json::to_string(&finops_tag) {
+            if let Ok(header_val) = HeaderValue::from_str(&tag_json) {
+                headers.insert("litellm-tags", header_val);
+            }
+        }
+
+        let http_client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap_or_default();
+
         Self {
-            client: Client::with_config(config),
+            client: Client::with_config(config).with_http_client(http_client),
             model,
         }
     }
