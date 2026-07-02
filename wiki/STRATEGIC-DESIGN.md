@@ -43,9 +43,9 @@ graph TD
 
 | Layer | Crate / Responsibility | Focus |
 | :--- | :--- | :--- |
-| **Domain** | `factory-core` | Business entities, aggregate roots, and domain logic. `Mission`, `Task`, `MissionStatus`, `SecurityValidator` trait, `FactoryError`. |
+| **Domain** | `factory-core` | Business entities, aggregate roots, and domain logic. `Mission`, `Task`, `MissionStatus`, `SecurityValidator` trait, `SecurityBounds` trait, `FactoryError`. |
 | **Application** | `factory-application` | Orchestrates use cases. Hatchet Workflows (6-phase DAG), Rustant & ZeroClaw agent logic. |
-| **Infrastructure** | `factory-infrastructure` | External adapters (Kafka, R2R GraphRAG, Jira, S3, OpenZiti, MCP client). |
+| **Infrastructure** | `factory-infrastructure` | External adapters (Kafka, R2R GraphRAG, Jira, S3, OpenZiti, Vault, MCP client). |
 | **Interface** | `factory-mcp-server` / `factory-cli` | External entry points (Axum MCP server with SSE/HTTP, CLI Hatchet worker). |
 
 ---
@@ -54,8 +54,9 @@ graph TD
 
 Security is baked into the strategic design of every context:
 
-- **Identity-First**: `SecurityValidator` trait for content auditing and signature verification.
+- **Identity-First**: `SecurityValidator` trait for content auditing and Ed25519 signature verification.
 - **Dark Network**: All inter-service communication routed through **OpenZiti** mTLS 1.3 tunnels — zero publicly routable ports.
+- **Dynamic Access**: Short-lived JIT tokens provisioned dynamically via **Vault** (`SecurityBounds`).
 - **Sandbox Execution**: Untrusted code executes in **Firecracker** micro-VMs or via a `SubprocessDriver` for isolated sandboxing.
 - **Credential Management**: API keys and tokens loaded via environment variables, never hardcoded.
 
@@ -95,10 +96,10 @@ Based on `code-review-graph` analysis, the actual codebase structure is:
 
 | Crate | Nodes | Edges | Role |
 |-------|-------|-------|------|
-| `factory-core` | 12 | — | Domain models (`Mission`, `Task`, `SecurityValidator`) |
+| `factory-core` | 12 | — | Domain models (`Mission`, `Task`, `SecurityValidator`, `SecurityBounds`) |
 | `factory-application` | 21 | — | Agents (Rustant, ZeroClaw) + Workflows |
 | `factory-mcp-server` | 101 | — | MCP server, tools (8 tools), sandbox drivers |
-| `factory-infrastructure` | 42 | — | Service clients (Jira, R2R, Kafka, MCP, S3, Ziti) |
+| `factory-infrastructure` | 42 | — | Service clients (Jira, R2R, Kafka, MCP, S3, Ziti, Vault, Ed25519) |
 | `factory-cli` | 3 | — | CLI entry point |
 
 ### Agent Relationships (CRG Edge Graph)
@@ -124,4 +125,4 @@ Based on `code-review-graph` analysis, the actual codebase structure is:
 
 ---
 
-*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*
