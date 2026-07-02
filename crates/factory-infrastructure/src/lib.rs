@@ -1,6 +1,6 @@
-#[cfg_attr(test, mockall::automock)]
+#[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait::async_trait]
-pub trait S3Storage {
+pub trait S3Storage: Send + Sync {
     async fn put_object(&self, bucket: &str, key: &str, data: Vec<u8>) -> anyhow::Result<()>;
     async fn get_object(&self, bucket: &str, key: &str) -> anyhow::Result<Vec<u8>>;
 }
@@ -34,6 +34,7 @@ pub use r2r::MockR2rClient;
 pub use r2r::{HttpR2rClient, R2rClient};
 
 pub use s3::AwsS3Storage;
+
 #[cfg(any(test, feature = "test-utils"))]
 pub use ziti::MockZitiIdentity;
 pub use ziti::{OpenZitiIdentity, ZitiIdentity};

@@ -49,8 +49,39 @@ impl RustantAgent {
                 .await?;
         }
 
-        // Return a mock result to conform to legacy requirements (could be populated from tasks.md)
-        Ok(json!({ "status": "spec_kit_planning_complete" }))
+        // 3. Parse generated artifacts
+        // Try to find the latest spec in the specs directory
+        let mut latest_spec_dir = None;
+        if let Ok(entries) = std::fs::read_dir("specs") {
+            let mut dirs: Vec<_> = entries.filter_map(|e| e.ok()).collect();
+            // Sort by modified time to get the newest
+            dirs.sort_by_key(|dir| {
+                dir.metadata()
+                    .and_then(|m| m.modified())
+                    .unwrap_or(std::time::SystemTime::UNIX_EPOCH)
+            });
+            if let Some(latest) = dirs.last() {
+                latest_spec_dir = Some(latest.path());
+            }
+        }
+
+        let mut parsed_spec = String::new();
+        let mut parsed_plan = String::new();
+        let mut parsed_tasks = String::new();
+
+        if let Some(spec_dir) = latest_spec_dir {
+            parsed_spec = std::fs::read_to_string(spec_dir.join("spec.md")).unwrap_or_default();
+            parsed_plan = std::fs::read_to_string(spec_dir.join("plan.md")).unwrap_or_default();
+            parsed_tasks = std::fs::read_to_string(spec_dir.join("tasks.md")).unwrap_or_default();
+        }
+
+        Ok(json!({
+            "status": "spec_kit_planning_complete",
+            "spec": parsed_spec,
+            "plan": parsed_plan,
+            "tasks": parsed_tasks,
+            "summary": "Implement the task described in the parsed plan and tasks artifacts."
+        }))
     }
 
     pub async fn review_mission(
