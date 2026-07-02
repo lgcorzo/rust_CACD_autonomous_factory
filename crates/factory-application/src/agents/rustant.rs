@@ -55,7 +55,11 @@ impl RustantAgent {
         if let Ok(entries) = std::fs::read_dir("specs") {
             let mut dirs: Vec<_> = entries.filter_map(|e| e.ok()).collect();
             // Sort by modified time to get the newest
-            dirs.sort_by_key(|dir| dir.metadata().and_then(|m| m.modified()).unwrap_or(std::time::SystemTime::UNIX_EPOCH));
+            dirs.sort_by_key(|dir| {
+                dir.metadata()
+                    .and_then(|m| m.modified())
+                    .unwrap_or(std::time::SystemTime::UNIX_EPOCH)
+            });
             if let Some(latest) = dirs.last() {
                 latest_spec_dir = Some(latest.path());
             }
