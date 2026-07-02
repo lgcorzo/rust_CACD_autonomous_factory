@@ -1,4 +1,4 @@
-use crate::agents::{RustantAgent, ZeroClawAgent};
+use crate::agents::{AuditorAgent, RustantAgent, ZeroClawAgent};
 use factory_infrastructure::{
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
     aethalgard::{AethalgardClient, HttpAethalgardClient},
@@ -189,6 +189,16 @@ pub fn create_mission_workflow(
                         aethalgard_client
                             .notify_remediation(&mission_id, &last_error)
                             .await?;
+
+                        // SIM-4: Background Audit of failed mission
+                        let m_id = mission_id.clone();
+                        tokio::spawn(async move {
+                            let auditor = AuditorAgent::new();
+                            if let Ok(logs) = auditor.analyze_dag_logs(&m_id).await {
+                                let _ = auditor.audit_mission(&m_id, &logs).await;
+                            }
+                        });
+
                         anyhow::bail!(
                             "Validation failed permanently. Escalated to Jules Remediator."
                         );
@@ -197,12 +207,16 @@ pub fn create_mission_workflow(
                     kafka_client
                         .publish_thought(
                             &mission_id,
-                            &format!("Validation attempt {} failed. Retrying...", attempt),
+                            &format!("Validation attempt {} failed. Retrying with active patch generation...", attempt),
                             "zeroclaw",
                         )
                         .await?;
-                    // Simulate fixing code before retry
-                    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+
+                    // SIM-4: Actively generate patch for failing code instead of sleeping
+                    let fix_task = format!("Fix the following failing tests/code:\n{}", last_error);
+                    if let Err(e) = zeroclaw.execute_task(&mission_id, &fix_task, &[]).await {
+                        tracing::error!("Failed to execute patch task: {}", e);
+                    }
                 }
             })
         })
