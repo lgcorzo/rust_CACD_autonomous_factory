@@ -11,6 +11,8 @@ pub mod kafka;
 pub mod mcp_client;
 pub mod r2r;
 pub mod s3;
+pub mod sentry;
+pub mod gitlab;
 pub mod ziti;
 
 #[cfg(any(test, feature = "test-utils"))]
@@ -35,3 +37,11 @@ pub use s3::AwsS3Storage;
 #[cfg(any(test, feature = "test-utils"))]
 pub use ziti::MockZitiIdentity;
 pub use ziti::{OpenZitiIdentity, ZitiIdentity};
+
+#[cfg(any(test, feature = "test-utils"))]
+pub use sentry::MockSentryClient;
+pub use sentry::{HttpSentryClient, SentryClient, CrashEvent};
+
+#[cfg(any(test, feature = "test-utils"))]
+pub use gitlab::MockGitlabClient;
+pub use gitlab::{HttpGitlabClient, GitlabClient, GitlabIssue};
