@@ -16,12 +16,17 @@ This document details the **Adapters** that connect the autonomous factory to ex
 ## Authentication & Identity (Zero Trust)
 
 ### Security Validator
-- **Mechanism**: `SecurityValidator` trait in `factory-core/src/security.rs` with `validate_signature` and `audit_content` methods.
+- **Mechanism**: `SecurityValidator` trait in `factory-core/src/security.rs` implemented by `Ed25519Validator` in `factory-infrastructure/src/security_validator.rs`.
+- **Implementation**: Uses `ed25519-dalek` v2 to cryptographically verify 64-byte signatures.
 - **Audit Results**: `AuditResult` struct with `is_safe` boolean and `findings` vector.
+
+### Security Bounds
+- **Mechanism**: `SecurityBounds` trait in `factory-core/src/security.rs` implemented by `VaultSecurityBounds` in `factory-infrastructure/src/vault.rs`.
+- **Implementation**: Uses `reqwest` to issue and validate JIT tokens against HashiCorp Vault's Token API.
 
 ### OpenZiti Dark-Network Overlay
 - **Mesh**: All inter-service communication via OpenZiti mTLS tunnels.
-- **Integration**: `factory-infrastructure/src/ziti.rs` — `OpenZitiIdentity` struct with `get_token` and `service_name` methods.
+- **Integration**: `factory-infrastructure/src/ziti.rs` — `OpenZitiIdentity` struct uses `ziti-sdk` to dynamically parse and retrieve mTLS tokens.
 - **Mocking**: `MockZitiIdentity` available for testing.
 
 ---
@@ -80,6 +85,8 @@ Both implement the `SandboxDriver` trait in `factory-mcp-server/src/sandbox.rs`.
 | `McpHttpClient` / `McpSseClient` | `mcp_client.rs` | `call_tool_json(name, args)` |
 | `AwsS3Storage` / `S3Storage` | `s3.rs` | `put_object(key, data)`, `get_object(key)` |
 | `OpenZitiIdentity` / `ZitiIdentity` | `ziti.rs` | `get_token()`, `service_name()` |
+| `VaultSecurityBounds` / `SecurityBounds` | `vault.rs` | `issue_jit_token()`, `validate_token()` |
+| `Ed25519Validator` / `SecurityValidator` | `security_validator.rs` | `validate_signature()`, `audit_content()` |
 
 ---
 
@@ -104,8 +111,10 @@ Based on `code-review-graph` analysis, the infrastructure layer has the followin
 - **Kafka Client** → Published via `publish_thought` to agent-thought topic
 - **MCP Client** → SSE handshake (`get_session_url`) + HTTP calls (`call_tool_json`)
 - **S3 Storage** → `put_object` / `get_object` with configurable bucket
-- **Ziti Identity** → mTLS token retrieval with service name
+- **Ziti Identity** → mTLS token retrieval using `ziti-sdk` and dynamic JWT parsing
+- **Vault Security** → Standard HTTP calls via `reqwest` to Vault API endpoints
+- **Ed25519 Validator** → Uses `ed25519-dalek` v2 and `hex` for cryptographic verification
 
 ---
 
-*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*
