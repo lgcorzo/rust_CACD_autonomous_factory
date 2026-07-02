@@ -30,12 +30,18 @@ pub fn create_develop_task_workflow(
             Box::pin(async move {
                 tracing::info!("Workflow: executing task {}", input.task_id);
 
-                let bucket = std::env::var("S3_CHECKPOINT_BUCKET").unwrap_or_else(|_| "dg-factory-checkpoints".to_string());
+                let bucket = std::env::var("S3_CHECKPOINT_BUCKET")
+                    .unwrap_or_else(|_| "dg-factory-checkpoints".to_string());
                 let s3_client = factory_infrastructure::AwsS3Storage::new().await;
 
                 // Crash Resilience: Load checkpoint if exists
-                let mut state = crate::bridge::BridgeState::load_checkpoint(&input.task_id, &s3_client, &bucket).await?
-                    .unwrap_or_else(|| crate::bridge::BridgeState::new(input.task_id.clone()));
+                let mut state = crate::bridge::BridgeState::load_checkpoint(
+                    &input.task_id,
+                    &s3_client,
+                    &bucket,
+                )
+                .await?
+                .unwrap_or_else(|| crate::bridge::BridgeState::new(input.task_id.clone()));
 
                 // Example: If task was already completed in the checkpoint, we skip execution
                 if state.superpowers.completed_tasks.contains(&input.task_id) {
