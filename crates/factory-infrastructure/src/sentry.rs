@@ -11,7 +11,11 @@ pub struct CrashEvent {
 #[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait]
 pub trait SentryClient: Send + Sync {
-    async fn fetch_recent_crashes(&self, project: &str, since_minutes: u64) -> anyhow::Result<Vec<CrashEvent>>;
+    async fn fetch_recent_crashes(
+        &self,
+        project: &str,
+        since_minutes: u64,
+    ) -> anyhow::Result<Vec<CrashEvent>>;
 }
 
 pub struct HttpSentryClient {
@@ -32,10 +36,18 @@ impl HttpSentryClient {
 
 #[async_trait]
 impl SentryClient for HttpSentryClient {
-    async fn fetch_recent_crashes(&self, project: &str, since_minutes: u64) -> anyhow::Result<Vec<CrashEvent>> {
+    async fn fetch_recent_crashes(
+        &self,
+        project: &str,
+        since_minutes: u64,
+    ) -> anyhow::Result<Vec<CrashEvent>> {
         let stats_period = format!("{}m", since_minutes);
-        let search_url = format!("{}/api/0/projects/{}/events/", self.url.trim_end_matches('/'), project);
-        
+        let search_url = format!(
+            "{}/api/0/projects/{}/events/",
+            self.url.trim_end_matches('/'),
+            project
+        );
+
         let res = self
             .client
             .get(&search_url)
@@ -59,7 +71,7 @@ impl SentryClient for HttpSentryClient {
 mod tests {
     use super::*;
     use serde_json::json;
-    use wiremock::matchers::{method, path, query_param, header};
+    use wiremock::matchers::{header, method, path, query_param};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
     #[tokio::test]
@@ -83,7 +95,10 @@ mod tests {
             .mount(&mock_server)
             .await;
 
-        let result = client.fetch_recent_crashes("my-org/my-project", 15).await.unwrap();
+        let result = client
+            .fetch_recent_crashes("my-org/my-project", 15)
+            .await
+            .unwrap();
         assert_eq!(result.len(), 1);
         assert_eq!(result[0].event_id, "a1b2c3d4");
         assert_eq!(result[0].title, "ZeroDivisionError");

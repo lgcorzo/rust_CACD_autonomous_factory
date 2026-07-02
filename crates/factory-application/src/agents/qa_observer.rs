@@ -1,10 +1,10 @@
 use crate::Agent;
+use crate::workflows::autonomous_mission::MissionInput;
 use async_trait::async_trait;
 use factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient};
 use hatchet_sdk::{Hatchet, Runnable};
 use serde_json::Value;
 use std::time::Duration;
-use crate::workflows::autonomous_mission::MissionInput;
 use uuid::Uuid;
 
 pub struct QAObserverAgent {
@@ -19,7 +19,7 @@ impl Default for QAObserverAgent {
     fn default() -> Self {
         // We will construct this using the environment variables if provided.
         // It requires a Hatchet client instance.
-        // For default initialization, we will initialize a mock Hatchet if possible, 
+        // For default initialization, we will initialize a mock Hatchet if possible,
         // but typically this should be constructed explicitly.
         panic!("QAObserverAgent should be constructed with ::new()");
     }
@@ -51,38 +51,54 @@ impl QAObserverAgent {
         }
 
         loop {
-            tracing::info!("QAObserverAgent: Polling Sentry for recent crashes in {}...", self.sentry_project);
-            
+            tracing::info!(
+                "QAObserverAgent: Polling Sentry for recent crashes in {}...",
+                self.sentry_project
+            );
+
             // Poll for crashes in the last 15 minutes
-            match self.sentry_client.fetch_recent_crashes(&self.sentry_project, 15).await {
+            match self
+                .sentry_client
+                .fetch_recent_crashes(&self.sentry_project, 15)
+                .await
+            {
                 Ok(crashes) => {
                     for crash in crashes {
                         tracing::info!("Detected crash: {} - {}", crash.event_id, crash.title);
-                        
+
                         // Create GitLab issue
                         let title = format!("Crash Auto-Report: {}", crash.title);
                         let description = format!(
                             "A crash was detected by Sentry.\n\nEvent ID: {}\nTitle: {}\nCulprit: {:?}",
                             crash.event_id, crash.title, crash.culprit
                         );
-                        
-                        match self.gitlab_client.create_issue(&self.gitlab_project, &title, &description).await {
+
+                        match self
+                            .gitlab_client
+                            .create_issue(&self.gitlab_project, &title, &description)
+                            .await
+                        {
                             Ok(issue) => {
                                 tracing::info!("Created GitLab issue for crash: {}", issue.web_url);
-                                
+
                                 // Trigger AutonomousMission Hotfix via Hatchet
                                 let mission_input = MissionInput {
                                     mission_id: Some(Uuid::new_v4().to_string()),
-                                    goal: format!("Hotfix Crash: {}. Context: {}", title, issue.web_url),
+                                    goal: format!(
+                                        "Hotfix Crash: {}. Context: {}",
+                                        title, issue.web_url
+                                    ),
                                     repository_path: String::new(),
                                 };
-                                
+
                                 let workflow = self.hatchet.workflow::<MissionInput, crate::workflows::autonomous_mission::MissionOutput>("AutonomousMission").build().unwrap();
 
                                 if let Err(e) = workflow.run_no_wait(&mission_input, None).await {
                                     tracing::error!("Failed to trigger Hatchet mission: {}", e);
                                 } else {
-                                    tracing::info!("Successfully triggered autonomous hotfix mission.");
+                                    tracing::info!(
+                                        "Successfully triggered autonomous hotfix mission."
+                                    );
                                 }
                             }
                             Err(e) => {
@@ -95,7 +111,7 @@ impl QAObserverAgent {
                     tracing::error!("Failed to fetch Sentry crashes: {}", e);
                 }
             }
-            
+
             // Wait 15 minutes before polling again
             tokio::time::sleep(Duration::from_secs(15 * 60)).await;
         }
