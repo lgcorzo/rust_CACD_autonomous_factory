@@ -34,7 +34,9 @@ This document defines the common terminology used throughout the **Dark Gravity*
 | **Sandbox** | Isolated execution environment — SubprocessDriver (local) or Firecracker (KVM micro-VM). |
 | **Firecracker** | Hardware-virtualized micro-VM via KVM; uses `AF_VSOCK` for host-guest communication. |
 | **OpenZiti** | Zero Trust networking overlay; mTLS tunnels with zero public ports. |
-| **SecurityValidator** | Trait for signature verification and content auditing (`factory-core`). |
+| **SecurityValidator** | Trait for signature verification and content auditing (`factory-core`), implemented by `Ed25519Validator`. |
+| **SecurityBounds** | Trait for JIT token issuance and validation (`factory-core`), implemented by `VaultSecurityBounds`. |
+| **Vault** | HashiCorp Vault, used to dynamically provision short-lived JIT tokens via `SecurityBounds`. |
 | **R2R GraphRAG** | Graph-based Retrieval-Augmented Generation for semantic codebase memory. |
 
 ## Verification Terms
@@ -46,4 +48,4 @@ This document defines the common terminology used throughout the **Dark Gravity*
 
 ---
 
-*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*
