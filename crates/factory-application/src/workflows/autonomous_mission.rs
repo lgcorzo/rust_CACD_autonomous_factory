@@ -61,12 +61,16 @@ pub fn create_mission_workflow(
 
     let hatchet_clone = hatchet.clone();
     tokio::spawn(async move {
-        let sentry_url = std::env::var("SENTRY_URL").unwrap_or_else(|_| "https://sentry.io".to_string());
+        let sentry_url =
+            std::env::var("SENTRY_URL").unwrap_or_else(|_| "https://sentry.io".to_string());
         let sentry_token = std::env::var("SENTRY_API_TOKEN").unwrap_or_default();
-        let sentry_project = std::env::var("SENTRY_PROJECT").unwrap_or_else(|_| "dg-factory".to_string());
-        let gitlab_url = std::env::var("GITLAB_URL").unwrap_or_else(|_| "https://gitlab.com".to_string());
+        let sentry_project =
+            std::env::var("SENTRY_PROJECT").unwrap_or_else(|_| "dg-factory".to_string());
+        let gitlab_url =
+            std::env::var("GITLAB_URL").unwrap_or_else(|_| "https://gitlab.com".to_string());
         let gitlab_token = std::env::var("GITLAB_API_TOKEN").unwrap_or_default();
-        let gitlab_project = std::env::var("GITLAB_PROJECT").unwrap_or_else(|_| "lgcorzo-lab/autonomous_factory".to_string());
+        let gitlab_project = std::env::var("GITLAB_PROJECT")
+            .unwrap_or_else(|_| "lgcorzo-lab/autonomous_factory".to_string());
 
         let qa_agent = crate::agents::QAObserverAgent::new(
             sentry_url,

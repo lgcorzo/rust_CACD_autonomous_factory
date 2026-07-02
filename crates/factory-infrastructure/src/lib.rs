@@ -6,13 +6,13 @@ pub trait S3Storage {
 }
 
 pub mod aethalgard;
+pub mod gitlab;
 pub mod jira;
 pub mod kafka;
 pub mod mcp_client;
 pub mod r2r;
 pub mod s3;
 pub mod sentry;
-pub mod gitlab;
 pub mod ziti;
 
 #[cfg(any(test, feature = "test-utils"))]
@@ -40,8 +40,8 @@ pub use ziti::{OpenZitiIdentity, ZitiIdentity};
 
 #[cfg(any(test, feature = "test-utils"))]
 pub use sentry::MockSentryClient;
-pub use sentry::{HttpSentryClient, SentryClient, CrashEvent};
+pub use sentry::{CrashEvent, HttpSentryClient, SentryClient};
 
 #[cfg(any(test, feature = "test-utils"))]
 pub use gitlab::MockGitlabClient;
-pub use gitlab::{HttpGitlabClient, GitlabClient, GitlabIssue};
+pub use gitlab::{GitlabClient, GitlabIssue, HttpGitlabClient};

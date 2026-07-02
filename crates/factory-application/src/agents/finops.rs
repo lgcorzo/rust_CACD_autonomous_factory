@@ -1,9 +1,9 @@
 use crate::Agent;
 use async_trait::async_trait;
+use factory_core::FinOpsTag;
 use reqwest::Client;
 use serde_json::Value;
 use std::time::Duration;
-use factory_core::FinOpsTag;
 
 pub struct FinOpsAgent {
     litellm_base_url: String,
@@ -15,8 +15,10 @@ pub struct FinOpsAgent {
 impl Default for FinOpsAgent {
     fn default() -> Self {
         let tag = FinOpsTag {
-            cost_center: std::env::var("FINOPS_COST_CENTER").unwrap_or_else(|_| "engineering".to_string()),
-            project_code: std::env::var("FINOPS_PROJECT_CODE").unwrap_or_else(|_| "dg-factory".to_string()),
+            cost_center: std::env::var("FINOPS_COST_CENTER")
+                .unwrap_or_else(|_| "engineering".to_string()),
+            project_code: std::env::var("FINOPS_PROJECT_CODE")
+                .unwrap_or_else(|_| "dg-factory".to_string()),
             owner: std::env::var("FINOPS_OWNER").unwrap_or_else(|_| "ai-agent".to_string()),
         };
         Self::new(
@@ -43,17 +45,25 @@ impl FinOpsAgent {
             return Ok(());
         }
 
-        let url = format!("{}/v1/spend/logs", self.litellm_base_url.trim_end_matches('/'));
-        
+        let url = format!(
+            "{}/v1/spend/logs",
+            self.litellm_base_url.trim_end_matches('/')
+        );
+
         loop {
-            tracing::info!("FinOpsAgent: Checking spend for project {}", self.tag.project_code);
-            
-            let response = self.client.get(&url)
+            tracing::info!(
+                "FinOpsAgent: Checking spend for project {}",
+                self.tag.project_code
+            );
+
+            let response = self
+                .client
+                .get(&url)
                 .bearer_auth(&self.api_key)
                 .query(&[("project_code", &self.tag.project_code)])
                 .send()
                 .await;
-                
+
             match response {
                 Ok(resp) => {
                     if let Ok(json) = resp.json::<Value>().await {
@@ -65,15 +75,20 @@ impl FinOpsAgent {
                                 tracing::info!("Current spend: ${}. Budget is healthy.", spend);
                             }
                         } else {
-                            tracing::warn!("FinOpsAgent: Could not parse total_spend from LiteLLM response.");
+                            tracing::warn!(
+                                "FinOpsAgent: Could not parse total_spend from LiteLLM response."
+                            );
                         }
                     }
-                },
+                }
                 Err(e) => {
-                    tracing::error!("FinOpsAgent: Failed to fetch spend logs from LiteLLM: {}", e);
+                    tracing::error!(
+                        "FinOpsAgent: Failed to fetch spend logs from LiteLLM: {}",
+                        e
+                    );
                 }
             }
-            
+
             tokio::time::sleep(Duration::from_secs(60)).await;
         }
     }
