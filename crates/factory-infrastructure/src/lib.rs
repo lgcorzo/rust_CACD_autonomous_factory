@@ -12,7 +12,9 @@ pub mod kafka;
 pub mod mcp_client;
 pub mod r2r;
 pub mod s3;
+pub mod security_validator;
 pub mod sentry;
+pub mod vault;
 pub mod ziti;
 
 #[cfg(any(test, feature = "test-utils"))]
