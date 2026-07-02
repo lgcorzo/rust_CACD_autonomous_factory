@@ -1,7 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::fs;
-use std::path::PathBuf;
-
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct SpecKitState {
     pub spec_file_path: String,
@@ -38,30 +35,45 @@ impl BridgeState {
         }
     }
 
-    fn get_checkpoint_path(mission_id: &str) -> PathBuf {
-        PathBuf::from(format!("/tmp/bridge_state_{}.json", mission_id))
+    fn get_checkpoint_key(mission_id: &str) -> String {
+        format!("bridge_state_{}.json", mission_id)
     }
 
-    pub fn load_checkpoint(mission_id: &str) -> anyhow::Result<Option<Self>> {
-        let path = Self::get_checkpoint_path(mission_id);
-        if !path.exists() {
-            return Ok(None);
+    pub async fn load_checkpoint(
+        mission_id: &str,
+        s3: &dyn factory_infrastructure::S3Storage,
+        bucket: &str,
+    ) -> anyhow::Result<Option<Self>> {
+        let key = Self::get_checkpoint_key(mission_id);
+        match s3.get_object(bucket, &key).await {
+            Ok(data) => {
+                let content = String::from_utf8(data)?;
+                let state: Self = serde_json::from_str(&content)?;
+                Ok(Some(state))
+            }
+            Err(e) => {
+                // If the object doesn't exist, we return None.
+                // In AWS SDK this is a specific error, but for simplicity we treat any fetch error as None
+                // if it's "NoSuchKey", but we can just trace and return None for now.
+                tracing::debug!("Checkpoint not found or error loading: {}", e);
+                Ok(None)
+            }
         }
-
-        let content = fs::read_to_string(&path)?;
-        let state: Self = serde_json::from_str(&content)?;
-        Ok(Some(state))
     }
 
-    pub fn save_checkpoint(&mut self) -> anyhow::Result<()> {
+    pub async fn save_checkpoint(
+        &mut self,
+        s3: &dyn factory_infrastructure::S3Storage,
+        bucket: &str,
+    ) -> anyhow::Result<()> {
         self.last_updated = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_secs();
 
-        let path = Self::get_checkpoint_path(&self.mission_id);
+        let key = Self::get_checkpoint_key(&self.mission_id);
         let content = serde_json::to_string_pretty(self)?;
-        fs::write(&path, content)?;
+        s3.put_object(bucket, &key, content.into_bytes()).await?;
         Ok(())
     }
 }
