@@ -94,7 +94,7 @@ impl DocumentationAgent {
         let r2r_text = serde_json::to_string(&context).unwrap_or_default();
 
         let mut wiki_content = String::new();
-        if let Ok(entries) = std::fs::read_dir("Wiki") {
+        if let Ok(entries) = std::fs::read_dir("wiki") {
             for entry in entries.flatten() {
                 if entry.path().extension().and_then(|s| s.to_str()) == Some("md") {
                     if let Ok(content) = std::fs::read_to_string(entry.path()) {
