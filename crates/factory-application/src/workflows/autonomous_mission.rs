@@ -95,7 +95,16 @@ pub fn create_mission_workflow(
     ));
     let kafka_client: Arc<dyn KafkaClient> = if kafka_brokers == "mock" || kafka_brokers.is_empty()
     {
-        Arc::new(factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
+        #[cfg(not(feature = "production"))]
+        {
+            Arc::new(factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
+        }
+        #[cfg(feature = "production")]
+        {
+            panic!(
+                "Mock Kafka client is not available in production builds. Please provide real brokers."
+            );
+        }
     } else {
         Arc::new(factory_infrastructure::RdKafkaClient::new(&kafka_brokers).unwrap())
     };

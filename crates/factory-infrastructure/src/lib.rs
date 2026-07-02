@@ -25,7 +25,11 @@ pub use aethalgard::{AethalgardClient, HttpAethalgardClient};
 pub use jira::MockJiraClient;
 pub use jira::{HttpJiraClient, JiraClient};
 
+#[cfg(not(feature = "production"))]
 pub use kafka::{KafkaClient, RdKafkaClient, SimpleMockKafkaClient};
+
+#[cfg(feature = "production")]
+pub use kafka::{KafkaClient, RdKafkaClient};
 
 #[cfg(any(test, feature = "test-utils"))]
 pub use mcp_client::MockMcpClient;
