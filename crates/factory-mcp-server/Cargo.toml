@@ -32,4 +32,4 @@ lazy_static = "1.5.0"
 
 [features]
 default = []
-firecracker = []
+production = ["factory-infrastructure/production"]

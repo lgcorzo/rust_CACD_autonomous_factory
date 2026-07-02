@@ -5,6 +5,7 @@ edition = "2021"
 
 [features]
 test-utils = []
+production = []
 
 [dependencies]
 factory-core = { path = "../factory-core" }

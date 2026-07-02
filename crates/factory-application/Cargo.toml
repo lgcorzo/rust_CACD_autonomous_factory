@@ -3,6 +3,9 @@ name = "factory-application"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+production = ["factory-infrastructure/production"]
+
 [dependencies]
 factory-core = { path = "../factory-core" }
 factory-infrastructure = { path = "../factory-infrastructure" }

@@ -50,14 +50,17 @@ impl KafkaClient for RdKafkaClient {
     }
 }
 
+#[cfg(not(feature = "production"))]
 pub struct SimpleMockKafkaClient;
 
+#[cfg(not(feature = "production"))]
 impl SimpleMockKafkaClient {
     pub fn new(_brokers: &str) -> anyhow::Result<Self> {
         Ok(SimpleMockKafkaClient)
     }
 }
 
+#[cfg(not(feature = "production"))]
 #[async_trait]
 impl KafkaClient for SimpleMockKafkaClient {
     async fn publish(&self, topic: &str, key: &str, payload: &[u8]) -> anyhow::Result<()> {
