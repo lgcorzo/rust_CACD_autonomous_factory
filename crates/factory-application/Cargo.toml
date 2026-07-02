@@ -17,6 +17,7 @@ futures = "0.3"
 hatchet-sdk = { workspace = true }
 mockall = { workspace = true }
 prost = { workspace = true }
+reqwest = { version = "0.12", features = ["json"] }
 
 tokio-test = { workspace = true }
 

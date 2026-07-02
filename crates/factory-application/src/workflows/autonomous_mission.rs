@@ -1,4 +1,4 @@
-use crate::agents::{AuditorAgent, RustantAgent, ZeroClawAgent};
+use crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent};
 use factory_infrastructure::{
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
     aethalgard::{AethalgardClient, HttpAethalgardClient},
@@ -52,6 +52,13 @@ pub fn create_mission_workflow(
     kafka_brokers: String,
     aethalgard_webhook_url: String,
 ) -> Workflow<MissionInput, MissionOutput> {
+    tokio::spawn(async move {
+        let finops_agent = FinOpsAgent::default();
+        if let Err(e) = finops_agent.monitor_budget().await {
+            tracing::error!("FinOpsAgent monitor crashed: {}", e);
+        }
+    });
+
     let mcp_client: Arc<dyn McpClient> = Arc::new(McpHttpClient::new(mcp_url));
     let r2r_client: Arc<dyn R2rClient> = Arc::new(HttpR2rClient::new(
         r2r_url,
