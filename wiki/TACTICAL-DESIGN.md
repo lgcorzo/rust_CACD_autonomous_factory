@@ -8,9 +8,9 @@ This document details the **Tactical Design** of the autonomous factory, mapping
 
 | Crate | Layer | Responsibility |
 | :--- | :--- | :--- |
-| `factory-core` | **Domain** | Pure logic: `Mission`, `Task`, `MissionStatus`, `TaskStatus`, `SecurityValidator` trait, `FactoryError` |
+| `factory-core` | **Domain** | Pure logic: `Mission`, `Task`, `MissionStatus`, `TaskStatus`, `SecurityValidator` trait, `SecurityBounds` trait, `FactoryError` |
 | `factory-application` | **Application** | Hatchet Workflows (6-phase DAG), Agent Logic (Rustant, ZeroClaw) |
-| `factory-infrastructure` | **Infrastructure** | Clients: Kafka, R2R GraphRAG, S3, Jira, OpenZiti, MCP |
+| `factory-infrastructure` | **Infrastructure** | Clients: Kafka, R2R GraphRAG, S3, Jira, OpenZiti, MCP, Vault |
 | `factory-mcp-server` | **Interface** | Axum-based MCP Server with SSE/HTTP transport, 8 tools |
 | `factory-cli` | **Interface** | Hatchet worker CLI entry point |
 
@@ -94,6 +94,7 @@ Targets { agent_config, sandbox_config, expected_quality }
 SHAPValues { values (HashMap) }
 FeatureImportances { features (Vec) }
 SecurityValidator: validate_signature() / audit_content() -> AuditResult
+SecurityBounds: validate_token() / issue_jit_token() -> JitToken
 ```
 
 ---
@@ -138,4 +139,4 @@ Communication follows the JSON-RPC 2.0 standard over SSE/HTTP, defined in `crate
 
 ---
 
-*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*

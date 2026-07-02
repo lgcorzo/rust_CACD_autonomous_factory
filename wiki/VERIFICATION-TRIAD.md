@@ -36,7 +36,7 @@ We ensure mission reliability via **Sandbox Execution**.
 Automated linting ensures the code remains maintainable and true to the **Strategic Design**.
 
 - **Standard Linters**: `clippy` for Rust. Enforced in CI pipeline (`cargo clippy --workspace -- -D warnings`).
-- **Domain Compliance**: Rustant validates generated code against core domain models and `SecurityValidator` constraints.
+- **Domain Compliance**: Rustant validates generated code against core domain models, `SecurityValidator`, and `SecurityBounds` constraints.
 
 ---
 
@@ -46,6 +46,7 @@ The final gate before delivery.
 
 - **Automated Scanning**:
   - `security_review` MCP tool: LLM-as-a-Judge analysis of code diffs
+  - `SecurityValidator` cryptographic verification: Using `Ed25519Validator` to strictly check Ed25519 signatures
 - **Dependency Checking**: `cargo deny` / `cargo audit` (planned)
 - **Sandbox Isolation**: Code executes in isolated Firecracker micro-VMs
 
@@ -85,4 +86,4 @@ Based on `code-review-graph` analysis, the test structure across the codebase in
 
 ---
 
-*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*

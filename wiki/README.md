@@ -62,10 +62,10 @@ Based on `code-review-graph` analysis of the codebase:
 | Community | Crate | Nodes | Purpose |
 |-----------|-------|-------|---------|
 | `tools-tool` | factory-mcp-server | 68 | MCP tools (plan_mission, execute_code, retrieve_context, etc.) |
-| `src-client` | factory-infrastructure | 42 | Service clients (Jira, R2R, Kafka, MCP, S3, Ziti) |
+| `src-client` | factory-infrastructure | 42 | Service clients (Jira, R2R, Kafka, MCP, S3, Ziti, Vault) |
 | `agents-agent` | factory-application | 15 | Rustant (Planner) & ZeroClaw (Executor) agents |
 | `workflows-mission` | factory-application | 6 | Hatchet workflows (mission, task orchestration) |
-| `src-mission` | factory-core | 12 | Domain models (Mission, Task, Metadata, SecurityValidator) |
+| `src-mission` | factory-core | 12 | Domain models (Mission, Task, Metadata, SecurityValidator, SecurityBounds) |
 | `src-tool` | factory-mcp-server | 33 | Sandbox, protocol, protocol handlers |
 | `skills-context` | .agents/skills | 11 | Superpowers skill definitions |
 | `src-cli` | factory-cli | 3 | CLI entry point |
@@ -81,4 +81,4 @@ Based on `code-review-graph` analysis of the codebase:
 
 ---
 
-*Last updated: 2026-06-23 — Generated from CRG analysis + source verification*
+*Last updated: 2026-07-02 — Generated from CRG analysis + source verification*
