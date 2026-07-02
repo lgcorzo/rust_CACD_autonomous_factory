@@ -13,7 +13,12 @@ pub struct GitlabIssue {
 #[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait]
 pub trait GitlabClient: Send + Sync {
-    async fn create_issue(&self, project_id: &str, title: &str, description: &str) -> anyhow::Result<GitlabIssue>;
+    async fn create_issue(
+        &self,
+        project_id: &str,
+        title: &str,
+        description: &str,
+    ) -> anyhow::Result<GitlabIssue>;
 }
 
 pub struct HttpGitlabClient {
@@ -34,11 +39,20 @@ impl HttpGitlabClient {
 
 #[async_trait]
 impl GitlabClient for HttpGitlabClient {
-    async fn create_issue(&self, project_id: &str, title: &str, description: &str) -> anyhow::Result<GitlabIssue> {
+    async fn create_issue(
+        &self,
+        project_id: &str,
+        title: &str,
+        description: &str,
+    ) -> anyhow::Result<GitlabIssue> {
         // Project ID in GitLab API can be URL-encoded path like `group%2Fproject` or numeric ID
         let encoded_project_id = urlencoding::encode(project_id);
-        let create_url = format!("{}/api/v4/projects/{}/issues", self.url.trim_end_matches('/'), encoded_project_id);
-        
+        let create_url = format!(
+            "{}/api/v4/projects/{}/issues",
+            self.url.trim_end_matches('/'),
+            encoded_project_id
+        );
+
         let payload = serde_json::json!({
             "title": title,
             "description": description
@@ -67,7 +81,7 @@ impl GitlabClient for HttpGitlabClient {
 mod tests {
     use super::*;
     use serde_json::json;
-    use wiremock::matchers::{method, path, header, body_json};
+    use wiremock::matchers::{body_json, header, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
     #[tokio::test]
@@ -96,7 +110,14 @@ mod tests {
             .mount(&mock_server)
             .await;
 
-        let result = client.create_issue("my-org/my-project", "Crash: ZeroDivisionError", "Details here").await.unwrap();
+        let result = client
+            .create_issue(
+                "my-org/my-project",
+                "Crash: ZeroDivisionError",
+                "Details here",
+            )
+            .await
+            .unwrap();
         assert_eq!(result.id, 12345);
         assert_eq!(result.iid, 42);
         assert_eq!(result.title, "Crash: ZeroDivisionError");
@@ -112,7 +133,9 @@ mod tests {
             .mount(&mock_server)
             .await;
 
-        let result = client.create_issue("my-org/my-project", "Crash", "Details").await;
+        let result = client
+            .create_issue("my-org/my-project", "Crash", "Details")
+            .await;
         assert!(result.is_err());
         let err_msg = result.unwrap_err().to_string();
         assert!(err_msg.contains("401 Unauthorized"));
