@@ -25,7 +25,7 @@ spec:
               name: opencode-secrets
               key: LITELLM_API_KEY
         - name: LITELLM_BASE_URL
-          value: "http://litellm.factory.svc.cluster.local:4000/v1"
+          value: "http://litellm.llm-apps.svc.cluster.local/v1"
         volumeMounts:
         - name: config-volume
           mountPath: /etc/opencode
@@ -50,7 +50,7 @@ data:
       },
       "modelProviders": {
         "litellm": {
-          "baseURL": "http://litellm.factory.svc.cluster.local:4000/v1"
+          "baseURL": "http://litellm.llm-apps.svc.cluster.local/v1"
         }
       }
     }
