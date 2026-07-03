@@ -1,25 +1,25 @@
 # Navigation
 
-## [Home](Home.md)
+## [Home](Home)
 
 ### 🧭 Strategic Context
-* [0. Glossary](GLOSSARY.md)
-* [1. Business Context](BUSINESS-CONTEXT.md)
+* [0. Glossary](GLOSSARY)
+* [1. Business Context](BUSINESS-CONTEXT)
 
 ### 🏗 Architecture
-* [2. Strategic Design](STRATEGIC-DESIGN.md)
-* [3. Tactical Design](TACTICAL-DESIGN.md)
+* [2. Strategic Design](STRATEGIC-DESIGN)
+* [3. Tactical Design](TACTICAL-DESIGN)
 
 ### 🤖 Workforce
-* [4. Agent Specs](AGENT-SPECIFICATIONS.md)
-* [5. Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md)
+* [4. Agent Specs](AGENT-SPECIFICATIONS)
+* [5. Experiment Lifecycle](EXPERIMENT-LIFECYCLE)
 
 ### 🔌 Operations
-* [6. Adapters](INFRASTRUCTURE-ADAPTERS.md)
-* [7. Verification Triad](VERIFICATION-TRIAD.md)
-* [8. Production Ops](PRODUCTION-OPERATIONS.md)
+* [6. Adapters](INFRASTRUCTURE-ADAPTERS)
+* [7. Verification Triad](VERIFICATION-TRIAD)
+* [8. Production Ops](PRODUCTION-OPERATIONS)
 
 ### 📋 Project
-* [Mission History](EXPERIMENT-LOGS.md)
-* [README](README.md)
-* [Test Plan Report](Test_Plan_Report.md)
+* [Mission History](EXPERIMENT-LOGS)
+* [README](README)
+* [Test Plan Report](Test_Plan_Report)
