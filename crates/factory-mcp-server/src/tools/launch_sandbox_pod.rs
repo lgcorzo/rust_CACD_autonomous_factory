@@ -65,17 +65,52 @@ impl Tool for LaunchSandboxPodTool {
                 .collect::<String>()
         );
 
-        let template = include_str!("sandbox-job.yaml");
-        let mut job_yaml = template.replace("{{JOB_NAME}}", &job_name);
-
         let cmd = match language {
             "python" => format!("python3 -c '{}'", code.replace("'", "'\\''")),
             "rust" => format!("rustc -e '{}'", code.replace("'", "'\\''")),
             _ => return Err(anyhow::anyhow!("Unsupported language")),
         };
-        job_yaml = job_yaml.replace("{{COMMAND}}", &cmd);
 
-        let job: Job = serde_yaml::from_str(&job_yaml)?;
+        let job_json = serde_json::json!({
+            "apiVersion": "batch/v1",
+            "kind": "Job",
+            "metadata": {
+                "name": job_name,
+                "namespace": "development"
+            },
+            "spec": {
+                "backoffLimit": 0,
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "job-name": job_name
+                        }
+                    },
+                    "spec": {
+                        "runtimeClassName": "gvisor",
+                        "restartPolicy": "Never",
+                        "containers": [{
+                            "name": "sandbox",
+                            "image": "python:3.11-slim",
+                            "command": ["/bin/sh", "-c"],
+                            "args": [cmd],
+                            "resources": {
+                                "limits": {
+                                    "memory": "30Mi",
+                                    "cpu": "100m"
+                                },
+                                "requests": {
+                                    "memory": "10Mi",
+                                    "cpu": "50m"
+                                }
+                            }
+                        }]
+                    }
+                }
+            }
+        });
+
+        let job: Job = serde_json::from_value(job_json)?;
 
         // Create Job
         jobs.create(&PostParams::default(), &job).await?;
