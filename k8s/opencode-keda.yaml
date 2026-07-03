@@ -13,7 +13,7 @@ spec:
   triggers:
     - type: kafka
       metadata:
-        bootstrapServers: my-kafka.confluent.svc:9092
+        bootstrapServers: my-kafka-cluster.confluent.svc.cluster.local:9092
         topic: mission-input
         consumerGroup: opencode-workers
         lagThreshold: "1"

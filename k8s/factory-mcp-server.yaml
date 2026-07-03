@@ -29,9 +29,9 @@ spec:
               name: opencode-secrets
               key: LITELLM_API_KEY
         - name: LITELLM_BASE_URL
-          value: "http://litellm.factory.svc.cluster.local:4000/v1"
+          value: "http://litellm.llm-apps.svc.cluster.local/v1"
         - name: R2R_BASE_URL
-          value: "http://r2r.factory.svc.cluster.local:8000"
+          value: "http://r2r.llm-apps.svc.cluster.local:7272"
         resources:
           limits:
             cpu: "500m"
