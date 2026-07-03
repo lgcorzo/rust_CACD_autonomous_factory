@@ -8,13 +8,13 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 
 | Section | Description | Key Topics |
 | :--- | :--- | :--- |
-| [**Business Understanding**](BUSINESS-CONTEXT.md) | The "Why" and "What" | ROI, KPIs, Workforce, Mission Lifecycle. |
-| [**Architecture**](STRATEGIC-DESIGN.md) | Technical Blueprint | DDD Layers, ADRs, Bounded Contexts, Zero Trust. |
-| [**Execution Flows**](EXPERIMENT-LIFECYCLE.md) | How it Works | 6-Phase DAG, Agent Orchestration, Mission Lifecycle. |
-| [**Agent Specifications**](AGENT-SPECIFICATIONS.md) | Specialized Workers | **Rustant** (Planner), **ZeroClaw** (Executor), **DevOps**, **Documentation**. |
-| [**Testing Strategy**](VERIFICATION-TRIAD.md) | Quality Assurance | Logical, Architectural, Security Validation. |
-| [**Integrations**](INFRASTRUCTURE-ADAPTERS.md) | External Connectivity | **Kafka**, **R2R GraphRAG**, **OpenZiti**, **Jira**, **S3**, **Sentry**. |
-| [**Deployment Guide**](PRODUCTION-OPERATIONS.md) | Operations & Scaling | GitOps, K8s Manifests, KEDA, Sealed Secrets. |
+| [**Business Understanding**](BUSINESS-CONTEXT) | The "Why" and "What" | ROI, KPIs, Workforce, Mission Lifecycle. |
+| [**Architecture**](STRATEGIC-DESIGN) | Technical Blueprint | DDD Layers, ADRs, Bounded Contexts, Zero Trust. |
+| [**Execution Flows**](EXPERIMENT-LIFECYCLE) | How it Works | 6-Phase DAG, Agent Orchestration, Mission Lifecycle. |
+| [**Agent Specifications**](AGENT-SPECIFICATIONS) | Specialized Workers | **Rustant** (Planner), **ZeroClaw** (Executor), **DevOps**, **Documentation**. |
+| [**Testing Strategy**](VERIFICATION-TRIAD) | Quality Assurance | Logical, Architectural, Security Validation. |
+| [**Integrations**](INFRASTRUCTURE-ADAPTERS) | External Connectivity | **Kafka**, **R2R GraphRAG**, **OpenZiti**, **Jira**, **S3**, **Sentry**. |
+| [**Deployment Guide**](PRODUCTION-OPERATIONS) | Operations & Scaling | GitOps, K8s Manifests, KEDA, Sealed Secrets. |
 
 ---
 

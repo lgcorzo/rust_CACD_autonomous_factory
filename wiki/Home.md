@@ -9,25 +9,25 @@ The system orchestrates a specialized autonomous workforce — **Rustant** (Plan
 ## Project Navigation
 
 ### 0. Context & Language
-- **[GLOSSARY](GLOSSARY.md)**: The Ubiquitous Language defining our domain.
-- **[BUSINESS-CONTEXT](BUSINESS-CONTEXT.md)**: Problem space, ROI, and Domain Vision.
+- **[GLOSSARY](GLOSSARY)**: The Ubiquitous Language defining our domain.
+- **[BUSINESS-CONTEXT](BUSINESS-CONTEXT)**: Problem space, ROI, and Domain Vision.
 
 ### 1. Architecture & Design
-- **[STRATEGIC-DESIGN](STRATEGIC-DESIGN.md)**: Bounded Contexts, ADRs, and High-Level Architecture.
-- **[TACTICAL-DESIGN](TACTICAL-DESIGN.md)**: Crate mapping, MCP Tool Inventory, DAG Phases.
+- **[STRATEGIC-DESIGN](STRATEGIC-DESIGN)**: Bounded Contexts, ADRs, and High-Level Architecture.
+- **[TACTICAL-DESIGN](TACTICAL-DESIGN)**: Crate mapping, MCP Tool Inventory, DAG Phases.
 
 ### 2. Autonomous Workforce
-- **[AGENT-SPECIFICATIONS](AGENT-SPECIFICATIONS.md)**: Roles, Tools, and Agent Interface.
-- **[EXPERIMENT-LIFECYCLE](EXPERIMENT-LIFECYCLE.md)**: 6-Phase DAG execution, R2R context retrieval.
+- **[AGENT-SPECIFICATIONS](AGENT-SPECIFICATIONS)**: Roles, Tools, and Agent Interface.
+- **[EXPERIMENT-LIFECYCLE](EXPERIMENT-LIFECYCLE)**: 6-Phase DAG execution, R2R context retrieval.
 
 ### 3. Operations & Reliability
-- **[INFRASTRUCTURE-ADAPTERS](INFRASTRUCTURE-ADAPTERS.md)**: Kafka, R2R, OpenZiti, Sandbox, Jira adapters.
-- **[VERIFICATION-TRIAD](VERIFICATION-TRIAD.md)**: Logic, Architecture, and Security validation.
-- **[PRODUCTION-OPERATIONS](PRODUCTION-OPERATIONS.md)**: K8s Deployments, KEDA Scaling, Secrets.
+- **[INFRASTRUCTURE-ADAPTERS](INFRASTRUCTURE-ADAPTERS)**: Kafka, R2R, OpenZiti, Sandbox, Jira adapters.
+- **[VERIFICATION-TRIAD](VERIFICATION-TRIAD)**: Logic, Architecture, and Security validation.
+- **[PRODUCTION-OPERATIONS](PRODUCTION-OPERATIONS)**: K8s Deployments, KEDA Scaling, Secrets.
 
 ### 4. History & Governance
-- **[EXPERIMENT-LOGS](EXPERIMENT-LOGS.md)**: Historical audit of missions and performance.
-- **[Test Plan Report](Test_Plan_Report.md)**: Documentation verification results.
+- **[EXPERIMENT-LOGS](EXPERIMENT-LOGS)**: Historical audit of missions and performance.
+- **[Test Plan Report](Test_Plan_Report)**: Documentation verification results.
 
 ---
 
