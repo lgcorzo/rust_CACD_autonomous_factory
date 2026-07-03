@@ -65,8 +65,8 @@ impl Tool for LaunchSandboxPodTool {
                 .collect::<String>()
         );
 
-        let yaml_template = include_str!("../../../../k8s/sandbox-job.yaml");
-        let mut job_yaml = yaml_template.replace("{{JOB_NAME}}", &job_name);
+        let template = include_str!("sandbox-job.yaml");
+        let mut job_yaml = template.replace("{{JOB_NAME}}", &job_name);
 
         let cmd = match language {
             "python" => format!("python3 -c '{}'", code.replace("'", "'\\''")),
