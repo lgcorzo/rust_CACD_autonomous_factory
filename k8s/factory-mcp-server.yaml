@@ -17,7 +17,8 @@ spec:
     spec:
       containers:
       - name: mcp-server
-        image: ghcr.io/lgcorzo/factory-mcp-server:latest
+        image: docker.io/lgcorzo/dark-gravity-factory:latest
+        command: ["/usr/local/bin/factory-mcp-server"]
         ports:
         - containerPort: 8100
         env:
