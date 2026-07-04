@@ -40,9 +40,7 @@ jobs:
           echo "Spec artifacts verified."
 
       - name: Verify OSR Threshold
-        run: |
-          chmod +x scripts/verify-osr.sh || true
-          ./scripts/verify-osr.sh
+        run: cargo run -p factory-cli -- verify-osr --r2r-url http://localhost:8000
 
       - name: Install cargo-audit
         run: |
