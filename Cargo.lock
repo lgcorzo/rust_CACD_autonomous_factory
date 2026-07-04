@@ -1645,6 +1645,7 @@ dependencies = [
  "factory-application",
  "factory-infrastructure",
  "hatchet-sdk",
+ "serde_json",
  "tokio",
  "tracing",
  "tracing-subscriber",
