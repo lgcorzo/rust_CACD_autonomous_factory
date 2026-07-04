@@ -54,7 +54,12 @@ pub fn create_develop_task_workflow(
                     });
                 }
 
-                let zeroclaw = ZeroClawAgent::new(mcp_client);
+                let aethalgard_client = factory_infrastructure::HttpAethalgardClient::new(
+                    std::env::var("AETHALGARD_WEBHOOK_URL")
+                        .unwrap_or_else(|_| "http://localhost:8080/webhook".to_string()),
+                );
+                let zeroclaw =
+                    ZeroClawAgent::new(mcp_client, std::sync::Arc::new(aethalgard_client));
 
                 // Use the execute_task method from ZeroClawAgent
                 let result = zeroclaw
