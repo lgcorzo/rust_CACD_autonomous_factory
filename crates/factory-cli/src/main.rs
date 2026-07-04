@@ -27,6 +27,17 @@ enum Commands {
         )]
         aethalgard_webhook_url: String,
     },
+    /// Verify Out-of-Sync Rate (OSR) against R2R knowledge base
+    VerifyOsr {
+        #[arg(long, default_value = "http://localhost:8000")]
+        r2r_url: String,
+
+        #[arg(long, default_value = "admin")]
+        r2r_user: String,
+
+        #[arg(long, default_value = "admin")]
+        r2r_pwd: String,
+    },
 }
 
 #[tokio::main]
@@ -69,6 +80,40 @@ async fn main() -> anyhow::Result<()> {
             worker = hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &task_wf);
 
             worker.start().await?;
+        }
+        Commands::VerifyOsr {
+            r2r_url,
+            r2r_user,
+            r2r_pwd,
+        } => {
+            tracing::info!("Starting OSR verification against R2R...");
+            use factory_infrastructure::r2r::R2rClient;
+            let r2r_client =
+                factory_infrastructure::r2r::HttpR2rClient::new(r2r_url, r2r_user, r2r_pwd);
+
+            let context = r2r_client.search("documentation sync state").await?;
+            let r2r_text = serde_json::to_string(&context).unwrap_or_default();
+
+            let mut wiki_content = String::new();
+            if let Ok(entries) = std::fs::read_dir("wiki") {
+                for entry in entries.flatten() {
+                    if entry.path().extension().and_then(|s| s.to_str()) == Some("md") {
+                        if let Ok(content) = std::fs::read_to_string(entry.path()) {
+                            wiki_content.push_str(&content);
+                        }
+                    }
+                }
+            }
+
+            let osr = factory_application::utils::osr::calculate_osr(&wiki_content, &r2r_text);
+
+            if osr <= 0.05 {
+                tracing::info!("OSR validation passed with {}%", osr * 100.0);
+                std::process::exit(0);
+            } else {
+                tracing::error!("OSR validation failed with {}%", osr * 100.0);
+                std::process::exit(1);
+            }
         }
     }
 
