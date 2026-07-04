@@ -1,16 +1,23 @@
 use crate::Agent;
 use async_trait::async_trait;
-use factory_infrastructure::McpClient;
+use factory_infrastructure::{AethalgardClient, McpClient};
 use serde_json::{Value, json};
 use std::sync::Arc;
 
 pub struct ZeroClawAgent {
     mcp_client: Arc<dyn McpClient>,
+    aethalgard_client: Arc<dyn AethalgardClient>,
 }
 
 impl ZeroClawAgent {
-    pub fn new(mcp_client: Arc<dyn McpClient>) -> Self {
-        Self { mcp_client }
+    pub fn new(
+        mcp_client: Arc<dyn McpClient>,
+        aethalgard_client: Arc<dyn AethalgardClient>,
+    ) -> Self {
+        Self {
+            mcp_client,
+            aethalgard_client,
+        }
     }
 
     pub async fn execute_task(
@@ -80,24 +87,63 @@ impl ZeroClawAgent {
         mission_id: &str,
         test_command: &str,
     ) -> anyhow::Result<Value> {
-        tracing::info!(
-            "[ZeroClawAgent:{}] Validating mission with tests: {}",
-            mission_id,
-            test_command
-        );
+        let max_retries = 3;
+        let mut attempt = 0;
 
-        let result = self
-            .mcp_client
-            .call_tool_json(
-                "run_tests",
-                json!({
-                    "mission_id": mission_id,
-                    "command": test_command
-                }),
-            )
-            .await?;
+        loop {
+            attempt += 1;
+            tracing::info!(
+                "[ZeroClawAgent:{}] Validating mission with tests: {} (Attempt {}/{})",
+                mission_id,
+                test_command,
+                attempt,
+                max_retries
+            );
 
-        Ok(result)
+            let result = self
+                .mcp_client
+                .call_tool_json(
+                    "run_tests",
+                    json!({
+                        "mission_id": mission_id,
+                        "command": test_command
+                    }),
+                )
+                .await;
+
+            match result {
+                Ok(val) => {
+                    if val["is_error"].as_bool().unwrap_or(false) {
+                        tracing::warn!("Validation failed on attempt {}", attempt);
+                    } else {
+                        return Ok(val);
+                    }
+                }
+                Err(e) => {
+                    tracing::warn!("Validation execution error on attempt {}: {}", attempt, e);
+                }
+            }
+
+            if attempt >= max_retries {
+                tracing::error!(
+                    "[ZeroClawAgent:{}] Validation failed after {} attempts. Triggering Jules remediation.",
+                    mission_id,
+                    max_retries
+                );
+
+                if let Err(aeth_err) = self
+                    .aethalgard_client
+                    .notify_remediation(mission_id, "Validation failed after 3 attempts")
+                    .await
+                {
+                    tracing::error!("Failed to notify Aethalgard: {}", aeth_err);
+                }
+
+                anyhow::bail!("Validation failed after 3 attempts. Remediation requested.");
+            }
+
+            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+        }
     }
 
     pub async fn introspect_k8s(&self, mission_id: &str) -> anyhow::Result<Value> {
