@@ -1,46 +1,39 @@
 use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
+use async_openai::config::OpenAIConfig;
+use async_openai::types::{
+    ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
+    CreateChatCompletionRequestArgs,
+};
+use async_openai::Client;
 use async_trait::async_trait;
-use regex::Regex;
 use serde_json::{json, Value};
-use std::sync::LazyLock;
+use std::env;
 
-pub struct SecurityReviewTool;
-
-struct SecurityRule {
-    rule: &'static str,
-    re: Regex,
-    severity: &'static str,
-    description: &'static str,
+pub struct SecurityReviewTool {
+    client: Client<OpenAIConfig>,
 }
 
-static SECURITY_RULES: LazyLock<Vec<SecurityRule>> = LazyLock::new(|| {
-    vec![
-        SecurityRule {
-            rule: "A03:Injection - SQL",
-            re: Regex::new(
-                r#"(?i)(?:execute|cursor\.execute|raw\s*\()(?s:.*?)(?:%s|format\(|f["']|\+\s*[a-zA-Z_]|\,\s*[a-zA-Z_])"#,
-            )
-            .unwrap(),
-            severity: "high",
-            description: "Potential SQL injection.",
-        },
-        SecurityRule {
-            rule: "A03:Injection - Command",
-            re: Regex::new(r#"(?i)(?:os\.system|subprocess\.call|subprocess\.Popen)\s*\(\s*[f"']"#)
-                .unwrap(),
-            severity: "high",
-            description: "Potential command injection.",
-        },
-        SecurityRule {
-            rule: "A02:Crypto - Hardcoded Secret",
-            re: Regex::new(r#"(?i)(?:password|secret|api_key|token)\s*=\s*["'][^"']{8,}["']"#)
-                .unwrap(),
-            severity: "medium",
-            description: "Possible hardcoded secret.",
-        },
-    ]
-});
+impl SecurityReviewTool {
+    pub fn new() -> Self {
+        let api_base = env::var("LITELLM_API_BASE")
+            .unwrap_or_else(|_| "http://litellm.llm-apps.svc.cluster.local:4000".to_string());
+
+        let config = OpenAIConfig::new()
+            .with_api_base(api_base)
+            .with_api_key("sk-dummy"); // LiteLLM might not require a real key for internal traffic, but it requires the format
+
+        Self {
+            client: Client::with_config(config),
+        }
+    }
+}
+
+impl Default for SecurityReviewTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[async_trait]
 impl Tool for SecurityReviewTool {
@@ -49,7 +42,7 @@ impl Tool for SecurityReviewTool {
     }
 
     fn description(&self) -> String {
-        "Analyzes code diffs for OWASP Top 10 security vulnerabilities.".to_string()
+        "Analyzes code diffs for security vulnerabilities using LLM SAST and generates a score out of 10.0.".to_string()
     }
 
     fn input_schema(&self) -> Value {
@@ -64,39 +57,60 @@ impl Tool for SecurityReviewTool {
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
         let diff = params["diff"].as_str().unwrap_or("");
-        let findings = self.scan_owasp_patterns(diff);
 
-        let status = if findings.iter().any(|f| f["severity"] == "high") {
-            "rejected"
-        } else {
-            "approved"
+        let system_msg = ChatCompletionRequestSystemMessageArgs::default()
+            .content("You are a strict security auditor. Review the provided code diff for vulnerabilities (e.g. injection, hardcoded secrets, memory safety). You must output ONLY a valid JSON object with two fields: 'score' (a float from 0.0 to 10.0, where 10.0 is perfectly secure, and anything below 8.0 means it has high/medium vulnerabilities), and 'findings' (an array of strings describing the vulnerabilities found).")
+            .build()?;
+
+        let user_msg = ChatCompletionRequestUserMessageArgs::default()
+            .content(format!("Review this code:\n{}", diff))
+            .build()?;
+
+        let request = CreateChatCompletionRequestArgs::default()
+            .model("qwen2.5")
+            .messages([system_msg.into(), user_msg.into()])
+            .build()?;
+
+        let response = match self.client.chat().create(request).await {
+            Ok(resp) => resp,
+            Err(e) => {
+                return Ok(CallToolResult {
+                    content: vec![McpContent::Text {
+                        text: format!("SAST LLM error: {}", e),
+                    }],
+                    is_error: true,
+                });
+            }
         };
+
+        let content = response
+            .choices
+            .first()
+            .and_then(|c| c.message.content.clone())
+            .unwrap_or_else(|| "{}".to_string());
+
+        // Try to parse the JSON response
+        let parsed: Value = serde_json::from_str(&content).unwrap_or_else(|_| {
+            // Fallback if the LLM didn't return perfect JSON
+            json!({
+                "score": 0.0,
+                "findings": ["Failed to parse SAST JSON from LLM"]
+            })
+        });
+
+        let score = parsed["score"].as_f64().unwrap_or(0.0);
+        let status = if score < 8.0 { "rejected" } else { "approved" };
 
         Ok(CallToolResult {
             content: vec![McpContent::Text {
                 text: json!({
                     "status": status,
-                    "findings": findings
+                    "score": score,
+                    "findings": parsed["findings"]
                 })
                 .to_string(),
             }],
             is_error: false,
         })
-    }
-}
-
-impl SecurityReviewTool {
-    fn scan_owasp_patterns(&self, diff: &str) -> Vec<Value> {
-        let mut findings = Vec::new();
-        for rule in SECURITY_RULES.iter() {
-            if rule.re.is_match(diff) {
-                findings.push(json!({
-                    "rule": rule.rule,
-                    "severity": rule.severity,
-                    "description": rule.description
-                }));
-            }
-        }
-        findings
     }
 }

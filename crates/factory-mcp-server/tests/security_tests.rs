@@ -4,8 +4,9 @@ use factory_mcp_server::tools::Tool;
 use serde_json::{json, Value};
 
 #[tokio::test]
+#[ignore = "Requires LiteLLM gateway"]
 async fn test_security_review_sql_injection() {
-    let tool = SecurityReviewTool;
+    let tool = SecurityReviewTool::new();
     let malicious_diff = "+ cursor.execute(\"SELECT * FROM users WHERE id = \" + id)";
     let params = json!({ "diff": malicious_diff });
 
@@ -13,7 +14,7 @@ async fn test_security_review_sql_injection() {
     let McpContent::Text { text } = &result.content[0] else {
         panic!("Expected Text content")
     };
-    let content: Value = serde_json::from_str(text).unwrap();
+    let content: Value = serde_json::from_str(&text).unwrap();
 
     assert_eq!(content["status"], "rejected");
     assert!(content["findings"]
@@ -24,8 +25,9 @@ async fn test_security_review_sql_injection() {
 }
 
 #[tokio::test]
+#[ignore = "Requires LiteLLM gateway"]
 async fn test_security_review_command_injection() {
-    let tool = SecurityReviewTool;
+    let tool = SecurityReviewTool::new();
     let malicious_diff = "+ os.system(f\"rm -rf {path}\")";
     let params = json!({ "diff": malicious_diff });
 
@@ -33,7 +35,7 @@ async fn test_security_review_command_injection() {
     let McpContent::Text { text } = &result.content[0] else {
         panic!("Expected Text content")
     };
-    let content: Value = serde_json::from_str(text).unwrap();
+    let content: Value = serde_json::from_str(&text).unwrap();
 
     assert_eq!(content["status"], "rejected");
     assert!(content["findings"]
@@ -44,8 +46,9 @@ async fn test_security_review_command_injection() {
 }
 
 #[tokio::test]
+#[ignore = "Requires LiteLLM gateway"]
 async fn test_security_review_hardcoded_secret() {
-    let tool = SecurityReviewTool;
+    let tool = SecurityReviewTool::new();
     let malicious_diff = "+ api_key = \"sk-1234567890abcdef1234567890abcdef\"";
     let params = json!({ "diff": malicious_diff });
 
@@ -53,7 +56,7 @@ async fn test_security_review_hardcoded_secret() {
     let McpContent::Text { text } = &result.content[0] else {
         panic!("Expected Text content")
     };
-    let content: Value = serde_json::from_str(text).unwrap();
+    let content: Value = serde_json::from_str(&text).unwrap();
 
     assert!(content["findings"]
         .as_array()
@@ -63,8 +66,9 @@ async fn test_security_review_hardcoded_secret() {
 }
 
 #[tokio::test]
+#[ignore = "Requires LiteLLM gateway"]
 async fn test_security_review_safe_code() {
-    let tool = SecurityReviewTool;
+    let tool = SecurityReviewTool::new();
     let safe_diff = "+ def hello():\n+     print(\"Hello world\")";
     let params = json!({ "diff": safe_diff });
 
@@ -72,7 +76,7 @@ async fn test_security_review_safe_code() {
     let McpContent::Text { text } = &result.content[0] else {
         panic!("Expected Text content")
     };
-    let content: Value = serde_json::from_str(text).unwrap();
+    let content: Value = serde_json::from_str(&text).unwrap();
 
     assert_eq!(content["status"], "approved");
     assert_eq!(content["findings"].as_array().unwrap().len(), 0);
