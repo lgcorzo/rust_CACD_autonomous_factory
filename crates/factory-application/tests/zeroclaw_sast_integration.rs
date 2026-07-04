@@ -32,7 +32,8 @@ async fn test_zeroclaw_blocks_execution_on_sast_failure() {
         .times(0)
         .returning(|_, _| Ok(json!({})));
 
-    let agent = ZeroClawAgent::new(Arc::new(mock_mcp));
+    let mock_aethalgard = factory_infrastructure::MockAethalgardClient::new();
+    let agent = ZeroClawAgent::new(Arc::new(mock_mcp), Arc::new(mock_aethalgard));
 
     let malicious_code = "import os; os.system('rm -rf /')";
     let result = agent.execute_task("mission-123", malicious_code, &[]).await;
@@ -77,7 +78,8 @@ async fn test_zeroclaw_allows_execution_on_sast_pass() {
             }))
         });
 
-    let agent = ZeroClawAgent::new(Arc::new(mock_mcp));
+    let mock_aethalgard = factory_infrastructure::MockAethalgardClient::new();
+    let agent = ZeroClawAgent::new(Arc::new(mock_mcp), Arc::new(mock_aethalgard));
 
     let safe_code = "print('hello world')";
     let result = agent.execute_task("mission-123", safe_code, &[]).await;

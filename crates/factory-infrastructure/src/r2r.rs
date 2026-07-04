@@ -5,7 +5,7 @@ use serde_json::json;
 #[async_trait]
 pub trait R2rClient: Send + Sync {
     async fn search(&self, query: &str) -> anyhow::Result<String>;
-    async fn push_osr_metric(&self, osr_value: f32) -> anyhow::Result<()>;
+    async fn push_osr_metric(&self, metric: &factory_core::OsrMetric) -> anyhow::Result<()>;
 }
 
 pub struct HttpR2rClient {
@@ -132,7 +132,7 @@ impl R2rClient for HttpR2rClient {
         Ok(combined_results)
     }
 
-    async fn push_osr_metric(&self, osr_value: f32) -> anyhow::Result<()> {
+    async fn push_osr_metric(&self, metric: &factory_core::OsrMetric) -> anyhow::Result<()> {
         let token = self.get_token().await?;
         let metrics_url = format!(
             "{}/v3/observability/metrics",
@@ -141,7 +141,10 @@ impl R2rClient for HttpR2rClient {
 
         let payload = json!({
             "metric": "osr",
-            "value": osr_value
+            "mission_id": metric.mission_id,
+            "value": metric.osr_value,
+            "wiki_commit_sha": metric.wiki_commit_sha,
+            "timestamp": metric.timestamp
         });
 
         let metrics_res = self
@@ -164,7 +167,7 @@ impl R2rClient for HttpR2rClient {
             anyhow::bail!("Failed to push OSR metric with status {}", status);
         }
 
-        tracing::info!("Successfully pushed OSR metric: {}", osr_value);
+        tracing::info!("Successfully pushed OSR metric: {}", metric.osr_value);
         Ok(())
     }
 }

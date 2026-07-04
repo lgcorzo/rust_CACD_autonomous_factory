@@ -109,6 +109,9 @@ pub fn create_mission_workflow(
         Arc::new(factory_infrastructure::RdKafkaClient::new(&kafka_brokers).unwrap())
     };
 
+    let aethalgard_client: Arc<dyn AethalgardClient> =
+        Arc::new(HttpAethalgardClient::new(aethalgard_webhook_url));
+
     // 1. Planning Phase (Rustant)
     let mcp_client_clone = mcp_client.clone();
     let r2r_client_clone = r2r_client.clone();
@@ -143,10 +146,12 @@ pub fn create_mission_workflow(
     // 2. Coding Phase (ZeroClaw)
     let mcp_client_clone = mcp_client.clone();
     let kafka_client_clone = kafka_client.clone();
+    let aethalgard_client_clone = aethalgard_client.clone();
     let code_task = hatchet
         .task("zeroclaw-execute", move |input: MissionInput, ctx| {
             let mcp_client = mcp_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
+            let aethalgard_client = aethalgard_client_clone.clone();
             let mission_id = input
                 .mission_id
                 .clone()
@@ -154,13 +159,17 @@ pub fn create_mission_workflow(
 
             Box::pin(async move {
                 let plan: serde_json::Value = ctx.parent_output("rustant-plan").await?;
-                let zeroclaw = ZeroClawAgent::new(mcp_client);
+                let zeroclaw = ZeroClawAgent::new(mcp_client, aethalgard_client);
 
                 kafka_client
                     .publish_thought(&mission_id, "Starting coding phase...", "zeroclaw")
                     .await?;
                 let result = zeroclaw
-                    .execute_task(&mission_id, plan["summary"].as_str().unwrap_or(""), &[])
+                    .execute_task(
+                        &mission_id,
+                        plan["tasks"][0]["description"].as_str().unwrap_or(""),
+                        &[],
+                    )
                     .await?;
                 kafka_client
                     .publish_thought(&mission_id, "Coding completed", "zeroclaw")
@@ -172,9 +181,6 @@ pub fn create_mission_workflow(
         .build()
         .unwrap()
         .add_parent(&plan_task);
-
-    let aethalgard_client: Arc<dyn AethalgardClient> =
-        Arc::new(HttpAethalgardClient::new(aethalgard_webhook_url));
 
     // 3. Validation Phase (ZeroClaw)
     let mcp_client_clone = mcp_client.clone();
@@ -191,7 +197,7 @@ pub fn create_mission_workflow(
                 .unwrap_or_else(|| Uuid::new_v4().to_string());
 
             Box::pin(async move {
-                let zeroclaw = ZeroClawAgent::new(mcp_client);
+                let zeroclaw = ZeroClawAgent::new(mcp_client, aethalgard_client.clone());
 
                 kafka_client
                     .publish_thought(&mission_id, "Starting validation phase...", "zeroclaw")

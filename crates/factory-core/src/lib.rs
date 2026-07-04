@@ -99,8 +99,9 @@ pub struct SpecArtifact {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OsrMetric {
-    pub metric_name: String,
-    pub value: f64,
+    pub mission_id: String,
+    pub osr_value: f32,
+    pub wiki_commit_sha: String,
     pub timestamp: DateTime<Utc>,
 }
 
