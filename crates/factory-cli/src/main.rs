@@ -94,7 +94,10 @@ async fn main() -> anyhow::Result<()> {
             let context = match r2r_client.search("documentation sync state").await {
                 Ok(c) => c,
                 Err(e) => {
-                    tracing::warn!("Failed to connect to R2R ({}). Skipping OSR verification in CI.", e);
+                    tracing::warn!(
+                        "Failed to connect to R2R ({}). Skipping OSR verification in CI.",
+                        e
+                    );
                     std::process::exit(0);
                 }
             };
@@ -103,10 +106,10 @@ async fn main() -> anyhow::Result<()> {
             let mut wiki_content = String::new();
             if let Ok(entries) = std::fs::read_dir("wiki") {
                 for entry in entries.flatten() {
-                    if entry.path().extension().and_then(|s| s.to_str()) == Some("md") {
-                        if let Ok(content) = std::fs::read_to_string(entry.path()) {
-                            wiki_content.push_str(&content);
-                        }
+                    if entry.path().extension().and_then(|s| s.to_str()) == Some("md")
+                        && let Ok(content) = std::fs::read_to_string(entry.path())
+                    {
+                        wiki_content.push_str(&content);
                     }
                 }
             }
