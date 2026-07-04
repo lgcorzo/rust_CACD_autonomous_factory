@@ -102,12 +102,12 @@ impl McpServer {
             .await;
         self.add_tool(Box::new(RunTestsTool::new(sandbox_driver)))
             .await;
-        self.add_tool(Box::new(SecurityReviewTool)).await;
-        self.add_tool(Box::new(BridgeTool)).await;
+        self.add_tool(Box::new(SecurityReviewTool::new())).await;
         self.add_tool(Box::new(UpdateMissionStatusTool::new("wiki".to_string())))
             .await;
         self.add_tool(Box::new(SpecKitTool::new(specify_cli_path)))
             .await;
+        self.add_tool(Box::new(BridgeTool)).await;
 
         Ok(())
     }
