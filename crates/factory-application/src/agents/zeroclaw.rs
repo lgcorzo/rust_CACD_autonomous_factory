@@ -17,7 +17,7 @@ impl ZeroClawAgent {
         &self,
         mission_id: &str,
         task_description: &str,
-        files: &[String],
+        _files: &[String],
     ) -> anyhow::Result<Value> {
         tracing::info!(
             "[ZeroClawAgent:{}] Executing task: {}",
@@ -25,19 +25,49 @@ impl ZeroClawAgent {
             task_description
         );
 
-        // 1. Sandbox Orchestration (Skill)
-        // 2. Call MCP tool for execution
+        // 1. SAST Forensic Scan
+        let sast_result = self
+            .mcp_client
+            .call_tool_json(
+                "security_review",
+                json!({
+                    "diff": task_description
+                }),
+            )
+            .await?;
+
+        // Extract score or status from SAST
+        let is_rejected = if let Some(content) =
+            sast_result["content"].as_array().and_then(|c| c.first())
+        {
+            if let Some(text) = content["text"].as_str() {
+                if let Ok(parsed) = serde_json::from_str::<Value>(text) {
+                    parsed["score"].as_f64().unwrap_or(0.0) < 8.0 || parsed["status"] == "rejected"
+                } else {
+                    true // If we can't parse it, fail safely
+                }
+            } else {
+                true
+            }
+        } else {
+            true
+        };
+
+        if is_rejected || sast_result["is_error"].as_bool().unwrap_or(false) {
+            anyhow::bail!(
+                "Security scan failed: SAST score < 8.0 or LLM error. Execution blocked."
+            );
+        }
+
+        // 2. Sandbox Orchestration (Skill)
+        // Call MCP tool for execution
         let result = self
             .mcp_client
             .call_tool_json(
                 "execute_code",
                 json!({
-                    "mission_id": mission_id,
-                    "task": {
-                        "description": task_description,
-                        "files": files
-                    },
-                    "workspace_path": format!("/tmp/sandbox/zeroclaw/{}", mission_id)
+                    "code": task_description,
+                    "language": "python" // Assume python for now, or detect
                 }),
             )
             .await?;
