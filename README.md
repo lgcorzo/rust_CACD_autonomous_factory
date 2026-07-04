@@ -65,6 +65,11 @@ Missions are orchestrated using a robust **6-phase DAG** in **Hatchet** with dat
 
 ### Running the Factory Worker
 
+Ensure your `.env` file contains the live Kafka broker endpoint:
+```env
+KAFKA_BROKERS=my-kafka-cluster-bootstrap.confluent.svc.cluster.local:9092
+```
+
 Start the unified worker to begin processing autonomous missions:
 
 ```bash
