@@ -21,6 +21,7 @@ pub mod retrieve_context;
 pub mod run_tests;
 pub mod search_jira;
 pub mod security_review;
+pub mod spec_kit_tasks_to_issues;
 pub mod spec_kit_tool;
 pub mod update_mission_status;
 
@@ -33,5 +34,6 @@ pub use retrieve_context::RetrieveContextTool;
 pub use run_tests::RunTestsTool;
 pub use search_jira::SearchJiraTool;
 pub use security_review::SecurityReviewTool;
+pub use spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool;
 pub use spec_kit_tool::SpecKitTool;
 pub use update_mission_status::UpdateMissionStatusTool;
