@@ -47,9 +47,10 @@ impl McpServer {
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
-            spec_kit_tool::SpecKitTool, update_mission_status::UpdateMissionStatusTool,
+            spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
+            update_mission_status::UpdateMissionStatusTool,
         };
-        use factory_infrastructure::{HttpJiraClient, HttpR2rClient};
+        use factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient};
 
         let sandbox_mode =
             std::env::var("SANDBOX_MODE").unwrap_or_else(|_| "subprocess".to_string());
@@ -84,6 +85,11 @@ impl McpServer {
         let jira_token = std::env::var("JIRA_API_TOKEN")?;
         let jira_client = Arc::new(HttpJiraClient::new(jira_url, jira_user, jira_token));
 
+        let gitlab_url =
+            std::env::var("GITLAB_URL").unwrap_or_else(|_| "https://gitlab.com".to_string());
+        let gitlab_token = std::env::var("GITLAB_API_TOKEN").unwrap_or_else(|_| "".to_string());
+        let gitlab_client = Arc::new(HttpGitlabClient::new(gitlab_url, gitlab_token));
+
         self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone())))
             .await;
         self.add_tool(Box::new(LaunchSandboxPodTool::new())).await;
@@ -106,6 +112,8 @@ impl McpServer {
         self.add_tool(Box::new(UpdateMissionStatusTool::new("wiki".to_string())))
             .await;
         self.add_tool(Box::new(SpecKitTool::new(specify_cli_path)))
+            .await;
+        self.add_tool(Box::new(SpecKitTasksToIssuesTool::new(gitlab_client)))
             .await;
         self.add_tool(Box::new(BridgeTool)).await;
 
