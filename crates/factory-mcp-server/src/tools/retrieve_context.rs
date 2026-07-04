@@ -73,7 +73,7 @@ mod tests {
             }
         }
 
-        async fn push_osr_metric(&self, _osr_value: f32) -> anyhow::Result<()> {
+        async fn push_osr_metric(&self, _metric: &factory_core::OsrMetric) -> anyhow::Result<()> {
             Ok(())
         }
     }

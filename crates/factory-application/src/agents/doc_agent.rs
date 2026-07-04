@@ -8,13 +8,19 @@ use std::time::Duration;
 pub struct DocumentationAgent {
     mcp_client: Arc<dyn McpClient>,
     r2r_client: Arc<dyn R2rClient>,
+    superpowers_skills_root: std::path::PathBuf,
 }
 
 impl DocumentationAgent {
-    pub fn new(mcp_client: Arc<dyn McpClient>, r2r_client: Arc<dyn R2rClient>) -> Self {
+    pub fn new(
+        mcp_client: Arc<dyn McpClient>,
+        r2r_client: Arc<dyn R2rClient>,
+        superpowers_skills_root: std::path::PathBuf,
+    ) -> Self {
         Self {
             mcp_client,
             r2r_client,
+            superpowers_skills_root,
         }
     }
 
@@ -44,13 +50,25 @@ impl DocumentationAgent {
                 max_retries + 1
             );
 
-            for skill in &skills {
+            if attempt == 1 {
+                for skill in &skills {
+                    self.mcp_client
+                        .call_tool_json(
+                            "invoke_spec_kit",
+                            json!({
+                                "command": skill,
+                                "args": [self.superpowers_skills_root.to_string_lossy().to_string()]
+                            }),
+                        )
+                        .await?;
+                }
+            } else {
                 self.mcp_client
                     .call_tool_json(
                         "invoke_spec_kit",
                         json!({
-                            "command": skill,
-                            "args": []
+                            "command": "subagent-driven-development",
+                            "args": [self.superpowers_skills_root.to_string_lossy().to_string()]
                         }),
                     )
                     .await?;
@@ -58,8 +76,21 @@ impl DocumentationAgent {
 
             let osr_value = self.verify_osr().await?;
 
+            let commit_sha = std::process::Command::new("git")
+                .args(["rev-parse", "HEAD"])
+                .output()
+                .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+                .unwrap_or_else(|_| "unknown".to_string());
+
+            let metric = factory_core::OsrMetric {
+                mission_id: mission_id.to_string(),
+                osr_value,
+                wiki_commit_sha: commit_sha,
+                timestamp: chrono::Utc::now(),
+            };
+
             // Push metric to R2R
-            if let Err(e) = self.r2r_client.push_osr_metric(osr_value).await {
+            if let Err(e) = self.r2r_client.push_osr_metric(&metric).await {
                 tracing::warn!("Failed to push OSR metric: {}", e);
             }
 
@@ -76,6 +107,16 @@ impl DocumentationAgent {
                         "HITL Escalation: OSR remained > 5% after {} retries",
                         max_retries
                     );
+                    let _ = self
+                        .mcp_client
+                        .call_tool_json(
+                            "update_mission_status",
+                            json!({
+                                "mission_id": mission_id,
+                                "status": "doc_escalation"
+                            }),
+                        )
+                        .await;
                     anyhow::bail!(
                         "HITL Escalation: Documentation remains out of sync (OSR: {})",
                         osr_value
