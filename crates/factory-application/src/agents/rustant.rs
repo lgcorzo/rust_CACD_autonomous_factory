@@ -50,18 +50,36 @@ impl RustantAgent {
         }
 
         // 3. Parse generated artifacts
-        // Try to find the latest spec in the specs directory
-        let mut latest_spec_dir = None;
-        if let Ok(entries) = std::fs::read_dir("specs") {
-            let mut dirs: Vec<_> = entries.filter_map(|e| e.ok()).collect();
-            // Sort by modified time to get the newest
-            dirs.sort_by_key(|dir| {
-                dir.metadata()
-                    .and_then(|m| m.modified())
-                    .unwrap_or(std::time::SystemTime::UNIX_EPOCH)
-            });
-            if let Some(latest) = dirs.last() {
-                latest_spec_dir = Some(latest.path());
+        let mut target_spec_dir = None;
+
+        // Try reading .specify/init-options.json
+        let config_str = std::fs::read_to_string(".specify/init-options.json").ok();
+        let config: Option<serde_json::Value> =
+            config_str.and_then(|s| serde_json::from_str(&s).ok());
+        if let Some(specs_dir) = config
+            .as_ref()
+            .and_then(|c| c.get("specs_dir"))
+            .and_then(|v| v.as_str())
+        {
+            let path = std::path::PathBuf::from(specs_dir);
+            if path.exists() {
+                target_spec_dir = Some(path);
+            }
+        }
+
+        // Fall back to latest directory in specs/
+        if target_spec_dir.is_none() {
+            let entries = std::fs::read_dir("specs").ok();
+            if let Some(entries) = entries {
+                let mut dirs: Vec<_> = entries.filter_map(|e| e.ok()).collect();
+                dirs.sort_by_key(|dir| {
+                    dir.metadata()
+                        .and_then(|m| m.modified())
+                        .unwrap_or(std::time::SystemTime::UNIX_EPOCH)
+                });
+                if let Some(latest) = dirs.last() {
+                    target_spec_dir = Some(latest.path());
+                }
             }
         }
 
@@ -69,7 +87,7 @@ impl RustantAgent {
         let mut parsed_plan = String::new();
         let mut parsed_tasks = String::new();
 
-        if let Some(spec_dir) = latest_spec_dir {
+        if let Some(spec_dir) = target_spec_dir {
             parsed_spec = std::fs::read_to_string(spec_dir.join("spec.md")).unwrap_or_default();
             parsed_plan = std::fs::read_to_string(spec_dir.join("plan.md")).unwrap_or_default();
             parsed_tasks = std::fs::read_to_string(spec_dir.join("tasks.md")).unwrap_or_default();
