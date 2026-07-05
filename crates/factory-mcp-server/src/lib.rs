@@ -68,11 +68,14 @@ impl McpServer {
         let litellm_model = std::env::var("LITELLM_MODEL")?;
 
         let finops_tag = factory_core::FinOpsTag {
+            team: std::env::var("FINOPS_TEAM").unwrap_or_else(|_| "dark-gravity-ops".to_string()),
+            epic: std::env::var("FINOPS_EPIC").unwrap_or_else(|_| "E6.3".to_string()),
+            microservice: std::env::var("FINOPS_MICROSERVICE")
+                .unwrap_or_else(|_| "factory-mcp-server".to_string()),
+            environment: std::env::var("FINOPS_ENVIRONMENT")
+                .unwrap_or_else(|_| "staging".to_string()),
             cost_center: std::env::var("FINOPS_COST_CENTER")
                 .unwrap_or_else(|_| "engineering".to_string()),
-            project_code: std::env::var("FINOPS_PROJECT_CODE")
-                .unwrap_or_else(|_| "dg-factory".to_string()),
-            owner: std::env::var("FINOPS_OWNER").unwrap_or_else(|_| "ai-agent".to_string()),
         };
 
         let r2r_base_url = std::env::var("R2R_BASE_URL")?;
