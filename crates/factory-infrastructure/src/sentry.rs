@@ -4,7 +4,10 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CrashEvent {
     pub event_id: String,
-    pub title: String,
+    pub project: String,
+    pub message: String,
+    pub level: String,
+    pub timestamp: String,
     pub culprit: Option<String>,
 }
 
@@ -82,7 +85,10 @@ mod tests {
         let response_body = json!([
             {
                 "event_id": "a1b2c3d4",
-                "title": "ZeroDivisionError",
+                "project": "my-project",
+                "message": "ZeroDivisionError",
+                "level": "error",
+                "timestamp": "2026-07-05T09:00:00Z",
                 "culprit": "main.py"
             }
         ]);
@@ -101,7 +107,8 @@ mod tests {
             .unwrap();
         assert_eq!(result.len(), 1);
         assert_eq!(result[0].event_id, "a1b2c3d4");
-        assert_eq!(result[0].title, "ZeroDivisionError");
+        assert_eq!(result[0].message, "ZeroDivisionError");
+        assert_eq!(result[0].level, "error");
     }
 
     #[tokio::test]
