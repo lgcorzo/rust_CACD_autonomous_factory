@@ -90,13 +90,31 @@ impl AuditorAgent {
             .with_api_key("sk-dummy");
 
         let mut headers = reqwest::header::HeaderMap::new();
-        headers.insert("x-vtags-team", reqwest::header::HeaderValue::from_static("dark-gravity-ops"));
-        headers.insert("x-vtags-epic", reqwest::header::HeaderValue::from_static("E6.3"));
-        headers.insert("x-vtags-microservice", reqwest::header::HeaderValue::from_static("factory-application"));
-        headers.insert("x-vtags-environment", reqwest::header::HeaderValue::from_static("staging"));
-        headers.insert("x-vtags-cost_center", reqwest::header::HeaderValue::from_static("eu-rd-grants"));
+        headers.insert(
+            "x-vtags-team",
+            reqwest::header::HeaderValue::from_static("dark-gravity-ops"),
+        );
+        headers.insert(
+            "x-vtags-epic",
+            reqwest::header::HeaderValue::from_static("E6.3"),
+        );
+        headers.insert(
+            "x-vtags-microservice",
+            reqwest::header::HeaderValue::from_static("factory-application"),
+        );
+        headers.insert(
+            "x-vtags-environment",
+            reqwest::header::HeaderValue::from_static("staging"),
+        );
+        headers.insert(
+            "x-vtags-cost_center",
+            reqwest::header::HeaderValue::from_static("eu-rd-grants"),
+        );
 
-        let http_client = reqwest::Client::builder().default_headers(headers).build().unwrap_or_default();
+        let http_client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap_or_default();
         let client = async_openai::Client::with_config(config).with_http_client(http_client);
 
         let system_msg = async_openai::types::ChatCompletionRequestSystemMessageArgs::default()
