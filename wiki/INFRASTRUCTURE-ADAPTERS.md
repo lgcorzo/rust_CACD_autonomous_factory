@@ -4,6 +4,38 @@ This document details the **Adapters** that connect the autonomous factory to ex
 
 ---
 
+## Physical Topology (Deployment)
+
+```mermaid
+C4Deployment
+    title Dark Gravity Physical Topology
+
+    Deployment_Node(k8s, "Kubernetes Cluster", "Target Environment") {
+        Deployment_Node(factory_pod, "Factory Pod", "Controller") {
+            Container(app, "Dark Gravity Application", "Rust", "Hatchet workers & Agents")
+            Container(mcp, "MCP Server", "Rust/Axum", "Runs tools via HTTP/SSE")
+        }
+        Deployment_Node(sandbox_pod, "Sandbox Node", "Zero Trust Executor") {
+            Container(firecracker, "Firecracker Micro-VM", "KVM", "Executes isolated code")
+        }
+    }
+
+    Deployment_Node(hatchet_node, "Hatchet Cloud", "Orchestration") {
+        System_Ext(hatchet, "Hatchet Engine")
+    }
+
+    Deployment_Node(ziti_node, "OpenZiti Edge", "mTLS Network") {
+        System_Ext(ziti, "Ziti Controller/Router")
+    }
+    
+    Rel(app, mcp, "API Calls", "SSE/HTTP")
+    Rel(mcp, firecracker, "Spawns & Execs", "AF_VSOCK/Local")
+    Rel(app, hatchet, "Syncs workflows", "gRPC / HTTP")
+    Rel(factory_pod, ziti_node, "Secure Tunnel", "mTLS 1.3")
+```
+
+---
+
 ## Messaging & Telemetry (The Nervous System)
 
 ### Kafka Event Bus
