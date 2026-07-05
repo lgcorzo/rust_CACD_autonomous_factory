@@ -64,13 +64,13 @@ impl QAObserverAgent {
             {
                 Ok(crashes) => {
                     for crash in crashes {
-                        tracing::info!("Detected crash: {} - {}", crash.event_id, crash.title);
+                        tracing::info!("Detected crash: {} - {}", crash.event_id, crash.message);
 
                         // Create GitLab issue
-                        let title = format!("Crash Auto-Report: {}", crash.title);
+                        let title = format!("Crash Auto-Report: {}", crash.message);
                         let description = format!(
-                            "A crash was detected by Sentry.\n\nEvent ID: {}\nTitle: {}\nCulprit: {:?}",
-                            crash.event_id, crash.title, crash.culprit
+                            "A crash was detected by Sentry.\n\nEvent ID: {}\nLevel: {}\nMessage: {}\nCulprit: {:?}\n\n[RESOURCE_LIMIT: RAM <= 30Mi]",
+                            crash.event_id, crash.level, crash.message, crash.culprit
                         );
 
                         match self
