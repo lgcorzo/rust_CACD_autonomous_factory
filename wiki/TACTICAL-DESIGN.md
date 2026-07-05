@@ -33,6 +33,45 @@ Based on `code-review-graph` analysis of `factory-mcp-server/src/tools/`:
 
 Each tool implements the `Tool` trait with `name()`, `description()`, `input_schema()`, and `call()` methods.
 
+### C4 Component Diagram: MCP Server
+
+```mermaid
+C4Component
+    title Dark Gravity Autonomous Factory - MCP Server Components
+
+    Container_Boundary(mcp_server, "MCP Server (factory-mcp-server)") {
+        Component(protocol, "Protocol Handler", "Axum SSE/HTTP", "Handles JSON-RPC 2.0 requests")
+        
+        Boundary(tools_boundary, "MCP Tools") {
+            Component(plan_mission, "Plan Mission Tool", "Rust", "Uses R2R context for planning")
+            Component(execute_code, "Execute Code Tool", "Rust", "Runs code in sandbox")
+            Component(run_tests, "Run Tests Tool", "Rust", "Validates tests in sandbox")
+            Component(retrieve_context, "Retrieve Context Tool", "Rust", "Fetches graphRAG context")
+            Component(index_code, "Index Code Tool", "Rust", "Indexes code into R2R")
+            Component(security_review, "Security Review Tool", "Rust", "Audits code")
+            Component(search_jira, "Search Jira Tool", "Rust", "Queries Jira API")
+            Component(update_status, "Update Mission Status Tool", "Rust", "Updates Hatchet/DB")
+        }
+        
+        Component(sandbox_driver, "Sandbox Driver", "Trait", "Interface for Firecracker/Subprocess")
+    }
+
+    Container(app, "Application / Agents", "Rust", "Initiates tool calls")
+    ContainerExt(r2r, "R2R GraphRAG", "Knowledge Base")
+    ContainerExt(k8s, "Kubernetes / Firecracker", "Sandbox Engine")
+
+    Rel(app, protocol, "JSON-RPC Call", "HTTP/SSE")
+    Rel(protocol, tools_boundary, "Routes Request")
+    
+    Rel(plan_mission, r2r, "Search")
+    Rel(retrieve_context, r2r, "Fetch")
+    Rel(index_code, r2r, "Upsert")
+    
+    Rel(execute_code, sandbox_driver, "Invoke")
+    Rel(run_tests, sandbox_driver, "Invoke")
+    Rel(sandbox_driver, k8s, "Execute")
+```
+
 ---
 
 ## Communication Patterns
@@ -62,20 +101,49 @@ sequenceDiagram
     participant Hatchet as "Hatchet Engine"
     participant RU as "Rustant (Planner Agent)"
     participant ZC as "ZeroClaw (Executor Agent)"
+    participant MCP as "MCP Server"
+    participant R2R as "R2R GraphRAG"
     participant Sandbox as "Firecracker Sandbox"
-    participant GH as "GitHub PR"
+    participant GH as "GitHub API"
 
-    Hatchet->>RU: Phase 1: Planning
-    RU->>RU: plan_mission (LLM reasoning + R2rClient context)
-    Hatchet->>ZC: Phase 2: Implementation
-    ZC->>Sandbox: execute_code
-    Sandbox-->>ZC: Code result
-    Hatchet->>ZC: Phase 3: Validation
-    ZC->>Sandbox: run_tests (cargo test)
-    Sandbox-->>ZC: Test results
-    Hatchet->>RU: Phase 4: Security Review
-    RU->>RU: security_review (LLM-as-a-Judge)
-    Hatchet->>GH: Phase 5: Delivery (create_pull_request)
+    Hatchet->>RU: Phase 1: Trigger Planning
+    activate RU
+    RU->>MCP: Call retrieve_context
+    MCP->>R2R: Query semantic context
+    R2R-->>MCP: Context results
+    MCP-->>RU: Return context
+    RU->>MCP: Call plan_mission (LLM)
+    MCP-->>RU: Plan generated
+    RU-->>Hatchet: Commit Plan Checkpoint
+    deactivate RU
+
+    Hatchet->>ZC: Phase 2: Trigger Implementation
+    activate ZC
+    ZC->>MCP: Call execute_code
+    MCP->>Sandbox: Spin up micro-VM & run code
+    Sandbox-->>MCP: Code result (stdout/stderr)
+    MCP-->>ZC: Result
+    ZC-->>Hatchet: Commit Implementation Checkpoint
+    deactivate ZC
+
+    Hatchet->>ZC: Phase 3: Trigger Validation
+    activate ZC
+    ZC->>MCP: Call run_tests (cargo test)
+    MCP->>Sandbox: Run in isolated VM
+    Sandbox-->>MCP: Test results
+    MCP-->>ZC: Pass/Fail
+    ZC-->>Hatchet: Commit Validation Checkpoint
+    deactivate ZC
+
+    Hatchet->>RU: Phase 4: Trigger Security Review
+    activate RU
+    RU->>MCP: Call security_review (LLM-as-a-Judge)
+    MCP-->>RU: Audit Result (Pass/Fail)
+    RU-->>Hatchet: Commit Review Checkpoint
+    deactivate RU
+
+    Hatchet->>GH: Phase 5: Delivery
+    GH-->>Hatchet: PR Created URL
 ```
 
 ---

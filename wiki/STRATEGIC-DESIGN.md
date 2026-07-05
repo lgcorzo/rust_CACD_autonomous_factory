@@ -18,12 +18,46 @@ C4Context
     System_Ext(github, "GitHub / Gitlab", "VCS, Code hosting, PR delivery")
     System_Ext(k8s, "Kubernetes Cluster", "Target environment for deployments")
     System_Ext(llm, "LiteLLM Gateway", "AI Model routing for Agents")
+    System_Ext(hatchet, "Hatchet", "Durable Workflows Orchestration")
     
     Rel(user, jira, "Creates tickets")
     Rel(factory, jira, "Polls for new missions")
     Rel(factory, llm, "Requests reasoning & planning")
     Rel(factory, github, "Commits code & creates PRs")
     Rel(factory, k8s, "Deploys code (ZeroClaw sandbox execution)")
+    Rel(factory, hatchet, "Syncs mission state")
+```
+
+### C4 Container Diagram
+
+```mermaid
+C4Container
+    title Dark Gravity Autonomous Factory - Containers
+
+    System_Ext(jira, "Atlassian Jira")
+    System_Ext(github, "GitHub / Gitlab")
+    System_Ext(hatchet, "Hatchet")
+    System_Ext(llm, "LiteLLM Gateway")
+    System_Ext(k8s, "Kubernetes Cluster")
+
+    Container_Boundary(factory, "Dark Gravity CA/CD") {
+        Container(cli, "CLI / Worker", "Rust (factory-cli)", "Hatchet worker entry point")
+        Container(app, "Application / Agents", "Rust (factory-application)", "Agent logic (Rustant, ZeroClaw) & Workflows")
+        Container(mcp, "MCP Server", "Rust (factory-mcp-server)", "Axum SSE/HTTP, 8 Tools, Sandboxes")
+        Container(infra, "Infrastructure Adapters", "Rust (factory-infrastructure)", "Kafka, R2R, Jira, S3, Vault clients")
+        Container(core, "Core Domain", "Rust (factory-core)", "Entities: Mission, Task, Models")
+    }
+
+    Rel(cli, app, "Executes workflows", "Rust function call")
+    Rel(app, mcp, "Calls tools via MCP", "HTTP/SSE")
+    Rel(app, core, "Uses domain logic", "Rust uses")
+    Rel(mcp, infra, "Leverages adapters", "Rust uses")
+    Rel(infra, core, "Maps external data to domain", "Rust uses")
+    
+    Rel(cli, hatchet, "Registers worker")
+    Rel(app, llm, "Reasoning & generation", "HTTP via Gateway")
+    Rel(infra, jira, "Fetches tasks", "REST API")
+    Rel(mcp, k8s, "Executes sandboxed code", "Firecracker / K8s API")
 ```
 
 The system is partitioned into four bounded contexts to ensure isolation and clear ownership of logic.

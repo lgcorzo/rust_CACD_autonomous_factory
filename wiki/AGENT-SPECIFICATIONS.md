@@ -19,6 +19,27 @@ The "Captain" of the mission. Governs the **Intelligence Context**.
 - **Dependencies**: `McpClient`, `R2rClient`
 - **Agent trait**: Implements `Agent` (`name`, `execute`)
 
+#### Rustant Mission Planning Sequence
+```mermaid
+sequenceDiagram
+    participant Hatchet as Workflow Engine
+    participant RU as RustantAgent
+    participant R2R as R2rClient
+    participant LLM as LiteLLM Gateway
+    participant MCP as McpServer
+
+    Hatchet->>RU: execute(task_description)
+    activate RU
+    RU->>R2R: search("Context for task...")
+    R2R-->>RU: GraphRAG nodes & edges
+    RU->>MCP: call_tool("plan_mission", payload)
+    MCP->>LLM: generate_text()
+    LLM-->>MCP: execution plan JSON
+    MCP-->>RU: Result
+    RU-->>Hatchet: MissionPlan
+    deactivate RU
+```
+
 ---
 
 ## ZeroClaw (Executor Agent)
@@ -36,6 +57,31 @@ The "Muscle" of the system. Operates within the **Execution Context**.
 - **Dependencies**: `McpClient`
 - **Sandbox Drivers**: `SubprocessDriver` (local), `FirecrackerDriver` (micro-VM via KVM)
 - **Agent trait**: Implements `Agent` (`name`, `execute`)
+
+#### ZeroClaw Execution Sequence
+```mermaid
+sequenceDiagram
+    participant Hatchet as Workflow Engine
+    participant ZC as ZeroClawAgent
+    participant MCP as McpServer
+    participant Sandbox as SandboxDriver
+    
+    Hatchet->>ZC: execute(task_description)
+    activate ZC
+    loop Iterative Execution
+        ZC->>MCP: call_tool("execute_code", source)
+        MCP->>Sandbox: execute(language, source)
+        Sandbox-->>MCP: stdout, stderr
+        MCP-->>ZC: Result
+        
+        ZC->>MCP: call_tool("run_tests", config)
+        MCP->>Sandbox: execute("cargo test")
+        Sandbox-->>MCP: Test pass/fail
+        MCP-->>ZC: Result
+    end
+    ZC-->>Hatchet: Execution Result
+    deactivate ZC
+```
 
 ---
 
@@ -79,31 +125,41 @@ All agents implement the `Agent` trait in `crates/factory-application/src/agents
 ```mermaid
 classDiagram
     class Agent {
-        <<interface>>
+        <<trait>>
         +name() String
         +execute(task_description: String) Value
     }
     class DocumentationAgent {
+        <<active>>
         +run_post_merge_pipeline()
         +extract_code_deltas()
         +generate_hazitek_report()
     }
     class RustantAgent {
+        <<active>>
         +plan_mission()
         +review_mission()
     }
     class ZeroClawAgent {
+        <<active>>
         +execute_task()
         +validate_mission()
     }
     class AuditorAgent {
+        <<planned>>
         +audit_mission_logs()
     }
     class QAObserverAgent {
+        <<planned>>
         +poll_sentry()
     }
     class FinOpsAgent {
+        <<planned>>
         +track_anomaly()
+    }
+    class DevOpsAgent {
+        <<planned>>
+        +remediate_ci_failure()
     }
     
     Agent <|-- DocumentationAgent
@@ -112,6 +168,7 @@ classDiagram
     Agent <|-- AuditorAgent
     Agent <|-- QAObserverAgent
     Agent <|-- FinOpsAgent
+    Agent <|-- DevOpsAgent
 ```
 
 ```rust
