@@ -107,9 +107,11 @@ pub struct OsrMetric {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FinOpsTag {
+    pub team: String,
+    pub epic: String,
+    pub microservice: String,
+    pub environment: String,
     pub cost_center: String,
-    pub project_code: String,
-    pub owner: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
