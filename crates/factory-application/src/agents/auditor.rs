@@ -89,7 +89,33 @@ impl AuditorAgent {
             .with_api_base(api_base)
             .with_api_key("sk-dummy");
 
-        let client = async_openai::Client::with_config(config);
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(
+            "x-vtags-team",
+            reqwest::header::HeaderValue::from_static("dark-gravity-ops"),
+        );
+        headers.insert(
+            "x-vtags-epic",
+            reqwest::header::HeaderValue::from_static("E6.3"),
+        );
+        headers.insert(
+            "x-vtags-microservice",
+            reqwest::header::HeaderValue::from_static("factory-application"),
+        );
+        headers.insert(
+            "x-vtags-environment",
+            reqwest::header::HeaderValue::from_static("staging"),
+        );
+        headers.insert(
+            "x-vtags-cost_center",
+            reqwest::header::HeaderValue::from_static("eu-rd-grants"),
+        );
+
+        let http_client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap_or_default();
+        let client = async_openai::Client::with_config(config).with_http_client(http_client);
 
         let system_msg = async_openai::types::ChatCompletionRequestSystemMessageArgs::default()
             .content("You are an Automation Auditor. Analyze the provided failure logs from Hatchet workflow runs. You must output ONLY a valid JSON array of objects. Each object must have a 'type' ('prompt_adjustment' or 'tool_modification'), a 'target_agent' or 'target_tool', and a 'recommendation' string.")
