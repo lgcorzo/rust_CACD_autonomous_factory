@@ -31,7 +31,7 @@ C4Deployment
     Rel(app, mcp, "API Calls", "SSE/HTTP")
     Rel(mcp, firecracker, "Spawns & Execs", "AF_VSOCK/Local")
     Rel(app, hatchet, "Syncs workflows", "gRPC / HTTP")
-    Rel(factory_pod, ziti_node, "Secure Tunnel", "mTLS 1.3")
+    Rel(app, ziti, "Secure Tunnel", "mTLS 1.3")
 ```
 
 ---

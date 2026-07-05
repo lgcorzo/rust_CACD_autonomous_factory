@@ -57,8 +57,8 @@ C4Component
     }
 
     Container(app, "Application / Agents", "Rust", "Initiates tool calls")
-    ContainerExt(r2r, "R2R GraphRAG", "Knowledge Base")
-    ContainerExt(k8s, "Kubernetes / Firecracker", "Sandbox Engine")
+    Container_Ext(r2r, "R2R GraphRAG", "Knowledge Base")
+    Container_Ext(k8s, "Kubernetes / Firecracker", "Sandbox Engine")
 
     Rel(app, protocol, "JSON-RPC Call", "HTTP/SSE")
     Rel(protocol, tools_boundary, "Routes Request")
