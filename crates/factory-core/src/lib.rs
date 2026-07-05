@@ -121,6 +121,15 @@ pub struct ComplianceReport {
     pub findings: Vec<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct UserFeedbackPayload {
+    pub user_id: String,
+    pub session_id: Option<String>,
+    pub feedback_text: String,
+    pub sentiment: String,
+    pub metadata: Option<serde_json::Value>,
+}
+
 pub mod proto {
     pub mod v1 {
         include!(concat!(env!("OUT_DIR"), "/dark_gravity.factory.v1.rs"));
