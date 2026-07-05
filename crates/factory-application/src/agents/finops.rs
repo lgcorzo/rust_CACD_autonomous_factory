@@ -56,10 +56,7 @@ impl FinOpsAgent {
         let mut previous_spend: f64 = 0.0;
 
         loop {
-            tracing::info!(
-                "FinOpsAgent: Checking spend for epic {}",
-                self.tag.epic
-            );
+            tracing::info!("FinOpsAgent: Checking spend for epic {}", self.tag.epic);
 
             let response = self
                 .client
@@ -77,11 +74,19 @@ impl FinOpsAgent {
                             // Preventative Anomaly Detection: check velocity
                             let spend_velocity = spend - previous_spend;
                             if spend_velocity > 1.0 {
-                                tracing::error!("ANOMALY DETECTED! High token spend velocity: +${} in 60s! Total: ${}", spend_velocity, spend);
+                                tracing::error!(
+                                    "ANOMALY DETECTED! High token spend velocity: +${} in 60s! Total: ${}",
+                                    spend_velocity,
+                                    spend
+                                );
                             } else if spend > 10.0 {
                                 tracing::error!("LIMIT REACHED! High token spend: ${}", spend);
                             } else {
-                                tracing::info!("Current spend: ${}. Velocity: +${}. Budget is healthy.", spend, spend_velocity);
+                                tracing::info!(
+                                    "Current spend: ${}. Velocity: +${}. Budget is healthy.",
+                                    spend,
+                                    spend_velocity
+                                );
                             }
                             previous_spend = spend;
                         } else {
