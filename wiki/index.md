@@ -1,10 +1,40 @@
-# Code Wiki
+# Documentation Index
+
+Welcome to the Dark Gravity Autonomous Factory documentation.
+
+## Core Documentation
+
+### 🧭 Strategic Context
+* [Glossary](GLOSSARY.md) - Ubiquitous Language
+* [Business Context](BUSINESS-CONTEXT.md) - Business goals and strategy
+
+### 🏗 Architecture
+* [Strategic Design](STRATEGIC-DESIGN.md) - High-level system strategy
+* [Tactical Design](TACTICAL-DESIGN.md) - Domain models and component design
+
+### 🤖 Workforce
+* [Agent Specs](AGENT-SPECIFICATIONS.md) - Autonomous agents details
+* [Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md) - Execution and MLflow experiments
+
+### 🔌 Operations
+* [Adapters](INFRASTRUCTURE-ADAPTERS.md) - Connectors and external systems
+* [Verification Triad](VERIFICATION-TRIAD.md) - Three-pillar validation strategy
+* [Production Ops](PRODUCTION-OPERATIONS.md) - Deployment and maintenance
+
+### 📋 Project & Reports
+* [Mission History](EXPERIMENT-LOGS.md) - Experiment tracking logs
+* [Test Plan Report](Test_Plan_Report.md) - Testing strategy and reports
+* [README](README.md) - Project Overview
+
+---
+
+## Code Wiki (Auto-generated)
 
 Auto-generated documentation from the code knowledge graph community structure.
 
 **Total communities**: 9
 
-## Communities
+### Communities
 
 | Community | Size | Link |
 |-----------|------|------|
