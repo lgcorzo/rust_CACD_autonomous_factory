@@ -77,6 +77,34 @@ Both implement the `SandboxDriver` trait in `factory-mcp-server/src/sandbox.rs`.
 
 ## External Service Clients
 
+```mermaid
+C4Container
+    title Dark Gravity Infrastructure Adapters
+
+    Container_Boundary(factory, "Dark Gravity Autonomous Factory") {
+        Component(clients, "External Clients", "Rust", "Adapters for external communication")
+        Component(mcp, "MCP Server", "Rust/Axum", "Tools API")
+    }
+
+    System_Ext(jira, "Atlassian Jira", "Backlog & Bug tracking")
+    System_Ext(r2r, "R2R GraphRAG", "Vector Store & Semantic Memory")
+    System_Ext(kafka, "Confluent Kafka", "Event Bus for telemetry")
+    System_Ext(s3, "AWS S3", "Object Storage for artifacts")
+    System_Ext(ziti, "OpenZiti", "mTLS Zero Trust Network")
+    System_Ext(vault, "HashiCorp Vault", "JIT Tokens & Security Bounds")
+    System_Ext(sentry, "Sentry", "Error tracking & Polling")
+
+    Rel(clients, jira, "Fetches issues & updates status", "HTTPS")
+    Rel(clients, r2r, "Queries context & updates knowledge", "HTTPS/JWT")
+    Rel(clients, kafka, "Publishes events & telemetry", "TCP")
+    Rel(clients, s3, "Puts/Gets objects", "HTTPS")
+    Rel(clients, ziti, "Retrieves mTLS tokens", "OpenZiti SDK")
+    Rel(clients, vault, "Validates JIT tokens", "HTTPS")
+    Rel(clients, sentry, "Polls for crashes", "HTTPS")
+    
+    Rel(mcp, clients, "Uses adapters to perform tool logic", "In-Process")
+```
+
 | Client | File | Key Methods |
 | :--- | :--- | :--- |
 | `HttpJiraClient` / `JiraClient` | `jira.rs` | `search_issues(query)` |
