@@ -1,5 +1,7 @@
+pub mod feedback_route;
 pub mod protocol;
 pub mod sandbox;
+pub mod skills;
 pub mod tools;
 
 use crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool};

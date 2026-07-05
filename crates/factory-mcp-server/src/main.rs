@@ -24,7 +24,11 @@ async fn main() -> anyhow::Result<()> {
 
     let app = Router::new()
         .route("/mcp", post(McpServer::post_handler))
-        .route("/sse", get(McpServer::sse_handler));
+        .route("/sse", get(McpServer::sse_handler))
+        .route(
+            "/feedback",
+            post(factory_mcp_server::feedback_route::handle_feedback),
+        );
 
     let app = if allowed_origins_raw.is_empty() {
         app.layer(cors)

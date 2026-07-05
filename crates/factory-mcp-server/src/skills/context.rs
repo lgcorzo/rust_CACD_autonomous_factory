@@ -85,7 +85,7 @@ mod tests {
     fn test_prune_context_unicode_boundary() {
         let skill = ContextSkill;
         let context = "🦀🦀🦀"; // each 🦀 is 4 bytes
-        // Safe boundary
+                                // Safe boundary
         assert_eq!(skill.prune_context(context, 4), "🦀");
     }
 
