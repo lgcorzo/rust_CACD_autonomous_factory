@@ -21,6 +21,7 @@ hatchet-sdk = { workspace = true }
 mockall = { workspace = true }
 prost = { workspace = true }
 reqwest = { version = "0.12", features = ["json"] }
+async-openai = "0.23"
 
 tokio-test = { workspace = true }
 chrono.workspace = true

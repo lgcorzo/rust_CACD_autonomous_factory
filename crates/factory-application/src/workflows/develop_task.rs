@@ -44,7 +44,11 @@ pub fn create_develop_task_workflow(
                 .unwrap_or_else(|| crate::bridge::BridgeState::new(input.task_id.clone()));
 
                 // Example: If task was already completed in the checkpoint, we skip execution
-                if state.superpowers.completed_tasks.contains(&input.task_id) {
+                if state
+                    .checkpoints
+                    .get(&input.task_id)
+                    .is_some_and(|c| c.output_snapshot.is_some())
+                {
                     tracing::info!(
                         "Task {} already completed in checkpoint. Skipping.",
                         input.task_id
@@ -67,10 +71,15 @@ pub fn create_develop_task_workflow(
                     .await?;
 
                 // Crash Resilience: Update and save checkpoint after successful execution
-                state
-                    .superpowers
-                    .completed_tasks
-                    .push(input.task_id.clone());
+                state.checkpoints.insert(
+                    input.task_id.clone(),
+                    crate::bridge::StepCheckpoint {
+                        step_name: "code".to_string(),
+                        input_snapshot: serde_json::json!({ "description": input.description }),
+                        output_snapshot: Some(result.clone()),
+                        completed_at: Some(chrono::Utc::now()),
+                    },
+                );
                 state.save_checkpoint(&s3_client, &bucket).await?;
 
                 Ok(TaskOutput { result })
