@@ -6,6 +6,26 @@ This document defines the **Strategic Design** of the Dark Gravity autonomous fa
 
 ## Bounded Contexts
 
+```mermaid
+C4Context
+    title Dark Gravity Autonomous Factory - System Context
+
+    Person(user, "Developer / User", "Initiates missions or interacts via Jira")
+    
+    System(factory, "Dark Gravity CA/CD", "Autonomous Agent Factory executing development missions")
+    
+    System_Ext(jira, "Atlassian Jira", "Mission ingestion and backlog tracking")
+    System_Ext(github, "GitHub / Gitlab", "VCS, Code hosting, PR delivery")
+    System_Ext(k8s, "Kubernetes Cluster", "Target environment for deployments")
+    System_Ext(llm, "LiteLLM Gateway", "AI Model routing for Agents")
+    
+    Rel(user, jira, "Creates tickets")
+    Rel(factory, jira, "Polls for new missions")
+    Rel(factory, llm, "Requests reasoning & planning")
+    Rel(factory, github, "Commits code & creates PRs")
+    Rel(factory, k8s, "Deploys code (ZeroClaw sandbox execution)")
+```
+
 The system is partitioned into four bounded contexts to ensure isolation and clear ownership of logic.
 
 | Context | Responsibility | Key Entities | Agent |

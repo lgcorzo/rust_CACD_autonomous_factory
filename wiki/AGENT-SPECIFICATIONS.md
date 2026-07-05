@@ -76,12 +76,79 @@ The "Memory Keeper". Manages the **Infrastructure Context** for documentation.
 
 All agents implement the `Agent` trait in `crates/factory-application/src/agents/`:
 
+```mermaid
+classDiagram
+    class Agent {
+        <<interface>>
+        +name() String
+        +execute(task_description: String) Value
+    }
+    class DocumentationAgent {
+        +run_post_merge_pipeline()
+        +extract_code_deltas()
+        +generate_hazitek_report()
+    }
+    class RustantAgent {
+        +plan_mission()
+        +review_mission()
+    }
+    class ZeroClawAgent {
+        +execute_task()
+        +validate_mission()
+    }
+    class AuditorAgent {
+        +audit_mission_logs()
+    }
+    class QAObserverAgent {
+        +poll_sentry()
+    }
+    class FinOpsAgent {
+        +track_anomaly()
+    }
+    
+    Agent <|-- DocumentationAgent
+    Agent <|-- RustantAgent
+    Agent <|-- ZeroClawAgent
+    Agent <|-- AuditorAgent
+    Agent <|-- QAObserverAgent
+    Agent <|-- FinOpsAgent
+```
+
 ```rust
 #[async_trait]
 pub trait Agent: Send + Sync {
     fn name(&self) -> String;
     async fn execute(&self, task_description: &str) -> anyhow::Result<Value>;
 }
+```
+
+---
+
+## Agentic Interaction Flow
+
+```mermaid
+sequenceDiagram
+    participant Hatchet as Hatchet DAG
+    participant RU as Rustant
+    participant ZC as ZeroClaw
+    participant MCP as Factory MCP Server
+    
+    Hatchet->>RU: Trigger Mission Planning
+    RU->>MCP: retrieve_context & plan_mission
+    MCP-->>RU: Plan Context
+    RU-->>Hatchet: Mission Plan
+    
+    Hatchet->>ZC: Trigger Execution
+    ZC->>MCP: execute_code (Sandbox)
+    MCP-->>ZC: Code Diff
+    ZC->>MCP: run_tests
+    MCP-->>ZC: Test Results
+    ZC-->>Hatchet: Implementation artifacts
+    
+    Hatchet->>RU: Trigger Review
+    RU->>MCP: security_review
+    MCP-->>RU: Audit Result
+    RU-->>Hatchet: Final Status
 ```
 
 ---
