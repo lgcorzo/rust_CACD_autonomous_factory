@@ -15,11 +15,14 @@ pub struct FinOpsAgent {
 impl Default for FinOpsAgent {
     fn default() -> Self {
         let tag = FinOpsTag {
+            team: std::env::var("FINOPS_TEAM").unwrap_or_else(|_| "dark-gravity-ops".to_string()),
+            epic: std::env::var("FINOPS_EPIC").unwrap_or_else(|_| "E6.3".to_string()),
+            microservice: std::env::var("FINOPS_MICROSERVICE")
+                .unwrap_or_else(|_| "factory-application".to_string()),
+            environment: std::env::var("FINOPS_ENVIRONMENT")
+                .unwrap_or_else(|_| "staging".to_string()),
             cost_center: std::env::var("FINOPS_COST_CENTER")
-                .unwrap_or_else(|_| "engineering".to_string()),
-            project_code: std::env::var("FINOPS_PROJECT_CODE")
-                .unwrap_or_else(|_| "dg-factory".to_string()),
-            owner: std::env::var("FINOPS_OWNER").unwrap_or_else(|_| "ai-agent".to_string()),
+                .unwrap_or_else(|_| "eu-rd-grants".to_string()),
         };
         Self::new(
             std::env::var("LITELLM_BASE_URL").unwrap_or_default(),
@@ -50,17 +53,19 @@ impl FinOpsAgent {
             self.litellm_base_url.trim_end_matches('/')
         );
 
+        let mut previous_spend: f64 = 0.0;
+
         loop {
             tracing::info!(
-                "FinOpsAgent: Checking spend for project {}",
-                self.tag.project_code
+                "FinOpsAgent: Checking spend for epic {}",
+                self.tag.epic
             );
 
             let response = self
                 .client
                 .get(&url)
                 .bearer_auth(&self.api_key)
-                .query(&[("project_code", &self.tag.project_code)])
+                .query(&[("epic", &self.tag.epic)])
                 .send()
                 .await;
 
@@ -69,11 +74,16 @@ impl FinOpsAgent {
                     if let Ok(json) = resp.json::<Value>().await {
                         // Attempt to read total_spend from LiteLLM spend response
                         if let Some(spend) = json.get("total_spend").and_then(|v| v.as_f64()) {
-                            if spend > 10.0 {
-                                tracing::error!("ANOMALY DETECTED! High token spend: ${}", spend);
+                            // Preventative Anomaly Detection: check velocity
+                            let spend_velocity = spend - previous_spend;
+                            if spend_velocity > 1.0 {
+                                tracing::error!("ANOMALY DETECTED! High token spend velocity: +${} in 60s! Total: ${}", spend_velocity, spend);
+                            } else if spend > 10.0 {
+                                tracing::error!("LIMIT REACHED! High token spend: ${}", spend);
                             } else {
-                                tracing::info!("Current spend: ${}. Budget is healthy.", spend);
+                                tracing::info!("Current spend: ${}. Velocity: +${}. Budget is healthy.", spend, spend_velocity);
                             }
+                            previous_spend = spend;
                         } else {
                             tracing::warn!(
                                 "FinOpsAgent: Could not parse total_spend from LiteLLM response."
