@@ -42,7 +42,7 @@ C4Component
     Container_Boundary(mcp_server, "MCP Server (factory-mcp-server)") {
         Component(protocol, "Protocol Handler", "Axum SSE/HTTP", "Handles JSON-RPC 2.0 requests")
         
-        Boundary(tools_boundary, "MCP Tools") {
+        Container_Boundary(tools_boundary, "MCP Tools") {
             Component(plan_mission, "Plan Mission Tool", "Rust", "Uses R2R context for planning")
             Component(execute_code, "Execute Code Tool", "Rust", "Runs code in sandbox")
             Component(run_tests, "Run Tests Tool", "Rust", "Validates tests in sandbox")
@@ -61,7 +61,15 @@ C4Component
     Container_Ext(k8s, "Kubernetes / Firecracker", "Sandbox Engine")
 
     Rel(app, protocol, "JSON-RPC Call", "HTTP/SSE")
-    Rel(protocol, tools_boundary, "Routes Request")
+    
+    Rel(protocol, plan_mission, "Routes Request")
+    Rel(protocol, execute_code, "Routes Request")
+    Rel(protocol, run_tests, "Routes Request")
+    Rel(protocol, retrieve_context, "Routes Request")
+    Rel(protocol, index_code, "Routes Request")
+    Rel(protocol, security_review, "Routes Request")
+    Rel(protocol, search_jira, "Routes Request")
+    Rel(protocol, update_status, "Routes Request")
     
     Rel(plan_mission, r2r, "Search")
     Rel(retrieve_context, r2r, "Fetch")
