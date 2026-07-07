@@ -137,7 +137,6 @@ impl R2rClient for HttpR2rClient {
             .await?;
 
         let status = metrics_res.status();
-        let body_text = metrics_res.text().await?;
 
         if !status.is_success() {
             tracing::error!("Failed to push OSR metric to R2R. Status: {}", status);
