@@ -87,3 +87,8 @@
 **Vulnerability:** The `SubprocessDriver` was executing Python and Rust code without any timeouts or orphan process management. An attacker could submit code that hangs indefinitely or spawns many processes, leading to resource exhaustion and Denial of Service (DoS).
 **Learning:** Using `tokio::process::Command` without `kill_on_drop(true)` and a wrapper timeout can leave orphan processes running on the host system even if the parent task is cancelled.
 **Prevention:** Always wrap external command execution in `tokio::time::timeout` and configure child processes to be killed on drop. For code execution, define a strict maximum runtime (e.g., 30s) to bound resource usage.
+
+## 2026-07-07 - Information Leakage in Infrastructure Logs
+**Vulnerability:** Infrastructure clients (Jira, R2R) were logging raw third-party API response bodies via `tracing::error!` when requests failed.
+**Learning:** Logging full response bodies for debugging convenience can leak sensitive data like auth tokens, PII, or internal system details into log aggregation systems.
+**Prevention:** Log only non-sensitive metadata (e.g., HTTP status codes) and generic error messages. Avoid reflecting untrusted or unfiltered external data directly into application logs.
