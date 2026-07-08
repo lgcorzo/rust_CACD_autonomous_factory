@@ -58,7 +58,7 @@ C4Component
 
     Container(app, "Application / Agents", "Rust", "Initiates tool calls")
     Container_Ext(r2r, "R2R GraphRAG", "Knowledge Base")
-    Container_Ext(k8s, "Kubernetes / Firecracker", "Sandbox Engine")
+    Container_Ext(k8s, "Kubernetes / gVisor", "Sandbox Engine")
 
     Rel(app, protocol, "JSON-RPC Call", "HTTP/SSE")
     
@@ -111,7 +111,7 @@ sequenceDiagram
     participant ZC as "ZeroClaw (Executor Agent)"
     participant MCP as "MCP Server"
     participant R2R as "R2R GraphRAG"
-    participant Sandbox as "Firecracker Sandbox"
+    participant Sandbox as "gVisor Sandbox"
     participant GH as "GitHub API"
 
     Hatchet->>RU: Phase 1: Trigger Planning
@@ -128,7 +128,7 @@ sequenceDiagram
     Hatchet->>ZC: Phase 2: Trigger Implementation
     activate ZC
     ZC->>MCP: Call execute_code
-    MCP->>Sandbox: Spin up micro-VM & run code
+    MCP->>Sandbox: Spin up gVisor container & run code
     Sandbox-->>MCP: Code result (stdout/stderr)
     MCP-->>ZC: Result
     ZC-->>Hatchet: Commit Implementation Checkpoint
@@ -171,6 +171,7 @@ SHAPValues { values (HashMap) }
 FeatureImportances { features (Vec) }
 SecurityValidator: validate_signature() / audit_content() -> AuditResult
 SecurityBounds: validate_token() / issue_jit_token() -> JitToken
+VerifiableCredential: sign() / verify() (W3C JSON-LD with Ed25519)
 ```
 
 ---
@@ -186,8 +187,11 @@ classDiagram
     class SubprocessDriver {
         +execute(language, code) ExecutionResult
     }
-    class FirecrackerDriver {
+    class GvisorK8sDriver {
         +execute(language, code) ExecutionResult
+    }
+    class NativeSurgerySandboxDriver {
+        +execute_surgery(language, code) ExecutionResult
     }
     class ExecutionResult {
         +stdout: String
@@ -195,7 +199,8 @@ classDiagram
         +exit_code: i32
     }
     SandboxDriver <|-- SubprocessDriver
-    SandboxDriver <|-- FirecrackerDriver
+    SandboxDriver <|-- GvisorK8sDriver
+    SandboxDriver <|-- NativeSurgerySandboxDriver
 ```
 
 Both drivers are implemented in `crates/factory-mcp-server/src/sandbox.rs`.
@@ -215,4 +220,4 @@ Communication follows the JSON-RPC 2.0 standard over SSE/HTTP, defined in `crate
 
 ---
 
-*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-08 — Verified against actual codebase via CRG analysis*
