@@ -1,9 +1,8 @@
 use rdkafka::Message;
-use rdkafka::consumer::{Consumer, DefaultConsumerContext, StreamConsumer};
+use rdkafka::consumer::{Consumer, StreamConsumer};
 use reqwest::Client;
 use serde_json::Value;
 use std::sync::Arc;
-use tokio::sync::Mutex;
 
 pub struct TelemetryExporter {
     kafka_brokers: String,
@@ -55,10 +54,10 @@ impl TelemetryExporter {
                             }
                         };
 
-                        if let Ok(json) = serde_json::from_str::<Value>(payload) {
-                            if let Err(e) = self.push_to_openwebui(&json).await {
-                                tracing::error!("Failed to export telemetry to OpenWebUI: {}", e);
-                            }
+                        if let Ok(json) = serde_json::from_str::<Value>(payload) 
+                            && let Err(e) = self.push_to_openwebui(&json).await 
+                        {
+                            tracing::error!("Failed to export telemetry to OpenWebUI: {}", e);
                         }
                     }
                 }
