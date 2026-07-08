@@ -1,6 +1,6 @@
+use crate::error::FactoryError;
 use async_trait::async_trait;
 use std::path::PathBuf;
-use crate::error::FactoryError;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SurgicalPatch {
@@ -18,6 +18,10 @@ pub struct ExecutionResult {
 
 #[async_trait]
 pub trait CodeSurgeryExecutor: Send + Sync {
-    async fn apply_patch(&self, mission_id: &str, patch: &SurgicalPatch) -> Result<ExecutionResult, FactoryError>;
+    async fn apply_patch(
+        &self,
+        mission_id: &str,
+        patch: &SurgicalPatch,
+    ) -> Result<ExecutionResult, FactoryError>;
     async fn verify_syntax(&self, file_path: &std::path::Path) -> Result<bool, FactoryError>;
 }
