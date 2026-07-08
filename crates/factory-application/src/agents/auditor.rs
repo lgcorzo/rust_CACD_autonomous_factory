@@ -159,6 +159,64 @@ impl AuditorAgent {
 
         Ok(recommendations)
     }
+
+    /// Self-Improving Prompt Engineering evaluation loop.
+    /// Analyzes Hatchet failure recommendations against Target ground truths to propose a new system prompt.
+    pub async fn evaluate_prompts(
+        &self,
+        mission_id: &str,
+        targets: &[factory_core::Targets],
+        recommendations: &[Value],
+    ) -> anyhow::Result<String> {
+        tracing::info!(
+            "[AuditorAgent:{}] Evaluating prompts for self-improvement",
+            mission_id
+        );
+
+        let targets_json = serde_json::to_string(targets)?;
+        let recs_json = serde_json::to_string(recommendations)?;
+
+        let api_base = std::env::var("LITELLM_API_BASE")
+            .unwrap_or_else(|_| "http://litellm.llm-apps.svc.cluster.local:4000".to_string());
+
+        let config = async_openai::config::OpenAIConfig::new()
+            .with_api_base(api_base)
+            .with_api_key("sk-dummy");
+
+        let client = async_openai::Client::with_config(config);
+
+        let system_msg = async_openai::types::ChatCompletionRequestSystemMessageArgs::default()
+            .content("You are an Automation Auditor prompt engineer. Given the Ground Truth Targets and recent Failure Recommendations, propose a single, optimized System Prompt string that would prevent these failures in the future. Output ONLY the raw prompt string.")
+            .build()?;
+
+        let user_msg = async_openai::types::ChatCompletionRequestUserMessageArgs::default()
+            .content(format!(
+                "Targets:\n{}\n\nRecommendations:\n{}",
+                targets_json, recs_json
+            ))
+            .build()?;
+
+        let request = async_openai::types::CreateChatCompletionRequestArgs::default()
+            .model("qwen2.5")
+            .messages([system_msg.into(), user_msg.into()])
+            .build()?;
+
+        let response = match client.chat().create(request).await {
+            Ok(resp) => resp,
+            Err(_) => {
+                // Fallback mock
+                return Ok("You are an expert developer. Pay strict attention to variable naming and OSR calculations. Always use Levenshtein distance.".to_string());
+            }
+        };
+
+        let optimized_prompt = response
+            .choices
+            .first()
+            .and_then(|c| c.message.content.clone())
+            .unwrap_or_else(|| "You are a factory agent.".to_string());
+
+        Ok(optimized_prompt)
+    }
 }
 
 #[async_trait]

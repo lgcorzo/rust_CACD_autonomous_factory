@@ -11,8 +11,8 @@ pub enum FactoryError {
     #[error("Internal processing error: {0}")]
     Internal(String),
 
-    #[error("Unauthorized access or security violation")]
-    Security,
+    #[error("Unauthorized access or security violation: {0}")]
+    Security(String),
 
     #[error("Agent failure: {0}")]
     Agent(String),
