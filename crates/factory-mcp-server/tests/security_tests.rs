@@ -14,7 +14,7 @@ async fn test_security_review_sql_injection() {
     let McpContent::Text { text } = &result.content[0] else {
         panic!("Expected Text content")
     };
-    let content: Value = serde_json::from_str(&text).unwrap();
+    let content: Value = serde_json::from_str(text).unwrap();
 
     assert_eq!(content["status"], "rejected");
     assert!(content["findings"]
@@ -35,7 +35,7 @@ async fn test_security_review_command_injection() {
     let McpContent::Text { text } = &result.content[0] else {
         panic!("Expected Text content")
     };
-    let content: Value = serde_json::from_str(&text).unwrap();
+    let content: Value = serde_json::from_str(text).unwrap();
 
     assert_eq!(content["status"], "rejected");
     assert!(content["findings"]
@@ -56,7 +56,7 @@ async fn test_security_review_hardcoded_secret() {
     let McpContent::Text { text } = &result.content[0] else {
         panic!("Expected Text content")
     };
-    let content: Value = serde_json::from_str(&text).unwrap();
+    let content: Value = serde_json::from_str(text).unwrap();
 
     assert!(content["findings"]
         .as_array()
@@ -76,7 +76,7 @@ async fn test_security_review_safe_code() {
     let McpContent::Text { text } = &result.content[0] else {
         panic!("Expected Text content")
     };
-    let content: Value = serde_json::from_str(&text).unwrap();
+    let content: Value = serde_json::from_str(text).unwrap();
 
     assert_eq!(content["status"], "approved");
     assert_eq!(content["findings"].as_array().unwrap().len(), 0);

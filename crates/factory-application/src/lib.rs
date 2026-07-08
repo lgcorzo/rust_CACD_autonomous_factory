@@ -10,5 +10,6 @@ pub trait Agent: Send + Sync {
 
 pub mod agents;
 pub mod bridge;
+pub mod telemetry_export;
 pub mod utils;
 pub mod workflows;
