@@ -25,6 +25,12 @@ pub enum FactoryError {
 
     #[error("Database or storage error: {0}")]
     Storage(String),
+
+    #[error("IO error: {0}")]
+    IoError(String),
+
+    #[error("Remediation error: {0}")]
+    RemediationError(String),
 }
 
 pub type Result<T> = std::result::Result<T, FactoryError>;
