@@ -52,8 +52,7 @@ impl SentryClient for HttpSentryClient {
         let project_path = if project.contains('/') {
             project.to_string()
         } else {
-            let org = std::env::var("SENTRY_ORG")
-                .unwrap_or_else(|_| "sentry".to_string());
+            let org = std::env::var("SENTRY_ORG").unwrap_or_else(|_| "sentry".to_string());
             format!("{}/{}", org, project)
         };
 
@@ -73,7 +72,11 @@ impl SentryClient for HttpSentryClient {
 
         if !res.status().is_success() {
             let status = res.status();
-            tracing::error!("Sentry fetch failed with status {} (url: {})", status, search_url);
+            tracing::error!(
+                "Sentry fetch failed with status {} (url: {})",
+                status,
+                search_url
+            );
             anyhow::bail!("Sentry fetch failed with status {}", status);
         }
 

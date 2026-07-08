@@ -101,11 +101,8 @@ pub fn create_mission_workflow(
             }
         });
     } else {
-        tracing::warn!(
-            "QAObserverAgent: SENTRY_API_TOKEN not set, skipping crash monitor."
-        );
+        tracing::warn!("QAObserverAgent: SENTRY_API_TOKEN not set, skipping crash monitor.");
     }
-
 
     let mcp_client: Arc<dyn McpClient> = Arc::new(McpHttpClient::new(mcp_url));
     let r2r_client: Arc<dyn R2rClient> = Arc::new(HttpR2rClient::new(
