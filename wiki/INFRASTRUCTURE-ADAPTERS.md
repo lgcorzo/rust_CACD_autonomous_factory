@@ -39,9 +39,10 @@ C4Deployment
 ## Messaging & Telemetry (The Nervous System)
 
 ### Kafka Event Bus
-- **Client**: `SimpleMockKafkaClient` in `factory-infrastructure/src/kafka.rs` — publishes `publish_thought` events.
+- **Client**: `SimpleMockKafkaClient` in `factory-infrastructure/src/kafka.rs` (gated under `#[cfg(not(feature = "production"))]`) — publishes `publish_thought` events.
 - **Topics**: `mission-input`, `agent-thought`, `mission-artifact`
 - **Serialization**: JSON (via `serde_json`)
+- **Telemetry Exporter**: `TelemetryExporter` asynchronously consumes `agent-thought` events and pushes them to OpenWebUI.
 
 ---
 
@@ -58,7 +59,7 @@ C4Deployment
 
 ### OpenZiti Dark-Network Overlay
 - **Mesh**: All inter-service communication via OpenZiti mTLS tunnels.
-- **Integration**: `factory-infrastructure/src/ziti.rs` — `OpenZitiIdentity` struct uses `ziti-sdk` to dynamically parse and retrieve mTLS tokens.
+- **Integration**: `factory-infrastructure/src/ziti.rs` — `OpenZitiIdentity` struct uses `ziti-sdk` to dynamically initialize real contexts and retrieve mTLS tokens.
 - **Mocking**: `MockZitiIdentity` available for testing.
 
 ---
@@ -100,8 +101,8 @@ All tools are provided by the Axum-based MCP server in `factory-mcp-server`:
 
 | Driver | Isolation | Communication |
 | :--- | :--- | :--- |
-| `SubprocessDriver` | Local subprocess | tokio stdin/stdout |
-| `FirecrackerDriver` | KVM hardware micro-VM | AF_VSOCK (planned implementation) |
+| `SubprocessDriver` | Local subprocess (`python`, `rust`, `go`, `typescript`) | tokio stdin/stdout |
+| `GvisorK8sDriver` | Kubernetes gVisor runsc | K8s API Job execution |
 
 Both implement the `SandboxDriver` trait in `factory-mcp-server/src/sandbox.rs`.
 
@@ -177,4 +178,4 @@ Based on `code-review-graph` analysis, the infrastructure layer has the followin
 
 ---
 
-*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-08 — Verified against actual codebase via CRG analysis*

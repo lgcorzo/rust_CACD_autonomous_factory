@@ -146,8 +146,9 @@ classDiagram
         +validate_mission()
     }
     class AuditorAgent {
-        <<planned>>
+        <<active>>
         +audit_mission_logs()
+        +evaluate_prompts()
     }
     class QAObserverAgent {
         <<planned>>
@@ -233,4 +234,4 @@ Based on `code-review-graph` edge analysis:
 
 ---
 
-*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-08 — Verified against actual codebase via CRG analysis*

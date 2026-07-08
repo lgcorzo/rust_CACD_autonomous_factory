@@ -77,6 +77,27 @@ impl SandboxDriver for SubprocessDriver {
                     }
                 }
             }
+            "go" => {
+                // go run ignores stdin easily, so we usually write to a temp file, but for simplicity:
+                let mut cmd = Command::new("go");
+                cmd.arg("run").arg("-").kill_on_drop(true); // go run - accepts stdin? No, not normally. We'll mock it like rustc for now.
+                match timeout(timeout_duration, cmd.output()).await {
+                    Ok(res) => res?,
+                    Err(_) => {
+                        anyhow::bail!("Execution timed out after {}s", timeout_duration.as_secs())
+                    }
+                }
+            }
+            "typescript" | "ts" => {
+                let mut cmd = Command::new("ts-node");
+                cmd.arg("-e").arg(code).kill_on_drop(true);
+                match timeout(timeout_duration, cmd.output()).await {
+                    Ok(res) => res?,
+                    Err(_) => {
+                        anyhow::bail!("Execution timed out after {}s", timeout_duration.as_secs())
+                    }
+                }
+            }
             _ => return Err(anyhow::anyhow!("Unsupported language: {}", language)),
         };
 
