@@ -57,7 +57,7 @@ C4Container
     Rel(cli, hatchet, "Registers worker")
     Rel(app, llm, "Reasoning & generation", "HTTP via Gateway")
     Rel(infra, jira, "Fetches tasks", "REST API")
-    Rel(mcp, k8s, "Executes sandboxed code", "Firecracker / K8s API")
+    Rel(mcp, k8s, "Executes sandboxed code", "gVisor / K8s API")
 ```
 
 The system is partitioned into four bounded contexts to ensure isolation and clear ownership of logic.
@@ -111,7 +111,7 @@ Security is baked into the strategic design of every context:
 - **Identity-First**: `SecurityValidator` trait for content auditing and Ed25519 signature verification.
 - **Dark Network**: All inter-service communication routed through **OpenZiti** mTLS 1.3 tunnels — zero publicly routable ports.
 - **Dynamic Access**: Short-lived JIT tokens provisioned dynamically via **Vault** (`SecurityBounds`).
-- **Sandbox Execution**: Untrusted code executes in **Firecracker** micro-VMs or via a `SubprocessDriver` for isolated sandboxing.
+- **Sandbox Execution**: Untrusted code executes in **gVisor** containers (via `GvisorK8sDriver`) or via a `SubprocessDriver` for isolated sandboxing.
 - **Credential Management**: API keys and tokens loaded via environment variables, never hardcoded.
 
 ---
@@ -121,7 +121,7 @@ Security is baked into the strategic design of every context:
 | Agent | Context | Primary Tools | DAG Step |
 | :--- | :--- | :--- | :--- |
 | **Rustant** (Planner Agent) | Intelligence | R2rClient for semantic context search, `plan_mission` MCP tool | Planning, Review |
-| **ZeroClaw** (Executor Agent) | Execution | `execute_code` MCP tool, `run_tests` MCP tool, Firecracker sandbox | Code, Validate |
+| **ZeroClaw** (Executor Agent) | Execution | `execute_code` MCP tool, `run_tests` MCP tool, `CodeSurgeryExecutor`, gVisor sandbox | Code, Validate |
 | **DevOps Agent** | Remediation | Auto-Remediation Loop, Sentry integration | CI/CD Healing |
 | **Documentation Agent** | Infrastructure | Superpowers skills (`writing-plans`, `subagent-driven-development`) | Wiki Sync |
 
@@ -133,7 +133,7 @@ The system orchestrates missions through a durable **6-phase Hatchet DAG**:
 
 1. **Ingestion** → Parse Jira requirements into structured tasks
 2. **Plan (Rustant)** → Use R2rClient for semantic context retrieval and mission planning
-3. **Code (ZeroClaw)** → Generate and execute code in sandboxed environment
+3. **Code (ZeroClaw)** → Generate and execute code in sandboxed environment (or natively via `CodeSurgeryExecutor`)
 4. **Validation (ZeroClaw)** → Run tests and validate outputs
 5. **Review (Rustant)** → Review results and provide feedback
 6. **Delivery (GitOps)** → Commit and push changes
@@ -179,4 +179,4 @@ Based on `code-review-graph` analysis, the actual codebase structure is:
 
 ---
 
-*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-08 — Verified against actual codebase via CRG analysis*
