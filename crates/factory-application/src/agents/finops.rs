@@ -38,7 +38,11 @@ impl Default for FinOpsAgent {
             .trim_end_matches('/')
             .trim_end_matches("/v1")
             .to_string();
-        Self::new(base, std::env::var("LITELLM_API_KEY").unwrap_or_default(), tag)
+        Self::new(
+            base,
+            std::env::var("LITELLM_API_KEY").unwrap_or_default(),
+            tag,
+        )
     }
 }
 
