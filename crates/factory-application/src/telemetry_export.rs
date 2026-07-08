@@ -54,8 +54,8 @@ impl TelemetryExporter {
                             }
                         };
 
-                        if let Ok(json) = serde_json::from_str::<Value>(payload) 
-                            && let Err(e) = self.push_to_openwebui(&json).await 
+                        if let Ok(json) = serde_json::from_str::<Value>(payload)
+                            && let Err(e) = self.push_to_openwebui(&json).await
                         {
                             tracing::error!("Failed to export telemetry to OpenWebUI: {}", e);
                         }
