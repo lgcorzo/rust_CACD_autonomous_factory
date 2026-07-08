@@ -7,6 +7,10 @@ use serde_json::Value;
 use std::time::Duration;
 use uuid::Uuid;
 
+/// Circuit breaker threshold: after this many consecutive failures,
+/// downgrade logging from ERROR to WARN and apply maximum backoff.
+const CIRCUIT_BREAKER_THRESHOLD: u32 = 3;
+
 pub struct QAObserverAgent {
     sentry_client: Box<dyn SentryClient>,
     gitlab_client: Box<dyn GitlabClient>,
@@ -50,6 +54,11 @@ impl QAObserverAgent {
             return Ok(());
         }
 
+        let base_interval = Duration::from_secs(15 * 60); // 15 minutes
+        let max_interval = Duration::from_secs(60 * 60); // 1 hour
+        let mut current_interval = base_interval;
+        let mut consecutive_failures: u32 = 0;
+
         loop {
             tracing::info!(
                 "QAObserverAgent: Polling Sentry for recent crashes in {}...",
@@ -63,6 +72,10 @@ impl QAObserverAgent {
                 .await
             {
                 Ok(crashes) => {
+                    // Reset backoff on successful fetch
+                    consecutive_failures = 0;
+                    current_interval = base_interval;
+
                     for crash in crashes {
                         tracing::info!("Detected crash: {} - {}", crash.event_id, crash.message);
 
@@ -108,12 +121,25 @@ impl QAObserverAgent {
                     }
                 }
                 Err(e) => {
-                    tracing::error!("Failed to fetch Sentry crashes: {}", e);
+                    consecutive_failures += 1;
+                    if consecutive_failures >= CIRCUIT_BREAKER_THRESHOLD {
+                        // Circuit breaker open: downgrade to WARN to avoid log flooding
+                        tracing::warn!(
+                            "QAObserverAgent: Sentry unreachable ({} consecutive failures, backoff {}s): {}",
+                            consecutive_failures,
+                            current_interval.as_secs(),
+                            e
+                        );
+                    } else {
+                        tracing::error!("Failed to fetch Sentry crashes: {}", e);
+                    }
+                    // Exponential backoff: double interval on each failure, capped at max
+                    current_interval = (current_interval * 2).min(max_interval);
                 }
             }
 
-            // Wait 15 minutes before polling again
-            tokio::time::sleep(Duration::from_secs(15 * 60)).await;
+            // Wait before polling again (adaptive interval with backoff)
+            tokio::time::sleep(current_interval).await;
         }
     }
 }
