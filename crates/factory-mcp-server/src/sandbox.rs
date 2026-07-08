@@ -15,6 +15,35 @@ pub struct ExecutionResult {
 #[async_trait]
 pub trait SandboxDriver: Send + Sync {
     async fn execute(&self, code: &str, language: &str) -> anyhow::Result<ExecutionResult>;
+
+    async fn execute_surgery(
+        &self,
+        _id: &str,
+        _patch: &factory_core::executor::SurgicalPatch,
+    ) -> factory_core::error::Result<factory_core::executor::ExecutionResult> {
+        Err(factory_core::error::FactoryError::Internal(
+            "Surgery not supported by this sandbox driver".to_string(),
+        ))
+    }
+}
+
+pub struct NativeSurgerySandboxDriver {
+    pub execution_engine: std::sync::Arc<dyn factory_core::executor::CodeSurgeryExecutor>,
+}
+
+#[async_trait]
+impl SandboxDriver for NativeSurgerySandboxDriver {
+    async fn execute(&self, _code: &str, _language: &str) -> anyhow::Result<ExecutionResult> {
+        anyhow::bail!("NativeSurgerySandboxDriver does not support code execution");
+    }
+
+    async fn execute_surgery(
+        &self,
+        id: &str,
+        patch: &factory_core::executor::SurgicalPatch,
+    ) -> factory_core::error::Result<factory_core::executor::ExecutionResult> {
+        self.execution_engine.apply_patch(id, patch).await
+    }
 }
 
 pub struct SubprocessDriver;

@@ -77,6 +77,69 @@ Start the unified worker to begin processing autonomous missions:
 cargo run -p factory-cli -- worker --mcp-url http://localhost:8100
 ```
 
+### Agent Tooling: Graphify & Code Review
+
+**Graphify** turns the repository into a navigable knowledge graph, enabling AI agents and developers to quickly understand the project architecture and file relationships.
+**Code-Review-Graph** works alongside Graphify to provide incremental, graph-based code reviews and semantic search capabilities.
+
+#### 1. Install & Register Tools
+
+Install the CLIs and register them as skills with your autonomous agent (e.g., Antigravity):
+
+```bash
+# Install tools
+uv tool install graphifyy
+uv tool install code-review-graph
+
+# Register with Antigravity
+graphify install
+code-review-graph install -y --platform antigravity
+```
+
+#### 2. Configuration & API Keys
+
+For secure embeddings and semantic extraction, both tools route through OpenZiti to reach internal LiteLLM endpoints. Ensure your `.env` file is configured correctly:
+
+```env
+# Graphify / Code Review Embeddings Config (LiteLLM via Ziti)
+OPENAI_BASE_URL=https://litellm.ziti/v1
+OPENAI_API_KEY=<insert-your-actual-litellm-api-key>
+OPENAI_MODEL=internal-gpt4_v0.1
+
+# Fallback for graphify extraction if not using LiteLLM:
+# GEMINI_API_KEY=<insert-your-gemini-api-key>
+# GOOGLE_API_KEY=<insert-your-google-api-key>
+
+CRG_OPENAI_BASE_URL=https://litellm.ziti/v1
+CRG_OPENAI_API_KEY=<insert-your-actual-litellm-api-key>
+CRG_OPENAI_MODEL=lite_embedding
+```
+
+#### 3. Common Usage & Workflow
+
+Keep the graphs up-to-date and leverage semantic search during development:
+
+- **Update Graphify**: Run after major code changes to rebuild the knowledge graph (AST extraction is fast and free).
+  ```bash
+  graphify update .
+  ```
+- **Query the Knowledge Graph**: Explore architecture or concepts.
+  ```bash
+  graphify query "What does this project do?"
+  ```
+- **Update Code Review Graph**: Incrementally index file changes.
+  ```bash
+  code-review-graph update
+  ```
+- **Enable Semantic Search**: Download embedding models and index new nodes for search.
+  ```bash
+  code-review-graph embed
+  ```
+- **Code Review & Impact Analysis**: Use semantic features to detect changes and their blast radius.
+  ```bash
+  code-review-graph detect-changes
+  ```
+
 ---
 
 ## 🛠 Development Workflow

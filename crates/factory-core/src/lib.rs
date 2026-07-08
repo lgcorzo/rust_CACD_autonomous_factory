@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 pub mod error;
+pub mod executor;
 pub mod security;
 
 /// Metadata for tracing and versioning.
