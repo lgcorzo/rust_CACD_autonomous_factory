@@ -4,6 +4,9 @@ FROM rust:1.94-slim-bookworm AS builder
 WORKDIR /usr/src/app
 COPY . .
 
+ARG SENTRY_RELEASE
+ENV SENTRY_RELEASE=${SENTRY_RELEASE}
+
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
     pkg-config \
