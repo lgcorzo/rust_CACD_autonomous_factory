@@ -116,7 +116,7 @@ jobs:
 
       - name: Create Sentry Release
         env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_AUTH_TOKEN: d37df79c38d81c7d25ccefbe0cbd10e8a3db42d51bc0984d7ec0f8943b17a735
           SENTRY_ORG: lgcorzo
           SENTRY_PROJECT: rust
         run: |
