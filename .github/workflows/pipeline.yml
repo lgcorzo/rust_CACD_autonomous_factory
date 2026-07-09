@@ -107,6 +107,22 @@ jobs:
           context: .
           cache-to: type=gha,mode=max
           cache-from: type=gha
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
           tags: |
             ${{ env.DOCKER_IMAGE }}:latest
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+
+      - name: Install Sentry CLI
+        run: curl -sL https://sentry.io/get-cli/ | bash
+
+      - name: Create Sentry Release
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: lgcorzo
+          SENTRY_PROJECT: rust
+        run: |
+          VERSION=$(sentry-cli releases propose-version)
+          sentry-cli releases new "$VERSION"
+          sentry-cli releases set-commits "$VERSION" --auto
+          sentry-cli releases finalize "$VERSION"

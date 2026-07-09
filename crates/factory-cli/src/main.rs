@@ -42,6 +42,15 @@ enum Commands {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    let _guard = sentry::init((
+        "https://2c78059d7a60a77da9bd8cc9a6affd33@o4511678618271744.ingest.de.sentry.io/4511701441445968",
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            send_default_pii: true,
+            ..Default::default()
+        },
+    ));
+
     tracing_subscriber::fmt::init();
 
     let cli = Cli::parse();
