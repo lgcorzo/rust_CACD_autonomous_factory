@@ -17,3 +17,4 @@ anyhow = { workspace = true }
 hatchet-sdk = { workspace = true }
 serde_json = { workspace = true }
 sentry = "0.48.4"
+jemallocator = "0.5.4"
