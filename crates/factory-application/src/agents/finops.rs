@@ -65,7 +65,7 @@ impl FinOpsAgent {
         }
 
         let url = format!(
-            "{}/v1/spend/logs",
+            "{}/spend/logs",
             self.litellm_base_url.trim_end_matches('/')
         );
 
@@ -187,8 +187,8 @@ mod tests {
             test_tag(),
         );
         // The constructor doesn't strip — Default::default() does.
-        // But the URL construction in monitor_budget appends /v1/spend/logs.
-        // So a raw URL with /v1 would become /v1/v1/spend/logs.
+        // But the URL construction in monitor_budget appends /spend/logs.
+        // So a raw URL with /v1 would become /v1/spend/logs.
         // This test verifies the URL stored.
         assert_eq!(agent.litellm_base_url, "http://litellm.local:4000/v1");
     }
