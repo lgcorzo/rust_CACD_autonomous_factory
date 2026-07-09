@@ -64,10 +64,7 @@ impl FinOpsAgent {
             return Ok(());
         }
 
-        let url = format!(
-            "{}/spend/logs",
-            self.litellm_base_url.trim_end_matches('/')
-        );
+        let url = format!("{}/spend/logs", self.litellm_base_url.trim_end_matches('/'));
 
         let base_interval = Duration::from_secs(60);
         let max_interval = Duration::from_secs(15 * 60); // 15 minutes
