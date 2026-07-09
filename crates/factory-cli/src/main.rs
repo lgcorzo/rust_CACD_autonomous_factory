@@ -1,5 +1,7 @@
 use clap::{Parser, Subcommand};
 
+#[global_allocator]
+static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 #[derive(Parser)]
 #[command(name = "factory-cli", version = "0.1.0")]
 struct Cli {
