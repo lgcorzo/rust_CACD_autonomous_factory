@@ -107,6 +107,8 @@ jobs:
           context: .
           cache-to: type=gha,mode=max
           cache-from: type=gha
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
           tags: |
             ${{ env.DOCKER_IMAGE }}:latest
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
