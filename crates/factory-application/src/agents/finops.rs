@@ -93,7 +93,21 @@ impl FinOpsAgent {
                 Ok(resp) => {
                     if let Ok(json) = resp.json::<Value>().await {
                         // Attempt to read total_spend from LiteLLM spend response
-                        if let Some(spend) = json.get("total_spend").and_then(|v| v.as_f64()) {
+                        let mut parsed_spend = None;
+                        if let Some(array) = json.as_array() {
+                            let mut sum = 0.0;
+                            for item in array {
+                                if let Some(spend) = item.get("spend").and_then(|v| v.as_f64()) {
+                                    sum += spend;
+                                }
+                            }
+                            parsed_spend = Some(sum);
+                        } else if let Some(spend) = json.get("total_spend").and_then(|v| v.as_f64())
+                        {
+                            parsed_spend = Some(spend);
+                        }
+
+                        if let Some(spend) = parsed_spend {
                             // Reset backoff on successful data fetch
                             consecutive_failures = 0;
                             current_interval = base_interval;
