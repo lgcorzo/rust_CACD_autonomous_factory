@@ -4,47 +4,50 @@
 
 Directory-based community: factory-mcp-server/src
 
-- **Size**: 33 nodes
-- **Cohesion**: 0.1259
+- **Size**: 36 nodes
+- **Cohesion**: 0.0988
 - **Dominant Language**: rust
 
 ## Members
 
 | Name | Kind | File | Lines |
 |------|------|------|-------|
-| McpServer | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 32-200 |
-| Default | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 26-30 |
-| default | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 27-29 |
-| new | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 33-38 |
-| add_tool | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 40-43 |
-| register_default_tools | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 44-89 |
-| handle_request | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 91-97 |
-| handle_list_tools | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 99-116 |
-| handle_call_tool | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 118-140 |
-| sse_handler | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 142-168 |
-| post_handler | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 170-186 |
-| error_response | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 188-199 |
-| ax_keep_alive | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 202-206 |
-| test_list_tools | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 215-241 |
-| test_call_tool_not_found | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 244-256 |
-| test_call_tool_error_sanitization | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 259-283 |
-| test_call_tool_success | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 286-310 |
-| main | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/main.rs | 11-51 |
-| JsonRpcRequest | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 4-9 |
-| JsonRpcResponse | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 12-17 |
-| JsonRpcError | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 20-24 |
-| McpTool | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 27-31 |
-| CallToolResult | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 34-37 |
-| McpContent | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 41-45 |
+| handle_feedback | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/feedback_route.rs | 11-80 |
+| McpServer | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 34-262 |
+| Default | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 28-32 |
+| default | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 29-31 |
+| new | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 35-40 |
+| add_tool | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 42-45 |
+| register_default_tools | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 46-126 |
+| handle_request | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 128-159 |
+| handle_list_tools | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 161-178 |
+| handle_call_tool | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 180-202 |
+| sse_handler | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 204-230 |
+| post_handler | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 232-248 |
+| error_response | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 250-261 |
+| ax_keep_alive | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 264-268 |
+| test_list_tools | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 277-303 |
+| test_call_tool_not_found | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 306-318 |
+| test_call_tool_error_sanitization | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 321-345 |
+| test_call_tool_success | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs | 348-372 |
+| main | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/main.rs | 11-55 |
+| JsonRpcRequest | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 4-11 |
+| JsonRpcResponse | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 14-22 |
+| JsonRpcError | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 25-29 |
+| McpTool | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 33-37 |
+| CallToolResult | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 41-45 |
+| McpContent | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs | 49-53 |
 | ExecutionResult | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 8-13 |
-| SubprocessDriver | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 20-20 |
-| SandboxDriver | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 94-122 |
-| execute | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 95-121 |
-| test_subprocess_driver_timeout | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 68-74 |
-| FirecrackerDriver | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 87-91 |
-| Default | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 81-85 |
-| default | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 82-84 |
-| new | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 88-90 |
+| execute_surgery | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 19-27 |
+| NativeSurgerySandboxDriver | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 30-32 |
+| SandboxDriver | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 122-175 |
+| execute | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 123-174 |
+| execute_surgery | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 40-46 |
+| SubprocessDriver | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 49-49 |
+| SandboxMode | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 114-117 |
+| GvisorK8sDriver | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 119-119 |
+| test_subprocess_driver_timeout | Test | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs | 182-188 |
+| main | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/scratch.rs | 5-17 |
 
 ## Execution Flows
 
@@ -58,25 +61,27 @@ Directory-based community: factory-mcp-server/src
 
 ### Outgoing
 
-- `to_string` (22 edge(s))
-- `Some` (11 edge(s))
-- `std::env::var` (11 edge(s))
-- `Box::new` (11 edge(s))
-- `json` (9 edge(s))
-- `clone` (7 edge(s))
-- `unwrap` (6 edge(s))
-- `Arc::new` (6 edge(s))
+- `to_string` (35 edge(s))
+- `std::env::var` (23 edge(s))
+- `Box::new` (15 edge(s))
+- `Some` (14 edge(s))
+- `unwrap_or_else` (11 edge(s))
+- `clone` (10 edge(s))
+- `json` (10 edge(s))
+- `Arc::new` (9 edge(s))
+- `unwrap` (8 edge(s))
+- `tracing::info` (6 edge(s))
 - `Ok` (6 edge(s))
 - `assert` (6 edge(s))
+- `map` (5 edge(s))
 - `McpServer::new` (5 edge(s))
 - `return_const` (5 edge(s))
-- `assert_eq` (5 edge(s))
-- `get` (4 edge(s))
-- `tracing::info` (4 edge(s))
 
 ### Incoming
 
+- `/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs` (10 edge(s))
 - `/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/lib.rs` (8 edge(s))
-- `/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/sandbox.rs` (8 edge(s))
 - `/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/protocol.rs` (6 edge(s))
+- `/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/feedback_route.rs` (1 edge(s))
 - `/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/main.rs` (1 edge(s))
+- `/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server/src/scratch.rs` (1 edge(s))
