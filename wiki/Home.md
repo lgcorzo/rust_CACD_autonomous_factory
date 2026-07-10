@@ -35,12 +35,12 @@ The system orchestrates a specialized autonomous workforce — **Rustant** (Plan
 
 | Metric | Value |
 | :--- | :--- |
-| **Total Nodes** | 254 |
-| **Total Edges** | 1,522 |
-| **Communities** | 9 |
-| **Files Analyzed** | 35 |
+| **Total Nodes** | 425 |
+| **Total Edges** | 3,363 |
+| **Communities** | 79 |
+| **Files Analyzed** | 65 |
 | **Languages** | Rust |
-| **Embedded Nodes** | 195 |
+| **Embedded Nodes** | 425 |
 
 ---
 
@@ -48,11 +48,11 @@ The system orchestrates a specialized autonomous workforce — **Rustant** (Plan
 
 | Metric | Value |
 | :--- | :--- |
-| **Total Nodes** | 611 |
-| **Edges** | 965 |
-| **Communities** | 53 |
-| **Last Updated** | 2026-06-23 |
+| **Total Nodes** | 1,066 |
+| **Edges** | 1,587 |
+| **Communities** | 79 |
+| **Last Updated** | 2026-07-10 |
 
 ---
 
-*Last Updated: 2026-06-23 — Verified via CRG + Graphify analysis*
+*Last Updated: 2026-07-10 — Verified via CRG + Graphify analysis*

@@ -85,6 +85,60 @@ sequenceDiagram
 
 ---
 
+## Auditor Agent
+
+> **Status: Active**
+
+The "Quality Control". Governs the **Verification Context**.
+
+### Responsibilities
+- **Log Analysis**: Queries Hatchet API for recent failed mission DAGs to identify failure patterns.
+- **Root Cause Analysis**: Uses LiteLLM to process failures and output actionable recommendations (prompt adjustments, tool modifications).
+- **Prompt Engineering**: Automatically evaluates and proposes new optimized system prompts based on target ground truths and failure logs.
+
+### Implementation
+- **File**: `crates/factory-application/src/agents/auditor.rs`
+- **Key Methods**: `new()`, `analyze_dag_logs()`, `audit_mission()`, `evaluate_prompts()`
+- **Agent trait**: Implements `Agent` (`name`, `execute`)
+
+---
+
+## QAObserver Agent
+
+> **Status: Active**
+
+The "Observer". Operates within the **Observability Context**.
+
+### Responsibilities
+- **Crash Monitoring**: Polls Sentry for recent crashes in the designated project every 15 minutes.
+- **Issue Tracking**: Automatically creates GitLab issues for detected crashes, detailing the event and culprit.
+- **Auto-Remediation Trigger**: Triggers an AutonomousMission via Hatchet to hotfix the detected crash automatically.
+
+### Implementation
+- **File**: `crates/factory-application/src/agents/qa_observer.rs`
+- **Key Methods**: `new()`, `monitor_crashes()`
+- **Agent trait**: Implements `Agent` (`name`, `execute`)
+
+---
+
+## FinOps Agent
+
+> **Status: Active**
+
+The "Treasurer". Governs the **Cost Context**.
+
+### Responsibilities
+- **Budget Monitoring**: Polls the LiteLLM API to track token spend for specific epics and teams.
+- **Anomaly Detection**: Monitors spend velocity and triggers alerts if limits are exceeded.
+- **Resilience**: Implements circuit breaker patterns and exponential backoff to handle API outages gracefully.
+
+### Implementation
+- **File**: `crates/factory-application/src/agents/finops.rs`
+- **Key Methods**: `new()`, `monitor_budget()`
+- **Agent trait**: Implements `Agent` (`name`, `execute`)
+
+---
+
 ## DevOps Agent (Aethelgard Loop)
 
 > **Status: Planned (Not yet implemented)**
@@ -151,12 +205,12 @@ classDiagram
         +evaluate_prompts()
     }
     class QAObserverAgent {
-        <<planned>>
-        +poll_sentry()
+        <<active>>
+        +monitor_crashes()
     }
     class FinOpsAgent {
-        <<planned>>
-        +track_anomaly()
+        <<active>>
+        +monitor_budget()
     }
     class DevOpsAgent {
         <<planned>>
@@ -234,4 +288,4 @@ Based on `code-review-graph` edge analysis:
 
 ---
 
-*Last updated: 2026-07-08 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-10 — Verified against actual codebase via CRG analysis*
