@@ -12,9 +12,9 @@ Directory-based community: factory-cli/src
 
 | Name | Kind | File | Lines |
 |------|------|------|-------|
-| Cli | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-cli/src/main.rs | 5-8 |
-| Commands | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-cli/src/main.rs | 11-23 |
-| main | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-cli/src/main.rs | 26-61 |
+| Cli | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-cli/src/main.rs | 7-10 |
+| Commands | Class | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-cli/src/main.rs | 13-43 |
+| main | Function | /mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-cli/src/main.rs | 46-141 |
 
 ## Execution Flows
 
@@ -24,20 +24,21 @@ No execution flows pass through this community.
 
 ### Outgoing
 
+- `tracing::info` (3 edge(s))
+- `std::process::exit` (3 edge(s))
 - `hatchet_sdk::worker::worker::Register::add_task_or_workflow` (2 edge(s))
+- `path` (2 edge(s))
+- `sentry::init` (1 edge(s))
+- `sentry::release_name` (1 edge(s))
+- `Default::default` (1 edge(s))
 - `tracing_subscriber::fmt::init` (1 edge(s))
 - `Cli::parse` (1 edge(s))
-- `tracing::info` (1 edge(s))
+- `is_empty` (1 edge(s))
+- `trim` (1 edge(s))
+- `anyhow::bail` (1 edge(s))
 - `hatchet_sdk::Hatchet::from_env` (1 edge(s))
 - `unwrap` (1 edge(s))
 - `build` (1 edge(s))
-- `slots` (1 edge(s))
-- `worker` (1 edge(s))
-- `factory_application::workflows::create_mission_workflow` (1 edge(s))
-- `clone` (1 edge(s))
-- `factory_application::workflows::create_develop_task_workflow` (1 edge(s))
-- `start` (1 edge(s))
-- `Ok` (1 edge(s))
 
 ### Incoming
 
