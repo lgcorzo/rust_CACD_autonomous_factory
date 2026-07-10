@@ -30,6 +30,10 @@ Based on `code-review-graph` analysis of `factory-mcp-server/src/tools/`:
 | `security_review` | `tools/security_review.rs` | — | — | Implemented |
 | `search_jira` | `tools/search_jira.rs` | 12-56 | `new`, `name`, `description`, `input_schema`, `call` | Implemented |
 | `update_mission_status` | `tools/update_mission_status.rs` | — | — | Implemented |
+| `bridge` | `tools/bridge.rs` | — | — | Implemented |
+| `launch_sandbox_pod` | `tools/launch_sandbox_pod.rs` | — | — | Implemented |
+| `spec_kit_tasks_to_issues` | `tools/spec_kit_tasks_to_issues.rs` | — | — | Implemented |
+| `spec_kit_tool` | `tools/spec_kit_tool.rs` | — | — | Implemented |
 
 Each tool implements the `Tool` trait with `name()`, `description()`, `input_schema()`, and `call()` methods.
 
@@ -51,6 +55,10 @@ C4Component
             Component(security_review, "Security Review Tool", "Rust", "Audits code")
             Component(search_jira, "Search Jira Tool", "Rust", "Queries Jira API")
             Component(update_status, "Update Mission Status Tool", "Rust", "Updates Hatchet/DB")
+            Component(bridge, "Bridge Checkpoint Tool", "Rust", "Cross-agent state check")
+            Component(launch_pod, "Launch Sandbox Pod Tool", "Rust", "Provisions K8s pod")
+            Component(spec_kit, "Spec Kit Tool", "Rust", "Generates specifications")
+            Component(spec_kit_jira, "Spec Kit Tasks to Jira Tool", "Rust", "Syncs tasks to Jira")
         }
         
         Component(sandbox_driver, "Sandbox Driver", "Trait", "Interface for Firecracker/Subprocess")
@@ -70,6 +78,10 @@ C4Component
     Rel(protocol, security_review, "Routes Request")
     Rel(protocol, search_jira, "Routes Request")
     Rel(protocol, update_status, "Routes Request")
+    Rel(protocol, bridge, "Routes Request")
+    Rel(protocol, launch_pod, "Routes Request")
+    Rel(protocol, spec_kit, "Routes Request")
+    Rel(protocol, spec_kit_jira, "Routes Request")
     
     Rel(plan_mission, r2r, "Search")
     Rel(retrieve_context, r2r, "Fetch")
@@ -220,4 +232,4 @@ Communication follows the JSON-RPC 2.0 standard over SSE/HTTP, defined in `crate
 
 ---
 
-*Last updated: 2026-07-08 — Verified against actual codebase via CRG analysis*
+*Last updated: 2026-07-10 — Verified against actual codebase via CRG analysis*
