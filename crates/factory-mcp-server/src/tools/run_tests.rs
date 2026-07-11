@@ -6,6 +6,7 @@ use serde_json::{json, Value};
 use std::sync::Arc;
 
 pub struct RunTestsTool {
+    #[allow(dead_code)]
     driver: Arc<dyn SandboxDriver>,
 }
 
@@ -36,7 +37,7 @@ impl Tool for RunTestsTool {
         })
     }
 
-    async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
+    async fn call(&self, _params: Value) -> anyhow::Result<CallToolResult> {
         Ok(CallToolResult {
             content: vec![McpContent::Text {
                 text: json!({

@@ -6,6 +6,7 @@ use serde_json::{json, Value};
 use std::sync::Arc;
 
 pub struct ExecuteCodeTool {
+    #[allow(dead_code)]
     driver: Arc<dyn SandboxDriver>,
 }
 
@@ -37,8 +38,8 @@ impl Tool for ExecuteCodeTool {
     }
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
-        let code = params["code"].as_str().unwrap_or("");
-        let language = params["language"].as_str().unwrap_or("python");
+        let _code = params["code"].as_str().unwrap_or("");
+        let _language = params["language"].as_str().unwrap_or("python");
 
         Ok(CallToolResult {
             content: vec![McpContent::Text {
