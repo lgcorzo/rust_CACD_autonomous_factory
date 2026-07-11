@@ -35,7 +35,8 @@ impl ZitiIdentity for OpenZitiIdentity {
             // Use real ziti-sdk to load the identity and authenticate
             // Note: ziti-sdk establishes mTLS via its C CGO wrapper internally.
             // We initialize the context here to ensure the identity is valid and enrolled.
-            let ctx = ziti_sdk::Context::new(&self.identity_file)
+            let _ctx = ziti_sdk::Context::from_file(&self.identity_file)
+                .await
                 .map_err(|e| anyhow::anyhow!("Failed to initialize OpenZiti context: {:?}", e))?;
 
             // In a full implementation, we'd use this Context to create Ziti TCP streams.

@@ -165,7 +165,7 @@ pub fn create_mission_workflow(
     let kafka_client_clone = kafka_client.clone();
     let aethalgard_client_clone = aethalgard_client.clone();
     let code_task = hatchet
-        .task("zeroclaw-execute", move |input: MissionInput, ctx| {
+        .task("zeroclaw-execute", move |input: MissionInput, _ctx| {
             let mcp_client = mcp_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
             let aethalgard_client = aethalgard_client_clone.clone();
@@ -232,6 +232,7 @@ pub fn create_mission_workflow(
                             tracing::info!("Raw validation response: {:?}", raw_res);
                             let mut status = String::new();
                             let mut last_err_msg = "Unknown test failure".to_string();
+                            #[allow(clippy::collapsible_if)]
                             if let Some(content) = raw_res["content"].as_array().and_then(|c| c.first()) {
                                 if let Some(text) = content["text"].as_str() {
                                     tracing::info!("Parsed validation text: {}", text);
@@ -307,7 +308,7 @@ pub fn create_mission_workflow(
     let r2r_client_clone = r2r_client.clone();
     let kafka_client_clone = kafka_client.clone();
     let review_task = hatchet
-        .task("rustant-review", move |input: MissionInput, ctx| {
+        .task("rustant-review", move |input: MissionInput, _ctx| {
             let mcp_client = mcp_client_clone.clone();
             let r2r_client = r2r_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
@@ -352,13 +353,14 @@ pub fn create_mission_workflow(
                 let review_res = rustant.review_mission(&mission_id, "mock diff").await?;
 
                 let mut is_approved = false;
-                if let Some(content) = review_res["content"].as_array().and_then(|c| c.first()) {
-                    if let Some(text) = content["text"].as_str() {
-                        if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(text) {
-                            if parsed["status"] == "approved" {
-                                is_approved = true;
-                            }
-                        }
+                #[allow(clippy::collapsible_if)]
+                if let Some(text) = review_res["content"]
+                    .as_array()
+                    .and_then(|c| c.first())
+                    .and_then(|c| c["text"].as_str())
+                {
+                    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(text) {
+                        is_approved = parsed["status"] == "approved";
                     }
                 }
 
@@ -367,7 +369,7 @@ pub fn create_mission_workflow(
                         .publish_thought(&mission_id, "Review approved. Creating PR...", "factory")
                         .await?;
 
-                    let branch_name = format!("mission-{}", mission_id);
+                    let _branch_name = format!("mission-{}", mission_id);
                     let pr_res = serde_json::json!({
                         "url": format!("https://gitlab.com/repo/merge_requests/{}", mission_id)
                     });

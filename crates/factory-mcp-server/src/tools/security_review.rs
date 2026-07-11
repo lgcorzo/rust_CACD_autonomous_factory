@@ -1,16 +1,13 @@
 use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_openai::config::OpenAIConfig;
-use async_openai::types::{
-    ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
-    CreateChatCompletionRequestArgs,
-};
 use async_openai::Client;
 use async_trait::async_trait;
 use serde_json::{json, Value};
 use std::env;
 
 pub struct SecurityReviewTool {
+    #[allow(dead_code)]
     client: Client<OpenAIConfig>,
 }
 
@@ -58,7 +55,7 @@ impl Tool for SecurityReviewTool {
     }
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
-        let diff = params["diff"].as_str().unwrap_or("");
+        let _diff = params["diff"].as_str().unwrap_or("");
 
         Ok(CallToolResult {
             content: vec![McpContent::Text {

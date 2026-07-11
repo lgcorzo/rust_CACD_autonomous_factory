@@ -3,7 +3,6 @@ use crate::tools::Tool;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use tokio::process::Command;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -31,6 +30,7 @@ pub enum SpecKitCommand {
 }
 
 pub struct SpecKitTool {
+    #[allow(dead_code)]
     specify_cli_path: String,
 }
 
@@ -42,7 +42,7 @@ impl SpecKitTool {
     pub async fn invoke_spec_kit(
         &self,
         command: SpecKitCommand,
-        args: Vec<String>,
+        _args: Vec<String>,
     ) -> anyhow::Result<String> {
         let command_str = serde_json::to_string(&command)?
             .trim_matches('"')
