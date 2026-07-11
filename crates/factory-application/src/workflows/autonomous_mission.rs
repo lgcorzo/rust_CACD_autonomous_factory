@@ -105,14 +105,11 @@ pub fn create_mission_workflow(
     }
 
     let mcp_client: Arc<dyn McpClient> = Arc::new(McpHttpClient::new(mcp_url));
-    let r2r_user = std::env::var("R2R_SUPERUSER_EMAIL").unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
+    let r2r_user =
+        std::env::var("R2R_SUPERUSER_EMAIL").unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
     let r2r_pwd = std::env::var("R2R_SUPERUSER_PASSWORD").unwrap_or_else(|_| "admin".to_string());
 
-    let r2r_client: Arc<dyn R2rClient> = Arc::new(HttpR2rClient::new(
-        r2r_url,
-        r2r_user,
-        r2r_pwd,
-    ));
+    let r2r_client: Arc<dyn R2rClient> = Arc::new(HttpR2rClient::new(r2r_url, r2r_user, r2r_pwd));
     let kafka_client: Arc<dyn KafkaClient> = if kafka_brokers == "mock" || kafka_brokers.is_empty()
     {
         #[cfg(not(feature = "production"))]
@@ -185,19 +182,13 @@ pub fn create_mission_workflow(
                     .publish_thought(&mission_id, "Starting coding phase...", "zeroclaw")
                     .await?;
 
-                let result = match zeroclaw
-                    .execute_task(
-                        &mission_id,
-                        task_desc,
-                        &[],
-                    )
-                    .await {
-                        Ok(r) => r,
-                        Err(e) => {
-                            tracing::error!("zeroclaw-execute failed with error: {:?}", e);
-                            return Err(e);
-                        }
-                    };
+                let result = match zeroclaw.execute_task(&mission_id, task_desc, &[]).await {
+                    Ok(r) => r,
+                    Err(e) => {
+                        tracing::error!("zeroclaw-execute failed with error: {:?}", e);
+                        return Err(e);
+                    }
+                };
                 kafka_client
                     .publish_thought(&mission_id, "Coding completed", "zeroclaw")
                     .await?;
@@ -331,9 +322,7 @@ pub fn create_mission_workflow(
                 kafka_client
                     .publish_thought(&mission_id, "Starting security review phase...", "rustant")
                     .await?;
-                let review = rustant
-                    .review_mission(&mission_id, "mock diff")
-                    .await?;
+                let review = rustant.review_mission(&mission_id, "mock diff").await?;
                 kafka_client
                     .publish_thought(&mission_id, "Review completed", "rustant")
                     .await?;

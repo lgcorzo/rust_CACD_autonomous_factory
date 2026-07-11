@@ -42,7 +42,8 @@ impl Tool for RunTestsTool {
                 text: json!({
                     "status": "success",
                     "output": "Mock tests passed successfully!"
-                }).to_string(),
+                })
+                .to_string(),
             }],
             is_error: false,
         })
