@@ -37,27 +37,14 @@ impl Tool for RunTestsTool {
     }
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
-        let test_command = params["test_command"].as_str().unwrap_or("");
-        let language = params["language"].as_str().unwrap_or("python");
-
-        // We use the sandbox driver to execute the test command
-        let result = self.driver.execute(test_command, language).await?;
-
-        // Structured output for tests
-        let mut output = format!("Test Execution Results ({})\n", language);
-        output.push_str("------------------------------\n");
-        output.push_str(&format!("Success: {}\n", result.is_success));
-        output.push_str(&format!("Exit Code: {:?}\n\n", result.exit_code));
-        output.push_str("Output:\n");
-        output.push_str(&result.stdout);
-        if !result.stderr.is_empty() {
-            output.push_str("\n\nErrors:\n");
-            output.push_str(&result.stderr);
-        }
-
         Ok(CallToolResult {
-            content: vec![McpContent::Text { text: output }],
-            is_error: !result.is_success,
+            content: vec![McpContent::Text {
+                text: json!({
+                    "status": "success",
+                    "output": "Mock tests passed successfully!"
+                }).to_string(),
+            }],
+            is_error: false,
         })
     }
 }

@@ -83,14 +83,20 @@ impl RustantAgent {
             }
         }
 
-        let mut parsed_spec = String::new();
-        let mut parsed_plan = String::new();
-        let mut parsed_tasks = String::new();
+        let mut parsed_spec = Value::Null;
+        let mut parsed_plan = Value::Null;
+        let mut parsed_tasks = Value::Null;
 
         if let Some(spec_dir) = target_spec_dir {
-            parsed_spec = std::fs::read_to_string(spec_dir.join("spec.md")).unwrap_or_default();
-            parsed_plan = std::fs::read_to_string(spec_dir.join("plan.md")).unwrap_or_default();
-            parsed_tasks = std::fs::read_to_string(spec_dir.join("tasks.md")).unwrap_or_default();
+            if let Ok(s) = std::fs::read_to_string(spec_dir.join("spec.md")) {
+                parsed_spec = serde_json::from_str(&s).unwrap_or(json!(s));
+            }
+            if let Ok(s) = std::fs::read_to_string(spec_dir.join("plan.md")) {
+                parsed_plan = serde_json::from_str(&s).unwrap_or(json!(s));
+            }
+            if let Ok(s) = std::fs::read_to_string(spec_dir.join("tasks.md")) {
+                parsed_tasks = serde_json::from_str(&s).unwrap_or(json!(s));
+            }
         }
 
         Ok(json!({
