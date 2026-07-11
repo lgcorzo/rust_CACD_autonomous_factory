@@ -44,7 +44,17 @@ impl McpClient for McpHttpClient {
             return Err(anyhow!("MCP Tool Error: {}", msg));
         }
 
-        Ok(body["result"].clone())
+        let result = body["result"].clone();
+        if result["isError"].as_bool().unwrap_or(false) || result["is_error"].as_bool().unwrap_or(false) {
+            let err_text = result["content"]
+                .as_array()
+                .and_then(|c| c.first())
+                .and_then(|c| c["text"].as_str())
+                .unwrap_or("Unknown tool execution error");
+            return Err(anyhow!("MCP Tool Execution Failed: {}", err_text));
+        }
+
+        Ok(result)
     }
 }
 
@@ -141,7 +151,17 @@ impl McpClient for McpSseClient {
             return Err(anyhow!("MCP Tool Error: {}", msg));
         }
 
-        Ok(body["result"].clone())
+        let result = body["result"].clone();
+        if result["isError"].as_bool().unwrap_or(false) || result["is_error"].as_bool().unwrap_or(false) {
+            let err_text = result["content"]
+                .as_array()
+                .and_then(|c| c.first())
+                .and_then(|c| c["text"].as_str())
+                .unwrap_or("Unknown tool execution error");
+            return Err(anyhow!("MCP Tool Execution Failed: {}", err_text));
+        }
+
+        Ok(result)
     }
 }
 
