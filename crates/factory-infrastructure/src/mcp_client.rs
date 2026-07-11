@@ -45,7 +45,9 @@ impl McpClient for McpHttpClient {
         }
 
         let result = body["result"].clone();
-        if result["isError"].as_bool().unwrap_or(false) || result["is_error"].as_bool().unwrap_or(false) {
+        if result["isError"].as_bool().unwrap_or(false)
+            || result["is_error"].as_bool().unwrap_or(false)
+        {
             let err_text = result["content"]
                 .as_array()
                 .and_then(|c| c.first())
@@ -152,7 +154,9 @@ impl McpClient for McpSseClient {
         }
 
         let result = body["result"].clone();
-        if result["isError"].as_bool().unwrap_or(false) || result["is_error"].as_bool().unwrap_or(false) {
+        if result["isError"].as_bool().unwrap_or(false)
+            || result["is_error"].as_bool().unwrap_or(false)
+        {
             let err_text = result["content"]
                 .as_array()
                 .and_then(|c| c.first())

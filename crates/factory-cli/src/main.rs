@@ -72,11 +72,17 @@ async fn main() -> anyhow::Result<()> {
 
             tracing::info!("Starting Hatchet worker...");
 
-            let token = std::env::var("HATCHET_CLIENT_TOKEN").expect("HATCHET_CLIENT_TOKEN must be set");
-            let server_url = std::env::var("HATCHET_CLIENT_REST_URL").unwrap_or_else(|_| "http://127.0.0.1:8080".to_string());
-            let grpc_url = std::env::var("HATCHET_CLIENT_GRPC_URL").unwrap_or_else(|_| "127.0.0.1:7070".to_string());
-            let tls_strategy = std::env::var("HATCHET_CLIENT_TLS_STRATEGY").unwrap_or_else(|_| "none".to_string());
-            let hatchet = hatchet_sdk::Hatchet::from_token(&server_url, &grpc_url, &token, &tls_strategy).await?;
+            let token =
+                std::env::var("HATCHET_CLIENT_TOKEN").expect("HATCHET_CLIENT_TOKEN must be set");
+            let server_url = std::env::var("HATCHET_CLIENT_REST_URL")
+                .unwrap_or_else(|_| "http://127.0.0.1:8080".to_string());
+            let grpc_url = std::env::var("HATCHET_CLIENT_GRPC_URL")
+                .unwrap_or_else(|_| "127.0.0.1:7070".to_string());
+            let tls_strategy =
+                std::env::var("HATCHET_CLIENT_TLS_STRATEGY").unwrap_or_else(|_| "none".to_string());
+            let hatchet =
+                hatchet_sdk::Hatchet::from_token(&server_url, &grpc_url, &token, &tls_strategy)
+                    .await?;
             let mut worker = hatchet.worker("factory-worker").slots(10).build().unwrap();
 
             // Register workflows
