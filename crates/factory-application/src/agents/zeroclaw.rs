@@ -20,6 +20,7 @@ impl ZeroClawAgent {
         }
     }
 
+    #[allow(clippy::collapsible_if)]
     pub async fn execute_task(
         &self,
         mission_id: &str,
