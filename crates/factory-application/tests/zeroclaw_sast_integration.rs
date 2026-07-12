@@ -7,6 +7,12 @@ use std::sync::Arc;
 async fn test_zeroclaw_blocks_execution_on_sast_failure() {
     let mut mock_mcp = MockMcpClient::new();
 
+    mock_mcp
+        .expect_call_tool_json()
+        .withf(|tool, _params| tool == "sync_bridge_state")
+        .times(1)
+        .returning(|_, _| Ok(json!({"is_error": false, "content": []})));
+
     // Mock the SAST call to return a score < 8.0
     mock_mcp
         .expect_call_tool_json()
@@ -25,10 +31,10 @@ async fn test_zeroclaw_blocks_execution_on_sast_failure() {
             }))
         });
 
-    // execute_code should NEVER be called since SAST failed
+    // launch_sandbox_pod should NEVER be called since SAST failed
     mock_mcp
         .expect_call_tool_json()
-        .withf(|tool, _params| tool == "execute_code")
+        .withf(|tool, _params| tool == "launch_sandbox_pod")
         .times(0)
         .returning(|_, _| Ok(json!({})));
 
@@ -48,6 +54,12 @@ async fn test_zeroclaw_blocks_execution_on_sast_failure() {
 async fn test_zeroclaw_allows_execution_on_sast_pass() {
     let mut mock_mcp = MockMcpClient::new();
 
+    mock_mcp
+        .expect_call_tool_json()
+        .withf(|tool, _params| tool == "sync_bridge_state")
+        .times(2)
+        .returning(|_, _| Ok(json!({"is_error": false, "content": []})));
+
     // Mock the SAST call to return a score >= 8.0
     mock_mcp
         .expect_call_tool_json()
@@ -66,10 +78,10 @@ async fn test_zeroclaw_allows_execution_on_sast_pass() {
             }))
         });
 
-    // execute_code SHOULD be called
+    // launch_sandbox_pod SHOULD be called
     mock_mcp
         .expect_call_tool_json()
-        .withf(|tool, _params| tool == "execute_code")
+        .withf(|tool, _params| tool == "launch_sandbox_pod")
         .times(1)
         .returning(|_, _| {
             Ok(json!({

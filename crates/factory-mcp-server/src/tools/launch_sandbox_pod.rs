@@ -71,7 +71,9 @@ impl Tool for LaunchSandboxPodTool {
             _ => return Err(anyhow::anyhow!("Unsupported language")),
         };
 
-        let job_json = serde_json::json!({
+        let use_gvisor = std::env::var("USE_GVISOR").unwrap_or_default() == "true";
+
+        let mut job_json = serde_json::json!({
             "apiVersion": "batch/v1",
             "kind": "Job",
             "metadata": {
@@ -87,7 +89,6 @@ impl Tool for LaunchSandboxPodTool {
                         }
                     },
                     "spec": {
-                        "runtimeClassName": "gvisor",
                         "restartPolicy": "Never",
                         "containers": [{
                             "name": "sandbox",
@@ -98,10 +99,6 @@ impl Tool for LaunchSandboxPodTool {
                                 "limits": {
                                     "memory": "30Mi",
                                     "cpu": "100m"
-                                },
-                                "requests": {
-                                    "memory": "10Mi",
-                                    "cpu": "50m"
                                 }
                             }
                         }]
@@ -109,6 +106,17 @@ impl Tool for LaunchSandboxPodTool {
                 }
             }
         });
+
+        if use_gvisor {
+            if let Some(spec) = job_json
+                .get_mut("spec")
+                .and_then(|s| s.get_mut("template"))
+                .and_then(|t| t.get_mut("spec"))
+                .and_then(|s| s.as_object_mut())
+            {
+                spec.insert("runtimeClassName".to_string(), serde_json::json!("gvisor"));
+            }
+        }
 
         let job: Job = serde_json::from_value(job_json)?;
 
