@@ -12,7 +12,10 @@ async fn main() -> anyhow::Result<()> {
 
     // Parse --payload
     let mut args = std::env::args().skip(1);
-    let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs();
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
     let mut mission_id = format!("test-uuid-{}", timestamp);
     let mut goal = "Test goal".to_string();
 
@@ -22,7 +25,10 @@ async fn main() -> anyhow::Result<()> {
                 if let Ok(payload) = serde_json::from_str::<serde_json::Value>(&payload_str) {
                     let event_id = payload["event_id"].as_str().unwrap_or("test-uuid-default");
                     mission_id = format!("{}-{}", event_id, timestamp);
-                    goal = payload["message"].as_str().unwrap_or("Test goal").to_string();
+                    goal = payload["message"]
+                        .as_str()
+                        .unwrap_or("Test goal")
+                        .to_string();
                 }
             }
         }
@@ -34,7 +40,11 @@ async fn main() -> anyhow::Result<()> {
         repository_path: String::new(),
     };
 
-    tracing::info!("Triggering darkgravitymission with ID: {} and goal: {}", mission_id, goal);
+    tracing::info!(
+        "Triggering darkgravitymission with ID: {} and goal: {}",
+        mission_id,
+        goal
+    );
     match hatchet
         .workflow::<MissionInput, factory_application::workflows::MissionOutput>(
             "darkgravitymission-dev-lgcorzo",

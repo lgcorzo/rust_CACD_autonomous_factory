@@ -9,10 +9,7 @@ pub struct BridgeTool;
 
 impl BridgeTool {
     fn get_checkpoint_path(mission_id: &str) -> PathBuf {
-        PathBuf::from(format!(
-            "./checkpoints/bridge_state_{}.json",
-            mission_id
-        ))
+        PathBuf::from(format!("./checkpoints/bridge_state_{}.json", mission_id))
     }
 
     pub fn load_state(mission_id: &str) -> anyhow::Result<Value> {

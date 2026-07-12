@@ -72,7 +72,7 @@ impl Tool for LaunchSandboxPodTool {
         };
 
         let use_gvisor = std::env::var("USE_GVISOR").unwrap_or_default() == "true";
-        
+
         let mut job_json = serde_json::json!({
             "apiVersion": "batch/v1",
             "kind": "Job",
@@ -108,7 +108,8 @@ impl Tool for LaunchSandboxPodTool {
         });
 
         if use_gvisor {
-            if let Some(spec) = job_json.get_mut("spec")
+            if let Some(spec) = job_json
+                .get_mut("spec")
                 .and_then(|s| s.get_mut("template"))
                 .and_then(|t| t.get_mut("spec"))
                 .and_then(|s| s.as_object_mut())
