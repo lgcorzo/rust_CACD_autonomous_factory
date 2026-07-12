@@ -22,4 +22,5 @@
 ### 📋 Project
 * [Mission History](EXPERIMENT-LOGS)
 * [README](README)
+* [User Manual](USER-MANUAL)
 * [Test Plan Report](Test_Plan_Report)
