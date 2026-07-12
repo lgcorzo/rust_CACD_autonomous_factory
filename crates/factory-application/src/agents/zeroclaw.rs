@@ -71,21 +71,21 @@ impl ZeroClawAgent {
                 .await?;
 
             // Extract score or status from SAST
-            let is_rejected = if let Some(content) =
-                sast_result["content"].as_array().and_then(|c| c.first())
-            {
-                if let Some(text) = content["text"].as_str() {
-                    if let Ok(parsed) = serde_json::from_str::<Value>(text) {
-                        parsed["score"].as_f64().unwrap_or(0.0) < 8.0 || parsed["status"] == "rejected"
+            let is_rejected =
+                if let Some(content) = sast_result["content"].as_array().and_then(|c| c.first()) {
+                    if let Some(text) = content["text"].as_str() {
+                        if let Ok(parsed) = serde_json::from_str::<Value>(text) {
+                            parsed["score"].as_f64().unwrap_or(0.0) < 8.0
+                                || parsed["status"] == "rejected"
+                        } else {
+                            true // If we can't parse it, fail safely
+                        }
                     } else {
-                        true // If we can't parse it, fail safely
+                        true
                     }
                 } else {
                     true
-                }
-            } else {
-                true
-            };
+                };
 
             if is_rejected || sast_result["is_error"].as_bool().unwrap_or(false) {
                 anyhow::bail!(
