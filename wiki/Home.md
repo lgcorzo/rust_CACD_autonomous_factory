@@ -26,6 +26,7 @@ The system orchestrates a specialized autonomous workforce — **Rustant** (Plan
 - **[PRODUCTION-OPERATIONS](PRODUCTION-OPERATIONS)**: K8s Deployments, KEDA Scaling, Secrets.
 
 ### 4. History & Governance
+- **[USER-MANUAL](USER-MANUAL)**: Setup, Agent usage, and Operational guides.
 - **[EXPERIMENT-LOGS](EXPERIMENT-LOGS)**: Historical audit of missions and performance.
 - **[Test Plan Report](Test_Plan_Report)**: Documentation verification results.
 
