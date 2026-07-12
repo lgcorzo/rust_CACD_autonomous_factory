@@ -3,6 +3,7 @@ use hatchet_sdk::Hatchet;
 use hatchet_sdk::Runnable;
 
 #[tokio::main]
+#[allow(clippy::collapsible_if)]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
 
