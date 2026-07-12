@@ -20,6 +20,7 @@ impl ZeroClawAgent {
         }
     }
 
+    #[allow(clippy::collapsible_if)]
     pub async fn execute_task(
         &self,
         mission_id: &str,
@@ -32,37 +33,82 @@ impl ZeroClawAgent {
             task_description
         );
 
-        // 1. SAST Forensic Scan
-        let sast_result = self
+        // Load checkpointed state
+        let mut sast_complete = false;
+        if let Ok(res) = self
             .mcp_client
             .call_tool_json(
-                "security_review",
+                "sync_bridge_state",
                 json!({
-                    "diff": task_description
+                    "action": "load",
+                    "mission_id": mission_id
                 }),
             )
-            .await?;
-
-        // Extract score or status from SAST
-        let is_rejected = if let Some(content) =
-            sast_result["content"].as_array().and_then(|c| c.first())
+            .await
         {
-            if let Some(text) = content["text"].as_str() {
-                if let Ok(parsed) = serde_json::from_str::<Value>(text) {
-                    parsed["score"].as_f64().unwrap_or(0.0) < 8.0 || parsed["status"] == "rejected"
-                } else {
-                    true // If we can't parse it, fail safely
+            if !res["is_error"].as_bool().unwrap_or(false) {
+                if let Some(content) = res["content"].as_array().and_then(|c| c.first()) {
+                    if let Some(text) = content["text"].as_str() {
+                        if let Ok(state) = serde_json::from_str::<Value>(text) {
+                            sast_complete = state["sast_complete"].as_bool().unwrap_or(false);
+                        }
+                    }
                 }
-            } else {
-                true
             }
-        } else {
-            true
-        };
+        }
 
-        if is_rejected || sast_result["is_error"].as_bool().unwrap_or(false) {
-            anyhow::bail!(
-                "Security scan failed: SAST score < 8.0 or LLM error. Execution blocked."
+        if !sast_complete {
+            tracing::info!("[ZeroClawAgent:{}] Running SAST Forensic Scan", mission_id);
+            // 1. SAST Forensic Scan
+            let sast_result = self
+                .mcp_client
+                .call_tool_json(
+                    "security_review",
+                    json!({
+                        "diff": task_description
+                    }),
+                )
+                .await?;
+
+            // Extract score or status from SAST
+            let is_rejected =
+                if let Some(content) = sast_result["content"].as_array().and_then(|c| c.first()) {
+                    if let Some(text) = content["text"].as_str() {
+                        if let Ok(parsed) = serde_json::from_str::<Value>(text) {
+                            parsed["score"].as_f64().unwrap_or(0.0) < 8.0
+                                || parsed["status"] == "rejected"
+                        } else {
+                            true // If we can't parse it, fail safely
+                        }
+                    } else {
+                        true
+                    }
+                } else {
+                    true
+                };
+
+            if is_rejected || sast_result["is_error"].as_bool().unwrap_or(false) {
+                anyhow::bail!(
+                    "Security scan failed: SAST score < 8.0 or LLM error. Execution blocked."
+                );
+            }
+
+            // Save state after successful SAST
+            let _ = self
+                .mcp_client
+                .call_tool_json(
+                    "sync_bridge_state",
+                    json!({
+                        "action": "save",
+                        "mission_id": mission_id,
+                        "state": { "sast_complete": true }
+                    }),
+                )
+                .await;
+        } else {
+            tracing::info!(
+                "[ZeroClawAgent:{}] SAST scan already complete from previous checkpoint. Resuming...",
+                mission_id
             );
         }
 
@@ -71,7 +117,7 @@ impl ZeroClawAgent {
         let result = self
             .mcp_client
             .call_tool_json(
-                "execute_code",
+                "launch_sandbox_pod",
                 json!({
                     "code": task_description,
                     "language": "python" // Assume python for now, or detect

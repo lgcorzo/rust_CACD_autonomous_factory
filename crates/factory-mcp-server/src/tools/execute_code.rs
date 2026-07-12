@@ -38,14 +38,26 @@ impl Tool for ExecuteCodeTool {
     }
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
-        let _code = params["code"].as_str().unwrap_or("");
-        let _language = params["language"].as_str().unwrap_or("python");
+        let code = params["code"].as_str().unwrap_or("");
+        let language = params["language"].as_str().unwrap_or("python");
 
-        Ok(CallToolResult {
-            content: vec![McpContent::Text {
-                text: "Mock execution successful.".to_string(),
-            }],
-            is_error: false,
-        })
+        match self.driver.execute(code, language).await {
+            Ok(res) => {
+                let output = format!(
+                    "Execution finished.\nExit code: {:?}\nStdout:\n{}\nStderr:\n{}",
+                    res.exit_code, res.stdout, res.stderr
+                );
+                Ok(CallToolResult {
+                    content: vec![McpContent::Text { text: output }],
+                    is_error: !res.is_success,
+                })
+            }
+            Err(e) => Ok(CallToolResult {
+                content: vec![McpContent::Text {
+                    text: format!("Execution failed: {}", e),
+                }],
+                is_error: true,
+            }),
+        }
     }
 }
