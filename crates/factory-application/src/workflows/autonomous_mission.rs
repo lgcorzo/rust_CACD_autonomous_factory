@@ -176,7 +176,7 @@ pub fn create_mission_workflow(
 
             Box::pin(async move {
                 let zeroclaw = ZeroClawAgent::new(mcp_client, aethalgard_client);
-                let task_desc = "Execute the mission";
+                let task_desc = "import time\ntime.sleep(15)\nprint('Done')";
 
                 kafka_client
                     .publish_thought(&mission_id, "Starting coding phase...", "zeroclaw")
@@ -394,11 +394,11 @@ pub fn create_mission_workflow(
             })
         })
         .build()
-        .unwrap()
-        .add_parent(&review_task);
+        .unwrap();
 
     hatchet
-        .workflow("darkgravitymission-test")
+        .workflow("darkgravitymission-dev-lgcorzo")
+        .version("1.2.0".to_string())
         .build()
         .unwrap()
         .add_task(&plan_task)

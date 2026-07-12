@@ -10,6 +10,9 @@ use tower_http::cors::CorsLayer;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .ok();
 
     tracing::info!("Initializing MCP Server...");
     let server = Arc::new(McpServer::new());

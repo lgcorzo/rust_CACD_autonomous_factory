@@ -10,7 +10,7 @@ pub struct BridgeTool;
 impl BridgeTool {
     fn get_checkpoint_path(mission_id: &str) -> PathBuf {
         PathBuf::from(format!(
-            "/data/checkpoints/bridge_state_{}.json",
+            "./checkpoints/bridge_state_{}.json",
             mission_id
         ))
     }
@@ -31,6 +31,9 @@ impl BridgeTool {
 
     pub fn save_state(mission_id: &str, state: Value) -> anyhow::Result<Value> {
         let path = Self::get_checkpoint_path(mission_id);
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
         let content = serde_json::to_string_pretty(&state)?;
         fs::write(&path, content)?;
 
