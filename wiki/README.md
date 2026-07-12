@@ -15,6 +15,7 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 | [**Testing Strategy**](VERIFICATION-TRIAD) | Quality Assurance | Logical, Architectural, Security Validation. |
 | [**Integrations**](INFRASTRUCTURE-ADAPTERS) | External Connectivity | **Kafka**, **R2R GraphRAG**, **OpenZiti**, **Jira**, **S3**, **Sentry**. |
 | [**Deployment Guide**](PRODUCTION-OPERATIONS) | Operations & Scaling | GitOps, K8s Manifests, KEDA, Sealed Secrets. |
+| [**User Manual**](USER-MANUAL) | User Guides | Project onboarding, setup, and usage. |
 
 ---
 
