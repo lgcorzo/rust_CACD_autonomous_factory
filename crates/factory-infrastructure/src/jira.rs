@@ -44,8 +44,7 @@ impl JiraClient for HttpJiraClient {
 
         if !res.status().is_success() {
             let status = res.status();
-            let body = res.text().await.unwrap_or_default();
-            tracing::error!("Jira search failed with status {}. Body: {}", status, body);
+            tracing::error!("Jira search failed with status {}", status);
             anyhow::bail!("Jira search failed with status {}", status);
         }
 
