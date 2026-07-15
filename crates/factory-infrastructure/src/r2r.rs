@@ -38,20 +38,12 @@ impl HttpR2rClient {
         let login_body = login_res.text().await?;
 
         if !login_status.is_success() {
-            tracing::error!(
-                "R2R login failed with status {}. Body: {}",
-                login_status,
-                login_body
-            );
+            tracing::error!("R2R login failed with status {}", login_status);
             anyhow::bail!("R2R login failed with status {}", login_status);
         }
 
         let login_data: serde_json::Value = serde_json::from_str(&login_body).map_err(|e| {
-            tracing::error!(
-                "Failed to decode R2R login response: {}. Body: {}",
-                e,
-                login_body
-            );
+            tracing::error!("Failed to decode R2R login response: {}", e);
             anyhow::anyhow!("Failed to decode R2R login response")
         })?;
 
@@ -59,10 +51,7 @@ impl HttpR2rClient {
             .as_str()
             .or_else(|| login_data["results"]["access_token"]["token"].as_str())
             .ok_or_else(|| {
-                tracing::error!(
-                    "Failed to retrieve access token from R2R. Response was: {}",
-                    login_data
-                );
+                tracing::error!("Failed to retrieve access token from R2R");
                 anyhow::anyhow!("Failed to retrieve access token from R2R")
             })?;
 
@@ -96,20 +85,12 @@ impl R2rClient for HttpR2rClient {
         let body_text = search_res.text().await?;
 
         if !status.is_success() {
-            tracing::error!(
-                "R2R search query failed with status {}. Body: {}",
-                status,
-                body_text
-            );
+            tracing::error!("R2R search query failed with status {}", status);
             anyhow::bail!("R2R search query failed with status {}", status);
         }
 
         let search_data: serde_json::Value = serde_json::from_str(&body_text).map_err(|e| {
-            tracing::error!(
-                "Failed to decode R2R search response: {}. Body: {}",
-                e,
-                body_text
-            );
+            tracing::error!("Failed to decode R2R search response: {}", e);
             anyhow::anyhow!("Failed to decode R2R search response")
         })?;
 
@@ -156,14 +137,9 @@ impl R2rClient for HttpR2rClient {
             .await?;
 
         let status = metrics_res.status();
-        let body_text = metrics_res.text().await?;
 
         if !status.is_success() {
-            tracing::error!(
-                "Failed to push OSR metric to R2R. Status: {}. Body: {}",
-                status,
-                body_text
-            );
+            tracing::error!("Failed to push OSR metric to R2R. Status: {}", status);
             anyhow::bail!("Failed to push OSR metric with status {}", status);
         }
 
