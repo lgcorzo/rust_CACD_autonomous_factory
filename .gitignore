@@ -44,3 +44,7 @@ target/
 graphify-out/
 .graphify_labels.json
 .graphify_root
+
+# spec-kit
+.specify/
+.agents/
