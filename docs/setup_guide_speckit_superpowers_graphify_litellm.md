@@ -1,6 +1,6 @@
 # Comprehensive Setup Guide: Spec Kit, Superpowers, Graphify, and LiteLLM Gateway Integration
 
-This document provides a step-by-step installation, configuration, and operational guide for integrating **Spec Kit**, **Superpowers**, and **Graphify** powered by an internal **LiteLLM Gateway** (with models like `ollama/qwen2.5:7b` and `ollama/qwen2.5-coder:7b`).
+This document provides a step-by-step installation, configuration, and operational guide for integrating **Spec Kit**, **Superpowers**, and **Graphify**, powered by an internal **LiteLLM Gateway** (with models such as `ollama/qwen2.5:7b` and `ollama/qwen2.5-coder:7b`).
 
 ---
 
@@ -57,9 +57,7 @@ data:
 
 ### 1.2 Nginx Reverse Proxy ConfigMap (`client_max_body_size`)
 
-To prevent `HTTP 413 Request Entity Too Large` errors when Graphify or Spec Kit sends large context batches:
-
-In `gitops_internal_lgcorzo/infrastructure/llm-apps/litellm/litellm-nginx-config-cm.yaml`:
+To prevent `HTTP 413 Request Entity Too Large` errors when Graphify or Spec Kit sends large context batches, adjust `litellm-nginx-config-cm.yaml`:
 
 ```nginx
 http {
@@ -85,7 +83,7 @@ export LITELLM_API_BASE="https://litellm.ziti/v1"
 
 ---
 
-## 2. Graphify Setup
+## 2. Graphify Knowledge Graph Setup
 
 `graphify` parses your repository into a navigable AST knowledge graph and uses LiteLLM Gateway models for semantic extraction over documentation and code architecture.
 
@@ -98,24 +96,24 @@ uv tool install graphifyy
 # or: pip install graphifyy
 ```
 
-### 2.2 Register Agent Hooks for Graphify
+### 2.2 Register Agent Hooks
 
-To integrate Graphify into your coding assistant environment:
+To integrate Graphify into your coding assistant runtime:
 
 ```bash
 graphify antigravity install
 # or for Codex: graphify codex install
 ```
 
-### 2.4 AST-Only Graph Update (Free / No LLM Cost)
+### 2.3 AST-Only Graph Update (Free / No LLM Cost)
 
-To update code symbols, dependencies, and file relationships without invoking LLMs:
+To index or update code symbols, dependencies, and file relationships without invoking LLMs:
 
 ```bash
 graphify update .
 ```
 
-### 2.5 Semantic Graph Extraction via LiteLLM Gateway
+### 2.4 Semantic Graph Extraction via LiteLLM Gateway
 
 When running full semantic extraction over documentation using `ollama/qwen2.5:7b` via LiteLLM:
 
@@ -166,19 +164,20 @@ mkdir -p ~/.gemini/config/plugins/superpowers
 
 ---
 
-## 4. Spec Kit Workflow Setup
+## 4. Spec Kit & Superpowers Bridge Setup
 
 Spec Kit standardizes specification-driven development using `.specify/` specs, implementation plans, and ordered task lists.
 
 ### 4.1 Installation & Superpowers Bridge Integration
 
 Add Spec Kit to your environment:
+
 ```bash
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 specify init --here --integration agy
 ```
 
-#### Connecting Spec-Kit with Superpowers via Superpowers Bridge (`speckit-superpowers-bridge`)
+#### Connecting Spec Kit with Superpowers via `speckit-superpowers-bridge`
 
 **Superpowers Implementation Bridge** (`speckit-superpowers-bridge` v1.1.0) is the thin orchestrator between **Spec Kit** (design) and **Superpowers** (implementation). Installed into `.specify/extensions/speckit-superpowers-bridge/`, it exposes 3 specialized commands:
 
@@ -236,25 +235,19 @@ sequenceDiagram
     Agent->>SpecKit: speckit-implement (Execute tasks using TDD & Verification)
 ```
 
-1. `/speckit-specify` — Create or update feature specification.
-2. `/speckit-plan` — Generate design artifacts and implementation plan.
-3. `/speckit-tasks` — Build dependency-ordered `tasks.md`.
-4. `/speckit-analyze` — Run quality check across `spec.md`, `plan.md`, and `tasks.md`.
-5. `/speckit-implement` — Execute tasks sequentially with automated verification.
-
-### 4.4 Getting Started
+### 4.4 Step-by-Step Feature Workflow
 
 1. **Initialize Project Governance**
    ```bash
    /speckit.constitution MyProject
    ```
-   This creates the `.specify/` directory structure and interviews you about core principles, technology stack, and quality gates.
+   Creates the `.specify/` directory structure and sets project coding standards, tech stack, and quality gates.
 
-2. **Write Your First Spec**
+2. **Write Your Feature Specification**
    ```bash
    /speckit.specify "User authentication with email and password"
    ```
-   This creates a feature specification at `specs/001-user-authentication/spec.md` with user stories, requirements, and success criteria.
+   Creates a feature specification at `specs/001-user-authentication/spec.md` with user stories, requirements, and success criteria.
 
 3. **Brainstorm & Refine Requirements**
    ```bash
@@ -275,12 +268,12 @@ sequenceDiagram
 
 ## 5. Integrated End-to-End Development Workflow
 
-When all components (**LiteLLM Gateway**, **Graphify**, **Superpowers**, **Spec-Kit**, and **Superpowers Bridge**) are installed and configured, the autonomous factory operates under a unified 5-phase execution workflow:
+When all components (**LiteLLM Gateway**, **Graphify**, **Superpowers**, **Spec Kit**, and **Superpowers Bridge**) are installed and configured, the autonomous factory operates under a unified 5-phase execution workflow:
 
 ```mermaid
 flowchart TD
     Phase1[1. Context & Exploration<br/>Graphify + LiteLLM] --> Phase2[2. Design & Alignment<br/>Superpowers Brainstorming]
-    Phase2 --> Phase3[3. Specification & Planning<br/>Spec-Kit + Superpowers Bridge]
+    Phase2 --> Phase3[3. Specification & Planning<br/>Spec Kit + Superpowers Bridge]
     Phase3 --> Phase4[4. TDD & Implementation<br/>Superpowers TDD & Debugging]
     Phase4 --> Phase5[5. Empirical Verification & AST Refresh<br/>Verification + Graphify Update]
 
@@ -296,7 +289,7 @@ flowchart TD
 
 #### Phase 1: Context & Architecture Exploration
 - **Tools**: `Graphify`, `LiteLLM Gateway`
-- **Action**: Before modifying code, query the AST Knowledge Graph to inspect existing symbols, callers, and module boundaries without consuming high token counts.
+- **Action**: Query the AST Knowledge Graph to inspect existing symbols, callers, and module boundaries without consuming high token counts.
 - **Commands**:
   ```bash
   graphify query "Explain the architecture and main dependencies of module X"
@@ -307,8 +300,8 @@ flowchart TD
 - **Action**: Explore user intent, business requirements, and potential edge cases before writing formal specs. Clarify architectural choices and trade-offs.
 
 #### Phase 3: Specification & Task Planning
-- **Tools**: `Spec-Kit`, `Superpowers Bridge` (`speckit-superpowers-bridge` installed into `.specify/extensions/speckit-superpowers-bridge/`)
-- **Action**: Run the Spec-Kit pipeline. Superpowers Bridge injects Superpowers guidelines into each artifact generation step, ensuring strict governance and zero hallucinations.
+- **Tools**: `Spec Kit`, `Superpowers Bridge` (`speckit-superpowers-bridge`)
+- **Action**: Run the Spec Kit pipeline. Superpowers Bridge injects Superpowers guidelines into each artifact generation step, ensuring strict governance and zero hallucinations.
 - **Pipeline Execution**:
   1. `/speckit-specify` — Define business intent and requirement contracts in `spec.md`.
   2. `/speckit-plan` — Design system architecture and component structure in `plan.md`.
@@ -316,7 +309,7 @@ flowchart TD
   4. `/speckit-analyze` — Execute cross-artifact consistency validation across `spec.md`, `plan.md`, and `tasks.md`.
 
 #### Phase 4: Test-Driven Implementation & Debugging
-- **Tools**: `Superpowers` (`test-driven-development`, `systematic-debugging`), `Spec-Kit` (`/speckit-implement`)
+- **Tools**: `Superpowers` (`test-driven-development`, `systematic-debugging`), `Spec Kit` (`/speckit-implement`)
 - **Action**: Execute tasks sequentially from `tasks.md`:
   - **TDD Cycle**: Write failing tests first (Red), implement code to pass (Green), and refactor cleanly (Refactor).
   - **Systematic Debugging**: If tests or compilation fail, analyze logs and trace root causes before modifying code.
@@ -325,14 +318,61 @@ flowchart TD
 - **Tools**: `Superpowers` (`verification-before-completion`), `Graphify` (`graphify update .`)
 - **Action**:
   1. Run automated build and test suites (`cargo test`, `pytest`, `npm test`) to obtain empirical proof of success.
-  2. Execute AST graph update to keep the project's knowledge graph in sync with the new code changes without incurring LLM API costs:
+  2. Execute AST graph update to keep the project's knowledge graph in sync with code changes without incurring LLM API costs:
      ```bash
      graphify update .
      ```
 
 ---
 
-## 6. Verification & Best Practices
+## 6. Command-by-Command Reference Guide
+
+Here is the complete command-by-command reference guide for the combined architecture (**Spec Kit** + **Spec Kit Superpowers Bridge** + **Superpowers** + **Graphify**).
+
+### Step 0: Initialize Structural Memory (The Foundation)
+Before touching any feature specification, give your agent a structural map of the existing repository using Graphify.
+- **Command**: `graphify .`
+- **What it does**: Uses local tree-sitter AST parsing to map code, SQL schemas, and config files into local queryable files (`graphify-out/graph.json`, `GRAPH_REPORT.md`, and `graph.html`).
+- **Why it matters**: Gives the agent instant topological awareness of dependencies, modules, and "god nodes".
+
+### Step 1: Establish Project Governance
+- **Command**: `/speckit.constitution`
+- **What it does**: Scaffolds `.specify/memory/constitution.md` to define project-wide coding standards, testing rules, and architectural boundaries.
+
+### Step 2: Define Feature Requirements
+- **Command**: `/speckit.specify` (followed by your feature description)
+- **What it does**: Creates an isolated working branch and generates a clear requirements document at `specs/[feature-id]/spec.md`.
+
+### Step 3: Socratic Clarification & Edge-Case Deep-Dive
+- **Command**: `/speckit.clarify` (or Superpowers `brainstorming` skill)
+- **What it does**: Invokes interactive Socratic dialogue to walk through edge cases, failure modes, and trade-offs before code is written.
+
+### Step 4: Technical Planning & Sizing
+- **Command**: `/speckit.plan`
+- **What it does**: Generates `specs/[feature-id]/plan.md`, specifying the tech stack, data contracts, and architecture.
+- **Graphify Synergy**: The agent queries `graph.json` via Graphify to ensure the plan respects existing dependency boundaries.
+
+### Step 5: Atomic Task Decomposition
+- **Command**: `/speckit.tasks`
+- **What it does**: Translates `plan.md` into an atomic task checklist inside `specs/[feature-id]/tasks.md`, structured into bite-sized steps with explicit ordering.
+
+### Step 6: Bridge Guard, Handoff & Disciplined Execution (TDD Core)
+- **Commands**: 
+  - `/speckit.speckit-superpowers-bridge.handoff` — Create/update implementation handoff state.
+  - `/speckit.speckit-superpowers-bridge.guard` — Enforce ownership boundaries between design artifacts and implementation files.
+  - `/speckit.speckit-superpowers-bridge.execute` — Execute Spec Kit `tasks.md` through the Superpowers bridge.
+- **What it does**:
+  1. **Git Worktree Isolation**: Provisions an isolated workspace (`using-git-worktrees`).
+  2. **Test-Driven Development (TDD)**: Forces a strict Red-Green-Refactor loop for every task (`test-driven-development`).
+  3. **Subagent-Driven Iteration**: Dispatches focused subagents (`subagent-driven-development`) to tackle tasks sequentially while cross-checking quality.
+
+### Step 7: Convergence & Code Review
+- **Command**: Superpowers `requesting-code-review` / `verification-before-completion`
+- **What it does**: Assesses the codebase against `spec.md`, `plan.md`, and `tasks.md`. When clean, Superpowers initiates branch finishing (`finishing-a-development-branch`) to verify all system tests pass before opening a PR.
+
+---
+
+## 7. Verification & Best Practices
 
 1. **Verify Gateway Status**:
    ```bash
@@ -345,82 +385,13 @@ flowchart TD
 3. **Enforce Verification Before Completion**:
    Never mark tasks complete without running builds and unit tests (`cargo test`, `pytest`, `npm test`).
 
-
 ---
 
-## 7. Command-by-Command Reference Guide
+## Daily Cheat Sheet
 
-Here is the complete command-by-command reference guide for your combined architecture (**Spec-Kit** + **Spec Kit Superpowers Bridge** + **Superpowers** + **Graphify**).
-
-This sequence outlines the exact command you call at each step, what happens behind the scenes, and how the engines coordinate to maintain absolute discipline without burning tokens.
-
-### Step 0: Initialize Structural Memory (The Foundation)
-Before you touch any feature specification, give your agent a structural map of the existing repository using Graphify.
-
-- **Command**: `/graphify .` (or `graphify .` in terminal depending on your agent runtime)
-- **What it does**: Uses local tree-sitter AST parsing (zero vector databases, zero cloud telemetry) to map your code, SQL schemas, and config files into local queryable files (`graphify-out/graph.json`, `GRAPH_REPORT.md`, and `graph.html`).
-- **Why it matters**: Ensures your agent has instant topological awareness of dependencies, modules, and "god nodes" from second zero.
-
-### Step 1: Establish Project Governance
-Set the constitutional ground rules that apply to the entire application.
-
-- **Command**: `/speckit.constitution`
-- **What it does**: Scaffolds `.specify/memory/constitution.md` to define project-wide coding standards, testing rules, and architectural boundaries.
-- **Bridge Behavior**: Spec-Kit securely owns this governance asset; no other tool can overwrite it.
-
-### Step 2: Define Feature Requirements
-Define what you want to build and why, independent of the tech stack.
-
-- **Command**: `/speckit.specify` (followed by your feature description)
-- **What it does**: Creates an isolated working branch and generates a clear user-focused requirements document at `specs/[feature-id]/spec.md`.
-
-### Step 3: Socratic Clarification & Edge-Case Deep-Dive
-Before locking down a technical plan, eliminate ambiguity.
-
-- **Command**: `/speckit.clarify` (or Superpowers `brainstorming` skill)
-- **What it does**: Invokes interactive Socratic dialogue to walk you through edge cases, failure modes, and trade-offs section by section before any code is written.
-
-### Step 4: Technical Planning & Sizing
-Map out the exact implementation strategy.
-
-- **Command**: `/speckit.plan`
-- **What it does**: Generates `specs/[feature-id]/plan.md`, specifying the tech stack, data contracts, and architecture.
-- **Graphify Integration Synergy**: During this step, the agent queries `graph.json` via Graphify to ensure the new plan respects existing dependency boundaries rather than proposing conflicting patterns.
-
-### Step 5: Atomic Task Decomposition
-Break the plan down into manageable chunks.
-
-- **Command**: `/speckit.tasks`
-- **What it does**: Translates `plan.md` into an atomic task checklist inside `specs/[feature-id]/tasks.md`, structured into bite-sized steps complete with explicit ordering and test dependencies.
-
-### Step 6: Bridge Guard, Handoff & Disciplined Execution (The TDD Core)
-This is where `speckit-superpowers-bridge` orchestrates Superpowers' strictest engineering habits over Spec Kit tasks.
-
-- **Commands**: 
-  - `/speckit.speckit-superpowers-bridge.handoff` — Create/update the Superpowers implementation handoff state.
-  - `/speckit.speckit-superpowers-bridge.guard` — Enforce ownership boundaries between design artifacts and implementation files.
-  - `/speckit.speckit-superpowers-bridge.execute` — Execute Spec Kit `tasks.md` through the Superpowers bridge.
-- **What it does**:
-  1. **Git Worktree Isolation**: Automatically provisions an isolated workspace (`using-git-worktrees`) so your main branch stays completely clean.
-  2. **Test-Driven Development (TDD)**: Forces a strict Red-Green-Refactor loop for every single task (`test-driven-development`). Any implementation code written before a failing unit test is automatically rejected or deleted.
-  3. **Subagent-Driven Iteration**: Dispatches focused subagents (`subagent-driven-development`) to tackle tasks sequentially while cross-checking code quality.
-
-### Step 7: Convergence & Multi-Angle Code Review
-Validate that the code matches the specification contract down to the letter.
-
-- **Command**: Superpowers `requesting-code-review` / `verification-before-completion`
-- **What it does**: Assesses the codebase against `spec.md`, `plan.md`, and `tasks.md`. If converged cleanly, Superpowers initiates branch finishing (`finishing-a-development-branch`) to verify all system tests pass before queuing up the Pull Request.
-
----
-
-### Summary Checklist for Daily Use
-
-1. **Initialize/Refresh Memory**: `/graphify .`
+1. **Initialize/Refresh Memory**: `graphify .`
 2. **Specify Intent**: `/speckit.specify`
 3. **Refine Design & Plan**: `/speckit.plan` → `/speckit.tasks`
 4. **Handoff & Guard**: `/speckit.speckit-superpowers-bridge.handoff` → `/speckit.speckit-superpowers-bridge.guard`
 5. **Execute with TDD**: `/speckit.speckit-superpowers-bridge.execute`
 6. **Review & Merge**: Superpowers verification & finish branch
-
-References:
-- https://dev.to/mir_mursalin_ankur/graphify-code-review-graph-build-a-self-updating-knowledge-graph-for-claude-code-and-other-ai-j1m
