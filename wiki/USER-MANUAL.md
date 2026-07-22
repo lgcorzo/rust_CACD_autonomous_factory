@@ -64,12 +64,23 @@ cargo run -p factory-cli -- worker --mcp-url http://localhost:8100
 ### 4.1. Spec-Driven Development (UC-1)
 The **PO Agent** handles specification and task creation using the **Spec-Kit** pipeline. Before writing any code, the factory generates strict plans.
 
-1. Install Spec-Kit:
+1. **Install Spec-Kit & SuperSpec Bridge:**
+   Spec-Kit se conecta con Superpowers mediante **SuperSpec** ([WangX0111/superspec](https://github.com/WangX0111/superspec)), el puente comunitario que inyecta directrices de alta calidad en la carpeta `.specify/extensions/superspec/`.
+
    ```bash
+   # 1. Instalar Spec-Kit CLI
    uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
    specify init autonomous_factory
+
+   # 2. Instalar el puente SuperSpec (Spec-Kit + Superpowers)
+   mkdir -p .specify/extensions/superspec
+   curl -L https://github.com/WangX0111/superspec/archive/refs/heads/main.zip -o superspec.zip
+   unzip -o superspec.zip -d /tmp/superspec_temp
+   cp -r /tmp/superspec_temp/superspec-main/* .specify/extensions/superspec/
+   rm -rf superspec.zip /tmp/superspec_temp
    ```
-2. Core Pipeline Commands:
+
+2. **Core Pipeline Commands:**
    - `/speckit.constitution`: Applies global constraints (e.g., RAM limits, Zero Trust).
    - `/speckit.specify`: Defines what & why.
    - `/speckit.plan`: Outputs the architectural blueprint (`plan.md`).
