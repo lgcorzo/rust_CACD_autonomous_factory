@@ -28,6 +28,10 @@ Welcome to the Dark Gravity Autonomous Factory documentation.
 
 ---
 
+## OKF Documentation Vault
+
+* [[spec_kit_tool]]
+
 ## Code Wiki (Auto-generated)
 
 Auto-generated documentation from the code knowledge graph community structure.
