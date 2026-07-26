@@ -34,26 +34,60 @@ Welcome to the Dark Gravity Autonomous Factory documentation.
 
 ## Code Wiki (Auto-generated)
 
-Auto-generated documentation from the code knowledge graph community structure.
-
-**Total communities**: 15
-
-### Communities
-
-| Community | Size | Link |
-|-----------|------|------|
-| agents-agent | 55 | [agents-agent.md](agents-agent.md) |
-| bridge-checkpoint | 11 | [bridge-checkpoint.md](bridge-checkpoint.md) |
-| security-agent | 5 | [security-agent.md](security-agent.md) |
-| skills-context | 11 | [skills-context.md](skills-context.md) |
-| src-cli | 3 | [src-cli.md](src-cli.md) |
-| src-client | 76 | [src-client.md](src-client.md) |
-| src-result | 26 | [src-result.md](src-result.md) |
-| src-telemetry | 4 | [src-telemetry.md](src-telemetry.md) |
-| src-tool | 36 | [src-tool.md](src-tool.md) |
-| tests-security | 5 | [tests-security.md](tests-security.md) |
-| tests-token | 5 | [tests-token.md](tests-token.md) |
-| tests-zeroclaw | 4 | [tests-zeroclaw.md](tests-zeroclaw.md) |
-| tools-tool | 105 | [tools-tool.md](tools-tool.md) |
-| utils-osr | 3 | [utils-osr.md](utils-osr.md) |
-| workflows-mission | 8 | [workflows-mission.md](workflows-mission.md) |
+* [[crates_factory-application_src_agents_auditor]]
+* [[crates_factory-application_src_agents_doc_agent]]
+* [[crates_factory-application_src_agents_finops]]
+* [[crates_factory-application_src_agents_mod]]
+* [[crates_factory-application_src_agents_qa_observer]]
+* [[crates_factory-application_src_agents_rustant]]
+* [[crates_factory-application_src_agents_zeroclaw]]
+* [[crates_factory-application_src_bridge_adk_driver]]
+* [[crates_factory-application_src_bridge_mod]]
+* [[crates_factory-application_src_bridge_state]]
+* [[crates_factory-application_src_lib]]
+* [[crates_factory-application_src_telemetry_export]]
+* [[crates_factory-application_src_utils_mod]]
+* [[crates_factory-application_src_utils_osr]]
+* [[crates_factory-application_src_workflows_autonomous_mission]]
+* [[crates_factory-application_src_workflows_develop_task]]
+* [[crates_factory-application_src_workflows_mod]]
+* [[crates_factory-cli_src_bin_trigger_mission]]
+* [[crates_factory-cli_src_main]]
+* [[crates_factory-core_src_error]]
+* [[crates_factory-core_src_executor]]
+* [[crates_factory-core_src_lib]]
+* [[crates_factory-core_src_security]]
+* [[crates_factory-core_src_security_nhi]]
+* [[crates_factory-infrastructure_src_aethalgard]]
+* [[crates_factory-infrastructure_src_gitlab]]
+* [[crates_factory-infrastructure_src_jira]]
+* [[crates_factory-infrastructure_src_kafka]]
+* [[crates_factory-infrastructure_src_lib]]
+* [[crates_factory-infrastructure_src_mcp_client]]
+* [[crates_factory-infrastructure_src_r2r]]
+* [[crates_factory-infrastructure_src_s3]]
+* [[crates_factory-infrastructure_src_security_validator]]
+* [[crates_factory-infrastructure_src_sentry]]
+* [[crates_factory-infrastructure_src_vault]]
+* [[crates_factory-infrastructure_src_ziti]]
+* [[crates_factory-mcp-server_src_feedback_route]]
+* [[crates_factory-mcp-server_src_lib]]
+* [[crates_factory-mcp-server_src_main]]
+* [[crates_factory-mcp-server_src_protocol]]
+* [[crates_factory-mcp-server_src_sandbox]]
+* [[crates_factory-mcp-server_src_scratch]]
+* [[crates_factory-mcp-server_src_skills_context]]
+* [[crates_factory-mcp-server_src_skills_mod]]
+* [[crates_factory-mcp-server_src_tools_bridge]]
+* [[crates_factory-mcp-server_src_tools_execute_code]]
+* [[crates_factory-mcp-server_src_tools_index_code]]
+* [[crates_factory-mcp-server_src_tools_launch_sandbox_pod]]
+* [[crates_factory-mcp-server_src_tools_mod]]
+* [[crates_factory-mcp-server_src_tools_plan_mission]]
+* [[crates_factory-mcp-server_src_tools_retrieve_context]]
+* [[crates_factory-mcp-server_src_tools_run_tests]]
+* [[crates_factory-mcp-server_src_tools_search_jira]]
+* [[crates_factory-mcp-server_src_tools_security_review]]
+* [[crates_factory-mcp-server_src_tools_spec_kit_tasks_to_issues]]
+* [[crates_factory-mcp-server_src_tools_spec_kit_tool]]
+* [[crates_factory-mcp-server_src_tools_update_mission_status]]
