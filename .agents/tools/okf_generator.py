@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+import sys
+import os
+import subprocess
+import re
+
+def get_modified_files():
+    try:
+        output = subprocess.check_output(["git", "diff", "HEAD~1", "--name-only"]).decode("utf-8")
+        files = []
+        for f in output.splitlines():
+            f = f.strip()
+            if not f:
+                continue
+            if not (f.startswith("src/") or f.startswith("code/") or f.startswith("crates/")):
+                continue
+            if not f.endswith(('.rs', '.py', '.ts', '.js')):
+                continue
+            files.append(f)
+        return files
+    except subprocess.CalledProcessError:
+        return []
+
+def get_git_hash():
+    try:
+        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode("utf-8").strip()
+    except:
+        return "unknown"
+
+def generate_mermaid_class_diagram(content):
+    structs = re.findall(r'(?:pub\s+)?(?:struct|enum|class)\s+(\w+)', content)
+    if not structs:
+        return "classDiagram\n    class Empty"
+
+    diagram = "classDiagram\n"
+    for s in structs:
+        diagram += f"    class {s}\n"
+    return diagram.strip()
+
+def process_file(file_path):
+    if not os.path.exists(file_path):
+        return None
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    file_name = os.path.basename(file_path)
+    file_type = "module"
+    if "agent" in file_path.lower():
+        file_type = "class"
+
+    class_diagram = generate_mermaid_class_diagram(content)
+    git_hash = get_git_hash()
+
+    wiki_name = file_path.replace("/", "_").replace("\\", "_")
+    for ext in ['.rs', '.py', '.ts', '.js', '.md']:
+        if wiki_name.endswith(ext):
+            wiki_name = wiki_name[:-len(ext)]
+            break
+
+    wiki_file_path = f"wiki/{wiki_name}.md"
+
+    markdown = f"""---
+type: {file_type}
+title: "{file_name}"
+source_path: "{file_path}"
+description: "Documentation for {file_path}"
+tags: [rust, {file_type}]
+last_verified_commit: "{git_hash}"
+---
+
+# {file_name}
+
+Source File: `{file_path}`
+
+## Component Architecture
+
+```mermaid
+{class_diagram}
+```
+
+## Execution Flow
+
+```mermaid
+flowchart TD
+    Start --> End
+```
+"""
+    os.makedirs("wiki", exist_ok=True)
+    with open(wiki_file_path, "w", encoding="utf-8") as f:
+        f.write(markdown)
+    return wiki_name
+
+def update_index(new_wiki_names):
+    index_path = "wiki/index.md"
+    if not os.path.exists(index_path):
+        return
+
+    with open(index_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    lines = content.splitlines()
+
+    changed = False
+    for wiki_name in new_wiki_names:
+        link = f"- [[{wiki_name}]]"
+        if link not in content:
+            lines.append(link)
+            changed = True
+
+    if changed:
+        with open(index_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        files = []
+        for arg in sys.argv[1:]:
+            if arg.endswith(('.rs', '.py', '.ts', '.js')) and (arg.startswith("src/") or arg.startswith("code/") or arg.startswith("crates/")):
+                files.append(arg)
+    else:
+        files = get_modified_files()
+
+    if not files:
+        print("No source files modified in src/, code/, or crates/. Skipping documentation generation.")
+        sys.exit(0)
+
+    new_wiki_names = []
+    for f in files:
+        print(f"Processing {f}")
+        wiki_name = process_file(f)
+        if wiki_name:
+            new_wiki_names.append(wiki_name)
+
+    if new_wiki_names:
+        update_index(new_wiki_names)
+        print("Updated documentation.")

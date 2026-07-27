@@ -7,7 +7,8 @@ description: Explains how the OKF Incremental Documentation Agent operates, ensu
 
 ## Core Directives & Rules
 1. **Incremental Update via Git Diffs:**
-   - Execute git inspection (`git diff HEAD~1 --name-only`) to isolate changed files in `src/` or `code/`
+   - Execute git inspection (`git diff HEAD~1 --name-only`) to isolate changed files in `src/` or `code/` or `crates/`
+   - You must specifically execute `.agents/tools/okf_generator.py` to ensure only source files (.rs, .py, .ts, .js) are parsed to OKF Markdown. This tool guarantees non-source files (like specs.md) are not incorrectly generated.
    - Update, create, or prune specific OKF Markdown files that correspond to modified source files
 
 2. **The OKF Standard & Mandatory Relative Paths:**
