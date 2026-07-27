@@ -11,6 +11,7 @@ thiserror = { workspace = true }
 anyhow = { workspace = true }
 chrono = { workspace = true }
 uuid = { workspace = true }
+tokio = { workspace = true }
 async-trait = "0.1"
 prost = { workspace = true }
 zeroize = { version = "1.7", features = ["derive"] }
