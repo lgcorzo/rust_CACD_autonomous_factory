@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["hatchet-sdk"],
+      "enabled": false,
+      "description": "Hatchet SDK is pinned to exact version =0.2.7 due to pre-stable schema stability requirements."
+    }
+  ]
+}
