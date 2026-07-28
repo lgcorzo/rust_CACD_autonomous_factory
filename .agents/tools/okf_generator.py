@@ -6,7 +6,10 @@ import re
 
 def get_modified_files():
     try:
-        output = subprocess.check_output(["git", "diff", "HEAD~1", "--name-only"]).decode("utf-8")
+        try:
+            output = subprocess.check_output(["git", "log", "-m", "-1", "--name-only", "--pretty=format:"]).decode("utf-8")
+        except subprocess.CalledProcessError:
+            output = subprocess.check_output(["git", "show", "--name-only", "--format="]).decode("utf-8")
         files = []
         for f in output.splitlines():
             f = f.strip()
@@ -60,7 +63,34 @@ def process_file(file_path):
 
     wiki_file_path = f"wiki/{wiki_name}.md"
 
-    markdown = f"""---
+    if os.path.exists(wiki_file_path):
+        with open(wiki_file_path, "r", encoding="utf-8") as f:
+            old_md = f.read()
+
+        # Update last_verified_commit
+        old_md = re.sub(r'last_verified_commit: ".*?"', f'last_verified_commit: "{git_hash}"', old_md)
+
+        # We also need to embed accurate class diagrams.
+        # But we shouldn't rewrite unaffected components like Execution flow.
+        if 'classDiagram' in old_md:
+            # Replace old classDiagram block
+            old_md = re.sub(r'classDiagram[\s\S]*?(?=```)', class_diagram + '\n', old_md)
+        else:
+            old_md += f"\n## Component Architecture\n\n```mermaid\n{class_diagram}\n```\n"
+
+        # Ensure mandatory Source File relative path is present
+        if "Source File:" not in old_md:
+            header_pattern = rf"#(.*?)\n"
+            match = re.search(header_pattern, old_md)
+            if match:
+                insert_pos = match.end()
+                old_md = old_md[:insert_pos] + f"\nSource File: `{file_path}`\n" + old_md[insert_pos:]
+            else:
+                old_md = re.sub(r'(---[\s\S]*?---\n)', r'\1\nSource File: `' + file_path + '`\n\n', old_md)
+
+        markdown = old_md
+    else:
+        markdown = f"""---
 type: {file_type}
 title: "{file_name}"
 source_path: "{file_path}"
@@ -86,6 +116,7 @@ flowchart TD
     Start --> End
 ```
 """
+
     os.makedirs("wiki", exist_ok=True)
     with open(wiki_file_path, "w", encoding="utf-8") as f:
         f.write(markdown)
