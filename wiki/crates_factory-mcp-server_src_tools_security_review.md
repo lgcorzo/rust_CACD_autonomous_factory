@@ -4,7 +4,7 @@ title: "security_review.rs"
 source_path: "crates/factory-mcp-server/src/tools/security_review.rs"
 description: "Documentation for crates/factory-mcp-server/src/tools/security_review.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # security_review.rs

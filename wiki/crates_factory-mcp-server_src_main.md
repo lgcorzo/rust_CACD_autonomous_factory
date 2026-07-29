@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-mcp-server/src/main.rs"
 description: "Documentation for crates/factory-mcp-server/src/main.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # main.rs
@@ -15,7 +15,7 @@ Source File: `crates/factory-mcp-server/src/main.rs`
 
 ```mermaid
 classDiagram
-    class Empty { }
+    class Empty
 ```
 
 ## Execution Flow

@@ -4,7 +4,7 @@ title: "executor.rs"
 source_path: "crates/factory-core/src/executor.rs"
 description: "Documentation for crates/factory-core/src/executor.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # executor.rs

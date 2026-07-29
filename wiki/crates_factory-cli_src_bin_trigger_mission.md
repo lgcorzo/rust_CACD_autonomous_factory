@@ -4,7 +4,7 @@ title: "trigger_mission.rs"
 source_path: "crates/factory-cli/src/bin/trigger_mission.rs"
 description: "Documentation for crates/factory-cli/src/bin/trigger_mission.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # trigger_mission.rs
@@ -15,7 +15,7 @@ Source File: `crates/factory-cli/src/bin/trigger_mission.rs`
 
 ```mermaid
 classDiagram
-    class Empty { }
+    class Empty
 ```
 
 ## Execution Flow
