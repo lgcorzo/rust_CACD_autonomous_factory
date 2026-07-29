@@ -4,7 +4,7 @@ title: "bridge.rs"
 source_path: "crates/factory-mcp-server/src/tools/bridge.rs"
 description: "Documentation for crates/factory-mcp-server/src/tools/bridge.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # bridge.rs

@@ -4,7 +4,7 @@ title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Documentation for crates/factory-application/src/agents/doc_agent.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # doc_agent.rs

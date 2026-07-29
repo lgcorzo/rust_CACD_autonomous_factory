@@ -4,7 +4,7 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Documentation for crates/factory-application/src/agents/qa_observer.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # qa_observer.rs
@@ -16,7 +16,6 @@ Source File: `crates/factory-application/src/agents/qa_observer.rs`
 ```mermaid
 classDiagram
     class QAObserverAgent
-    class this
 ```
 
 ## Execution Flow

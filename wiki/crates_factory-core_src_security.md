@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Documentation for crates/factory-core/src/security.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # security.rs
@@ -16,12 +16,12 @@ Source File: `crates/factory-core/src/security.rs`
 ```mermaid
 classDiagram
     class SandboxConstraint
-    class AuditResult
-    class Ed25519SecurityValidator
-    class JitToken
     class SecurityValidator {
         <<trait>>
     }
+    class AuditResult
+    class Ed25519SecurityValidator
+    class JitToken
     class SecurityBounds {
         <<trait>>
     }

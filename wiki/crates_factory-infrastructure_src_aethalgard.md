@@ -4,7 +4,7 @@ title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Documentation for crates/factory-infrastructure/src/aethalgard.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # aethalgard.rs
@@ -15,10 +15,10 @@ Source File: `crates/factory-infrastructure/src/aethalgard.rs`
 
 ```mermaid
 classDiagram
-    class HttpAethalgardClient
     class AethalgardClient {
         <<trait>>
     }
+    class HttpAethalgardClient
 ```
 
 ## Execution Flow
