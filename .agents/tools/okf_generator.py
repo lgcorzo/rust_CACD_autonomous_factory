@@ -15,10 +15,20 @@ def get_modified_files():
             f = f.strip()
             if not f:
                 continue
-            if not (f.startswith("src/") or f.startswith("code/") or f.startswith("crates/")):
-                continue
             if not f.endswith(('.rs', '.py', '.ts', '.js')):
                 continue
+
+            # Ensure it's in a src/ or code/ folder, taking crates/ into account
+            is_valid_dir = False
+            parts = f.split('/')
+            for p in parts[:-1]: # exclude the filename itself
+                if p in ("src", "code"):
+                    is_valid_dir = True
+                    break
+
+            if not is_valid_dir:
+                continue
+
             files.append(f)
         return files
     except subprocess.CalledProcessError:
@@ -31,13 +41,18 @@ def get_git_hash():
         return "unknown"
 
 def generate_mermaid_class_diagram(content):
-    structs = re.findall(r'(?:pub\s+)?(?:struct|enum|class)\s+(\w+)', content)
-    if not structs:
+    matches = re.findall(r'(?:pub\s+)?\b(struct|enum|class|trait)\b\s+(\w+)', content)
+    if not matches:
         return "classDiagram\n    class Empty"
 
     diagram = "classDiagram\n"
-    for s in structs:
-        diagram += f"    class {s}\n"
+    for m_type, m_name in matches:
+        if m_type == "trait":
+            diagram += f"    class {m_name} {{\n        <<trait>>\n    }}\n"
+        elif m_type == "enum":
+            diagram += f"    class {m_name} {{\n        <<enumeration>>\n    }}\n"
+        else:
+            diagram += f"    class {m_name}\n"
     return diagram.strip()
 
 def process_file(file_path):
@@ -134,9 +149,10 @@ def update_index(new_wiki_names):
 
     changed = False
     for wiki_name in new_wiki_names:
-        link = f"- [[{wiki_name}]]"
-        if link not in content:
-            lines.append(link)
+        link1 = f"* [[{wiki_name}]]"
+        link2 = f"- [[{wiki_name}]]"
+        if link1 not in content and link2 not in content:
+            lines.append(link1)
             changed = True
 
     if changed:

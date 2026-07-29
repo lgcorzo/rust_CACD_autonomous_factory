@@ -4,7 +4,7 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Documentation for crates/factory-mcp-server/src/sandbox.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # sandbox.rs
@@ -16,15 +16,15 @@ Source File: `crates/factory-mcp-server/src/sandbox.rs`
 ```mermaid
 classDiagram
     class ExecutionResult
-    class NativeSurgerySandboxDriver
-    class SubprocessDriver
-    class GvisorK8sDriver
     class SandboxDriver {
         <<trait>>
     }
+    class NativeSurgerySandboxDriver
+    class SubprocessDriver
     class SandboxMode {
-        <<enum>>
+        <<enumeration>>
     }
+    class GvisorK8sDriver
 ```
 
 ## Execution Flow

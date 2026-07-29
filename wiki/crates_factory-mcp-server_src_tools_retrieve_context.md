@@ -4,7 +4,7 @@ title: "retrieve_context.rs"
 source_path: "crates/factory-mcp-server/src/tools/retrieve_context.rs"
 description: "Documentation for crates/factory-mcp-server/src/tools/retrieve_context.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # retrieve_context.rs

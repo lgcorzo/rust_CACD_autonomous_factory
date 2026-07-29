@@ -4,7 +4,7 @@ title: "vault.rs"
 source_path: "crates/factory-infrastructure/src/vault.rs"
 description: "Documentation for crates/factory-infrastructure/src/vault.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # vault.rs

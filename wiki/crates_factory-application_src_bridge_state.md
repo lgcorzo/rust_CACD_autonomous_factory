@@ -4,7 +4,7 @@ title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Documentation for crates/factory-application/src/bridge/state.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # state.rs
@@ -15,11 +15,11 @@ Source File: `crates/factory-application/src/bridge/state.rs`
 
 ```mermaid
 classDiagram
+    class BridgeStatus {
+        <<enumeration>>
+    }
     class StepCheckpoint
     class BridgeState
-    class BridgeStatus {
-        <<enum>>
-    }
 ```
 
 ## Execution Flow

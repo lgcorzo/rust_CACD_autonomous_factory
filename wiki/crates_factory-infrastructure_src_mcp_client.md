@@ -4,7 +4,7 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Documentation for crates/factory-infrastructure/src/mcp_client.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # mcp_client.rs
@@ -15,11 +15,11 @@ Source File: `crates/factory-infrastructure/src/mcp_client.rs`
 
 ```mermaid
 classDiagram
-    class McpHttpClient
-    class McpSseClient
     class McpClient {
         <<trait>>
     }
+    class McpHttpClient
+    class McpSseClient
 ```
 
 ## Execution Flow

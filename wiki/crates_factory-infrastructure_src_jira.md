@@ -4,7 +4,7 @@ title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Documentation for crates/factory-infrastructure/src/jira.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # jira.rs
@@ -15,10 +15,10 @@ Source File: `crates/factory-infrastructure/src/jira.rs`
 
 ```mermaid
 classDiagram
-    class HttpJiraClient
     class JiraClient {
         <<trait>>
     }
+    class HttpJiraClient
 ```
 
 ## Execution Flow
