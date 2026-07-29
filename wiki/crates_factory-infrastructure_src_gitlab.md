@@ -4,7 +4,7 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Documentation for crates/factory-infrastructure/src/gitlab.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # gitlab.rs
@@ -16,10 +16,10 @@ Source File: `crates/factory-infrastructure/src/gitlab.rs`
 ```mermaid
 classDiagram
     class GitlabIssue
-    class HttpGitlabClient
     class GitlabClient {
         <<trait>>
     }
+    class HttpGitlabClient
 ```
 
 ## Execution Flow

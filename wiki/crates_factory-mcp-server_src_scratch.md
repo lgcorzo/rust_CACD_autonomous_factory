@@ -4,7 +4,7 @@ title: "scratch.rs"
 source_path: "crates/factory-mcp-server/src/scratch.rs"
 description: "Documentation for crates/factory-mcp-server/src/scratch.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # scratch.rs
@@ -15,7 +15,7 @@ Source File: `crates/factory-mcp-server/src/scratch.rs`
 
 ```mermaid
 classDiagram
-    class Empty { }
+    class Empty
 ```
 
 ## Execution Flow

@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Documentation for crates/factory-application/src/workflows/autonomous_mission.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # autonomous_mission.rs

@@ -4,7 +4,7 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Documentation for crates/factory-infrastructure/src/r2r.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # r2r.rs
@@ -15,10 +15,10 @@ Source File: `crates/factory-infrastructure/src/r2r.rs`
 
 ```mermaid
 classDiagram
-    class HttpR2rClient
     class R2rClient {
         <<trait>>
     }
+    class HttpR2rClient
 ```
 
 ## Execution Flow

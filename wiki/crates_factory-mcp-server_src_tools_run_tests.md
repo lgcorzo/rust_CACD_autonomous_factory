@@ -4,7 +4,7 @@ title: "run_tests.rs"
 source_path: "crates/factory-mcp-server/src/tools/run_tests.rs"
 description: "Documentation for crates/factory-mcp-server/src/tools/run_tests.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # run_tests.rs

@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-application/src/agents/mod.rs"
 description: "Documentation for crates/factory-application/src/agents/mod.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # mod.rs
@@ -15,7 +15,7 @@ Source File: `crates/factory-application/src/agents/mod.rs`
 
 ```mermaid
 classDiagram
-    class Empty { }
+    class Empty
 ```
 
 ## Execution Flow

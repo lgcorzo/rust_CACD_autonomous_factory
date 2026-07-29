@@ -4,7 +4,7 @@ title: "auditor.rs"
 source_path: "crates/factory-application/src/agents/auditor.rs"
 description: "Documentation for crates/factory-application/src/agents/auditor.rs"
 tags: [rust, module]
-last_verified_commit: "4cb40d0"
+last_verified_commit: "17a28f4"
 ---
 
 # auditor.rs
@@ -16,7 +16,6 @@ Source File: `crates/factory-application/src/agents/auditor.rs`
 ```mermaid
 classDiagram
     class AuditorAgent
-    class the
 ```
 
 ## Execution Flow
