@@ -163,7 +163,18 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         files = []
         for arg in sys.argv[1:]:
-            if arg.endswith(('.rs', '.py', '.ts', '.js')) and (arg.startswith("src/") or arg.startswith("code/") or arg.startswith("crates/")):
+            if not arg.endswith(('.rs', '.py', '.ts', '.js')):
+                continue
+
+            # Ensure it's in a src/ or code/ folder, taking crates/ into account
+            is_valid_dir = False
+            parts = arg.split('/')
+            for p in parts[:-1]: # exclude the filename itself
+                if p in ("src", "code"):
+                    is_valid_dir = True
+                    break
+
+            if is_valid_dir:
                 files.append(arg)
     else:
         files = get_modified_files()

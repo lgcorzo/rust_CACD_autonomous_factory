@@ -4,7 +4,7 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Documentation for crates/factory-infrastructure/src/r2r.rs"
 tags: [rust, module]
-last_verified_commit: "17a28f4"
+last_verified_commit: "beeed91"
 ---
 
 # r2r.rs
