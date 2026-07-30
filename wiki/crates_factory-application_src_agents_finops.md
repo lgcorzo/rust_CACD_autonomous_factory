@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Documentation for crates/factory-application/src/agents/finops.rs"
 tags: [rust, module]
-last_verified_commit: "17a28f4"
+last_verified_commit: "beeed91"
 ---
 
 # finops.rs
