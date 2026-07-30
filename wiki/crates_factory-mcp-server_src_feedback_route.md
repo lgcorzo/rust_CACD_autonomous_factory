@@ -4,7 +4,7 @@ title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Documentation for crates/factory-mcp-server/src/feedback_route.rs"
 tags: [rust, module]
-last_verified_commit: "17a28f4"
+last_verified_commit: "beeed91"
 ---
 
 # feedback_route.rs

@@ -4,7 +4,7 @@ title: "protocol.rs"
 source_path: "crates/factory-mcp-server/src/protocol.rs"
 description: "Documentation for crates/factory-mcp-server/src/protocol.rs"
 tags: [rust, module]
-last_verified_commit: "17a28f4"
+last_verified_commit: "beeed91"
 ---
 
 # protocol.rs

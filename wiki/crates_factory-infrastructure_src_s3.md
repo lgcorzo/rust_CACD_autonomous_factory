@@ -4,7 +4,7 @@ title: "s3.rs"
 source_path: "crates/factory-infrastructure/src/s3.rs"
 description: "Documentation for crates/factory-infrastructure/src/s3.rs"
 tags: [rust, module]
-last_verified_commit: "17a28f4"
+last_verified_commit: "beeed91"
 ---
 
 # s3.rs

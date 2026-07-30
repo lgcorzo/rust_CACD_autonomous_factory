@@ -4,7 +4,7 @@ title: "adk_driver.rs"
 source_path: "crates/factory-application/src/bridge/adk_driver.rs"
 description: "Documentation for crates/factory-application/src/bridge/adk_driver.rs"
 tags: [rust, module]
-last_verified_commit: "17a28f4"
+last_verified_commit: "beeed91"
 ---
 
 # adk_driver.rs

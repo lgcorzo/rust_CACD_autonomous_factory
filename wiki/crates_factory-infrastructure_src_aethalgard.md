@@ -4,7 +4,7 @@ title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Documentation for crates/factory-infrastructure/src/aethalgard.rs"
 tags: [rust, module]
-last_verified_commit: "17a28f4"
+last_verified_commit: "beeed91"
 ---
 
 # aethalgard.rs
