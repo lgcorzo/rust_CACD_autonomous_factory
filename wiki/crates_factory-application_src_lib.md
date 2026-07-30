@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Documentation for crates/factory-application/src/lib.rs"
 tags: [rust, module]
-last_verified_commit: "17a28f4"
+last_verified_commit: "beeed91"
 ---
 
 # lib.rs
