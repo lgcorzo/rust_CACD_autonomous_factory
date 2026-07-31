@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "src"
 description: "Technical architecture and class hierarchy for src"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:28:30Z"
+timestamp: "2026-07-31T14:32:56Z"
 ---
 
 # Module Name: src

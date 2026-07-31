@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "src"
 description: "Technical architecture and class hierarchy for src"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:28:30Z"
+timestamp: "2026-07-31T14:32:56Z"
 ---
 
 # Module Name: src
 
 * **Source Directory Reference:** `crates/factory-application/src/`
-* **Package Dependency:** [rdkafka, async_trait, reqwest, serde_json, std]
+* **Package Dependency:** [serde_json, rdkafka, reqwest, std, async_trait]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `src` module, documenting its core responsibilities and structural design.
@@ -20,13 +20,13 @@ The following class diagram models the object-oriented structure, explicit inher
 ```mermaid
 classDiagram
     direction BT
-    class TelemetryExporter {
-        +new()
-    }
     class Agent {
         <<trait>>
         +name()
         +execute()
+    }
+    class TelemetryExporter {
+        +new()
     }
 
 ```
@@ -45,7 +45,7 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as SrcService
-    Caller->>Svc: new()
+    Caller->>Svc: name()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
@@ -54,10 +54,10 @@ sequenceDiagram
 ---
 
 * **Source Citations:**
+* Class `Agent`: `crates/factory-application/src/lib.rs:6`
+  * Method `name`: `crates/factory-application/src/lib.rs:7`
+  * Method `execute`: `crates/factory-application/src/lib.rs:8`
 * Class `TelemetryExporter`: `crates/factory-application/src/telemetry_export.rs:7`
   * Method `new`: `crates/factory-application/src/telemetry_export.rs:14`
 * Method `start_export_loop`: `crates/factory-application/src/telemetry_export.rs:23`
 * Method `push_to_openwebui`: `crates/factory-application/src/telemetry_export.rs:70`
-* Class `Agent`: `crates/factory-application/src/lib.rs:6`
-  * Method `name`: `crates/factory-application/src/lib.rs:7`
-  * Method `execute`: `crates/factory-application/src/lib.rs:8`
