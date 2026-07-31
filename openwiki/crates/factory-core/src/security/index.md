@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "security"
 description: "Technical architecture and class hierarchy for security"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:28:30Z"
+timestamp: "2026-07-31T14:32:56Z"
 ---
 
 # Module Name: security
 
 * **Source Directory Reference:** `crates/factory-core/src/security/`
-* **Package Dependency:** [chrono, serde, ed25519_dalek, super, rand, base64]
+* **Package Dependency:** [serde, super, rand, chrono, ed25519_dalek, base64]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `security` module, documenting its core responsibilities and structural design.

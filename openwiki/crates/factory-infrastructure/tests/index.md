@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "tests"
 description: "Technical architecture and class hierarchy for tests"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:28:30Z"
+timestamp: "2026-07-31T14:32:56Z"
 ---
 
 # Module Name: tests
 
 * **Source Directory Reference:** `crates/factory-infrastructure/tests/`
-* **Package Dependency:** [factory_infrastructure, std]
+* **Package Dependency:** [std, factory_infrastructure]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `tests` module, documenting its core responsibilities and structural design.

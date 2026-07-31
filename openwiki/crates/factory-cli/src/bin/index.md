@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "bin"
 description: "Technical architecture and class hierarchy for bin"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:28:30Z"
+timestamp: "2026-07-31T14:32:56Z"
 ---
 
 # Module Name: bin
 
 * **Source Directory Reference:** `crates/factory-cli/src/bin/`
-* **Package Dependency:** [factory_application, hatchet_sdk]
+* **Package Dependency:** [hatchet_sdk, factory_application]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `bin` module, documenting its core responsibilities and structural design.
