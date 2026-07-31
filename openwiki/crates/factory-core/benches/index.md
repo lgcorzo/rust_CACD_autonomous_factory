@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "benches"
 description: "Technical architecture and class hierarchy for benches"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:28:30Z"
+timestamp: "2026-07-31T14:32:56Z"
 ---
 
 # Module Name: benches
 
 * **Source Directory Reference:** `crates/factory-core/benches/`
-* **Package Dependency:** [factory_core, criterion, zeroize]
+* **Package Dependency:** [factory_core, zeroize, criterion]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `benches` module, documenting its core responsibilities and structural design.
