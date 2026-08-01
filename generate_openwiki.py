@@ -78,6 +78,8 @@ def main():
                 dir_path = os.path.dirname(path)
                 if dir_path == '':
                     dir_path = '.'
+                if dir_path == '.':
+                    continue
 
                 if dir_path not in target_dirs:
                     target_dirs[dir_path] = []
@@ -184,10 +186,26 @@ The following sequence diagram outlines the execution lifecycle and message pass
 
         index_links.append(f"* [[{clean_d}/index.md]] - {module_name} Module Architecture")
 
-    with open('openwiki/index.md', 'w', encoding='utf-8') as f:
-        f.write("# OpenWiki Root Index\n\n")
+    index_path = 'openwiki/index.md'
+    if os.path.exists(index_path):
+        with open(index_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        new_content = content
+        if "\n## Auto-Generated Module Architecture Links" not in new_content:
+            new_content += "\n\n## Auto-Generated Module Architecture Links\n"
+
         for link in sorted(index_links):
-            f.write(link + "\n")
+            if link not in new_content:
+                new_content += link + "\n"
+
+        with open(index_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+    else:
+        with open(index_path, 'w', encoding='utf-8') as f:
+            f.write("# OpenWiki Root Index\n\n")
+            for link in sorted(index_links):
+                f.write(link + "\n")
 
     with open('openwiki/logs.md', 'a', encoding='utf-8') as f:
         f.write(f"\n## {now}\n* Generated baseline OKF documentation for all source modules.\n")

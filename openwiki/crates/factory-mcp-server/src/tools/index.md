@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "tools"
 description: "Technical architecture and class hierarchy for tools"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-31T14:32:56Z"
+timestamp: "2026-08-01T05:35:59Z"
 ---
 
 # Module Name: tools
 
 * **Source Directory Reference:** `crates/factory-mcp-server/src/tools/`
-* **Package Dependency:** [kube, tokio, launch_sandbox_pod, crate, retrieve_context, index_code, async_trait, bridge, k8s_openapi, search_jira, serde_json, execute_code, plan_mission, security_review, spec_kit_tool, run_tests, serde, super, spec_kit_tasks_to_issues, factory_infrastructure, chrono, factory_core, update_mission_status, async_openai, reqwest, std]
+* **Package Dependency:** [index_code, async_trait, update_mission_status, reqwest, bridge, std, security_review, spec_kit_tool, plan_mission, factory_core, execute_code, crate, chrono, spec_kit_tasks_to_issues, retrieve_context, kube, serde_json, factory_infrastructure, serde, launch_sandbox_pod, k8s_openapi, super, search_jira, async_openai, run_tests, tokio]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `tools` module, documenting its core responsibilities and structural design.
@@ -25,37 +25,31 @@ classDiagram
         +name()
     }
     Tool <|-- BridgeTool : Inheritance / Specialization
-    class ExecuteCodeTool {
-        +new()
-        +name()
-    }
-    Tool <|-- ExecuteCodeTool : Inheritance / Specialization
-    class IndexCodeTool {
-        +new()
-        +name()
-    }
-    Tool <|-- IndexCodeTool : Inheritance / Specialization
-    class SandboxJobSpec {
-    }
-    class LaunchSandboxPodTool {
-        +new()
-        +default()
-        +name()
-    }
-    Default <|-- LaunchSandboxPodTool : Inheritance / Specialization
-    Tool <|-- LaunchSandboxPodTool : Inheritance / Specialization
-    class Tool {
-        <<trait>>
-        +name()
-        +description()
-        +input_schema()
-        +call()
-    }
     class PlanMissionTool {
         +new()
         +name()
     }
     Tool <|-- PlanMissionTool : Inheritance / Specialization
+    class RunTestsTool {
+        +new()
+        +name()
+    }
+    Tool <|-- RunTestsTool : Inheritance / Specialization
+    class ExecuteCodeTool {
+        +new()
+        +name()
+    }
+    Tool <|-- ExecuteCodeTool : Inheritance / Specialization
+    class UpdateMissionStatusTool {
+        +new()
+        +name()
+    }
+    Tool <|-- UpdateMissionStatusTool : Inheritance / Specialization
+    class IndexCodeTool {
+        +new()
+        +name()
+    }
+    Tool <|-- IndexCodeTool : Inheritance / Specialization
     class RetrieveContextTool {
         +new()
         +name()
@@ -65,32 +59,6 @@ classDiagram
         +search()
     }
     R2rClient <|-- ManualMockR2rClient : Inheritance / Specialization
-    class RunTestsTool {
-        +new()
-        +name()
-    }
-    Tool <|-- RunTestsTool : Inheritance / Specialization
-    class SearchJiraTool {
-        +new()
-        +name()
-    }
-    Tool <|-- SearchJiraTool : Inheritance / Specialization
-    class ManualMockJiraClient {
-        +search_issues()
-    }
-    JiraClient <|-- ManualMockJiraClient : Inheritance / Specialization
-    class SecurityReviewTool {
-        +new()
-        +default()
-        +name()
-    }
-    Default <|-- SecurityReviewTool : Inheritance / Specialization
-    Tool <|-- SecurityReviewTool : Inheritance / Specialization
-    class SpecKitTasksToIssuesTool {
-        +new()
-        +name()
-    }
-    Tool <|-- SpecKitTasksToIssuesTool : Inheritance / Specialization
     class SpecKitCommand {
         <<enumeration>>
     }
@@ -115,11 +83,43 @@ classDiagram
         +name()
     }
     Tool <|-- SpecKitTool : Inheritance / Specialization
-    class UpdateMissionStatusTool {
+    class SearchJiraTool {
         +new()
         +name()
     }
-    Tool <|-- UpdateMissionStatusTool : Inheritance / Specialization
+    Tool <|-- SearchJiraTool : Inheritance / Specialization
+    class ManualMockJiraClient {
+        +search_issues()
+    }
+    JiraClient <|-- ManualMockJiraClient : Inheritance / Specialization
+    class Tool {
+        <<trait>>
+        +name()
+        +description()
+        +input_schema()
+        +call()
+    }
+    class SpecKitTasksToIssuesTool {
+        +new()
+        +name()
+    }
+    Tool <|-- SpecKitTasksToIssuesTool : Inheritance / Specialization
+    class SecurityReviewTool {
+        +new()
+        +default()
+        +name()
+    }
+    Default <|-- SecurityReviewTool : Inheritance / Specialization
+    Tool <|-- SecurityReviewTool : Inheritance / Specialization
+    class SandboxJobSpec {
+    }
+    class LaunchSandboxPodTool {
+        +new()
+        +default()
+        +name()
+    }
+    Default <|-- LaunchSandboxPodTool : Inheritance / Specialization
+    Tool <|-- LaunchSandboxPodTool : Inheritance / Specialization
 
 ```
 
@@ -154,12 +154,30 @@ sequenceDiagram
 * Method `description`: `crates/factory-mcp-server/src/tools/bridge.rs:50`
 * Method `input_schema`: `crates/factory-mcp-server/src/tools/bridge.rs:54`
 * Method `call`: `crates/factory-mcp-server/src/tools/bridge.rs:76`
+* Class `PlanMissionTool`: `crates/factory-mcp-server/src/tools/plan_mission.rs:17`
+  * Method `new`: `crates/factory-mcp-server/src/tools/plan_mission.rs:23`
+  * Method `name`: `crates/factory-mcp-server/src/tools/plan_mission.rs:49`
+* Method `description`: `crates/factory-mcp-server/src/tools/plan_mission.rs:53`
+* Method `input_schema`: `crates/factory-mcp-server/src/tools/plan_mission.rs:57`
+* Method `call`: `crates/factory-mcp-server/src/tools/plan_mission.rs:67`
+* Class `RunTestsTool`: `crates/factory-mcp-server/src/tools/run_tests.rs:8`
+  * Method `new`: `crates/factory-mcp-server/src/tools/run_tests.rs:14`
+  * Method `name`: `crates/factory-mcp-server/src/tools/run_tests.rs:21`
+* Method `description`: `crates/factory-mcp-server/src/tools/run_tests.rs:25`
+* Method `input_schema`: `crates/factory-mcp-server/src/tools/run_tests.rs:29`
+* Method `call`: `crates/factory-mcp-server/src/tools/run_tests.rs:40`
 * Class `ExecuteCodeTool`: `crates/factory-mcp-server/src/tools/execute_code.rs:8`
   * Method `new`: `crates/factory-mcp-server/src/tools/execute_code.rs:14`
   * Method `name`: `crates/factory-mcp-server/src/tools/execute_code.rs:21`
 * Method `description`: `crates/factory-mcp-server/src/tools/execute_code.rs:25`
 * Method `input_schema`: `crates/factory-mcp-server/src/tools/execute_code.rs:29`
 * Method `call`: `crates/factory-mcp-server/src/tools/execute_code.rs:40`
+* Class `UpdateMissionStatusTool`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:9`
+  * Method `new`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:14`
+  * Method `name`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:21`
+* Method `description`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:25`
+* Method `input_schema`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:30`
+* Method `call`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:44`
 * Class `IndexCodeTool`: `crates/factory-mcp-server/src/tools/index_code.rs:6`
   * Method `new`: `crates/factory-mcp-server/src/tools/index_code.rs:12`
   * Method `name`: `crates/factory-mcp-server/src/tools/index_code.rs:22`
@@ -167,25 +185,6 @@ sequenceDiagram
 * Method `input_schema`: `crates/factory-mcp-server/src/tools/index_code.rs:30`
 * Method `call`: `crates/factory-mcp-server/src/tools/index_code.rs:41`
 * Method `test_index_code_tool_missing_content`: `crates/factory-mcp-server/src/tools/index_code.rs:87`
-* Class `SandboxJobSpec`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:12`
-* Class `LaunchSandboxPodTool`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:17`
-  * Method `new`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:20`
-  * Method `default`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:26`
-  * Method `name`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:33`
-* Method `description`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:37`
-* Method `input_schema`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:41`
-* Method `call`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:52`
-* Class `Tool`: `crates/factory-mcp-server/src/tools/mod.rs:7`
-  * Method `name`: `crates/factory-mcp-server/src/tools/mod.rs:8`
-  * Method `description`: `crates/factory-mcp-server/src/tools/mod.rs:9`
-  * Method `input_schema`: `crates/factory-mcp-server/src/tools/mod.rs:10`
-  * Method `call`: `crates/factory-mcp-server/src/tools/mod.rs:12`
-* Class `PlanMissionTool`: `crates/factory-mcp-server/src/tools/plan_mission.rs:17`
-  * Method `new`: `crates/factory-mcp-server/src/tools/plan_mission.rs:23`
-  * Method `name`: `crates/factory-mcp-server/src/tools/plan_mission.rs:49`
-* Method `description`: `crates/factory-mcp-server/src/tools/plan_mission.rs:53`
-* Method `input_schema`: `crates/factory-mcp-server/src/tools/plan_mission.rs:57`
-* Method `call`: `crates/factory-mcp-server/src/tools/plan_mission.rs:67`
 * Class `RetrieveContextTool`: `crates/factory-mcp-server/src/tools/retrieve_context.rs:8`
   * Method `new`: `crates/factory-mcp-server/src/tools/retrieve_context.rs:13`
   * Method `name`: `crates/factory-mcp-server/src/tools/retrieve_context.rs:20`
@@ -197,35 +196,6 @@ sequenceDiagram
 * Method `push_osr_metric`: `crates/factory-mcp-server/src/tools/retrieve_context.rs:76`
 * Method `test_retrieve_context_tool_success`: `crates/factory-mcp-server/src/tools/retrieve_context.rs:82`
 * Method `test_retrieve_context_tool_failure`: `crates/factory-mcp-server/src/tools/retrieve_context.rs:95`
-* Class `RunTestsTool`: `crates/factory-mcp-server/src/tools/run_tests.rs:8`
-  * Method `new`: `crates/factory-mcp-server/src/tools/run_tests.rs:14`
-  * Method `name`: `crates/factory-mcp-server/src/tools/run_tests.rs:21`
-* Method `description`: `crates/factory-mcp-server/src/tools/run_tests.rs:25`
-* Method `input_schema`: `crates/factory-mcp-server/src/tools/run_tests.rs:29`
-* Method `call`: `crates/factory-mcp-server/src/tools/run_tests.rs:40`
-* Class `SearchJiraTool`: `crates/factory-mcp-server/src/tools/search_jira.rs:8`
-  * Method `new`: `crates/factory-mcp-server/src/tools/search_jira.rs:13`
-  * Method `name`: `crates/factory-mcp-server/src/tools/search_jira.rs:20`
-* Class `ManualMockJiraClient`: `crates/factory-mcp-server/src/tools/search_jira.rs:62`
-  * Method `search_issues`: `crates/factory-mcp-server/src/tools/search_jira.rs:68`
-* Method `description`: `crates/factory-mcp-server/src/tools/search_jira.rs:24`
-* Method `input_schema`: `crates/factory-mcp-server/src/tools/search_jira.rs:28`
-* Method `call`: `crates/factory-mcp-server/src/tools/search_jira.rs:38`
-* Method `test_search_jira_tool_success`: `crates/factory-mcp-server/src/tools/search_jira.rs:78`
-* Method `test_search_jira_tool_failure`: `crates/factory-mcp-server/src/tools/search_jira.rs:91`
-* Class `SecurityReviewTool`: `crates/factory-mcp-server/src/tools/security_review.rs:9`
-  * Method `new`: `crates/factory-mcp-server/src/tools/security_review.rs:15`
-  * Method `default`: `crates/factory-mcp-server/src/tools/security_review.rs:32`
-  * Method `name`: `crates/factory-mcp-server/src/tools/security_review.rs:39`
-* Method `description`: `crates/factory-mcp-server/src/tools/security_review.rs:43`
-* Method `input_schema`: `crates/factory-mcp-server/src/tools/security_review.rs:47`
-* Method `call`: `crates/factory-mcp-server/src/tools/security_review.rs:57`
-* Class `SpecKitTasksToIssuesTool`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:8`
-  * Method `new`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:13`
-  * Method `name`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:20`
-* Method `description`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:24`
-* Method `input_schema`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:29`
-* Method `call`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:42`
 * Class `SpecKitCommand`: `crates/factory-mcp-server/src/tools/spec_kit_tool.rs:10`
 * Class `SpecProvider`: `crates/factory-mcp-server/src/tools/spec_kit_tool.rs:34`
   * Method `invoke`: `crates/factory-mcp-server/src/tools/spec_kit_tool.rs:35`
@@ -247,9 +217,39 @@ sequenceDiagram
 * Method `test_mock_spec_provider`: `crates/factory-mcp-server/src/tools/spec_kit_tool.rs:251`
 * Method `test_cli_spec_provider_fallback`: `crates/factory-mcp-server/src/tools/spec_kit_tool.rs:295`
 * Method `test_spec_kit_tool_mock_mode`: `crates/factory-mcp-server/src/tools/spec_kit_tool.rs:318`
-* Class `UpdateMissionStatusTool`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:9`
-  * Method `new`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:14`
-  * Method `name`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:21`
-* Method `description`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:25`
-* Method `input_schema`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:30`
-* Method `call`: `crates/factory-mcp-server/src/tools/update_mission_status.rs:44`
+* Class `SearchJiraTool`: `crates/factory-mcp-server/src/tools/search_jira.rs:8`
+  * Method `new`: `crates/factory-mcp-server/src/tools/search_jira.rs:13`
+  * Method `name`: `crates/factory-mcp-server/src/tools/search_jira.rs:20`
+* Class `ManualMockJiraClient`: `crates/factory-mcp-server/src/tools/search_jira.rs:62`
+  * Method `search_issues`: `crates/factory-mcp-server/src/tools/search_jira.rs:68`
+* Method `description`: `crates/factory-mcp-server/src/tools/search_jira.rs:24`
+* Method `input_schema`: `crates/factory-mcp-server/src/tools/search_jira.rs:28`
+* Method `call`: `crates/factory-mcp-server/src/tools/search_jira.rs:38`
+* Method `test_search_jira_tool_success`: `crates/factory-mcp-server/src/tools/search_jira.rs:78`
+* Method `test_search_jira_tool_failure`: `crates/factory-mcp-server/src/tools/search_jira.rs:91`
+* Class `Tool`: `crates/factory-mcp-server/src/tools/mod.rs:7`
+  * Method `name`: `crates/factory-mcp-server/src/tools/mod.rs:8`
+  * Method `description`: `crates/factory-mcp-server/src/tools/mod.rs:9`
+  * Method `input_schema`: `crates/factory-mcp-server/src/tools/mod.rs:10`
+  * Method `call`: `crates/factory-mcp-server/src/tools/mod.rs:12`
+* Class `SpecKitTasksToIssuesTool`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:8`
+  * Method `new`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:13`
+  * Method `name`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:20`
+* Method `description`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:24`
+* Method `input_schema`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:29`
+* Method `call`: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs:42`
+* Class `SecurityReviewTool`: `crates/factory-mcp-server/src/tools/security_review.rs:9`
+  * Method `new`: `crates/factory-mcp-server/src/tools/security_review.rs:15`
+  * Method `default`: `crates/factory-mcp-server/src/tools/security_review.rs:32`
+  * Method `name`: `crates/factory-mcp-server/src/tools/security_review.rs:39`
+* Method `description`: `crates/factory-mcp-server/src/tools/security_review.rs:43`
+* Method `input_schema`: `crates/factory-mcp-server/src/tools/security_review.rs:47`
+* Method `call`: `crates/factory-mcp-server/src/tools/security_review.rs:57`
+* Class `SandboxJobSpec`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:12`
+* Class `LaunchSandboxPodTool`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:17`
+  * Method `new`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:20`
+  * Method `default`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:26`
+  * Method `name`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:33`
+* Method `description`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:37`
+* Method `input_schema`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:41`
+* Method `call`: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:52`
