@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "src"
 description: "Technical architecture and class hierarchy for src"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-31T14:32:56Z"
+timestamp: "2026-08-01T05:35:59Z"
 ---
 
 # Module Name: src
 
 * **Source Directory Reference:** `crates/factory-core/src/`
-* **Package Dependency:** [serde, thiserror, chrono, ed25519_dalek, crate, base64, uuid, std, async_trait, zeroize]
+* **Package Dependency:** [std, ed25519_dalek, uuid, crate, async_trait, base64, thiserror, chrono, zeroize, serde]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `src` module, documenting its core responsibilities and structural design.
@@ -20,17 +20,29 @@ The following class diagram models the object-oriented structure, explicit inher
 ```mermaid
 classDiagram
     direction BT
+    class SandboxConstraint {
+    }
+    class SecurityValidator {
+        <<trait>>
+        +validate_signature()
+        +audit_content()
+    }
+    class AuditResult {
+    }
+    class Ed25519SecurityValidator {
+        +validate_signature()
+    }
+    SecurityValidator <|-- Ed25519SecurityValidator : Inheritance / Specialization
+    class JitToken {
+    }
+    class SecurityBounds {
+        <<trait>>
+        +validate_token()
+        +issue_jit_token()
+        +wipe_token_from_memory()
+    }
     class FactoryError {
         <<enumeration>>
-    }
-    class SurgicalPatch {
-    }
-    class ExecutionResult {
-    }
-    class CodeSurgeryExecutor {
-        <<trait>>
-        +apply_patch()
-        +verify_syntax()
     }
     class Metadata {
     }
@@ -64,26 +76,14 @@ classDiagram
     }
     class UserFeedbackPayload {
     }
-    class SandboxConstraint {
+    class SurgicalPatch {
     }
-    class SecurityValidator {
+    class ExecutionResult {
+    }
+    class CodeSurgeryExecutor {
         <<trait>>
-        +validate_signature()
-        +audit_content()
-    }
-    class AuditResult {
-    }
-    class Ed25519SecurityValidator {
-        +validate_signature()
-    }
-    SecurityValidator <|-- Ed25519SecurityValidator : Inheritance / Specialization
-    class JitToken {
-    }
-    class SecurityBounds {
-        <<trait>>
-        +validate_token()
-        +issue_jit_token()
-        +wipe_token_from_memory()
+        +apply_patch()
+        +verify_syntax()
     }
 
 ```
@@ -111,12 +111,20 @@ sequenceDiagram
 ---
 
 * **Source Citations:**
+* Class `SandboxConstraint`: `crates/factory-core/src/security.rs:7`
+* Class `SecurityValidator`: `crates/factory-core/src/security.rs:15`
+  * Method `validate_signature`: `crates/factory-core/src/security.rs:16`
+  * Method `audit_content`: `crates/factory-core/src/security.rs:17`
+* Class `AuditResult`: `crates/factory-core/src/security.rs:21`
+* Class `Ed25519SecurityValidator`: `crates/factory-core/src/security.rs:26`
+  * Method `validate_signature`: `crates/factory-core/src/security.rs:32`
+* Class `JitToken`: `crates/factory-core/src/security.rs:59`
+* Class `SecurityBounds`: `crates/factory-core/src/security.rs:64`
+  * Method `validate_token`: `crates/factory-core/src/security.rs:65`
+  * Method `issue_jit_token`: `crates/factory-core/src/security.rs:66`
+  * Method `wipe_token_from_memory`: `crates/factory-core/src/security.rs:67`
+* Method `audit_content`: `crates/factory-core/src/security.rs:47`
 * Class `FactoryError`: `crates/factory-core/src/error.rs:4`
-* Class `SurgicalPatch`: `crates/factory-core/src/executor.rs:6`
-* Class `ExecutionResult`: `crates/factory-core/src/executor.rs:13`
-* Class `CodeSurgeryExecutor`: `crates/factory-core/src/executor.rs:20`
-  * Method `apply_patch`: `crates/factory-core/src/executor.rs:21`
-  * Method `verify_syntax`: `crates/factory-core/src/executor.rs:26`
 * Class `Metadata`: `crates/factory-core/src/lib.rs:12`
 * Class `Inputs`: `crates/factory-core/src/lib.rs:21`
 * Class `Outputs`: `crates/factory-core/src/lib.rs:27`
@@ -132,16 +140,8 @@ sequenceDiagram
 * Class `FinOpsTag`: `crates/factory-core/src/lib.rs:110`
 * Class `ComplianceReport`: `crates/factory-core/src/lib.rs:119`
 * Class `UserFeedbackPayload`: `crates/factory-core/src/lib.rs:126`
-* Class `SandboxConstraint`: `crates/factory-core/src/security.rs:7`
-* Class `SecurityValidator`: `crates/factory-core/src/security.rs:15`
-  * Method `validate_signature`: `crates/factory-core/src/security.rs:16`
-  * Method `audit_content`: `crates/factory-core/src/security.rs:17`
-* Class `AuditResult`: `crates/factory-core/src/security.rs:21`
-* Class `Ed25519SecurityValidator`: `crates/factory-core/src/security.rs:26`
-  * Method `validate_signature`: `crates/factory-core/src/security.rs:32`
-* Class `JitToken`: `crates/factory-core/src/security.rs:59`
-* Class `SecurityBounds`: `crates/factory-core/src/security.rs:64`
-  * Method `validate_token`: `crates/factory-core/src/security.rs:65`
-  * Method `issue_jit_token`: `crates/factory-core/src/security.rs:66`
-  * Method `wipe_token_from_memory`: `crates/factory-core/src/security.rs:67`
-* Method `audit_content`: `crates/factory-core/src/security.rs:47`
+* Class `SurgicalPatch`: `crates/factory-core/src/executor.rs:6`
+* Class `ExecutionResult`: `crates/factory-core/src/executor.rs:13`
+* Class `CodeSurgeryExecutor`: `crates/factory-core/src/executor.rs:20`
+  * Method `apply_patch`: `crates/factory-core/src/executor.rs:21`
+  * Method `verify_syntax`: `crates/factory-core/src/executor.rs:26`
