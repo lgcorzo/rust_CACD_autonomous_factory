@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "tests"
 description: "Technical architecture and class hierarchy for tests"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-31T14:32:56Z"
+timestamp: "2026-08-01T05:35:59Z"
 ---
 
 # Module Name: tests
 
 * **Source Directory Reference:** `crates/factory-mcp-server/tests/`
-* **Package Dependency:** [k8s_openapi, serde_json, factory_mcp_server, kube]
+* **Package Dependency:** [factory_mcp_server, serde_json, kube, k8s_openapi]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `tests` module, documenting its core responsibilities and structural design.

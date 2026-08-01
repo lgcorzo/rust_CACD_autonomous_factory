@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "workflows"
 description: "Technical architecture and class hierarchy for workflows"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-31T14:32:56Z"
+timestamp: "2026-08-01T05:35:59Z"
 ---
 
 # Module Name: workflows
 
 * **Source Directory Reference:** `crates/factory-application/src/workflows/`
-* **Package Dependency:** [hatchet_sdk, serde, super, develop_task, factory_infrastructure, autonomous_mission, crate, factory_core, uuid, std, prost]
+* **Package Dependency:** [std, prost, super, hatchet_sdk, uuid, factory_core, crate, develop_task, factory_infrastructure, autonomous_mission, serde]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `workflows` module, documenting its core responsibilities and structural design.
