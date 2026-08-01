@@ -3,13 +3,13 @@ type: "module-architecture"
 title: "agents"
 description: "Technical architecture and class hierarchy for agents"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-31T14:32:56Z"
+timestamp: "2026-08-01T05:35:59Z"
 ---
 
 # Module Name: agents
 
 * **Source Directory Reference:** `crates/factory-application/src/agents/`
-* **Package Dependency:** [hatchet_sdk, rustant, serde_json, super, factory_infrastructure, reqwest, finops, zeroclaw, doc_agent, crate, factory_core, qa_observer, uuid, auditor, std, async_trait]
+* **Package Dependency:** [std, auditor, hatchet_sdk, super, uuid, zeroclaw, crate, serde_json, async_trait, factory_infrastructure, qa_observer, rustant, reqwest, doc_agent, factory_core, finops]
 
 ## 1. Executive Summary & Purpose
 Technical architecture and class hierarchy for the `agents` module, documenting its core responsibilities and structural design.
@@ -20,25 +20,6 @@ The following class diagram models the object-oriented structure, explicit inher
 ```mermaid
 classDiagram
     direction BT
-    class AuditorAgent {
-        +default()
-        +new()
-        +name()
-    }
-    Default <|-- AuditorAgent : Inheritance / Specialization
-    Agent <|-- AuditorAgent : Inheritance / Specialization
-    class DocumentationAgent {
-        +new()
-        +name()
-    }
-    Agent <|-- DocumentationAgent : Inheritance / Specialization
-    class FinOpsAgent {
-        +default()
-        +new()
-        +name()
-    }
-    Default <|-- FinOpsAgent : Inheritance / Specialization
-    Agent <|-- FinOpsAgent : Inheritance / Specialization
     class QAObserverAgent {
         +default()
         +new()
@@ -51,6 +32,25 @@ classDiagram
         +name()
     }
     Agent <|-- RustantAgent : Inheritance / Specialization
+    class DocumentationAgent {
+        +new()
+        +name()
+    }
+    Agent <|-- DocumentationAgent : Inheritance / Specialization
+    class FinOpsAgent {
+        +default()
+        +new()
+        +name()
+    }
+    Default <|-- FinOpsAgent : Inheritance / Specialization
+    Agent <|-- FinOpsAgent : Inheritance / Specialization
+    class AuditorAgent {
+        +default()
+        +new()
+        +name()
+    }
+    Default <|-- AuditorAgent : Inheritance / Specialization
+    Agent <|-- AuditorAgent : Inheritance / Specialization
     class ZeroClawAgent {
         +new()
         +name()
@@ -82,15 +82,18 @@ sequenceDiagram
 ---
 
 * **Source Citations:**
-* Class `AuditorAgent`: `crates/factory-application/src/agents/auditor.rs:5`
-  * Method `default`: `crates/factory-application/src/agents/auditor.rs:8`
-  * Method `new`: `crates/factory-application/src/agents/auditor.rs:14`
-  * Method `name`: `crates/factory-application/src/agents/auditor.rs:224`
-* Method `analyze_dag_logs`: `crates/factory-application/src/agents/auditor.rs:19`
-* Method `audit_mission`: `crates/factory-application/src/agents/auditor.rs:73`
-* Method `evaluate_prompts`: `crates/factory-application/src/agents/auditor.rs:165`
-* Method `execute`: `crates/factory-application/src/agents/auditor.rs:228`
-* Method `test_auditor_agent`: `crates/factory-application/src/agents/auditor.rs:240`
+* Class `QAObserverAgent`: `crates/factory-application/src/agents/qa_observer.rs:14`
+  * Method `default`: `crates/factory-application/src/agents/qa_observer.rs:23`
+  * Method `new`: `crates/factory-application/src/agents/qa_observer.rs:33`
+  * Method `name`: `crates/factory-application/src/agents/qa_observer.rs:149`
+* Method `monitor_crashes`: `crates/factory-application/src/agents/qa_observer.rs:51`
+* Method `execute`: `crates/factory-application/src/agents/qa_observer.rs:153`
+* Class `RustantAgent`: `crates/factory-application/src/agents/rustant.rs:7`
+  * Method `new`: `crates/factory-application/src/agents/rustant.rs:13`
+  * Method `name`: `crates/factory-application/src/agents/rustant.rs:135`
+* Method `plan_mission`: `crates/factory-application/src/agents/rustant.rs:20`
+* Method `review_mission`: `crates/factory-application/src/agents/rustant.rs:111`
+* Method `execute`: `crates/factory-application/src/agents/rustant.rs:139`
 * Class `DocumentationAgent`: `crates/factory-application/src/agents/doc_agent.rs:8`
   * Method `new`: `crates/factory-application/src/agents/doc_agent.rs:15`
   * Method `name`: `crates/factory-application/src/agents/doc_agent.rs:225`
@@ -109,18 +112,15 @@ sequenceDiagram
 * Method `test_tag`: `crates/factory-application/src/agents/finops.rs:183`
 * Method `test_finops_agent_strips_v1_suffix`: `crates/factory-application/src/agents/finops.rs:194`
 * Method `test_finops_agent_empty_url_guard`: `crates/factory-application/src/agents/finops.rs:208`
-* Class `QAObserverAgent`: `crates/factory-application/src/agents/qa_observer.rs:14`
-  * Method `default`: `crates/factory-application/src/agents/qa_observer.rs:23`
-  * Method `new`: `crates/factory-application/src/agents/qa_observer.rs:33`
-  * Method `name`: `crates/factory-application/src/agents/qa_observer.rs:149`
-* Method `monitor_crashes`: `crates/factory-application/src/agents/qa_observer.rs:51`
-* Method `execute`: `crates/factory-application/src/agents/qa_observer.rs:153`
-* Class `RustantAgent`: `crates/factory-application/src/agents/rustant.rs:7`
-  * Method `new`: `crates/factory-application/src/agents/rustant.rs:13`
-  * Method `name`: `crates/factory-application/src/agents/rustant.rs:135`
-* Method `plan_mission`: `crates/factory-application/src/agents/rustant.rs:20`
-* Method `review_mission`: `crates/factory-application/src/agents/rustant.rs:111`
-* Method `execute`: `crates/factory-application/src/agents/rustant.rs:139`
+* Class `AuditorAgent`: `crates/factory-application/src/agents/auditor.rs:5`
+  * Method `default`: `crates/factory-application/src/agents/auditor.rs:8`
+  * Method `new`: `crates/factory-application/src/agents/auditor.rs:14`
+  * Method `name`: `crates/factory-application/src/agents/auditor.rs:224`
+* Method `analyze_dag_logs`: `crates/factory-application/src/agents/auditor.rs:19`
+* Method `audit_mission`: `crates/factory-application/src/agents/auditor.rs:73`
+* Method `evaluate_prompts`: `crates/factory-application/src/agents/auditor.rs:165`
+* Method `execute`: `crates/factory-application/src/agents/auditor.rs:228`
+* Method `test_auditor_agent`: `crates/factory-application/src/agents/auditor.rs:240`
 * Class `ZeroClawAgent`: `crates/factory-application/src/agents/zeroclaw.rs:7`
   * Method `new`: `crates/factory-application/src/agents/zeroclaw.rs:13`
   * Method `name`: `crates/factory-application/src/agents/zeroclaw.rs:212`
