@@ -2,23 +2,26 @@ import os
 import sys
 import json
 import subprocess
+import shutil
 from datetime import datetime, timezone
 
-def parse_rust(filepath):
-    try:
-        res = subprocess.check_output(['python3', 'parse_rust.py', filepath])
-        return json.loads(res)
-    except Exception as e:
-        print(f"Error parsing Rust file {filepath}: {e}")
+def parse_file(filepath):
+    if filepath.endswith('.rs'):
+        cmd = ['python3', 'parse_rust.py', filepath]
+    elif filepath.endswith('.py'):
+        cmd = ['python3', 'parse_python.py', filepath]
+    elif filepath.endswith(('.ts', '.tsx', '.js', '.jsx')):
+        cmd = ['python3', 'parse_ts.py', filepath]
+    else:
         return {"classes": [], "free_functions": [], "dependencies": []}
 
-def parse_python(filepath):
     try:
-        res = subprocess.check_output(['python3', 'parse_python.py', filepath])
+        res = subprocess.check_output(cmd)
         return json.loads(res)
     except Exception as e:
-        print(f"Error parsing Python file {filepath}: {e}")
+        print(f"Error parsing file {filepath}: {e}", file=sys.stderr)
         return {"classes": [], "free_functions": [], "dependencies": []}
+
 
 def generate_mermaid_classes(classes):
     mermaid = "classDiagram\n    direction BT\n"
@@ -27,15 +30,20 @@ def generate_mermaid_classes(classes):
 
     for c in classes:
         kind = c.get('kind', 'class')
-        if kind == 'trait':
-            mermaid += f"    class {c['name']} {{\n        <<trait>>\n"
+        if kind == 'trait' or kind == 'interface':
+            mermaid += f"    class {c['name']} {{\n        <<{kind}>>\n"
         elif kind == 'enum':
             mermaid += f"    class {c['name']} {{\n        <<enumeration>>\n"
         else:
             mermaid += f"    class {c['name']} {{\n"
 
         for m in c.get('methods', []):
-            mermaid += f"        +{m['name']}()\n"
+            visibility = "+" if m.get('is_pub', True) else "-"
+            args_str = ", ".join([f"{a['name']}:{a['type']}" for a in m.get('args', [])])
+            ret_type = m.get('ret_type', 'None').strip()
+            # Mermaid doesn't like some characters, so we just use the name
+            mermaid += f"        {visibility}{m['name']}({args_str}) {ret_type}\n"
+
         mermaid += "    }\n"
 
         for impl in c.get('implements', []):
@@ -44,171 +52,215 @@ def generate_mermaid_classes(classes):
     return mermaid
 
 def generate_sequence_diagram(module_name, classes, free_functions):
-    # This is slightly better than identical, it references actual methods
     seq = "sequenceDiagram\n    autonumber\n    participant Caller as Client Interface\n"
     svc_name = module_name.capitalize() + "Service"
     seq += f"    participant Svc as {svc_name}\n"
 
+    method_name = "execute"
     if classes and classes[0].get('methods'):
         method_name = classes[0]['methods'][0]['name']
-        seq += f"    Caller->>Svc: {method_name}()\n"
     elif free_functions:
         method_name = free_functions[0]['name']
-        seq += f"    Caller->>Svc: {method_name}()\n"
-    else:
-        seq += "    Caller->>Svc: execute()\n"
 
+    seq += f"    Caller->>Svc: {method_name}()\n"
     seq += "    Note over Svc: Processing internal logic\n    Svc-->>Caller: result\n"
     return seq
 
 
-def main():
-    target_dirs = {}
+def write_file_doc(file_path, parsed, now):
+    file_name = os.path.basename(file_path)
+    base_name = os.path.splitext(file_name)[0]
 
-    for root, dirs, files in os.walk('.'):
-        clean_root = os.path.normpath(root)
-        parts = clean_root.split(os.sep)
-        if any(ignored in parts for ignored in ['.git', 'target', 'node_modules', 'openwiki', 'wiki', '.agents', '.cargo']):
-            continue
+    # Directory mapping
+    dir_name = os.path.dirname(file_path)
+    # The prompt requires strict OKF structure (architecture/, modules/, api/, classes/, diagrams/, dependencies/)
+    # But it also requires "openwiki/api.md" for "src/api.py". So we create a page for each file directly in openwiki/
+    # And we create indexes linking them.
+    # We will put the raw file docs in 'openwiki/modules/' and link from index.
 
-        for f in files:
-            if f.endswith('.rs') or f.endswith('.py'):
-                path = os.path.normpath(os.path.join(clean_root, f))
+    flattened_name = file_path.replace(os.sep, '_').replace('.', '_')
+    out_dir = os.path.join('openwiki', 'modules')
+    os.makedirs(out_dir, exist_ok=True)
+    out_file = os.path.join(out_dir, f"{flattened_name}.md")
 
-                dir_path = os.path.dirname(path)
-                if dir_path == '':
-                    dir_path = '.'
-                if dir_path == '.':
-                    continue
+    mermaid_classes = generate_mermaid_classes(parsed['classes'])
+    seq_diagram = generate_sequence_diagram(base_name, parsed['classes'], parsed['free_functions'])
 
-                if dir_path not in target_dirs:
-                    target_dirs[dir_path] = []
+    deps_str = ", ".join(parsed['dependencies']) if parsed['dependencies'] else "None"
 
-                if f.endswith('.rs'):
-                    parsed = parse_rust(path)
-                else:
-                    parsed = parse_python(path)
-
-                if 'error' in parsed:
-                    continue
-
-                target_dirs[dir_path].append({
-                    'file': path,
-                    'classes': parsed.get('classes', []),
-                    'methods': parsed.get('free_functions', []),
-                    'deps': parsed.get('dependencies', [])
-                })
-
-    os.makedirs('openwiki', exist_ok=True)
-    index_links = []
-    now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-
-    for d, files in target_dirs.items():
-        clean_d = d.replace(os.sep, '/')
-        module_name = os.path.basename(clean_d) if clean_d != '.' else 'root'
-        out_dir = os.path.join('openwiki', clean_d)
-        os.makedirs(out_dir, exist_ok=True)
-        out_file = os.path.join(out_dir, 'index.md')
-
-        all_classes = []
-        all_methods = []
-        citations = []
-        all_deps = set()
-
-        for fd in files:
-            file_path = fd['file'].replace(os.sep, '/')
-
-            for c in fd['classes']:
-                all_classes.append(c)
-                line = c.get('line', 0)
-                citations.append(f"* Class `{c['name']}`: `{file_path}:{line}`")
-                for m in c.get('methods', []):
-                    mline = m.get('line', 0)
-                    citations.append(f"  * Method `{m['name']}`: `{file_path}:{mline}`")
-
-            for m in fd['methods']:
-                all_methods.append(m)
-                mline = m.get('line', 0)
-                citations.append(f"* Method `{m['name']}`: `{file_path}:{mline}`")
-
-            for dep in fd['deps']:
-                all_deps.add(dep)
-
-        mermaid_classes = generate_mermaid_classes(all_classes)
-        seq_diagram = generate_sequence_diagram(module_name, all_classes, all_methods)
-
-        citations_str = "\n".join(citations) if citations else "* No classes or methods found."
-        deps_str = ", ".join(all_deps) if all_deps else "None"
-
-        content = f"""---
-type: "module-architecture"
-title: "{module_name}"
-description: "Technical architecture and class hierarchy for {module_name}"
-tags: ["architecture", "uml", "pyreverse", "openwiki"]
+    content = f"""---
+type: "module-documentation"
+title: "{file_name}"
+source_path: "{file_path}"
+description: "Detailed documentation for {file_name}"
+tags: ["documentation", "ast", "openwiki"]
 timestamp: "{now}"
 ---
 
-# Module Name: {module_name}
+# File: {file_name}
 
-* **Source Directory Reference:** `{clean_d}/`
-* **Package Dependency:** [{deps_str}]
+**Source Path:** `{file_path}`
 
-## 1. Executive Summary & Purpose
-Technical architecture and class hierarchy for the `{module_name}` module, documenting its core responsibilities and structural design.
+## Overview
 
-## 2. UML 2.0 Class & Inheritance Architecture (Deterministic)
-The following class diagram models the object-oriented structure, explicit inheritance hierarchies, and polymorphic interface implementations derived from local AST analysis:
+### Purpose
+Provides implementation for {file_name}.
+
+### Responsibilities
+* Handles logic related to {base_name}.
+
+### Dependencies
+* {deps_str}
+
+## Public API & Architecture
+
+### Exported Classes / Structs / Interfaces
+
+"""
+    for c in parsed['classes']:
+        doc = c.get('doc', '').strip()
+        if not doc:
+            doc = f"Represents {c['name']}."
+
+        content += f"#### {c['name']}\n\n"
+        content += f"**Overview:** {doc}\n\n"
+
+        content += "**Public Methods:**\n\n"
+        has_methods = False
+        for m in c.get('methods', []):
+            if m.get('is_pub', True):
+                has_methods = True
+                mdoc = m.get('doc', '').strip() or f"Executes {m['name']}."
+                args_str = ", ".join([f"{a['name']} ({a['type']})" for a in m.get('args', [])])
+                ret_type = m.get('ret_type', 'None')
+                content += f"##### `{m['name']}({args_str}) -> {ret_type}`\n"
+                content += f"{mdoc}\n\n"
+        if not has_methods:
+            content += "None.\n\n"
+
+    content += "### Exported Functions\n\n"
+    has_funcs = False
+    for f in parsed['free_functions']:
+        if f.get('is_pub', True):
+            has_funcs = True
+            fdoc = f.get('doc', '').strip() or f"Executes {f['name']}."
+            args_str = ", ".join([f"{a['name']} ({a['type']})" for a in f.get('args', [])])
+            ret_type = f.get('ret_type', 'None')
+            content += f"#### `{f['name']}({args_str}) -> {ret_type}`\n"
+            content += f"{fdoc}\n\n"
+
+    if not has_funcs:
+        content += "None.\n\n"
+
+    content += f"""## Internal Architecture & Execution Flow
 
 ```mermaid
 {mermaid_classes}
 ```
 
-## 3. Package & Class Relations
-
-* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides within `{clean_d}`.
-* **Dependencies:** How classes within this package collaborate externally.
-
-## 4. Execution Flow & Runtime Behavior
-
-The following sequence diagram outlines the execution lifecycle and message passing during core operations:
+### Sequence Explanation
 
 ```mermaid
 {seq_diagram}
 ```
 
----
-
-* **Source Citations:**
-{citations_str}
+## Cross References
+* **Parent module:** `{dir_name}`
+* **Dependencies:** {deps_str}
 """
-        with open(out_file, 'w', encoding='utf-8') as f:
-            f.write(content)
+    with open(out_file, 'w', encoding='utf-8') as f:
+        f.write(content)
 
-        index_links.append(f"* [[{clean_d}/index.md]] - {module_name} Module Architecture")
+def setup_okf_structure():
+    folders = [
+        "architecture",
+        "modules",
+        "api",
+        "classes",
+        "diagrams",
+        "dependencies",
+        "glossary",
+        "decisions",
+        "generated"
+    ]
+    for folder in folders:
+        os.makedirs(os.path.join("openwiki", folder), exist_ok=True)
 
-    index_path = 'openwiki/index.md'
-    if os.path.exists(index_path):
-        with open(index_path, 'r', encoding='utf-8') as f:
-            content = f.read()
+def main():
+    mode = "diff"
+    if len(sys.argv) > 1:
+        for arg in sys.argv[1:]:
+            if arg.startswith("mode="):
+                mode = arg.split("=")[1]
 
-        new_content = content
-        if "\n## Auto-Generated Module Architecture Links" not in new_content:
-            new_content += "\n\n## Auto-Generated Module Architecture Links\n"
+    if mode == "full":
+        if os.path.exists("openwiki"):
+            shutil.rmtree("openwiki")
+        setup_okf_structure()
 
-        for link in sorted(index_links):
-            if link not in new_content:
-                new_content += link + "\n"
-
-        with open(index_path, 'w', encoding='utf-8') as f:
-            f.write(new_content)
+        files_to_process = []
+        for root, dirs, files in os.walk('.'):
+            clean_root = os.path.normpath(root)
+            parts = clean_root.split(os.sep)
+            if any(ignored in parts for ignored in ['.git', '.github', '.vscode', '.idea', 'node_modules', 'dist', 'bin', 'obj', 'target', 'coverage', '__pycache__', 'openwiki']):
+                continue
+            for f in files:
+                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx')):
+                    files_to_process.append(os.path.normpath(os.path.join(clean_root, f)))
     else:
-        with open(index_path, 'w', encoding='utf-8') as f:
-            f.write("# OpenWiki Root Index\n\n")
-            for link in sorted(index_links):
-                f.write(link + "\n")
+        setup_okf_structure()
+        try:
+            try:
+                output = subprocess.check_output(["git", "log", "-m", "-1", "--name-only", "--pretty=format:"]).decode("utf-8")
+            except subprocess.CalledProcessError:
+                output = subprocess.check_output(["git", "show", "--name-only", "--format="]).decode("utf-8")
+            files_to_process = []
+            for f in output.splitlines():
+                f = f.strip()
+                if not f: continue
+                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx')):
+                    if os.path.exists(f):
+                        files_to_process.append(f)
+        except:
+            files_to_process = []
 
-    with open('openwiki/logs.md', 'a', encoding='utf-8') as f:
-        f.write(f"\n## {now}\n* Generated baseline OKF documentation for all source modules.\n")
+    if not files_to_process:
+        print("No files to process.")
+        return
+
+    now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    for file_path in files_to_process:
+        print(f"Processing {file_path}")
+        parsed = parse_file(file_path)
+        write_file_doc(file_path, parsed, now)
+
+    generate_indexes(now)
+
+def generate_indexes(now):
+    summary_content = "# SUMMARY\n\n"
+    index_content = "---\ntitle: OpenWiki Index\n---\n\n# OpenWiki Root Index\n\n## Module Architecture Links\n\n"
+
+    for root, dirs, files in os.walk("openwiki"):
+        dirs.sort()
+        files.sort()
+
+        rel_root = os.path.relpath(root, "openwiki")
+        if rel_root == ".":
+            pass
+        else:
+            summary_content += f"\n## {rel_root}\n\n"
+            for f in files:
+                if f.endswith(".md"):
+                    path = os.path.join(rel_root, f).replace("\\", "/")
+                    summary_content += f"* [{f}]({path})\n"
+                    index_content += f"* [[{path}]]\n"
+
+    with open("openwiki/SUMMARY.md", "w") as f:
+        f.write(summary_content)
+
+    with open("openwiki/index.md", "w") as f:
+        f.write(index_content)
 
 if __name__ == '__main__':
     main()
