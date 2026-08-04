@@ -1,104 +1,156 @@
-import re
+import tree_sitter_rust as tsrust
+from tree_sitter import Language, Parser
 import sys
 import json
 
+def get_node_text(node, source_bytes):
+    return source_bytes[node.start_byte:node.end_byte].decode('utf-8')
+
 def parse_rust(filepath):
-    classes = []
-    free_functions = []
-    dependencies = []
-
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+        with open(filepath, 'rb') as f:
+            source_bytes = f.read()
 
-        current_class = None
-        current_impl = None
+        RUST_LANGUAGE = Language(tsrust.language())
+        parser = Parser(RUST_LANGUAGE)
+        tree = parser.parse(source_bytes)
 
-        for i, line in enumerate(lines):
-            line_num = i + 1
+        classes = []
+        free_functions = []
+        dependencies = []
 
-            # Structs, Enums, Traits
-            m_struct = re.match(r'^\s*(?:pub\s+)?struct\s+(\w+)', line)
-            if m_struct:
-                classes.append({'name': m_struct.group(1), 'kind': 'struct', 'line': line_num, 'methods': [], 'implements': []})
-                current_class = m_struct.group(1)
+        def traverse(node):
+            if node.type == 'use_declaration':
+                text = get_node_text(node, source_bytes)
+                dependencies.append(text.replace('use ', '').replace(';', '').strip())
 
-            m_enum = re.match(r'^\s*(?:pub\s+)?enum\s+(\w+)', line)
-            if m_enum:
-                classes.append({'name': m_enum.group(1), 'kind': 'enum', 'line': line_num, 'methods': [], 'implements': []})
-                current_class = m_enum.group(1)
+            elif node.type in ['struct_item', 'enum_item', 'trait_item']:
+                name_node = node.child_by_field_name('name')
+                if name_node:
+                    name = get_node_text(name_node, source_bytes)
+                    doc_comments = []
+                    prev_sibling = node.prev_sibling
+                    while prev_sibling and prev_sibling.type == 'line_comment':
+                        doc_comments.append(get_node_text(prev_sibling, source_bytes))
+                        prev_sibling = prev_sibling.prev_sibling
 
-            m_trait = re.match(r'^\s*(?:pub\s+)?(?:async\s+)?trait\s+(\w+)', line)
-            if m_trait:
-                classes.append({'name': m_trait.group(1), 'kind': 'trait', 'line': line_num, 'methods': [], 'implements': []})
-                current_class = m_trait.group(1)
+                    kind = node.type.split('_')[0]
+                    classes.append({
+                        'name': name,
+                        'kind': kind,
+                        'doc': '\n'.join(reversed(doc_comments)),
+                        'methods': [],
+                        'fields': [],
+                        'implements': []
+                    })
 
-            # Methods in traits
-            if current_class and next((c for c in classes if c['name'] == current_class and c['kind'] == 'trait'), None):
-                m_fn = re.match(r'^\s*(?:pub\s+)?(?:async\s+)?fn\s+(\w+)', line)
-                if m_fn:
-                    for c in classes:
-                        if c['name'] == current_class:
-                            c['methods'].append({'name': m_fn.group(1), 'line': line_num})
-                            break
+            elif node.type == 'impl_item':
+                type_node = node.child_by_field_name('type')
+                trait_node = node.child_by_field_name('trait')
+                if type_node:
+                    target_name = get_node_text(type_node, source_bytes)
+                    target_class = next((c for c in classes if c['name'] == target_name), None)
+                    if not target_class:
+                        target_class = {
+                            'name': target_name,
+                            'kind': 'struct',
+                            'doc': '',
+                            'methods': [],
+                            'fields': [],
+                            'implements': []
+                        }
+                        classes.append(target_class)
 
-            # Impls
-            m_impl = re.match(r'^\s*impl(?:\s*<.*?>)?\s+(?:(\w+)\s+for\s+)?(\w+)', line)
-            if m_impl:
-                trait_name = m_impl.group(1)
-                target_name = m_impl.group(2)
+                    if trait_node:
+                        trait_name = get_node_text(trait_node, source_bytes)
+                        target_class['implements'].append(trait_name)
 
-                # Check if target_name exists in classes
-                found = False
-                for c in classes:
-                    if c['name'] == target_name:
-                        found = True
-                        if trait_name:
-                            c['implements'].append(trait_name)
-                        break
+                    body = node.child_by_field_name('body')
+                    if body:
+                        for b_child in body.children:
+                            if b_child.type == 'function_item':
+                                func_name_node = b_child.child_by_field_name('name')
+                                if func_name_node:
+                                    func_name = get_node_text(func_name_node, source_bytes)
+                                    is_pub = False
+                                    for c in b_child.children:
+                                        if c.type == 'visibility_modifier':
+                                            is_pub = True
 
-                if not found:
-                    classes.append({'name': target_name, 'kind': 'struct', 'line': line_num, 'methods': [], 'implements': [trait_name] if trait_name else []})
+                                    func_doc = []
+                                    ps = b_child.prev_sibling
+                                    while ps and ps.type == 'line_comment':
+                                        func_doc.append(get_node_text(ps, source_bytes))
+                                        ps = ps.prev_sibling
 
-                current_impl = target_name
+                                    args = []
+                                    ret_type = "None"
+                                    params_node = b_child.child_by_field_name('parameters')
+                                    if params_node:
+                                        for p in params_node.children:
+                                            if p.type == 'parameter':
+                                                args.append({"name": get_node_text(p, source_bytes), "type": "Any"})
+                                    return_type_node = b_child.child_by_field_name('return_type')
+                                    if return_type_node:
+                                        ret_type = get_node_text(return_type_node, source_bytes)
 
-            # Methods in impls
-            if current_impl:
-                m_fn = re.match(r'^\s*(?:pub\s+)?(?:async\s+)?fn\s+(\w+)', line)
-                if m_fn:
-                    for c in classes:
-                        if c['name'] == current_impl:
-                            c['methods'].append({'name': m_fn.group(1), 'line': line_num})
-                            break
+                                    target_class['methods'].append({
+                                        'name': func_name,
+                                        'is_pub': is_pub,
+                                        'doc': '\n'.join(reversed(func_doc)),
+                                        'args': args,
+                                        'ret_type': ret_type
+                                    })
 
-            # Reset current blocks blindly on closing brace
-            # This is flawed but better than line 0
-            if re.match(r'^}', line.strip()):
-                current_impl = None
-                current_class = None
+            elif node.type == 'function_item':
+                if node.parent and node.parent.type == 'source_file':
+                    name_node = node.child_by_field_name('name')
+                    if name_node:
+                        name = get_node_text(name_node, source_bytes)
+                        is_pub = False
+                        for c in node.children:
+                            if c.type == 'visibility_modifier':
+                                is_pub = True
 
-            # Free functions
-            if not current_impl and not (current_class and next((c for c in classes if c['name'] == current_class and c['kind'] == 'trait'), None)):
-                m_fn = re.match(r'^\s*(?:pub\s+)?(?:async\s+)?fn\s+(\w+)', line)
-                if m_fn:
-                    free_functions.append({'name': m_fn.group(1), 'line': line_num})
+                        doc_comments = []
+                        ps = node.prev_sibling
+                        while ps and ps.type == 'line_comment':
+                            doc_comments.append(get_node_text(ps, source_bytes))
+                            ps = ps.prev_sibling
 
-            # Use
-            m_use = re.match(r'^\s*(?:pub\s+)?use\s+([\w\:]+)', line)
-            if m_use:
-                dependencies.append(m_use.group(1).split('::')[0])
+                        args = []
+                        ret_type = "None"
+                        params_node = node.child_by_field_name('parameters')
+                        if params_node:
+                            for p in params_node.children:
+                                if p.type == 'parameter':
+                                    args.append({"name": get_node_text(p, source_bytes), "type": "Any"})
+                        return_type_node = node.child_by_field_name('return_type')
+                        if return_type_node:
+                            ret_type = get_node_text(return_type_node, source_bytes)
 
+                        free_functions.append({
+                            'name': name,
+                            'is_pub': is_pub,
+                            'doc': '\n'.join(reversed(doc_comments)),
+                            'args': args,
+                            'ret_type': ret_type
+                        })
+
+            for child in node.children:
+                traverse(child)
+
+        traverse(tree.root_node)
+
+        return {
+            "classes": classes,
+            "free_functions": free_functions,
+            "dependencies": list(set(dependencies))
+        }
     except Exception as e:
-        print(json.dumps({"error": str(e)}))
-        sys.exit(1)
-
-    print(json.dumps({
-        "classes": classes,
-        "free_functions": free_functions,
-        "dependencies": list(set(dependencies))
-    }))
+        print(f"Error parsing {filepath}: {e}", file=sys.stderr)
+        return {"classes": [], "free_functions": [], "dependencies": []}
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        sys.exit(1)
-    parse_rust(sys.argv[1])
+    if len(sys.argv) > 1:
+        print(json.dumps(parse_rust(sys.argv[1])))
