@@ -21,10 +21,29 @@ def parse_python_file(filepath):
                     dependencies.add(node.module)
             elif isinstance(node, ast.ClassDef):
                 methods = []
+                fields = []
                 for child in ast.iter_child_nodes(node):
-                    if isinstance(child, ast.FunctionDef) or isinstance(child, ast.AsyncFunctionDef):
+                    if isinstance(child, ast.AnnAssign):
+                        if isinstance(child.target, ast.Name):
+                            fields.append({
+                                'name': child.target.id,
+                                'type': ast.unparse(child.annotation)
+                            })
+                    elif isinstance(child, ast.Assign):
+                        for target in child.targets:
+                            if isinstance(target, ast.Name):
+                                fields.append({
+                                    'name': target.id,
+                                    'type': 'Any'
+                                })
+                    elif isinstance(child, ast.FunctionDef) or isinstance(child, ast.AsyncFunctionDef):
                         doc = ast.get_docstring(child) or ""
-                        is_pub = not child.name.startswith('_') or child.name.startswith('__')
+                        is_constructor = child.name == "__init__"
+
+                        if is_constructor:
+                            is_pub = True
+                        else:
+                            is_pub = not child.name.startswith('_') or (child.name.startswith('__') and child.name.endswith('__'))
 
                         args = []
                         for arg in child.args.args:
@@ -36,10 +55,34 @@ def parse_python_file(filepath):
                         methods.append({
                             'name': child.name,
                             'is_pub': is_pub,
+                            'is_constructor': is_constructor,
                             'doc': doc,
                             'args': args,
                             'ret_type': ret_type
                         })
+
+                        if is_constructor:
+                            for stmt in child.body:
+                                if isinstance(stmt, ast.Assign):
+                                    for target in stmt.targets:
+                                        if isinstance(target, ast.Attribute) and isinstance(target.value, ast.Name) and target.value.id == 'self':
+                                            fields.append({
+                                                'name': target.attr,
+                                                'type': 'Any'
+                                            })
+                                elif isinstance(stmt, ast.AnnAssign):
+                                    if isinstance(stmt.target, ast.Attribute) and isinstance(stmt.target.value, ast.Name) and stmt.target.value.id == 'self':
+                                        fields.append({
+                                            'name': stmt.target.attr,
+                                            'type': ast.unparse(stmt.annotation)
+                                        })
+
+                unique_fields = []
+                seen_fields = set()
+                for f in fields:
+                    if f['name'] not in seen_fields:
+                        seen_fields.add(f['name'])
+                        unique_fields.append(f)
 
                 implements = []
                 for base in node.bases:
@@ -55,7 +98,7 @@ def parse_python_file(filepath):
                     'doc': doc,
                     'methods': methods,
                     'implements': implements,
-                    'fields': []
+                    'fields': unique_fields
                 })
 
             elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.AsyncFunctionDef):

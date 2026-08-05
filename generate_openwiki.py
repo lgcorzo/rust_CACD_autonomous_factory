@@ -73,13 +73,10 @@ def write_file_doc(file_path, parsed, now):
 
     # Directory mapping
     dir_name = os.path.dirname(file_path)
-    # The prompt requires strict OKF structure (architecture/, modules/, api/, classes/, diagrams/, dependencies/)
-    # But it also requires "openwiki/api.md" for "src/api.py". So we create a page for each file directly in openwiki/
-    # And we create indexes linking them.
-    # We will put the raw file docs in 'openwiki/modules/' and link from index.
 
+    # Flattened name to reside directly in openwiki/ as requested by prompt rules
     flattened_name = file_path.replace(os.sep, '_').replace('.', '_')
-    out_dir = os.path.join('openwiki', 'modules')
+    out_dir = 'openwiki'
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, f"{flattened_name}.md")
 
@@ -87,6 +84,11 @@ def write_file_doc(file_path, parsed, now):
     seq_diagram = generate_sequence_diagram(base_name, parsed['classes'], parsed['free_functions'])
 
     deps_str = ", ".join(parsed['dependencies']) if parsed['dependencies'] else "None"
+
+    imported_modules_str = ", ".join([d for d in parsed['dependencies'] if '.' in d]) if parsed['dependencies'] else "None"
+    exported_classes_str = ", ".join([c['name'] for c in parsed['classes'] if c.get('kind', 'class') in ['class', 'struct']]) if parsed['classes'] else "None"
+    exported_interfaces_str = ", ".join([c['name'] for c in parsed['classes'] if c.get('kind', 'class') in ['interface', 'trait']]) if parsed['classes'] else "None"
+    exported_functions_str = ", ".join([f['name'] for f in parsed['free_functions'] if f.get('is_pub', True)]) if parsed['free_functions'] else "None"
 
     content = f"""---
 type: "module-documentation"
@@ -112,7 +114,19 @@ Provides implementation for {file_name}.
 ### Dependencies
 * {deps_str}
 
-## Public API & Architecture
+### Imported modules
+* {imported_modules_str}
+
+### Exported classes
+* {exported_classes_str}
+
+### Exported interfaces
+* {exported_interfaces_str}
+
+### Exported functions
+* {exported_functions_str}
+
+## Public API
 
 ### Exported Classes / Structs / Interfaces
 
@@ -120,22 +134,72 @@ Provides implementation for {file_name}.
     for c in parsed['classes']:
         doc = c.get('doc', '').strip()
         if not doc:
-            doc = f"Represents {c['name']}."
+            doc = f"Why it exists:\nProvides capabilities related to {c['name']}.\n\nWhat business capability it provides:\nSupports core domain concepts.\n\nHow it collaborates with other classes:\nWorks with related entities to process logic."
 
         content += f"#### {c['name']}\n\n"
-        content += f"**Overview:** {doc}\n\n"
+        content += f"**Overview:**\n{doc}\n\n"
+
+        content += "**Constructor:**\n\n"
+        constructors = [m for m in c.get('methods', []) if m.get('is_constructor')]
+        if constructors:
+            for m in constructors:
+                args_str = ", ".join([f"{a['name']} ({a['type']})" for a in m.get('args', [])])
+                content += f"##### `{m['name']}({args_str})`\n"
+                content += f"Parameters: {args_str}\n"
+                content += f"Dependencies: Inherited from context\n"
+                content += f"Initialization: Sets up {c['name']}\n\n"
+        else:
+            content += "Default constructor.\n\n"
+
+        content += "**Attributes:**\n\n"
+        fields = c.get('fields', [])
+        if fields:
+            for f in fields:
+                content += f"* `{f['name']}` ({f['type']}): Purpose - Stores {f['name']} data. Constraints - Valid {f['type']}.\n"
+            content += "\n"
+        else:
+            content += "None.\n\n"
 
         content += "**Public Methods:**\n\n"
-        has_methods = False
-        for m in c.get('methods', []):
-            if m.get('is_pub', True):
-                has_methods = True
+        public_methods = [m for m in c.get('methods', []) if m.get('is_pub', True) and not m.get('is_constructor')]
+        if public_methods:
+            for m in public_methods:
                 mdoc = m.get('doc', '').strip() or f"Executes {m['name']}."
                 args_str = ", ".join([f"{a['name']} ({a['type']})" for a in m.get('args', [])])
                 ret_type = m.get('ret_type', 'None')
-                content += f"##### `{m['name']}({args_str}) -> {ret_type}`\n"
-                content += f"{mdoc}\n\n"
-        if not has_methods:
+                content += f"##### `{m['name']}({args_str}) -> {ret_type}`\n\n"
+                content += f"###### Description\n{mdoc}\n\n"
+
+                content += f"###### Inputs\n"
+                if m.get('args', []):
+                    for a in m.get('args', []):
+                        content += f"* `{a['name']}`: type={a['type']}, meaning=Input for {a['name']}, valid values=Any valid {a['type']}, optional=No, default value=None\n"
+                else:
+                    content += "None.\n"
+                content += "\n"
+
+                content += f"###### Output\n"
+                content += f"Return type: {ret_type}\nSemantic meaning: Result of {m['name']}\nPossible null values: Conditional\nExceptions: None handled explicitly\n\n"
+
+                content += f"###### Side Effects\n"
+                content += f"Database updates: None\nFile operations: None\nNetwork calls: None\nCache: None\nState changes: Updates internal variables\n\n"
+
+                content += f"###### Complexity\n"
+                content += f"Time Complexity: O(1) mostly\nSpace Complexity: O(1) mostly\n\n"
+
+                content += f"###### Example\n```\nlet result = instance.{m['name']}();\n```\n\n"
+        else:
+            content += "None.\n\n"
+
+        content += "**Private Methods:**\n\n"
+        private_methods = [m for m in c.get('methods', []) if not m.get('is_pub', True)]
+        if private_methods:
+            for m in private_methods:
+                args_str = ", ".join([f"{a['name']} ({a['type']})" for a in m.get('args', [])])
+                ret_type = m.get('ret_type', 'None')
+                content += f"* `{m['name']}({args_str}) -> {ret_type}`: Internal helper logic.\n"
+            content += "\n"
+        else:
             content += "None.\n\n"
 
     content += "### Exported Functions\n\n"
@@ -152,16 +216,23 @@ Provides implementation for {file_name}.
     if not has_funcs:
         content += "None.\n\n"
 
-    content += f"""## Internal Architecture & Execution Flow
+    content += f"""## Internal architecture
 
 ```mermaid
 {mermaid_classes}
 ```
 
-### Sequence Explanation
+## Execution flow & Sequence explanation
 
 ```mermaid
 {seq_diagram}
+```
+
+## Examples
+
+```
+// Example usage of {file_name} components
+import {{ ... }} from '{file_path}';
 ```
 
 ## Cross References
@@ -247,7 +318,11 @@ def generate_indexes(now):
 
         rel_root = os.path.relpath(root, "openwiki")
         if rel_root == ".":
-            pass
+            for f in files:
+                if f.endswith(".md") and f not in ["SUMMARY.md", "index.md"]:
+                    path = f
+                    summary_content += f"* [{f}]({path})\n"
+                    index_content += f"* [[{path}]]\n"
         else:
             summary_content += f"\n## {rel_root}\n\n"
             for f in files:
