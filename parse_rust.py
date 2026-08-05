@@ -35,12 +35,27 @@ def parse_rust(filepath):
                         prev_sibling = prev_sibling.prev_sibling
 
                     kind = node.type.split('_')[0]
+
+                    fields = []
+                    if kind == 'struct':
+                        field_decl_list = node.child_by_field_name('body')
+                        if field_decl_list and field_decl_list.type == 'field_declaration_list':
+                            for f_child in field_decl_list.children:
+                                if f_child.type == 'field_declaration':
+                                    fname_node = f_child.child_by_field_name('name')
+                                    ftype_node = f_child.child_by_field_name('type')
+                                    if fname_node and ftype_node:
+                                        fields.append({
+                                            'name': get_node_text(fname_node, source_bytes),
+                                            'type': get_node_text(ftype_node, source_bytes)
+                                        })
+
                     classes.append({
                         'name': name,
                         'kind': kind,
                         'doc': '\n'.join(reversed(doc_comments)),
                         'methods': [],
-                        'fields': [],
+                        'fields': fields,
                         'implements': []
                     })
 
@@ -83,6 +98,8 @@ def parse_rust(filepath):
                                         func_doc.append(get_node_text(ps, source_bytes))
                                         ps = ps.prev_sibling
 
+                                    is_constructor = func_name == "new"
+
                                     args = []
                                     ret_type = "None"
                                     params_node = b_child.child_by_field_name('parameters')
@@ -97,6 +114,7 @@ def parse_rust(filepath):
                                     target_class['methods'].append({
                                         'name': func_name,
                                         'is_pub': is_pub,
+                                        'is_constructor': is_constructor,
                                         'doc': '\n'.join(reversed(func_doc)),
                                         'args': args,
                                         'ret_type': ret_type

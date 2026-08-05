@@ -1,0 +1,264 @@
+---
+type: "module-documentation"
+title: "security.rs"
+source_path: "crates/factory-core/src/security.rs"
+description: "Detailed documentation for security.rs"
+tags: ["documentation", "ast", "openwiki"]
+timestamp: "2026-08-05T05:55:37Z"
+---
+
+# File: security.rs
+
+**Source Path:** `crates/factory-core/src/security.rs`
+
+## Overview
+
+### Purpose
+Provides implementation for security.rs.
+
+### Responsibilities
+* Handles logic related to security.
+
+### Dependencies
+* crate::error::Result, zeroize::Zeroize, async_trait::async_trait, ed25519_dalek::{Signature, Verifier}, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}
+
+### Imported modules
+*
+
+### Exported classes
+* SandboxConstraint, AuditResult, Ed25519SecurityValidator, JitToken
+
+### Exported interfaces
+* SecurityValidator, SecurityBounds
+
+### Exported functions
+* None
+
+## Public API
+
+### Exported Classes / Structs / Interfaces
+
+#### SandboxConstraint
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SandboxConstraint.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `max_memory_mb` (u32): Purpose - Stores max_memory_mb data. Constraints - Valid u32.
+* `max_cpu_cores` (f32): Purpose - Stores max_cpu_cores data. Constraints - Valid f32.
+* `network_egress_allowed` (bool): Purpose - Stores network_egress_allowed data. Constraints - Valid bool.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### SecurityValidator
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SecurityValidator.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### AuditResult
+
+**Overview:**
+Why it exists:
+Provides capabilities related to AuditResult.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `is_safe` (bool): Purpose - Stores is_safe data. Constraints - Valid bool.
+* `findings` (Vec<String>): Purpose - Stores findings data. Constraints - Valid Vec<String>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### Ed25519SecurityValidator
+
+**Overview:**
+Why it exists:
+Provides capabilities related to Ed25519SecurityValidator.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `public_key` (ed25519_dalek::VerifyingKey): Purpose - Stores public_key data. Constraints - Valid ed25519_dalek::VerifyingKey.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+* `validate_signature(data: &[u8] (Any), signature: &str (Any)) -> Result<bool>`: Internal helper logic.
+* `audit_content(_content: &str (Any)) -> Result<AuditResult>`: Internal helper logic.
+
+#### JitToken
+
+**Overview:**
+Why it exists:
+Provides capabilities related to JitToken.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `token` (String): Purpose - Stores token data. Constraints - Valid String.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### SecurityBounds
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SecurityBounds.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+### Exported Functions
+
+None.
+
+## Internal architecture
+
+```mermaid
+classDiagram
+    direction BT
+    class SandboxConstraint {
+    }
+    class SecurityValidator {
+        <<trait>>
+    }
+    class AuditResult {
+    }
+    class Ed25519SecurityValidator {
+        -validate_signature(data: &[u8]:Any, signature: &str:Any) Result<bool>
+        -audit_content(_content: &str:Any) Result<AuditResult>
+    }
+    SecurityValidator <|-- Ed25519SecurityValidator : Inheritance / Specialization
+    class JitToken {
+    }
+    class SecurityBounds {
+        <<trait>>
+    }
+
+```
+
+## Execution flow & Sequence explanation
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Caller as Client Interface
+    participant Svc as SecurityService
+    Caller->>Svc: execute()
+    Note over Svc: Processing internal logic
+    Svc-->>Caller: result
+
+```
+
+## Examples
+
+```
+// Example usage of security.rs components
+import { ... } from 'crates/factory-core/src/security.rs';
+```
+
+## Cross References
+* **Parent module:** `crates/factory-core/src`
+* **Dependencies:** crate::error::Result, zeroize::Zeroize, async_trait::async_trait, ed25519_dalek::{Signature, Verifier}, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}
