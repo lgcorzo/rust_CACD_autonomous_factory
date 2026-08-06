@@ -4,7 +4,7 @@ title: "s3.rs"
 source_path: "crates/factory-infrastructure/src/s3.rs"
 description: "Detailed documentation for s3.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: s3.rs
@@ -20,7 +20,7 @@ Provides implementation for s3.rs.
 * Handles logic related to s3.
 
 ### Dependencies
-* aws_sdk_s3::Client, aws_sdk_s3::primitives::ByteStream, crate::S3Storage, async_trait::async_trait
+* aws_sdk_s3::Client, async_trait::async_trait, aws_sdk_s3::primitives::ByteStream, crate::S3Storage
 
 ### Imported modules
 *
@@ -101,6 +101,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -108,6 +109,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/s3.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** aws_sdk_s3::Client, aws_sdk_s3::primitives::ByteStream, crate::S3Storage, async_trait::async_trait
+* **Dependencies:** aws_sdk_s3::Client, async_trait::async_trait, aws_sdk_s3::primitives::ByteStream, crate::S3Storage

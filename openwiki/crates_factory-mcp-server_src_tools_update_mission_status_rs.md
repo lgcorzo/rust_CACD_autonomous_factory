@@ -4,7 +4,7 @@ title: "update_mission_status.rs"
 source_path: "crates/factory-mcp-server/src/tools/update_mission_status.rs"
 description: "Detailed documentation for update_mission_status.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: update_mission_status.rs
@@ -20,7 +20,7 @@ Provides implementation for update_mission_status.rs.
 * Handles logic related to update_mission_status.
 
 ### Dependencies
-* crate::tools::Tool, chrono::Local, serde_json::{json, Value}, async_trait::async_trait, std::io::Write, crate::protocol::{CallToolResult, McpContent}, std::fs::{File, OpenOptions}
+* std::io::Write, chrono::Local, crate::protocol::{CallToolResult, McpContent}, async_trait::async_trait, crate::tools::Tool, serde_json::{json, Value}, std::fs::{File, OpenOptions}
 
 ### Imported modules
 *
@@ -105,6 +105,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -112,6 +113,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/update_mission_status.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** crate::tools::Tool, chrono::Local, serde_json::{json, Value}, async_trait::async_trait, std::io::Write, crate::protocol::{CallToolResult, McpContent}, std::fs::{File, OpenOptions}
+* **Dependencies:** std::io::Write, chrono::Local, crate::protocol::{CallToolResult, McpContent}, async_trait::async_trait, crate::tools::Tool, serde_json::{json, Value}, std::fs::{File, OpenOptions}

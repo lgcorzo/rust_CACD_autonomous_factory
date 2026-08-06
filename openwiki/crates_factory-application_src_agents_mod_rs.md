@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-application/src/agents/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: mod.rs
@@ -20,7 +20,7 @@ Provides implementation for mod.rs.
 * Handles logic related to mod.
 
 ### Dependencies
-* pub rustant::RustantAgent, pub auditor::AuditorAgent, pub finops::FinOpsAgent, pub doc_agent::DocumentationAgent, pub qa_observer::QAObserverAgent, pub zeroclaw::ZeroClawAgent
+* pub finops::FinOpsAgent, pub auditor::AuditorAgent, pub zeroclaw::ZeroClawAgent, pub rustant::RustantAgent, pub doc_agent::DocumentationAgent, pub qa_observer::QAObserverAgent
 
 ### Imported modules
 *
@@ -65,6 +65,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -72,6 +73,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/agents/mod.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`
-* **Dependencies:** pub rustant::RustantAgent, pub auditor::AuditorAgent, pub finops::FinOpsAgent, pub doc_agent::DocumentationAgent, pub qa_observer::QAObserverAgent, pub zeroclaw::ZeroClawAgent
+* **Dependencies:** pub finops::FinOpsAgent, pub auditor::AuditorAgent, pub zeroclaw::ZeroClawAgent, pub rustant::RustantAgent, pub doc_agent::DocumentationAgent, pub qa_observer::QAObserverAgent

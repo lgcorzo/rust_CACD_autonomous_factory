@@ -4,7 +4,7 @@ title: "retrieve_context.rs"
 source_path: "crates/factory-mcp-server/src/tools/retrieve_context.rs"
 description: "Detailed documentation for retrieve_context.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: retrieve_context.rs
@@ -20,7 +20,7 @@ Provides implementation for retrieve_context.rs.
 * Handles logic related to retrieve_context.
 
 ### Dependencies
-* crate::protocol::{CallToolResult, McpContent}, super::*, async_trait::async_trait, serde_json::{json, Value}, crate::tools::Tool, std::sync::Arc, factory_infrastructure::R2rClient
+* factory_infrastructure::R2rClient, std::sync::Arc, crate::protocol::{CallToolResult, McpContent}, async_trait::async_trait, crate::tools::Tool, super::*, serde_json::{json, Value}
 
 ### Imported modules
 *
@@ -139,6 +139,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -146,6 +147,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/retrieve_context.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** crate::protocol::{CallToolResult, McpContent}, super::*, async_trait::async_trait, serde_json::{json, Value}, crate::tools::Tool, std::sync::Arc, factory_infrastructure::R2rClient
+* **Dependencies:** factory_infrastructure::R2rClient, std::sync::Arc, crate::protocol::{CallToolResult, McpContent}, async_trait::async_trait, crate::tools::Tool, super::*, serde_json::{json, Value}

@@ -4,7 +4,7 @@ title: "error.rs"
 source_path: "crates/factory-core/src/error.rs"
 description: "Detailed documentation for error.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: error.rs
@@ -94,12 +94,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of error.rs components
 import { ... } from 'crates/factory-core/src/error.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

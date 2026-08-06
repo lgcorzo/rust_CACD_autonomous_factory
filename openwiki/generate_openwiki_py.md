@@ -4,7 +4,7 @@ title: "generate_openwiki.py"
 source_path: "generate_openwiki.py"
 description: "Detailed documentation for generate_openwiki.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T18:28:56Z"
 ---
 
 # File: generate_openwiki.py
@@ -20,7 +20,7 @@ Provides implementation for generate_openwiki.py.
 * Handles logic related to generate_openwiki.
 
 ### Dependencies
-* subprocess, os, datetime, json, shutil, sys
+* datetime, json, os, re, shutil, subprocess, sys
 
 ### Imported modules
 *
@@ -84,6 +84,10 @@ sequenceDiagram
 
 ```
 
+
+
+
+
 ## Examples
 
 ```
@@ -91,6 +95,10 @@ sequenceDiagram
 import { ... } from 'generate_openwiki.py';
 ```
 
+
+
+
+
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** subprocess, os, datetime, json, shutil, sys
+* **Dependencies:** datetime, json, os, re, shutil, subprocess, sys

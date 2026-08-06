@@ -4,7 +4,7 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: gitlab.rs
@@ -20,7 +20,7 @@ Provides implementation for gitlab.rs.
 * Handles logic related to gitlab.
 
 ### Dependencies
-* serde_json::json, wiremock::matchers::{body_json, header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}, serde::{Deserialize, Serialize}, async_trait::async_trait, super::*
+* wiremock::matchers::{body_json, header, method, path}, serde_json::json, serde::{Deserialize, Serialize}, async_trait::async_trait, wiremock::{Mock, MockServer, ResponseTemplate}, super::*
 
 ### Imported modules
 *
@@ -166,6 +166,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -173,6 +174,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/gitlab.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** serde_json::json, wiremock::matchers::{body_json, header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}, serde::{Deserialize, Serialize}, async_trait::async_trait, super::*
+* **Dependencies:** wiremock::matchers::{body_json, header, method, path}, serde_json::json, serde::{Deserialize, Serialize}, async_trait::async_trait, wiremock::{Mock, MockServer, ResponseTemplate}, super::*

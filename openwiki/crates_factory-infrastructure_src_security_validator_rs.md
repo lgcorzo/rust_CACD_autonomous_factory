@@ -4,7 +4,7 @@ title: "security_validator.rs"
 source_path: "crates/factory-infrastructure/src/security_validator.rs"
 description: "Detailed documentation for security_validator.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: security_validator.rs
@@ -20,7 +20,7 @@ Provides implementation for security_validator.rs.
 * Handles logic related to security_validator.
 
 ### Dependencies
-* std::sync::Arc, async_trait::async_trait, factory_core::security::{AuditResult, SecurityValidator}, super::*, rand::rngs::OsRng, ed25519_dalek::{Signature, Verifier, VerifyingKey}, ed25519_dalek::{Signer, SigningKey}, crate::mcp_client::McpClient
+* async_trait::async_trait, crate::mcp_client::McpClient, ed25519_dalek::{Signature, Verifier, VerifyingKey}, std::sync::Arc, super::*, ed25519_dalek::{Signer, SigningKey}, factory_core::security::{AuditResult, SecurityValidator}, rand::rngs::OsRng
 
 ### Imported modules
 *
@@ -102,6 +102,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -109,6 +110,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/security_validator.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** std::sync::Arc, async_trait::async_trait, factory_core::security::{AuditResult, SecurityValidator}, super::*, rand::rngs::OsRng, ed25519_dalek::{Signature, Verifier, VerifyingKey}, ed25519_dalek::{Signer, SigningKey}, crate::mcp_client::McpClient
+* **Dependencies:** async_trait::async_trait, crate::mcp_client::McpClient, ed25519_dalek::{Signature, Verifier, VerifyingKey}, std::sync::Arc, super::*, ed25519_dalek::{Signer, SigningKey}, factory_core::security::{AuditResult, SecurityValidator}, rand::rngs::OsRng

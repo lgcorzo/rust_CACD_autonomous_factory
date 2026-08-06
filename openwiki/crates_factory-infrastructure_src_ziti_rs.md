@@ -4,7 +4,7 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: ziti.rs
@@ -20,7 +20,7 @@ Provides implementation for ziti.rs.
 * Handles logic related to ziti.
 
 ### Dependencies
-* async_trait::async_trait, super::*
+* super::*, async_trait::async_trait
 
 ### Imported modules
 *
@@ -133,6 +133,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -140,6 +141,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/ziti.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** async_trait::async_trait, super::*
+* **Dependencies:** super::*, async_trait::async_trait

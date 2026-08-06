@@ -4,7 +4,7 @@ title: "launch_sandbox_pod.rs"
 source_path: "crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
 description: "Detailed documentation for launch_sandbox_pod.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: launch_sandbox_pod.rs
@@ -20,7 +20,7 @@ Provides implementation for launch_sandbox_pod.rs.
 * Handles logic related to launch_sandbox_pod.
 
 ### Dependencies
-* kube::Client, crate::tools::Tool, async_trait::async_trait, serde::{Deserialize, Serialize}, kube::api::{Api, DeleteParams, ListParams, PostParams}, tokio::time::{sleep, Duration}, k8s_openapi::api::batch::v1::Job, serde_json::{json, Value}, crate::protocol::{CallToolResult, McpContent}
+* crate::tools::Tool, k8s_openapi::api::batch::v1::Job, kube::Client, async_trait::async_trait, kube::api::{Api, DeleteParams, ListParams, PostParams}, tokio::time::{sleep, Duration}, serde_json::{json, Value}, crate::protocol::{CallToolResult, McpContent}, serde::{Deserialize, Serialize}
 
 ### Imported modules
 *
@@ -139,6 +139,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -146,6 +147,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** kube::Client, crate::tools::Tool, async_trait::async_trait, serde::{Deserialize, Serialize}, kube::api::{Api, DeleteParams, ListParams, PostParams}, tokio::time::{sleep, Duration}, k8s_openapi::api::batch::v1::Job, serde_json::{json, Value}, crate::protocol::{CallToolResult, McpContent}
+* **Dependencies:** crate::tools::Tool, k8s_openapi::api::batch::v1::Job, kube::Client, async_trait::async_trait, kube::api::{Api, DeleteParams, ListParams, PostParams}, tokio::time::{sleep, Duration}, serde_json::{json, Value}, crate::protocol::{CallToolResult, McpContent}, serde::{Deserialize, Serialize}

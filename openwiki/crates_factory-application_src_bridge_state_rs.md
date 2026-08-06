@@ -4,7 +4,7 @@ title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Detailed documentation for state.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: state.rs
@@ -20,7 +20,7 @@ Provides implementation for state.rs.
 * Handles logic related to state.
 
 ### Dependencies
-* chrono::{DateTime, Utc}, std::collections::HashMap, serde::{Deserialize, Serialize}
+* serde::{Deserialize, Serialize}, std::collections::HashMap, chrono::{DateTime, Utc}
 
 ### Imported modules
 *
@@ -230,6 +230,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -237,6 +238,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/bridge/state.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`
-* **Dependencies:** chrono::{DateTime, Utc}, std::collections::HashMap, serde::{Deserialize, Serialize}
+* **Dependencies:** serde::{Deserialize, Serialize}, std::collections::HashMap, chrono::{DateTime, Utc}
