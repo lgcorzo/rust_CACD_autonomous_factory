@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-infrastructure/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: lib.rs
@@ -20,7 +20,7 @@ Provides implementation for lib.rs.
 * Handles logic related to lib.
 
 ### Dependencies
-* pub r2r::{HttpR2rClient, R2rClient}, pub s3::AwsS3Storage, pub aethalgard::MockAethalgardClient, pub kafka::{KafkaClient, RdKafkaClient}, pub mcp_client::{McpClient, McpHttpClient, McpSseClient}, pub r2r::MockR2rClient, pub aethalgard::{AethalgardClient, HttpAethalgardClient}, pub kafka::{KafkaClient, RdKafkaClient, SimpleMockKafkaClient}, pub gitlab::MockGitlabClient, pub gitlab::{GitlabClient, GitlabIssue, HttpGitlabClient}, pub ziti::{OpenZitiIdentity, ZitiIdentity}, pub jira::MockJiraClient, pub jira::{HttpJiraClient, JiraClient}, pub mcp_client::MockMcpClient, pub sentry::MockSentryClient, pub sentry::{CrashEvent, HttpSentryClient, SentryClient}, pub ziti::MockZitiIdentity
+* pub jira::MockJiraClient, pub s3::AwsS3Storage, pub gitlab::MockGitlabClient, pub aethalgard::{AethalgardClient, HttpAethalgardClient}, pub kafka::{KafkaClient, RdKafkaClient}, pub mcp_client::{McpClient, McpHttpClient, McpSseClient}, pub jira::{HttpJiraClient, JiraClient}, pub mcp_client::MockMcpClient, pub gitlab::{GitlabClient, GitlabIssue, HttpGitlabClient}, pub aethalgard::MockAethalgardClient, pub kafka::{KafkaClient, RdKafkaClient, SimpleMockKafkaClient}, pub r2r::{HttpR2rClient, R2rClient}, pub sentry::{CrashEvent, HttpSentryClient, SentryClient}, pub ziti::MockZitiIdentity, pub ziti::{OpenZitiIdentity, ZitiIdentity}, pub r2r::MockR2rClient, pub sentry::MockSentryClient
 
 ### Imported modules
 *
@@ -94,6 +94,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -101,6 +102,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/lib.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** pub r2r::{HttpR2rClient, R2rClient}, pub s3::AwsS3Storage, pub aethalgard::MockAethalgardClient, pub kafka::{KafkaClient, RdKafkaClient}, pub mcp_client::{McpClient, McpHttpClient, McpSseClient}, pub r2r::MockR2rClient, pub aethalgard::{AethalgardClient, HttpAethalgardClient}, pub kafka::{KafkaClient, RdKafkaClient, SimpleMockKafkaClient}, pub gitlab::MockGitlabClient, pub gitlab::{GitlabClient, GitlabIssue, HttpGitlabClient}, pub ziti::{OpenZitiIdentity, ZitiIdentity}, pub jira::MockJiraClient, pub jira::{HttpJiraClient, JiraClient}, pub mcp_client::MockMcpClient, pub sentry::MockSentryClient, pub sentry::{CrashEvent, HttpSentryClient, SentryClient}, pub ziti::MockZitiIdentity
+* **Dependencies:** pub jira::MockJiraClient, pub s3::AwsS3Storage, pub gitlab::MockGitlabClient, pub aethalgard::{AethalgardClient, HttpAethalgardClient}, pub kafka::{KafkaClient, RdKafkaClient}, pub mcp_client::{McpClient, McpHttpClient, McpSseClient}, pub jira::{HttpJiraClient, JiraClient}, pub mcp_client::MockMcpClient, pub gitlab::{GitlabClient, GitlabIssue, HttpGitlabClient}, pub aethalgard::MockAethalgardClient, pub kafka::{KafkaClient, RdKafkaClient, SimpleMockKafkaClient}, pub r2r::{HttpR2rClient, R2rClient}, pub sentry::{CrashEvent, HttpSentryClient, SentryClient}, pub ziti::MockZitiIdentity, pub ziti::{OpenZitiIdentity, ZitiIdentity}, pub r2r::MockR2rClient, pub sentry::MockSentryClient

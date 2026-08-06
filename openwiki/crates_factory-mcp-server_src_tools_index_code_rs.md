@@ -4,7 +4,7 @@ title: "index_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/index_code.rs"
 description: "Detailed documentation for index_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: index_code.rs
@@ -20,7 +20,7 @@ Provides implementation for index_code.rs.
 * Handles logic related to index_code.
 
 ### Dependencies
-* crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, super::*, serde_json::{json, Value}, async_trait::async_trait
+* crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, crate::tools::Tool, async_trait::async_trait, super::*
 
 ### Imported modules
 *
@@ -106,6 +106,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -113,6 +114,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/index_code.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, super::*, serde_json::{json, Value}, async_trait::async_trait
+* **Dependencies:** crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, crate::tools::Tool, async_trait::async_trait, super::*

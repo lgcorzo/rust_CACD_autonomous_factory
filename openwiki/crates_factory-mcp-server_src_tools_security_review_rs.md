@@ -4,7 +4,7 @@ title: "security_review.rs"
 source_path: "crates/factory-mcp-server/src/tools/security_review.rs"
 description: "Detailed documentation for security_review.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: security_review.rs
@@ -20,7 +20,7 @@ Provides implementation for security_review.rs.
 * Handles logic related to security_review.
 
 ### Dependencies
-* serde_json::{json, Value}, std::env, async_openai::Client, async_openai::config::OpenAIConfig, async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool
+* crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, std::env, async_openai::Client, crate::tools::Tool, async_trait::async_trait, async_openai::config::OpenAIConfig
 
 ### Imported modules
 *
@@ -108,6 +108,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -115,6 +116,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/security_review.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** serde_json::{json, Value}, std::env, async_openai::Client, async_openai::config::OpenAIConfig, async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool
+* **Dependencies:** crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, std::env, async_openai::Client, crate::tools::Tool, async_trait::async_trait, async_openai::config::OpenAIConfig

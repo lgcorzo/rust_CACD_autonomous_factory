@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-cli/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: main.rs
@@ -124,12 +124,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of main.rs components
 import { ... } from 'crates/factory-cli/src/main.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-cli/src`

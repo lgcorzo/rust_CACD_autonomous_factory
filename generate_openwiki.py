@@ -1,3 +1,4 @@
+import re
 import os
 import sys
 import json
@@ -83,9 +84,9 @@ def write_file_doc(file_path, parsed, now):
     mermaid_classes = generate_mermaid_classes(parsed['classes'])
     seq_diagram = generate_sequence_diagram(base_name, parsed['classes'], parsed['free_functions'])
 
-    deps_str = ", ".join(parsed['dependencies']) if parsed['dependencies'] else "None"
+    deps_str = ", ".join(sorted(parsed['dependencies'])) if parsed['dependencies'] else "None"
 
-    imported_modules_str = ", ".join([d for d in parsed['dependencies'] if '.' in d]) if parsed['dependencies'] else "None"
+    imported_modules_str = ", ".join(sorted([d for d in parsed['dependencies'] if '.' in d])) if parsed['dependencies'] else "None"
     exported_classes_str = ", ".join([c['name'] for c in parsed['classes'] if c.get('kind', 'class') in ['class', 'struct']]) if parsed['classes'] else "None"
     exported_interfaces_str = ", ".join([c['name'] for c in parsed['classes'] if c.get('kind', 'class') in ['interface', 'trait']]) if parsed['classes'] else "None"
     exported_functions_str = ", ".join([f['name'] for f in parsed['free_functions'] if f.get('is_pub', True)]) if parsed['free_functions'] else "None"
@@ -239,6 +240,44 @@ import {{ ... }} from '{file_path}';
 * **Parent module:** `{dir_name}`
 * **Dependencies:** {deps_str}
 """
+    existing_execution_flow = ""
+    existing_examples = ""
+
+    if os.path.exists(out_file):
+        with open(out_file, 'r', encoding='utf-8') as f:
+            old_content = f.read()
+
+        # Extract Execution flow & Sequence explanation
+        flow_match = re.search(r"## Execution flow & Sequence explanation\n(.*?)## Examples\n", old_content, re.DOTALL)
+        if flow_match:
+            existing_execution_flow = flow_match.group(1)
+        else:
+            flow_match = re.search(r"## Execution flow & Sequence explanation\n(.*?)## Cross References\n", old_content, re.DOTALL)
+            if flow_match:
+                existing_execution_flow = flow_match.group(1)
+
+        # Extract Examples
+        examples_match = re.search(r"## Examples\n(.*?)## Cross References\n", old_content, re.DOTALL)
+        if examples_match:
+            existing_examples = examples_match.group(1)
+
+    if existing_execution_flow:
+        marker1 = "## Execution flow & Sequence explanation\n"
+        marker2 = "\n## Examples\n"
+        start_idx = content.find(marker1)
+        end_idx = content.find(marker2, start_idx)
+        if start_idx != -1 and end_idx != -1:
+            content = content[:start_idx] + marker1 + existing_execution_flow.strip() + marker2 + content[end_idx + len(marker2):]
+
+    if existing_examples:
+        marker1 = "## Examples\n"
+        marker2 = "\n## Cross References\n"
+        start_idx = content.find(marker1)
+        end_idx = content.find(marker2, start_idx)
+        if start_idx != -1 and end_idx != -1:
+            content = content[:start_idx] + marker1 + existing_examples.strip() + "\n" + marker2 + content[end_idx + len(marker2):]
+
+
     with open(out_file, 'w', encoding='utf-8') as f:
         f.write(content)
 
@@ -281,18 +320,34 @@ def main():
     else:
         setup_okf_structure()
         try:
+            # Fallback for diffing correctly in git
             try:
-                output = subprocess.check_output(["git", "log", "-m", "-1", "--name-only", "--pretty=format:"]).decode("utf-8")
+                output = subprocess.check_output(["git", "diff", "HEAD~1", "--name-only"]).decode("utf-8")
             except subprocess.CalledProcessError:
-                output = subprocess.check_output(["git", "show", "--name-only", "--format="]).decode("utf-8")
+                try:
+                    output = subprocess.check_output(["git", "log", "-m", "-1", "--name-only", "--pretty=format:"]).decode("utf-8")
+                except subprocess.CalledProcessError:
+                    output = subprocess.check_output(["git", "show", "--name-only", "--format="]).decode("utf-8")
             files_to_process = []
+            deleted_files = []
             for f in output.splitlines():
                 f = f.strip()
                 if not f: continue
                 if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx')):
                     if os.path.exists(f):
                         files_to_process.append(f)
-        except:
+                    else:
+                        deleted_files.append(f)
+
+            # Remove orphaned markdown files
+            for f in deleted_files:
+                flattened_name = f.replace(os.sep, '_').replace('.', '_')
+                orphan_file = os.path.join('openwiki', f"{flattened_name}.md")
+                if os.path.exists(orphan_file):
+                    os.remove(orphan_file)
+                    print(f"Removed orphaned file: {orphan_file}")
+        except Exception as e:
+            print(f"Error determining diff: {e}")
             files_to_process = []
 
     if not files_to_process:
@@ -334,8 +389,24 @@ def generate_indexes(now):
     with open("openwiki/SUMMARY.md", "w") as f:
         f.write(summary_content)
 
-    with open("openwiki/index.md", "w") as f:
-        f.write(index_content)
+    index_file = "openwiki/index.md"
+    if os.path.exists(index_file):
+        with open(index_file, "r") as f:
+            old_index = f.read()
+
+        if "## Module Architecture Links" in old_index:
+            prefix = old_index.split("## Module Architecture Links")[0]
+            new_links = index_content.split("## Module Architecture Links")[1]
+            final_index_content = prefix + "## Module Architecture Links" + new_links
+        else:
+            new_links = index_content.split("## Module Architecture Links")[1]
+            final_index_content = old_index + "\n## Module Architecture Links" + new_links
+
+        with open(index_file, "w") as f:
+            f.write(final_index_content)
+    else:
+        with open(index_file, "w") as f:
+            f.write(index_content)
 
 if __name__ == '__main__':
     main()

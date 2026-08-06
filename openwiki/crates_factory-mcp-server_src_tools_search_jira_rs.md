@@ -4,7 +4,7 @@ title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: search_jira.rs
@@ -20,7 +20,7 @@ Provides implementation for search_jira.rs.
 * Handles logic related to search_jira.
 
 ### Dependencies
-* serde_json::{json, Value}, std::sync::Arc, super::*, factory_infrastructure::JiraClient, async_trait::async_trait, crate::tools::Tool, crate::protocol::{CallToolResult, McpContent}
+* crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, async_trait::async_trait, std::sync::Arc, crate::tools::Tool, factory_infrastructure::JiraClient, super::*
 
 ### Imported modules
 *
@@ -137,6 +137,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -144,6 +145,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/search_jira.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** serde_json::{json, Value}, std::sync::Arc, super::*, factory_infrastructure::JiraClient, async_trait::async_trait, crate::tools::Tool, crate::protocol::{CallToolResult, McpContent}
+* **Dependencies:** crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, async_trait::async_trait, std::sync::Arc, crate::tools::Tool, factory_infrastructure::JiraClient, super::*

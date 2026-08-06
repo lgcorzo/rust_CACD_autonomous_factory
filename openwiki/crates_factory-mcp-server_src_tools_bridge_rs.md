@@ -4,7 +4,7 @@ title: "bridge.rs"
 source_path: "crates/factory-mcp-server/src/tools/bridge.rs"
 description: "Detailed documentation for bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: bridge.rs
@@ -20,7 +20,7 @@ Provides implementation for bridge.rs.
 * Handles logic related to bridge.
 
 ### Dependencies
-* crate::tools::Tool, async_trait::async_trait, std::fs, serde_json::{json, Value}, crate::protocol::CallToolResult, std::path::PathBuf
+* async_trait::async_trait, serde_json::{json, Value}, crate::tools::Tool, std::path::PathBuf, crate::protocol::CallToolResult, std::fs
 
 ### Imported modules
 *
@@ -164,6 +164,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -171,6 +172,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/bridge.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** crate::tools::Tool, async_trait::async_trait, std::fs, serde_json::{json, Value}, crate::protocol::CallToolResult, std::path::PathBuf
+* **Dependencies:** async_trait::async_trait, serde_json::{json, Value}, crate::tools::Tool, std::path::PathBuf, crate::protocol::CallToolResult, std::fs

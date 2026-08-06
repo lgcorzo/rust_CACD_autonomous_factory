@@ -4,7 +4,7 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: sandbox.rs
@@ -20,7 +20,7 @@ Provides implementation for sandbox.rs.
 * Handles logic related to sandbox.
 
 ### Dependencies
-* tokio::process::Command, super::*, std::time::Duration, crate::tools::Tool, serde::{Deserialize, Serialize}, async_trait::async_trait, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool, serde_json::json, tokio::time::timeout
+* async_trait::async_trait, std::time::Duration, tokio::time::timeout, crate::tools::Tool, serde::{Deserialize, Serialize}, tokio::process::Command, serde_json::json, super::*, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool
 
 ### Imported modules
 *
@@ -256,6 +256,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -263,6 +264,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/sandbox.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
-* **Dependencies:** tokio::process::Command, super::*, std::time::Duration, crate::tools::Tool, serde::{Deserialize, Serialize}, async_trait::async_trait, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool, serde_json::json, tokio::time::timeout
+* **Dependencies:** async_trait::async_trait, std::time::Duration, tokio::time::timeout, crate::tools::Tool, serde::{Deserialize, Serialize}, tokio::process::Command, serde_json::json, super::*, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool

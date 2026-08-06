@@ -4,7 +4,7 @@ title: "okf_generator.py"
 source_path: ".agents/tools/okf_generator.py"
 description: "Detailed documentation for okf_generator.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: okf_generator.py
@@ -20,7 +20,7 @@ Provides implementation for okf_generator.py.
 * Handles logic related to okf_generator.
 
 ### Dependencies
-* os, sys, subprocess, re
+* re, sys, os, subprocess
 
 ### Imported modules
 *
@@ -78,6 +78,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -85,6 +86,7 @@ sequenceDiagram
 import { ... } from '.agents/tools/okf_generator.py';
 ```
 
+
 ## Cross References
 * **Parent module:** `.agents/tools`
-* **Dependencies:** os, sys, subprocess, re
+* **Dependencies:** re, sys, os, subprocess

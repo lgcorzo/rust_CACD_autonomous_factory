@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: autonomous_mission.rs
@@ -20,10 +20,10 @@ Provides implementation for autonomous_mission.rs.
 * Handles logic related to autonomous_mission.
 
 ### Dependencies
-* serde::{Deserialize, Serialize}, uuid::Uuid, prost::Message, factory_infrastructure::{
+* hatchet_sdk::Hatchet, serde::{Deserialize, Serialize}, factory_infrastructure::{
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
     aethalgard::{AethalgardClient, HttpAethalgardClient},
-}, factory_core::proto::v1::MissionInput as ProtoInput, super::*, crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}, std::sync::Arc, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Workflow
+}, std::sync::Arc, crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}, uuid::Uuid, hatchet_sdk::runnables::Workflow, super::*, factory_core::proto::v1::MissionInput as ProtoInput, prost::Message
 
 ### Imported modules
 *
@@ -161,6 +161,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -168,9 +169,10 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/workflows/autonomous_mission.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`
-* **Dependencies:** serde::{Deserialize, Serialize}, uuid::Uuid, prost::Message, factory_infrastructure::{
+* **Dependencies:** hatchet_sdk::Hatchet, serde::{Deserialize, Serialize}, factory_infrastructure::{
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
     aethalgard::{AethalgardClient, HttpAethalgardClient},
-}, factory_core::proto::v1::MissionInput as ProtoInput, super::*, crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}, std::sync::Arc, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Workflow
+}, std::sync::Arc, crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}, uuid::Uuid, hatchet_sdk::runnables::Workflow, super::*, factory_core::proto::v1::MissionInput as ProtoInput, prost::Message
