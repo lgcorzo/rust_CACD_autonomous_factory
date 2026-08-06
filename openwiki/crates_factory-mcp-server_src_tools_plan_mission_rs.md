@@ -4,7 +4,7 @@ title: "plan_mission.rs"
 source_path: "crates/factory-mcp-server/src/tools/plan_mission.rs"
 description: "Detailed documentation for plan_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: plan_mission.rs
@@ -20,14 +20,14 @@ Provides implementation for plan_mission.rs.
 * Handles logic related to plan_mission.
 
 ### Dependencies
-* async_trait::async_trait, factory_core::FinOpsTag, reqwest::header::{HeaderMap, HeaderValue}, serde_json::{json, Value}, crate::tools::Tool, async_openai::{
+* serde_json::{json, Value}, async_openai::{
     types::{
         ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
         ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
         CreateChatCompletionRequestArgs,
     },
     Client,
-}, crate::protocol::{CallToolResult, McpContent}
+}, async_trait::async_trait, reqwest::header::{HeaderMap, HeaderValue}, factory_core::FinOpsTag, crate::tools::Tool, crate::protocol::{CallToolResult, McpContent}
 
 ### Imported modules
 *
@@ -113,6 +113,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -120,13 +121,14 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/plan_mission.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** async_trait::async_trait, factory_core::FinOpsTag, reqwest::header::{HeaderMap, HeaderValue}, serde_json::{json, Value}, crate::tools::Tool, async_openai::{
+* **Dependencies:** serde_json::{json, Value}, async_openai::{
     types::{
         ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
         ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
         CreateChatCompletionRequestArgs,
     },
     Client,
-}, crate::protocol::{CallToolResult, McpContent}
+}, async_trait::async_trait, reqwest::header::{HeaderMap, HeaderValue}, factory_core::FinOpsTag, crate::tools::Tool, crate::protocol::{CallToolResult, McpContent}

@@ -4,7 +4,7 @@ title: "adk_driver.rs"
 source_path: "crates/factory-application/src/bridge/adk_driver.rs"
 description: "Detailed documentation for adk_driver.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: adk_driver.rs
@@ -20,7 +20,7 @@ Provides implementation for adk_driver.rs.
 * Handles logic related to adk_driver.
 
 ### Dependencies
-* async_trait::async_trait, factory_core::executor::{CodeSurgeryExecutor, ExecutionResult, SurgicalPatch}, std::fs, factory_core::error::FactoryError
+* async_trait::async_trait, factory_core::error::FactoryError, factory_core::executor::{CodeSurgeryExecutor, ExecutionResult, SurgicalPatch}, std::fs
 
 ### Imported modules
 *
@@ -97,6 +97,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -104,6 +105,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/bridge/adk_driver.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`
-* **Dependencies:** async_trait::async_trait, factory_core::executor::{CodeSurgeryExecutor, ExecutionResult, SurgicalPatch}, std::fs, factory_core::error::FactoryError
+* **Dependencies:** async_trait::async_trait, factory_core::error::FactoryError, factory_core::executor::{CodeSurgeryExecutor, ExecutionResult, SurgicalPatch}, std::fs

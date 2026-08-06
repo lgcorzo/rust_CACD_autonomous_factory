@@ -4,7 +4,7 @@ title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Detailed documentation for jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: jira.rs
@@ -20,7 +20,7 @@ Provides implementation for jira.rs.
 * Handles logic related to jira.
 
 ### Dependencies
-* async_trait::async_trait, super::*, wiremock::{Mock, MockServer, ResponseTemplate}, wiremock::matchers::{method, path, query_param}, serde_json::json
+* async_trait::async_trait, wiremock::{Mock, MockServer, ResponseTemplate}, wiremock::matchers::{method, path, query_param}, serde_json::json, super::*
 
 ### Imported modules
 *
@@ -133,6 +133,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -140,6 +141,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/jira.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** async_trait::async_trait, super::*, wiremock::{Mock, MockServer, ResponseTemplate}, wiremock::matchers::{method, path, query_param}, serde_json::json
+* **Dependencies:** async_trait::async_trait, wiremock::{Mock, MockServer, ResponseTemplate}, wiremock::matchers::{method, path, query_param}, serde_json::json, super::*

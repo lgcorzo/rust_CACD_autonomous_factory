@@ -27,6 +27,7 @@ title: OpenWiki Index
 * [[crates_factory-application_tests_bridge_test_rs.md]]
 * [[crates_factory-application_tests_workflow_tests_rs.md]]
 * [[crates_factory-application_tests_zeroclaw_sast_integration_rs.md]]
+* [[crates_factory-cli_src_bin_trigger_mission_rs.md]]
 * [[crates_factory-cli_src_main_rs.md]]
 * [[crates_factory-core_benches_zeroize_benchmark_rs.md]]
 * [[crates_factory-core_build_rs.md]]

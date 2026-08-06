@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-mcp-server/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: main.rs
@@ -20,10 +20,10 @@ Provides implementation for main.rs.
 * Handles logic related to main.
 
 ### Dependencies
-* std::net::SocketAddr, tower_http::cors::CorsLayer, axum::{
+* std::sync::Arc, factory_mcp_server::McpServer, std::net::SocketAddr, axum::{
     routing::{get, post},
     Router,
-}, std::sync::Arc, factory_mcp_server::McpServer
+}, tower_http::cors::CorsLayer
 
 ### Imported modules
 *
@@ -68,6 +68,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -75,9 +76,10 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/main.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
-* **Dependencies:** std::net::SocketAddr, tower_http::cors::CorsLayer, axum::{
+* **Dependencies:** std::sync::Arc, factory_mcp_server::McpServer, std::net::SocketAddr, axum::{
     routing::{get, post},
     Router,
-}, std::sync::Arc, factory_mcp_server::McpServer
+}, tower_http::cors::CorsLayer

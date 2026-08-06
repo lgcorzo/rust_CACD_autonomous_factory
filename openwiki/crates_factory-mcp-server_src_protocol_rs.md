@@ -4,7 +4,7 @@ title: "protocol.rs"
 source_path: "crates/factory-mcp-server/src/protocol.rs"
 description: "Detailed documentation for protocol.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: protocol.rs
@@ -255,12 +255,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of protocol.rs components
 import { ... } from 'crates/factory-mcp-server/src/protocol.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

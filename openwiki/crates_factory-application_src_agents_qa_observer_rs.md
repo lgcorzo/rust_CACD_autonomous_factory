@@ -4,7 +4,7 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Detailed documentation for qa_observer.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: qa_observer.rs
@@ -20,7 +20,7 @@ Provides implementation for qa_observer.rs.
 * Handles logic related to qa_observer.
 
 ### Dependencies
-* crate::workflows::autonomous_mission::MissionInput, async_trait::async_trait, uuid::Uuid, factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}, serde_json::Value, hatchet_sdk::{Hatchet, Runnable}, std::time::Duration, crate::Agent
+* std::time::Duration, uuid::Uuid, factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}, hatchet_sdk::{Hatchet, Runnable}, crate::Agent, serde_json::Value, async_trait::async_trait, crate::workflows::autonomous_mission::MissionInput
 
 ### Imported modules
 *
@@ -137,6 +137,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -144,6 +145,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/agents/qa_observer.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`
-* **Dependencies:** crate::workflows::autonomous_mission::MissionInput, async_trait::async_trait, uuid::Uuid, factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}, serde_json::Value, hatchet_sdk::{Hatchet, Runnable}, std::time::Duration, crate::Agent
+* **Dependencies:** std::time::Duration, uuid::Uuid, factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}, hatchet_sdk::{Hatchet, Runnable}, crate::Agent, serde_json::Value, async_trait::async_trait, crate::workflows::autonomous_mission::MissionInput
