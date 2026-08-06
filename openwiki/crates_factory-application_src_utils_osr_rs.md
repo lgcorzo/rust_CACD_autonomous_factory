@@ -4,7 +4,7 @@ title: "osr.rs"
 source_path: "crates/factory-application/src/utils/osr.rs"
 description: "Detailed documentation for osr.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: osr.rs
@@ -69,12 +69,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of osr.rs components
 import { ... } from 'crates/factory-application/src/utils/osr.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/utils`

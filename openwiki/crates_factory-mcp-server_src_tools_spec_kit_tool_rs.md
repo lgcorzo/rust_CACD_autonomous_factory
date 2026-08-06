@@ -4,7 +4,7 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: spec_kit_tool.rs
@@ -20,7 +20,7 @@ Provides implementation for spec_kit_tool.rs.
 * Handles logic related to spec_kit_tool.
 
 ### Dependencies
-* async_trait::async_trait, serde_json::{json, Value}, std::sync::Arc, crate::protocol::CallToolResult, serde::{Deserialize, Serialize}, crate::tools::Tool, super::*
+* serde::{Deserialize, Serialize}, serde_json::{json, Value}, async_trait::async_trait, super::*, std::sync::Arc, crate::protocol::CallToolResult, crate::tools::Tool
 
 ### Imported modules
 *
@@ -304,6 +304,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -311,6 +312,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/spec_kit_tool.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** async_trait::async_trait, serde_json::{json, Value}, std::sync::Arc, crate::protocol::CallToolResult, serde::{Deserialize, Serialize}, crate::tools::Tool, super::*
+* **Dependencies:** serde::{Deserialize, Serialize}, serde_json::{json, Value}, async_trait::async_trait, super::*, std::sync::Arc, crate::protocol::CallToolResult, crate::tools::Tool

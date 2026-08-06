@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: security.rs
@@ -20,7 +20,7 @@ Provides implementation for security.rs.
 * Handles logic related to security.
 
 ### Dependencies
-* crate::error::Result, zeroize::Zeroize, async_trait::async_trait, ed25519_dalek::{Signature, Verifier}, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}
+* ed25519_dalek::{Signature, Verifier}, zeroize::Zeroize, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, async_trait::async_trait, crate::error::Result
 
 ### Imported modules
 *
@@ -252,6 +252,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -259,6 +260,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-core/src/security.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-core/src`
-* **Dependencies:** crate::error::Result, zeroize::Zeroize, async_trait::async_trait, ed25519_dalek::{Signature, Verifier}, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}
+* **Dependencies:** ed25519_dalek::{Signature, Verifier}, zeroize::Zeroize, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, async_trait::async_trait, crate::error::Result

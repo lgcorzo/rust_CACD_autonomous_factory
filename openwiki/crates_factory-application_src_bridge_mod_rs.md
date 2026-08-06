@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-application/src/bridge/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: mod.rs
@@ -20,7 +20,7 @@ Provides implementation for mod.rs.
 * Handles logic related to mod.
 
 ### Dependencies
-* pub state::{BridgeState, BridgeStatus, StepCheckpoint}, pub adk_driver::*
+* pub adk_driver::*, pub state::{BridgeState, BridgeStatus, StepCheckpoint}
 
 ### Imported modules
 *
@@ -65,6 +65,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -72,6 +73,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/bridge/mod.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`
-* **Dependencies:** pub state::{BridgeState, BridgeStatus, StepCheckpoint}, pub adk_driver::*
+* **Dependencies:** pub adk_driver::*, pub state::{BridgeState, BridgeStatus, StepCheckpoint}

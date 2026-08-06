@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: sentry.rs
@@ -20,7 +20,7 @@ Provides implementation for sentry.rs.
 * Handles logic related to sentry.
 
 ### Dependencies
-* super::*, async_trait::async_trait, serde_json::json, wiremock::matchers::{header, method, path, query_param}, serde::{Deserialize, Serialize}, wiremock::{Mock, MockServer, ResponseTemplate}
+* serde_json::json, wiremock::matchers::{header, method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}, serde::{Deserialize, Serialize}, async_trait::async_trait, super::*
 
 ### Imported modules
 *
@@ -167,6 +167,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -174,6 +175,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/sentry.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** super::*, async_trait::async_trait, serde_json::json, wiremock::matchers::{header, method, path, query_param}, serde::{Deserialize, Serialize}, wiremock::{Mock, MockServer, ResponseTemplate}
+* **Dependencies:** serde_json::json, wiremock::matchers::{header, method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}, serde::{Deserialize, Serialize}, async_trait::async_trait, super::*

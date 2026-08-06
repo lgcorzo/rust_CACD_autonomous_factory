@@ -4,7 +4,7 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: mcp_client.rs
@@ -20,7 +20,7 @@ Provides implementation for mcp_client.rs.
 * Handles logic related to mcp_client.
 
 ### Dependencies
-* anyhow::anyhow, wiremock::{Mock, MockServer, ResponseTemplate}, reqwest::Client, futures_util::StreamExt, serde_json::{json, Value}, super::*, tokio::sync::OnceCell, wiremock::matchers::{method, path}
+* serde_json::{json, Value}, tokio::sync::OnceCell, super::*, reqwest::Client, wiremock::matchers::{method, path}, futures_util::StreamExt, anyhow::anyhow, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
 *
@@ -164,6 +164,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -171,6 +172,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/mcp_client.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** anyhow::anyhow, wiremock::{Mock, MockServer, ResponseTemplate}, reqwest::Client, futures_util::StreamExt, serde_json::{json, Value}, super::*, tokio::sync::OnceCell, wiremock::matchers::{method, path}
+* **Dependencies:** serde_json::{json, Value}, tokio::sync::OnceCell, super::*, reqwest::Client, wiremock::matchers::{method, path}, futures_util::StreamExt, anyhow::anyhow, wiremock::{Mock, MockServer, ResponseTemplate}

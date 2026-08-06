@@ -4,7 +4,7 @@ title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: kafka.rs
@@ -20,7 +20,7 @@ Provides implementation for kafka.rs.
 * Handles logic related to kafka.
 
 ### Dependencies
-* rdkafka::config::ClientConfig, std::time::Duration, rdkafka::producer::{FutureProducer, FutureRecord}, async_trait::async_trait, chrono::Utc
+* async_trait::async_trait, rdkafka::config::ClientConfig, std::time::Duration, chrono::Utc, rdkafka::producer::{FutureProducer, FutureRecord}
 
 ### Imported modules
 *
@@ -166,6 +166,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -173,6 +174,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/kafka.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** rdkafka::config::ClientConfig, std::time::Duration, rdkafka::producer::{FutureProducer, FutureRecord}, async_trait::async_trait, chrono::Utc
+* **Dependencies:** async_trait::async_trait, rdkafka::config::ClientConfig, std::time::Duration, chrono::Utc, rdkafka::producer::{FutureProducer, FutureRecord}

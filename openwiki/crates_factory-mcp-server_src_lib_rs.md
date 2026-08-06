@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-mcp-server/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-05T05:55:37Z"
+timestamp: "2026-08-06T17:55:58Z"
 ---
 
 # File: lib.rs
@@ -20,18 +20,18 @@ Provides implementation for lib.rs.
 * Handles logic related to lib.
 
 ### Dependencies
-* axum::{
-    extract::{Query, State},
-    response::sse::{Event, Sse},
-    Json,
-}, crate::protocol::CallToolResult, super::*, std::time::Duration, tokio::sync::{mpsc, RwLock}, crate::tools::MockTool, crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}, serde_json::{json, Value}, std::sync::Arc, tokio_stream::wrappers::UnboundedReceiverStream, factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}, crate::tools::Tool, std::collections::HashMap, std::convert::Infallible, tokio_stream::{Stream, StreamExt}, crate::tools::{
+* crate::tools::Tool, factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}, std::collections::HashMap, crate::tools::{
             bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
-        }
+        }, serde_json::{json, Value}, std::time::Duration, crate::tools::MockTool, crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}, axum::{
+    extract::{Query, State},
+    response::sse::{Event, Sse},
+    Json,
+}, tokio::sync::{mpsc, RwLock}, tokio_stream::{Stream, StreamExt}, super::*, crate::protocol::CallToolResult, std::sync::Arc, std::convert::Infallible, tokio_stream::wrappers::UnboundedReceiverStream
 
 ### Imported modules
 *
@@ -272,6 +272,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -279,17 +280,18 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/lib.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
-* **Dependencies:** axum::{
-    extract::{Query, State},
-    response::sse::{Event, Sse},
-    Json,
-}, crate::protocol::CallToolResult, super::*, std::time::Duration, tokio::sync::{mpsc, RwLock}, crate::tools::MockTool, crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}, serde_json::{json, Value}, std::sync::Arc, tokio_stream::wrappers::UnboundedReceiverStream, factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}, crate::tools::Tool, std::collections::HashMap, std::convert::Infallible, tokio_stream::{Stream, StreamExt}, crate::tools::{
+* **Dependencies:** crate::tools::Tool, factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}, std::collections::HashMap, crate::tools::{
             bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
-        }
+        }, serde_json::{json, Value}, std::time::Duration, crate::tools::MockTool, crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}, axum::{
+    extract::{Query, State},
+    response::sse::{Event, Sse},
+    Json,
+}, tokio::sync::{mpsc, RwLock}, tokio_stream::{Stream, StreamExt}, super::*, crate::protocol::CallToolResult, std::sync::Arc, std::convert::Infallible, tokio_stream::wrappers::UnboundedReceiverStream
