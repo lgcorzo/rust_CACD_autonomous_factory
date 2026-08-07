@@ -4,7 +4,7 @@ title: "executor.rs"
 source_path: "crates/factory-core/src/executor.rs"
 description: "Detailed documentation for executor.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: executor.rs
@@ -26,7 +26,7 @@ Provides implementation for executor.rs.
 *
 
 ### Exported classes
-* SurgicalPatch, ExecutionResult
+* ExecutionResult, SurgicalPatch
 
 ### Exported interfaces
 * CodeSurgeryExecutor
@@ -38,11 +38,11 @@ Provides implementation for executor.rs.
 
 ### Exported Classes / Structs / Interfaces
 
-#### SurgicalPatch
+#### CodeSurgeryExecutor
 
 **Overview:**
 Why it exists:
-Provides capabilities related to SurgicalPatch.
+Provides capabilities related to CodeSurgeryExecutor.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -56,9 +56,7 @@ Default constructor.
 
 **Attributes:**
 
-* `file_path` (PathBuf): Purpose - Stores file_path data. Constraints - Valid PathBuf.
-* `search_block` (String): Purpose - Stores search_block data. Constraints - Valid String.
-* `replace_block` (String): Purpose - Stores replace_block data. Constraints - Valid String.
+None.
 
 **Public Methods:**
 
@@ -98,11 +96,11 @@ None.
 
 None.
 
-#### CodeSurgeryExecutor
+#### SurgicalPatch
 
 **Overview:**
 Why it exists:
-Provides capabilities related to CodeSurgeryExecutor.
+Provides capabilities related to SurgicalPatch.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -116,7 +114,9 @@ Default constructor.
 
 **Attributes:**
 
-None.
+* `file_path` (PathBuf): Purpose - Stores file_path data. Constraints - Valid PathBuf.
+* `search_block` (String): Purpose - Stores search_block data. Constraints - Valid String.
+* `replace_block` (String): Purpose - Stores replace_block data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -135,12 +135,12 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class SurgicalPatch {
+    class CodeSurgeryExecutor {
+        <<trait>>
     }
     class ExecutionResult {
     }
-    class CodeSurgeryExecutor {
-        <<trait>>
+    class SurgicalPatch {
     }
 
 ```
@@ -158,14 +158,12 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of executor.rs components
 import { ... } from 'crates/factory-core/src/executor.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

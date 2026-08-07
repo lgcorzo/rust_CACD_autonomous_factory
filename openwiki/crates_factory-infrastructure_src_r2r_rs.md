@@ -4,7 +4,7 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Detailed documentation for r2r.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: r2r.rs
@@ -20,7 +20,7 @@ Provides implementation for r2r.rs.
 * Handles logic related to r2r.
 
 ### Dependencies
-* serde_json::json, wiremock::{Mock, MockServer, ResponseTemplate}, wiremock::matchers::{method, path}, async_trait::async_trait, super::*
+* async_trait::async_trait, serde_json::json, super::*, wiremock::matchers::{method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
 *
@@ -37,34 +37,6 @@ Provides implementation for r2r.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
-
-#### R2rClient
-
-**Overview:**
-Why it exists:
-Provides capabilities related to R2rClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-None.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
 
 #### HttpR2rClient
 
@@ -102,6 +74,34 @@ None.
 * `search(query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
 * `push_osr_metric(metric: &factory_core::OsrMetric (Any)) -> anyhow::Result<()>`: Internal helper logic.
 
+#### R2rClient
+
+**Overview:**
+Why it exists:
+Provides capabilities related to R2rClient.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 ### Exported Functions
 
 None.
@@ -111,9 +111,6 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class R2rClient {
-        <<trait>>
-    }
     class HttpR2rClient {
         +new(url: String:Any, user: String:Any, pwd: String:Any) Self
         -get_token() anyhow::Result<String>
@@ -121,6 +118,9 @@ classDiagram
         -push_osr_metric(metric: &factory_core::OsrMetric:Any) anyhow::Result<()>
     }
     R2rClient <|-- HttpR2rClient : Inheritance / Specialization
+    class R2rClient {
+        <<trait>>
+    }
 
 ```
 
@@ -131,12 +131,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as R2rService
-    Caller->>Svc: execute()
+    Caller->>Svc: new()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -145,7 +144,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/r2r.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** serde_json::json, wiremock::{Mock, MockServer, ResponseTemplate}, wiremock::matchers::{method, path}, async_trait::async_trait, super::*
+* **Dependencies:** async_trait::async_trait, serde_json::json, super::*, wiremock::matchers::{method, path}, wiremock::{Mock, MockServer, ResponseTemplate}

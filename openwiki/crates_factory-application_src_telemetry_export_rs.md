@@ -4,7 +4,7 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: telemetry_export.rs
@@ -20,7 +20,7 @@ Provides implementation for telemetry_export.rs.
 * Handles logic related to telemetry_export.
 
 ### Dependencies
-* std::sync::Arc, reqwest::Client, rdkafka::consumer::{Consumer, StreamConsumer}, serde_json::Value, rdkafka::Message
+* rdkafka::Message, rdkafka::consumer::{Consumer, StreamConsumer}, reqwest::Client, serde_json::Value, std::sync::Arc
 
 ### Imported modules
 *
@@ -129,7 +129,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -137,7 +136,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/telemetry_export.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src`
-* **Dependencies:** std::sync::Arc, reqwest::Client, rdkafka::consumer::{Consumer, StreamConsumer}, serde_json::Value, rdkafka::Message
+* **Dependencies:** rdkafka::Message, rdkafka::consumer::{Consumer, StreamConsumer}, reqwest::Client, serde_json::Value, std::sync::Arc

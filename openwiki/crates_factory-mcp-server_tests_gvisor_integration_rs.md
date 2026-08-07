@@ -4,7 +4,7 @@ title: "gvisor_integration.rs"
 source_path: "crates/factory-mcp-server/tests/gvisor_integration.rs"
 description: "Detailed documentation for gvisor_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: gvisor_integration.rs
@@ -20,10 +20,10 @@ Provides implementation for gvisor_integration.rs.
 * Handles logic related to gvisor_integration.
 
 ### Dependencies
-* factory_mcp_server::sandbox::{GvisorK8sDriver, SandboxDriver}, serde_json::json, kube::{
+* factory_mcp_server::sandbox::{GvisorK8sDriver, SandboxDriver}, k8s_openapi::api::core::v1::Namespace, kube::{
     api::{Api, PostParams},
     Client,
-}, k8s_openapi::api::core::v1::Namespace
+}, serde_json::json
 
 ### Imported modules
 *
@@ -68,7 +68,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -76,10 +75,9 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/tests/gvisor_integration.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/tests`
-* **Dependencies:** factory_mcp_server::sandbox::{GvisorK8sDriver, SandboxDriver}, serde_json::json, kube::{
+* **Dependencies:** factory_mcp_server::sandbox::{GvisorK8sDriver, SandboxDriver}, k8s_openapi::api::core::v1::Namespace, kube::{
     api::{Api, PostParams},
     Client,
-}, k8s_openapi::api::core::v1::Namespace
+}, serde_json::json

@@ -4,7 +4,7 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: gitlab.rs
@@ -20,7 +20,7 @@ Provides implementation for gitlab.rs.
 * Handles logic related to gitlab.
 
 ### Dependencies
-* wiremock::matchers::{body_json, header, method, path}, serde_json::json, serde::{Deserialize, Serialize}, async_trait::async_trait, wiremock::{Mock, MockServer, ResponseTemplate}, super::*
+* async_trait::async_trait, serde::{Deserialize, Serialize}, serde_json::json, super::*, wiremock::matchers::{body_json, header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
 *
@@ -37,6 +37,34 @@ Provides implementation for gitlab.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
+
+#### GitlabClient
+
+**Overview:**
+Why it exists:
+Provides capabilities related to GitlabClient.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
 
 #### GitlabIssue
 
@@ -61,34 +89,6 @@ Default constructor.
 * `title` (String): Purpose - Stores title data. Constraints - Valid String.
 * `description` (Option<String>): Purpose - Stores description data. Constraints - Valid Option<String>.
 * `web_url` (String): Purpose - Stores web_url data. Constraints - Valid String.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### GitlabClient
-
-**Overview:**
-Why it exists:
-Provides capabilities related to GitlabClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-None.
 
 **Public Methods:**
 
@@ -140,10 +140,10 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class GitlabIssue {
-    }
     class GitlabClient {
         <<trait>>
+    }
+    class GitlabIssue {
     }
     class HttpGitlabClient {
         +new(url: String:Any, api_token: String:Any) Self
@@ -166,7 +166,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -174,7 +173,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/gitlab.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** wiremock::matchers::{body_json, header, method, path}, serde_json::json, serde::{Deserialize, Serialize}, async_trait::async_trait, wiremock::{Mock, MockServer, ResponseTemplate}, super::*
+* **Dependencies:** async_trait::async_trait, serde::{Deserialize, Serialize}, serde_json::json, super::*, wiremock::matchers::{body_json, header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}

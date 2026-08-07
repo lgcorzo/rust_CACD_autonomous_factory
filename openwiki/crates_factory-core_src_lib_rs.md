@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: lib.rs
@@ -20,13 +20,13 @@ Provides implementation for lib.rs.
 * Handles logic related to lib.
 
 ### Dependencies
-* std::collections::HashMap, uuid::Uuid, chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}
+* chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap, uuid::Uuid
 
 ### Imported modules
 *
 
 ### Exported classes
-* Metadata, Inputs, Outputs, Targets, Mission, Task, SHAPValues, FeatureImportances, SpecArtifact, OsrMetric, FinOpsTag, ComplianceReport, UserFeedbackPayload
+* ComplianceReport, FeatureImportances, FinOpsTag, Inputs, Metadata, Mission, OsrMetric, Outputs, SHAPValues, SpecArtifact, Targets, Task, UserFeedbackPayload
 
 ### Exported interfaces
 *
@@ -38,11 +38,11 @@ Provides implementation for lib.rs.
 
 ### Exported Classes / Structs / Interfaces
 
-#### Metadata
+#### ComplianceReport
 
 **Overview:**
 Why it exists:
-Provides capabilities related to Metadata.
+Provides capabilities related to ComplianceReport.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -56,9 +56,70 @@ Default constructor.
 
 **Attributes:**
 
-* `timestamp` (DateTime<Utc>): Purpose - Stores timestamp data. Constraints - Valid DateTime<Utc>.
-* `model_version` (String): Purpose - Stores model_version data. Constraints - Valid String.
-* `extra` (HashMap<String, serde_json::Value>): Purpose - Stores extra data. Constraints - Valid HashMap<String, serde_json::Value>.
+* `report_id` (Uuid): Purpose - Stores report_id data. Constraints - Valid Uuid.
+* `status` (String): Purpose - Stores status data. Constraints - Valid String.
+* `findings` (Vec<String>): Purpose - Stores findings data. Constraints - Valid Vec<String>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### FeatureImportances
+
+**Overview:**
+Why it exists:
+Provides capabilities related to FeatureImportances.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `feature` (String): Purpose - Stores feature data. Constraints - Valid String.
+* `importance` (f32): Purpose - Stores importance data. Constraints - Valid f32.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### FinOpsTag
+
+**Overview:**
+Why it exists:
+Provides capabilities related to FinOpsTag.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `team` (String): Purpose - Stores team data. Constraints - Valid String.
+* `epic` (String): Purpose - Stores epic data. Constraints - Valid String.
+* `microservice` (String): Purpose - Stores microservice data. Constraints - Valid String.
+* `environment` (String): Purpose - Stores environment data. Constraints - Valid String.
+* `cost_center` (String): Purpose - Stores cost_center data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -96,11 +157,11 @@ None.
 
 None.
 
-#### Outputs
+#### Metadata
 
 **Overview:**
 Why it exists:
-Provides capabilities related to Outputs.
+Provides capabilities related to Metadata.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -114,37 +175,9 @@ Default constructor.
 
 **Attributes:**
 
-* `response` (String): Purpose - Stores response data. Constraints - Valid String.
-* `metadata` (Metadata): Purpose - Stores metadata data. Constraints - Valid Metadata.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### Targets
-
-**Overview:**
-Why it exists:
-Provides capabilities related to Targets.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `input_target` (String): Purpose - Stores input_target data. Constraints - Valid String.
-* `response` (String): Purpose - Stores response data. Constraints - Valid String.
+* `timestamp` (DateTime<Utc>): Purpose - Stores timestamp data. Constraints - Valid DateTime<Utc>.
+* `model_version` (String): Purpose - Stores model_version data. Constraints - Valid String.
+* `extra` (HashMap<String, serde_json::Value>): Purpose - Stores extra data. Constraints - Valid HashMap<String, serde_json::Value>.
 
 **Public Methods:**
 
@@ -215,6 +248,155 @@ None.
 
 None.
 
+#### OsrMetric
+
+**Overview:**
+Why it exists:
+Provides capabilities related to OsrMetric.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `mission_id` (String): Purpose - Stores mission_id data. Constraints - Valid String.
+* `osr_value` (f32): Purpose - Stores osr_value data. Constraints - Valid f32.
+* `wiki_commit_sha` (String): Purpose - Stores wiki_commit_sha data. Constraints - Valid String.
+* `timestamp` (DateTime<Utc>): Purpose - Stores timestamp data. Constraints - Valid DateTime<Utc>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### Outputs
+
+**Overview:**
+Why it exists:
+Provides capabilities related to Outputs.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `response` (String): Purpose - Stores response data. Constraints - Valid String.
+* `metadata` (Metadata): Purpose - Stores metadata data. Constraints - Valid Metadata.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### SHAPValues
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SHAPValues.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `sample` (String): Purpose - Stores sample data. Constraints - Valid String.
+* `explanation` (String): Purpose - Stores explanation data. Constraints - Valid String.
+* `shap_value` (f32): Purpose - Stores shap_value data. Constraints - Valid f32.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### SpecArtifact
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SpecArtifact.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `id` (Uuid): Purpose - Stores id data. Constraints - Valid Uuid.
+* `name` (String): Purpose - Stores name data. Constraints - Valid String.
+* `data` (serde_json::Value): Purpose - Stores data data. Constraints - Valid serde_json::Value.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### Targets
+
+**Overview:**
+Why it exists:
+Provides capabilities related to Targets.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `input_target` (String): Purpose - Stores input_target data. Constraints - Valid String.
+* `response` (String): Purpose - Stores response data. Constraints - Valid String.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 #### Task
 
 **Overview:**
@@ -276,188 +458,6 @@ None.
 
 None.
 
-#### SHAPValues
-
-**Overview:**
-Why it exists:
-Provides capabilities related to SHAPValues.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `sample` (String): Purpose - Stores sample data. Constraints - Valid String.
-* `explanation` (String): Purpose - Stores explanation data. Constraints - Valid String.
-* `shap_value` (f32): Purpose - Stores shap_value data. Constraints - Valid f32.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### FeatureImportances
-
-**Overview:**
-Why it exists:
-Provides capabilities related to FeatureImportances.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `feature` (String): Purpose - Stores feature data. Constraints - Valid String.
-* `importance` (f32): Purpose - Stores importance data. Constraints - Valid f32.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### SpecArtifact
-
-**Overview:**
-Why it exists:
-Provides capabilities related to SpecArtifact.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `id` (Uuid): Purpose - Stores id data. Constraints - Valid Uuid.
-* `name` (String): Purpose - Stores name data. Constraints - Valid String.
-* `data` (serde_json::Value): Purpose - Stores data data. Constraints - Valid serde_json::Value.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### OsrMetric
-
-**Overview:**
-Why it exists:
-Provides capabilities related to OsrMetric.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `mission_id` (String): Purpose - Stores mission_id data. Constraints - Valid String.
-* `osr_value` (f32): Purpose - Stores osr_value data. Constraints - Valid f32.
-* `wiki_commit_sha` (String): Purpose - Stores wiki_commit_sha data. Constraints - Valid String.
-* `timestamp` (DateTime<Utc>): Purpose - Stores timestamp data. Constraints - Valid DateTime<Utc>.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### FinOpsTag
-
-**Overview:**
-Why it exists:
-Provides capabilities related to FinOpsTag.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `team` (String): Purpose - Stores team data. Constraints - Valid String.
-* `epic` (String): Purpose - Stores epic data. Constraints - Valid String.
-* `microservice` (String): Purpose - Stores microservice data. Constraints - Valid String.
-* `environment` (String): Purpose - Stores environment data. Constraints - Valid String.
-* `cost_center` (String): Purpose - Stores cost_center data. Constraints - Valid String.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### ComplianceReport
-
-**Overview:**
-Why it exists:
-Provides capabilities related to ComplianceReport.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `report_id` (Uuid): Purpose - Stores report_id data. Constraints - Valid Uuid.
-* `status` (String): Purpose - Stores status data. Constraints - Valid String.
-* `findings` (Vec<String>): Purpose - Stores findings data. Constraints - Valid Vec<String>.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
 #### UserFeedbackPayload
 
 **Overview:**
@@ -499,35 +499,35 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class Metadata {
+    class ComplianceReport {
+    }
+    class FeatureImportances {
+    }
+    class FinOpsTag {
     }
     class Inputs {
     }
-    class Outputs {
-    }
-    class Targets {
+    class Metadata {
     }
     class Mission {
     }
     class MissionStatus {
         <<enumeration>>
     }
+    class OsrMetric {
+    }
+    class Outputs {
+    }
+    class SHAPValues {
+    }
+    class SpecArtifact {
+    }
+    class Targets {
+    }
     class Task {
     }
     class TaskStatus {
         <<enumeration>>
-    }
-    class SHAPValues {
-    }
-    class FeatureImportances {
-    }
-    class SpecArtifact {
-    }
-    class OsrMetric {
-    }
-    class FinOpsTag {
-    }
-    class ComplianceReport {
     }
     class UserFeedbackPayload {
     }
@@ -547,7 +547,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -555,7 +554,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-core/src/lib.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-core/src`
-* **Dependencies:** std::collections::HashMap, uuid::Uuid, chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}
+* **Dependencies:** chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap, uuid::Uuid

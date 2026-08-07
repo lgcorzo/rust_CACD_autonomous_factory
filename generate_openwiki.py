@@ -81,6 +81,8 @@ def write_file_doc(file_path, parsed, now):
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, f"{flattened_name}.md")
 
+    parsed['classes'].sort(key=lambda x: x['name'])
+    parsed['free_functions'].sort(key=lambda x: x['name'])
     mermaid_classes = generate_mermaid_classes(parsed['classes'])
     seq_diagram = generate_sequence_diagram(base_name, parsed['classes'], parsed['free_functions'])
 
@@ -322,12 +324,12 @@ def main():
         try:
             # Fallback for diffing correctly in git
             try:
-                output = subprocess.check_output(["git", "diff", "HEAD~1", "--name-only"]).decode("utf-8")
+                output = subprocess.check_output(["git", "diff", "HEAD~1", "--name-only"], stderr=subprocess.DEVNULL).decode("utf-8")
             except subprocess.CalledProcessError:
                 try:
-                    output = subprocess.check_output(["git", "log", "-m", "-1", "--name-only", "--pretty=format:"]).decode("utf-8")
+                    output = subprocess.check_output(["git", "log", "-m", "-1", "--name-only", "--pretty=format:"], stderr=subprocess.DEVNULL).decode("utf-8")
                 except subprocess.CalledProcessError:
-                    output = subprocess.check_output(["git", "show", "--name-only", "--format="]).decode("utf-8")
+                    output = subprocess.check_output(["git", "show", "--name-only", "--format="], stderr=subprocess.DEVNULL).decode("utf-8")
             files_to_process = []
             deleted_files = []
             for f in output.splitlines():
@@ -365,7 +367,7 @@ def main():
 
 def generate_indexes(now):
     summary_content = "# SUMMARY\n\n"
-    index_content = "---\ntitle: OpenWiki Index\n---\n\n# OpenWiki Root Index\n\n## Module Architecture Links\n\n"
+    index_content = "---\ntitle: OpenWiki Index\n---\n\n# OpenWiki Root Index\n\n## Auto-Generated Module Architecture Links\n\n"
 
     for root, dirs, files in os.walk("openwiki"):
         dirs.sort()
@@ -376,15 +378,15 @@ def generate_indexes(now):
             for f in files:
                 if f.endswith(".md") and f not in ["SUMMARY.md", "index.md"]:
                     path = f
-                    summary_content += f"* [{f}]({path})\n"
-                    index_content += f"* [[{path}]]\n"
+                    summary_content += f"* [{f[:-3]}]({path[:-3]})\n"
+                    index_content += f"* [[{path[:-3]}]]\n"
         else:
             summary_content += f"\n## {rel_root}\n\n"
             for f in files:
                 if f.endswith(".md"):
                     path = os.path.join(rel_root, f).replace("\\", "/")
-                    summary_content += f"* [{f}]({path})\n"
-                    index_content += f"* [[{path}]]\n"
+                    summary_content += f"* [{f[:-3]}]({path[:-3]})\n"
+                    index_content += f"* [[{path[:-3]}]]\n"
 
     with open("openwiki/SUMMARY.md", "w") as f:
         f.write(summary_content)
@@ -394,13 +396,20 @@ def generate_indexes(now):
         with open(index_file, "r") as f:
             old_index = f.read()
 
-        if "## Module Architecture Links" in old_index:
-            prefix = old_index.split("## Module Architecture Links")[0]
-            new_links = index_content.split("## Module Architecture Links")[1]
-            final_index_content = prefix + "## Module Architecture Links" + new_links
+        if "## Auto-Generated Module Architecture Links" in old_index:
+            parts = old_index.split("## Auto-Generated Module Architecture Links")
+            prefix = parts[0]
+            # Try to find if there's any section after the auto generated one
+            suffix = ""
+            if len(parts) > 1:
+                subparts = parts[1].split("\n## ", 1)
+                if len(subparts) > 1:
+                    suffix = "\n## " + subparts[1]
+            new_links = index_content.split("## Auto-Generated Module Architecture Links")[1]
+            final_index_content = prefix + "## Auto-Generated Module Architecture Links" + new_links.rstrip() + "\n" + suffix
         else:
-            new_links = index_content.split("## Module Architecture Links")[1]
-            final_index_content = old_index + "\n## Module Architecture Links" + new_links
+            new_links = index_content.split("## Auto-Generated Module Architecture Links")[1]
+            final_index_content = old_index + "\n## Auto-Generated Module Architecture Links" + new_links
 
         with open(index_file, "w") as f:
             f.write(final_index_content)

@@ -4,7 +4,7 @@ title: "bridge_test.rs"
 source_path: "crates/factory-application/tests/bridge_test.rs"
 description: "Detailed documentation for bridge_test.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: bridge_test.rs
@@ -65,14 +65,12 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of bridge_test.rs components
 import { ... } from 'crates/factory-application/tests/bridge_test.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`

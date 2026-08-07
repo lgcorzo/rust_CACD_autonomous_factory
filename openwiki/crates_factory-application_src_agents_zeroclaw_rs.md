@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: zeroclaw.rs
@@ -20,7 +20,7 @@ Provides implementation for zeroclaw.rs.
 * Handles logic related to zeroclaw.
 
 ### Dependencies
-* async_trait::async_trait, serde_json::{Value, json}, factory_infrastructure::{AethalgardClient, McpClient}, crate::Agent, std::sync::Arc
+* async_trait::async_trait, crate::Agent, factory_infrastructure::{AethalgardClient, McpClient}, serde_json::{Value, json}, std::sync::Arc
 
 ### Imported modules
 *
@@ -196,7 +196,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -204,7 +203,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/agents/zeroclaw.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`
-* **Dependencies:** async_trait::async_trait, serde_json::{Value, json}, factory_infrastructure::{AethalgardClient, McpClient}, crate::Agent, std::sync::Arc
+* **Dependencies:** async_trait::async_trait, crate::Agent, factory_infrastructure::{AethalgardClient, McpClient}, serde_json::{Value, json}, std::sync::Arc

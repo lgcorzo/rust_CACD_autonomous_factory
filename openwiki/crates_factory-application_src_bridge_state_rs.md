@@ -4,7 +4,7 @@ title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Detailed documentation for state.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: state.rs
@@ -20,13 +20,13 @@ Provides implementation for state.rs.
 * Handles logic related to state.
 
 ### Dependencies
-* serde::{Deserialize, Serialize}, std::collections::HashMap, chrono::{DateTime, Utc}
+* chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap
 
 ### Imported modules
 *
 
 ### Exported classes
-* StepCheckpoint, BridgeState
+* BridgeState, StepCheckpoint
 
 ### Exported interfaces
 *
@@ -37,65 +37,6 @@ Provides implementation for state.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
-
-#### BridgeStatus
-
-**Overview:**
-Why it exists:
-Provides capabilities related to BridgeStatus.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-None.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### StepCheckpoint
-
-**Overview:**
-Why it exists:
-Provides capabilities related to StepCheckpoint.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `step_name` (String): Purpose - Stores step_name data. Constraints - Valid String.
-* `input_snapshot` (serde_json::Value): Purpose - Stores input_snapshot data. Constraints - Valid serde_json::Value.
-* `output_snapshot` (Option<serde_json::Value>): Purpose - Stores output_snapshot data. Constraints - Valid Option<serde_json::Value>.
-* `completed_at` (Option<DateTime<Utc>>): Purpose - Stores completed_at data. Constraints - Valid Option<DateTime<Utc>>.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
 
 #### BridgeState
 
@@ -194,6 +135,65 @@ let result = instance.save_checkpoint();
 
 * `get_checkpoint_key(session_id: &str (Any)) -> String`: Internal helper logic.
 
+#### BridgeStatus
+
+**Overview:**
+Why it exists:
+Provides capabilities related to BridgeStatus.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### StepCheckpoint
+
+**Overview:**
+Why it exists:
+Provides capabilities related to StepCheckpoint.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `step_name` (String): Purpose - Stores step_name data. Constraints - Valid String.
+* `input_snapshot` (serde_json::Value): Purpose - Stores input_snapshot data. Constraints - Valid serde_json::Value.
+* `output_snapshot` (Option<serde_json::Value>): Purpose - Stores output_snapshot data. Constraints - Valid Option<serde_json::Value>.
+* `completed_at` (Option<DateTime<Utc>>): Purpose - Stores completed_at data. Constraints - Valid Option<DateTime<Utc>>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 ### Exported Functions
 
 None.
@@ -203,16 +203,16 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class BridgeStatus {
-        <<enumeration>>
-    }
-    class StepCheckpoint {
-    }
     class BridgeState {
         +new(session_id: String:Any) Self
         -get_checkpoint_key(session_id: &str:Any) String
         +load_checkpoint(session_id: &str:Any, s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) anyhow::Result<Option<Self>>
         +save_checkpoint(s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) anyhow::Result<()>
+    }
+    class BridgeStatus {
+        <<enumeration>>
+    }
+    class StepCheckpoint {
     }
 
 ```
@@ -224,12 +224,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as StateService
-    Caller->>Svc: execute()
+    Caller->>Svc: new()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -238,7 +237,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/bridge/state.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`
-* **Dependencies:** serde::{Deserialize, Serialize}, std::collections::HashMap, chrono::{DateTime, Utc}
+* **Dependencies:** chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap

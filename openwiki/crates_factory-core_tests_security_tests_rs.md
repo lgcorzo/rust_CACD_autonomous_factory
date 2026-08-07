@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-core/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: security_tests.rs
@@ -20,7 +20,7 @@ Provides implementation for security_tests.rs.
 * Handles logic related to security_tests.
 
 ### Dependencies
-* factory_core::security::JitToken, factory_core::security::SecurityBounds, factory_core::error::Result
+* factory_core::error::Result, factory_core::security::JitToken, factory_core::security::SecurityBounds
 
 ### Imported modules
 *
@@ -97,7 +97,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -105,7 +104,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-core/tests/security_tests.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-core/tests`
-* **Dependencies:** factory_core::security::JitToken, factory_core::security::SecurityBounds, factory_core::error::Result
+* **Dependencies:** factory_core::error::Result, factory_core::security::JitToken, factory_core::security::SecurityBounds

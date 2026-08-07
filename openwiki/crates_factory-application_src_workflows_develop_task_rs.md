@@ -4,7 +4,7 @@ title: "develop_task.rs"
 source_path: "crates/factory-application/src/workflows/develop_task.rs"
 description: "Detailed documentation for develop_task.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: develop_task.rs
@@ -20,7 +20,7 @@ Provides implementation for develop_task.rs.
 * Handles logic related to develop_task.
 
 ### Dependencies
-* hatchet_sdk::Hatchet, std::sync::Arc, crate::agents::ZeroClawAgent, factory_infrastructure::{McpClient, McpHttpClient}, serde::{Deserialize, Serialize}, hatchet_sdk::runnables::Task
+* crate::agents::ZeroClawAgent, factory_infrastructure::{McpClient, McpHttpClient}, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Task, serde::{Deserialize, Serialize}, std::sync::Arc
 
 ### Imported modules
 *
@@ -126,7 +126,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -134,7 +133,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/workflows/develop_task.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`
-* **Dependencies:** hatchet_sdk::Hatchet, std::sync::Arc, crate::agents::ZeroClawAgent, factory_infrastructure::{McpClient, McpHttpClient}, serde::{Deserialize, Serialize}, hatchet_sdk::runnables::Task
+* **Dependencies:** crate::agents::ZeroClawAgent, factory_infrastructure::{McpClient, McpHttpClient}, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Task, serde::{Deserialize, Serialize}, std::sync::Arc

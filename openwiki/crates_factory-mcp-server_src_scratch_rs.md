@@ -4,7 +4,7 @@ title: "scratch.rs"
 source_path: "crates/factory-mcp-server/src/scratch.rs"
 description: "Detailed documentation for scratch.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: scratch.rs
@@ -65,14 +65,12 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of scratch.rs components
 import { ... } from 'crates/factory-mcp-server/src/scratch.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
