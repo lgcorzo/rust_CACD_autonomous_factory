@@ -4,7 +4,7 @@ title: "parse_ts.py"
 source_path: "parse_ts.py"
 description: "Detailed documentation for parse_ts.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: parse_ts.py
@@ -20,7 +20,7 @@ Provides implementation for parse_ts.py.
 * Handles logic related to parse_ts.
 
 ### Dependencies
-* json, tree_sitter, sys, tree_sitter_typescript
+* json, sys, tree_sitter, tree_sitter_typescript
 
 ### Imported modules
 *
@@ -60,17 +60,22 @@ classDiagram
 
 ```mermaid
 sequenceDiagram
-    participant Test
-```
+    autonumber
+    participant Caller as Client Interface
+    participant Svc as Parse_tsService
+    Caller->>Svc: get_node_text()
+    Note over Svc: Processing internal logic
+    Svc-->>Caller: result
 
+```
 
 ## Examples
 
-```python
-print('Hello')
 ```
-
+// Example usage of parse_ts.py components
+import { ... } from 'parse_ts.py';
+```
 
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** json, tree_sitter, sys, tree_sitter_typescript
+* **Dependencies:** json, sys, tree_sitter, tree_sitter_typescript

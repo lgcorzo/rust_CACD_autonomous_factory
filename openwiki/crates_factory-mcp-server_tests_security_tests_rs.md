@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-mcp-server/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: security_tests.rs
@@ -20,7 +20,7 @@ Provides implementation for security_tests.rs.
 * Handles logic related to security_tests.
 
 ### Dependencies
-* factory_mcp_server::tools::security_review::SecurityReviewTool, factory_mcp_server::tools::Tool, serde_json::{json, Value}, factory_mcp_server::protocol::McpContent
+* factory_mcp_server::protocol::McpContent, factory_mcp_server::tools::Tool, factory_mcp_server::tools::security_review::SecurityReviewTool, serde_json::{json, Value}
 
 ### Imported modules
 *
@@ -59,12 +59,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Security_testsService
-    Caller->>Svc: test_security_review_sql_injection()
+    Caller->>Svc: test_security_review_command_injection()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -73,7 +72,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/tests/security_tests.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/tests`
-* **Dependencies:** factory_mcp_server::tools::security_review::SecurityReviewTool, factory_mcp_server::tools::Tool, serde_json::{json, Value}, factory_mcp_server::protocol::McpContent
+* **Dependencies:** factory_mcp_server::protocol::McpContent, factory_mcp_server::tools::Tool, factory_mcp_server::tools::security_review::SecurityReviewTool, serde_json::{json, Value}

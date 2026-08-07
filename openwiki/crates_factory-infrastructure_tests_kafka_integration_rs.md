@@ -4,7 +4,7 @@ title: "kafka_integration.rs"
 source_path: "crates/factory-infrastructure/tests/kafka_integration.rs"
 description: "Detailed documentation for kafka_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: kafka_integration.rs
@@ -20,7 +20,7 @@ Provides implementation for kafka_integration.rs.
 * Handles logic related to kafka_integration.
 
 ### Dependencies
-* std::env, factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}
+* factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}, std::env
 
 ### Imported modules
 *
@@ -65,7 +65,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -73,7 +72,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/tests/kafka_integration.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/tests`
-* **Dependencies:** std::env, factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}
+* **Dependencies:** factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}, std::env

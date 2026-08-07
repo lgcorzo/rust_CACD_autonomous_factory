@@ -4,7 +4,7 @@ title: "parse_python.py"
 source_path: "parse_python.py"
 description: "Detailed documentation for parse_python.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: parse_python.py
@@ -20,7 +20,7 @@ Provides implementation for parse_python.py.
 * Handles logic related to parse_python.
 
 ### Dependencies
-* json, sys, ast
+* ast, json, sys
 
 ### Imported modules
 *
@@ -66,7 +66,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -74,7 +73,6 @@ sequenceDiagram
 import { ... } from 'parse_python.py';
 ```
 
-
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** json, sys, ast
+* **Dependencies:** ast, json, sys

@@ -4,7 +4,7 @@ title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Detailed documentation for doc_agent.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: doc_agent.rs
@@ -20,7 +20,7 @@ Provides implementation for doc_agent.rs.
 * Handles logic related to doc_agent.
 
 ### Dependencies
-* serde_json::{Value, json}, std::sync::Arc, async_trait::async_trait, factory_infrastructure::{McpClient, R2rClient}, factory_infrastructure::{MockMcpClient, MockR2rClient}, super::*, std::time::Duration, crate::Agent
+* async_trait::async_trait, crate::Agent, factory_infrastructure::{McpClient, R2rClient}, factory_infrastructure::{MockMcpClient, MockR2rClient}, serde_json::{Value, json}, std::sync::Arc, std::time::Duration, super::*
 
 ### Imported modules
 *
@@ -196,7 +196,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -204,7 +203,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/agents/doc_agent.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`
-* **Dependencies:** serde_json::{Value, json}, std::sync::Arc, async_trait::async_trait, factory_infrastructure::{McpClient, R2rClient}, factory_infrastructure::{MockMcpClient, MockR2rClient}, super::*, std::time::Duration, crate::Agent
+* **Dependencies:** async_trait::async_trait, crate::Agent, factory_infrastructure::{McpClient, R2rClient}, factory_infrastructure::{MockMcpClient, MockR2rClient}, serde_json::{Value, json}, std::sync::Arc, std::time::Duration, super::*

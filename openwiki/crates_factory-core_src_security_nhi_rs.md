@@ -4,7 +4,7 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Detailed documentation for nhi.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: nhi.rs
@@ -20,7 +20,7 @@ Provides implementation for nhi.rs.
 * Handles logic related to nhi.
 
 ### Dependencies
-* ed25519_dalek::SigningKey, rand::rngs::OsRng, serde::{Deserialize, Serialize}, ed25519_dalek::Signer, chrono::{DateTime, Utc}, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, super::*
+* base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, chrono::{DateTime, Utc}, ed25519_dalek::Signer, ed25519_dalek::SigningKey, rand::rngs::OsRng, serde::{Deserialize, Serialize}, super::*
 
 ### Imported modules
 *
@@ -264,7 +264,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -272,7 +271,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-core/src/security/nhi.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-core/src/security`
-* **Dependencies:** ed25519_dalek::SigningKey, rand::rngs::OsRng, serde::{Deserialize, Serialize}, ed25519_dalek::Signer, chrono::{DateTime, Utc}, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, super::*
+* **Dependencies:** base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, chrono::{DateTime, Utc}, ed25519_dalek::Signer, ed25519_dalek::SigningKey, rand::rngs::OsRng, serde::{Deserialize, Serialize}, super::*

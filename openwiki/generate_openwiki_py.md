@@ -4,7 +4,7 @@ title: "generate_openwiki.py"
 source_path: "generate_openwiki.py"
 description: "Detailed documentation for generate_openwiki.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T18:28:56Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: generate_openwiki.py
@@ -32,7 +32,7 @@ Provides implementation for generate_openwiki.py.
 * None
 
 ### Exported functions
-* parse_file, generate_mermaid_classes, generate_sequence_diagram, write_file_doc, setup_okf_structure, main, generate_indexes
+* generate_indexes, generate_mermaid_classes, generate_sequence_diagram, main, parse_file, setup_okf_structure, write_file_doc
 
 ## Public API
 
@@ -40,8 +40,8 @@ Provides implementation for generate_openwiki.py.
 
 ### Exported Functions
 
-#### `parse_file(filepath (Any)) -> None`
-Executes parse_file.
+#### `generate_indexes(now (Any)) -> None`
+Executes generate_indexes.
 
 #### `generate_mermaid_classes(classes (Any)) -> None`
 Executes generate_mermaid_classes.
@@ -49,17 +49,17 @@ Executes generate_mermaid_classes.
 #### `generate_sequence_diagram(module_name (Any), classes (Any), free_functions (Any)) -> None`
 Executes generate_sequence_diagram.
 
-#### `write_file_doc(file_path (Any), parsed (Any), now (Any)) -> None`
-Executes write_file_doc.
+#### `main() -> None`
+Executes main.
+
+#### `parse_file(filepath (Any)) -> None`
+Executes parse_file.
 
 #### `setup_okf_structure() -> None`
 Executes setup_okf_structure.
 
-#### `main() -> None`
-Executes main.
-
-#### `generate_indexes(now (Any)) -> None`
-Executes generate_indexes.
+#### `write_file_doc(file_path (Any), parsed (Any), now (Any)) -> None`
+Executes write_file_doc.
 
 ## Internal architecture
 
@@ -78,15 +78,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Generate_openwikiService
-    Caller->>Svc: parse_file()
+    Caller->>Svc: generate_indexes()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
-
-
-
 
 ## Examples
 
@@ -94,10 +90,6 @@ sequenceDiagram
 // Example usage of generate_openwiki.py components
 import { ... } from 'generate_openwiki.py';
 ```
-
-
-
-
 
 ## Cross References
 * **Parent module:** ``

@@ -4,7 +4,7 @@ title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: search_jira.rs
@@ -20,13 +20,13 @@ Provides implementation for search_jira.rs.
 * Handles logic related to search_jira.
 
 ### Dependencies
-* crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, async_trait::async_trait, std::sync::Arc, crate::tools::Tool, factory_infrastructure::JiraClient, super::*
+* async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::JiraClient, serde_json::{json, Value}, std::sync::Arc, super::*
 
 ### Imported modules
 *
 
 ### Exported classes
-* SearchJiraTool, ManualMockJiraClient
+* ManualMockJiraClient, SearchJiraTool
 
 ### Exported interfaces
 *
@@ -37,6 +37,34 @@ Provides implementation for search_jira.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
+
+#### ManualMockJiraClient
+
+**Overview:**
+Why it exists:
+Provides capabilities related to ManualMockJiraClient.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `should_fail` (bool): Purpose - Stores should_fail data. Constraints - Valid bool.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+* `search_issues(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### SearchJiraTool
 
@@ -72,34 +100,6 @@ None.
 * `input_schema() -> Value`: Internal helper logic.
 * `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 
-#### ManualMockJiraClient
-
-**Overview:**
-Why it exists:
-Provides capabilities related to ManualMockJiraClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `should_fail` (bool): Purpose - Stores should_fail data. Constraints - Valid bool.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-* `search_issues(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
-
 ### Exported Functions
 
 None.
@@ -109,6 +109,10 @@ None.
 ```mermaid
 classDiagram
     direction BT
+    class ManualMockJiraClient {
+        -search_issues(_query: &str:Any) anyhow::Result<String>
+    }
+    JiraClient <|-- ManualMockJiraClient : Inheritance / Specialization
     class SearchJiraTool {
         +new(jira_client: Arc<dyn JiraClient>:Any) Self
         -name() String
@@ -117,10 +121,6 @@ classDiagram
         -call(params: Value:Any) anyhow::Result<CallToolResult>
     }
     Tool <|-- SearchJiraTool : Inheritance / Specialization
-    class ManualMockJiraClient {
-        -search_issues(_query: &str:Any) anyhow::Result<String>
-    }
-    JiraClient <|-- ManualMockJiraClient : Inheritance / Specialization
 
 ```
 
@@ -131,12 +131,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Search_jiraService
-    Caller->>Svc: new()
+    Caller->>Svc: search_issues()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -145,7 +144,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/search_jira.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, async_trait::async_trait, std::sync::Arc, crate::tools::Tool, factory_infrastructure::JiraClient, super::*
+* **Dependencies:** async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::JiraClient, serde_json::{json, Value}, std::sync::Arc, super::*

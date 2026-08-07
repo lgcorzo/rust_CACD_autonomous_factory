@@ -4,7 +4,7 @@ title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Detailed documentation for feedback_route.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: feedback_route.rs
@@ -20,11 +20,11 @@ Provides implementation for feedback_route.rs.
 * Handles logic related to feedback_route.
 
 ### Dependencies
-* std::sync::Arc, crate::McpServer, factory_core::UserFeedbackPayload, factory_infrastructure::HttpGitlabClient, factory_infrastructure::GitlabClient, axum::{
+* axum::{
     extract::{Json, State},
     http::StatusCode,
     response::IntoResponse,
-}
+}, crate::McpServer, factory_core::UserFeedbackPayload, factory_infrastructure::GitlabClient, factory_infrastructure::HttpGitlabClient, std::sync::Arc
 
 ### Imported modules
 *
@@ -70,7 +70,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -78,11 +77,10 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/feedback_route.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
-* **Dependencies:** std::sync::Arc, crate::McpServer, factory_core::UserFeedbackPayload, factory_infrastructure::HttpGitlabClient, factory_infrastructure::GitlabClient, axum::{
+* **Dependencies:** axum::{
     extract::{Json, State},
     http::StatusCode,
     response::IntoResponse,
-}
+}, crate::McpServer, factory_core::UserFeedbackPayload, factory_infrastructure::GitlabClient, factory_infrastructure::HttpGitlabClient, std::sync::Arc

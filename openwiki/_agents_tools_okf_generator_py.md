@@ -4,7 +4,7 @@ title: "okf_generator.py"
 source_path: ".agents/tools/okf_generator.py"
 description: "Detailed documentation for okf_generator.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: okf_generator.py
@@ -20,7 +20,7 @@ Provides implementation for okf_generator.py.
 * Handles logic related to okf_generator.
 
 ### Dependencies
-* re, sys, os, subprocess
+* os, re, subprocess, sys
 
 ### Imported modules
 *
@@ -32,7 +32,7 @@ Provides implementation for okf_generator.py.
 * None
 
 ### Exported functions
-* get_modified_files, get_git_hash, generate_mermaid_class_diagram, process_file, update_index
+* generate_mermaid_class_diagram, get_git_hash, get_modified_files, process_file, update_index
 
 ## Public API
 
@@ -40,14 +40,14 @@ Provides implementation for okf_generator.py.
 
 ### Exported Functions
 
-#### `get_modified_files() -> None`
-Executes get_modified_files.
+#### `generate_mermaid_class_diagram(content (Any)) -> None`
+Executes generate_mermaid_class_diagram.
 
 #### `get_git_hash() -> None`
 Executes get_git_hash.
 
-#### `generate_mermaid_class_diagram(content (Any)) -> None`
-Executes generate_mermaid_class_diagram.
+#### `get_modified_files() -> None`
+Executes get_modified_files.
 
 #### `process_file(file_path (Any)) -> None`
 Executes process_file.
@@ -72,12 +72,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Okf_generatorService
-    Caller->>Svc: get_modified_files()
+    Caller->>Svc: generate_mermaid_class_diagram()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -86,7 +85,6 @@ sequenceDiagram
 import { ... } from '.agents/tools/okf_generator.py';
 ```
 
-
 ## Cross References
 * **Parent module:** `.agents/tools`
-* **Dependencies:** re, sys, os, subprocess
+* **Dependencies:** os, re, subprocess, sys

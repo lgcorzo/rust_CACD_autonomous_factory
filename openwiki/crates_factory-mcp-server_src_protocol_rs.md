@@ -4,7 +4,7 @@ title: "protocol.rs"
 source_path: "crates/factory-mcp-server/src/protocol.rs"
 description: "Detailed documentation for protocol.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: protocol.rs
@@ -26,7 +26,7 @@ Provides implementation for protocol.rs.
 *
 
 ### Exported classes
-* JsonRpcRequest, JsonRpcResponse, JsonRpcError, McpTool, CallToolResult
+* CallToolResult, JsonRpcError, JsonRpcRequest, JsonRpcResponse, McpTool
 
 ### Exported interfaces
 *
@@ -37,6 +37,65 @@ Provides implementation for protocol.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
+
+#### CallToolResult
+
+**Overview:**
+Why it exists:
+Provides capabilities related to CallToolResult.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `content` (Vec<McpContent>): Purpose - Stores content data. Constraints - Valid Vec<McpContent>.
+* `is_error` (bool): Purpose - Stores is_error data. Constraints - Valid bool.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### JsonRpcError
+
+**Overview:**
+Why it exists:
+Provides capabilities related to JsonRpcError.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `code` (i32): Purpose - Stores code data. Constraints - Valid i32.
+* `message` (String): Purpose - Stores message data. Constraints - Valid String.
+* `data` (Option<serde_json::Value>): Purpose - Stores data data. Constraints - Valid Option<serde_json::Value>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
 
 #### JsonRpcRequest
 
@@ -100,11 +159,11 @@ None.
 
 None.
 
-#### JsonRpcError
+#### McpContent
 
 **Overview:**
 Why it exists:
-Provides capabilities related to JsonRpcError.
+Provides capabilities related to McpContent.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -118,9 +177,7 @@ Default constructor.
 
 **Attributes:**
 
-* `code` (i32): Purpose - Stores code data. Constraints - Valid i32.
-* `message` (String): Purpose - Stores message data. Constraints - Valid String.
-* `data` (Option<serde_json::Value>): Purpose - Stores data data. Constraints - Valid Option<serde_json::Value>.
+None.
 
 **Public Methods:**
 
@@ -160,63 +217,6 @@ None.
 
 None.
 
-#### CallToolResult
-
-**Overview:**
-Why it exists:
-Provides capabilities related to CallToolResult.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `content` (Vec<McpContent>): Purpose - Stores content data. Constraints - Valid Vec<McpContent>.
-* `is_error` (bool): Purpose - Stores is_error data. Constraints - Valid bool.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### McpContent
-
-**Overview:**
-Why it exists:
-Provides capabilities related to McpContent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-None.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
 ### Exported Functions
 
 None.
@@ -226,18 +226,18 @@ None.
 ```mermaid
 classDiagram
     direction BT
+    class CallToolResult {
+    }
+    class JsonRpcError {
+    }
     class JsonRpcRequest {
     }
     class JsonRpcResponse {
     }
-    class JsonRpcError {
-    }
-    class McpTool {
-    }
-    class CallToolResult {
-    }
     class McpContent {
         <<enumeration>>
+    }
+    class McpTool {
     }
 
 ```
@@ -255,14 +255,12 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of protocol.rs components
 import { ... } from 'crates/factory-mcp-server/src/protocol.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

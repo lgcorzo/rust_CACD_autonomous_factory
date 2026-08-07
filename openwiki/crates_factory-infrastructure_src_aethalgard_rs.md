@@ -4,7 +4,7 @@ title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Detailed documentation for aethalgard.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: aethalgard.rs
@@ -131,14 +131,12 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of aethalgard.rs components
 import { ... } from 'crates/factory-infrastructure/src/aethalgard.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

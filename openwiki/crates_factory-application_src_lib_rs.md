@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: lib.rs
@@ -20,7 +20,7 @@ Provides implementation for lib.rs.
 * Handles logic related to lib.
 
 ### Dependencies
-* serde_json::Value, async_trait::async_trait
+* async_trait::async_trait, serde_json::Value
 
 ### Imported modules
 *
@@ -94,7 +94,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -102,7 +101,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/lib.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src`
-* **Dependencies:** serde_json::Value, async_trait::async_trait
+* **Dependencies:** async_trait::async_trait, serde_json::Value

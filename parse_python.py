@@ -122,7 +122,7 @@ def parse_python_file(filepath):
         return {
             "classes": classes,
             "free_functions": free_functions,
-            "dependencies": list(dependencies)
+            "dependencies": sorted(list(dependencies))
         }
     except Exception as e:
         print(f"Error parsing {filepath}: {e}", file=sys.stderr)

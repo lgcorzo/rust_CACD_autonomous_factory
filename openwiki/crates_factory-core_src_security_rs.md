@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: security.rs
@@ -20,16 +20,16 @@ Provides implementation for security.rs.
 * Handles logic related to security.
 
 ### Dependencies
-* ed25519_dalek::{Signature, Verifier}, zeroize::Zeroize, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, async_trait::async_trait, crate::error::Result
+* async_trait::async_trait, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, crate::error::Result, ed25519_dalek::{Signature, Verifier}, zeroize::Zeroize
 
 ### Imported modules
 *
 
 ### Exported classes
-* SandboxConstraint, AuditResult, Ed25519SecurityValidator, JitToken
+* AuditResult, Ed25519SecurityValidator, JitToken, SandboxConstraint
 
 ### Exported interfaces
-* SecurityValidator, SecurityBounds
+* SecurityBounds, SecurityValidator
 
 ### Exported functions
 * None
@@ -37,64 +37,6 @@ Provides implementation for security.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
-
-#### SandboxConstraint
-
-**Overview:**
-Why it exists:
-Provides capabilities related to SandboxConstraint.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `max_memory_mb` (u32): Purpose - Stores max_memory_mb data. Constraints - Valid u32.
-* `max_cpu_cores` (f32): Purpose - Stores max_cpu_cores data. Constraints - Valid f32.
-* `network_egress_allowed` (bool): Purpose - Stores network_egress_allowed data. Constraints - Valid bool.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
-#### SecurityValidator
-
-**Overview:**
-Why it exists:
-Provides capabilities related to SecurityValidator.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-None.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
 
 #### AuditResult
 
@@ -182,11 +124,69 @@ None.
 
 None.
 
+#### SandboxConstraint
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SandboxConstraint.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `max_memory_mb` (u32): Purpose - Stores max_memory_mb data. Constraints - Valid u32.
+* `max_cpu_cores` (f32): Purpose - Stores max_cpu_cores data. Constraints - Valid f32.
+* `network_egress_allowed` (bool): Purpose - Stores network_egress_allowed data. Constraints - Valid bool.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 #### SecurityBounds
 
 **Overview:**
 Why it exists:
 Provides capabilities related to SecurityBounds.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### SecurityValidator
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SecurityValidator.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -219,11 +219,6 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class SandboxConstraint {
-    }
-    class SecurityValidator {
-        <<trait>>
-    }
     class AuditResult {
     }
     class Ed25519SecurityValidator {
@@ -233,7 +228,12 @@ classDiagram
     SecurityValidator <|-- Ed25519SecurityValidator : Inheritance / Specialization
     class JitToken {
     }
+    class SandboxConstraint {
+    }
     class SecurityBounds {
+        <<trait>>
+    }
+    class SecurityValidator {
         <<trait>>
     }
 
@@ -252,7 +252,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -260,7 +259,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-core/src/security.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-core/src`
-* **Dependencies:** ed25519_dalek::{Signature, Verifier}, zeroize::Zeroize, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, async_trait::async_trait, crate::error::Result
+* **Dependencies:** async_trait::async_trait, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, crate::error::Result, ed25519_dalek::{Signature, Verifier}, zeroize::Zeroize
