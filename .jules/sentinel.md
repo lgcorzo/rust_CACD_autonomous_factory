@@ -92,3 +92,9 @@
 **Vulnerability:** Infrastructure clients (Jira, R2R) were logging raw third-party API response bodies via `tracing::error!` when requests failed.
 **Learning:** Logging full response bodies for debugging convenience can leak sensitive data like auth tokens, PII, or internal system details into log aggregation systems.
 **Prevention:** Log only non-sensitive metadata (e.g., HTTP status codes) and generic error messages. Avoid reflecting untrusted or unfiltered external data directly into application logs.
+
+## 2026-03-08 - Blocking I/O and Markdown Injection in UpdateMissionStatusTool
+
+**Vulnerability:** `UpdateMissionStatusTool` performed blocking file writes using synchronous `std::fs` inside an asynchronous handler, risking thread pool starvation. Additionally, it formatted user inputs directly into markdown files without sanitization against newlines and pipe characters, allowing Markdown structure and log injection.
+**Learning:** Performing synchronous blocking I/O inside asynchronous runtimes (like Tokio) causes thread starvation. Blindly formatting untrusted inputs into structural formats like Markdown tables enables formatting injection attacks.
+**Prevention:** Use non-blocking async file wrappers (`tokio::fs` and `tokio::io::AsyncWriteExt`) within async handlers. Sanitize user inputs by removing or escaping control/delimiter characters (newlines, carriage returns, pipe characters) before embedding them in structural layouts.
