@@ -4,7 +4,7 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: rustant.rs
@@ -20,7 +20,7 @@ Provides implementation for rustant.rs.
 * Handles logic related to rustant.
 
 ### Dependencies
-* crate::Agent, async_trait::async_trait, factory_infrastructure::{McpClient, R2rClient}, std::sync::Arc, serde_json::{Value, json}
+* async_trait::async_trait, crate::Agent, factory_infrastructure::{McpClient, R2rClient}, serde_json::{Value, json}, std::sync::Arc
 
 ### Imported modules
 *
@@ -164,7 +164,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -172,7 +171,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/agents/rustant.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`
-* **Dependencies:** crate::Agent, async_trait::async_trait, factory_infrastructure::{McpClient, R2rClient}, std::sync::Arc, serde_json::{Value, json}
+* **Dependencies:** async_trait::async_trait, crate::Agent, factory_infrastructure::{McpClient, R2rClient}, serde_json::{Value, json}, std::sync::Arc

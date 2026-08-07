@@ -4,7 +4,7 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: spec_kit_tool.rs
@@ -20,13 +20,13 @@ Provides implementation for spec_kit_tool.rs.
 * Handles logic related to spec_kit_tool.
 
 ### Dependencies
-* serde::{Deserialize, Serialize}, serde_json::{json, Value}, async_trait::async_trait, super::*, std::sync::Arc, crate::protocol::CallToolResult, crate::tools::Tool
+* async_trait::async_trait, crate::protocol::CallToolResult, crate::tools::Tool, serde::{Deserialize, Serialize}, serde_json::{json, Value}, std::sync::Arc, super::*
 
 ### Imported modules
 *
 
 ### Exported classes
-* MockSpecProvider, CliSpecProvider, SpecKitTool
+* CliSpecProvider, MockSpecProvider, SpecKitTool
 
 ### Exported interfaces
 * SpecProvider
@@ -38,11 +38,11 @@ Provides implementation for spec_kit_tool.rs.
 
 ### Exported Classes / Structs / Interfaces
 
-#### SpecKitCommand
+#### CliSpecProvider
 
 **Overview:**
 Why it exists:
-Provides capabilities related to SpecKitCommand.
+Provides capabilities related to CliSpecProvider.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -52,11 +52,15 @@ Works with related entities to process logic.
 
 **Constructor:**
 
-Default constructor.
+##### `new(cli_path: String (Any))`
+Parameters: cli_path: String (Any)
+Dependencies: Inherited from context
+Initialization: Sets up CliSpecProvider
 
 **Attributes:**
 
-None.
+* `cli_path` (String): Purpose - Stores cli_path data. Constraints - Valid String.
+* `fallback` (MockSpecProvider): Purpose - Stores fallback data. Constraints - Valid MockSpecProvider.
 
 **Public Methods:**
 
@@ -64,35 +68,7 @@ None.
 
 **Private Methods:**
 
-None.
-
-#### SpecProvider
-
-**Overview:**
-Why it exists:
-Provides capabilities related to SpecProvider.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-None.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
+* `invoke(command: SpecKitCommand (Any), args: Vec<String> (Any)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### MockSpecProvider
 
@@ -126,11 +102,11 @@ None.
 * `default() -> Self`: Internal helper logic.
 * `invoke(command: SpecKitCommand (Any), _args: Vec<String> (Any)) -> anyhow::Result<String>`: Internal helper logic.
 
-#### CliSpecProvider
+#### SpecKitCommand
 
 **Overview:**
 Why it exists:
-Provides capabilities related to CliSpecProvider.
+Provides capabilities related to SpecKitCommand.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -140,15 +116,11 @@ Works with related entities to process logic.
 
 **Constructor:**
 
-##### `new(cli_path: String (Any))`
-Parameters: cli_path: String (Any)
-Dependencies: Inherited from context
-Initialization: Sets up CliSpecProvider
+Default constructor.
 
 **Attributes:**
 
-* `cli_path` (String): Purpose - Stores cli_path data. Constraints - Valid String.
-* `fallback` (MockSpecProvider): Purpose - Stores fallback data. Constraints - Valid MockSpecProvider.
+None.
 
 **Public Methods:**
 
@@ -156,7 +128,7 @@ None.
 
 **Private Methods:**
 
-* `invoke(command: SpecKitCommand (Any), args: Vec<String> (Any)) -> anyhow::Result<String>`: Internal helper logic.
+None.
 
 #### SpecKitTool
 
@@ -251,6 +223,34 @@ let result = instance.invoke_spec_kit();
 * `input_schema() -> Value`: Internal helper logic.
 * `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 
+#### SpecProvider
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SpecProvider.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 ### Exported Functions
 
 None.
@@ -260,12 +260,11 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class SpecKitCommand {
-        <<enumeration>>
+    class CliSpecProvider {
+        +new(cli_path: String:Any) Self
+        -invoke(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
     }
-    class SpecProvider {
-        <<trait>>
-    }
+    SpecProvider <|-- CliSpecProvider : Inheritance / Specialization
     class MockSpecProvider {
         +new(specs_dir: std::path::PathBuf:Any) Self
         -default() Self
@@ -273,11 +272,9 @@ classDiagram
     }
     Default <|-- MockSpecProvider : Inheritance / Specialization
     SpecProvider <|-- MockSpecProvider : Inheritance / Specialization
-    class CliSpecProvider {
-        +new(cli_path: String:Any) Self
-        -invoke(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
+    class SpecKitCommand {
+        <<enumeration>>
     }
-    SpecProvider <|-- CliSpecProvider : Inheritance / Specialization
     class SpecKitTool {
         +new(specify_cli_path: String:Any) Self
         +with_provider(provider: Arc<dyn SpecProvider>:Any) Self
@@ -288,6 +285,9 @@ classDiagram
         -call(params: Value:Any) anyhow::Result<CallToolResult>
     }
     Tool <|-- SpecKitTool : Inheritance / Specialization
+    class SpecProvider {
+        <<trait>>
+    }
 
 ```
 
@@ -298,12 +298,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Spec_kit_toolService
-    Caller->>Svc: execute()
+    Caller->>Svc: new()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -312,7 +311,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/spec_kit_tool.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** serde::{Deserialize, Serialize}, serde_json::{json, Value}, async_trait::async_trait, super::*, std::sync::Arc, crate::protocol::CallToolResult, crate::tools::Tool
+* **Dependencies:** async_trait::async_trait, crate::protocol::CallToolResult, crate::tools::Tool, serde::{Deserialize, Serialize}, serde_json::{json, Value}, std::sync::Arc, super::*

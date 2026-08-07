@@ -4,7 +4,7 @@ title: "zeroclaw_sast_integration.rs"
 source_path: "crates/factory-application/tests/zeroclaw_sast_integration.rs"
 description: "Detailed documentation for zeroclaw_sast_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: zeroclaw_sast_integration.rs
@@ -20,7 +20,7 @@ Provides implementation for zeroclaw_sast_integration.rs.
 * Handles logic related to zeroclaw_sast_integration.
 
 ### Dependencies
-* factory_infrastructure::MockMcpClient, factory_application::agents::ZeroClawAgent, std::sync::Arc, serde_json::json
+* factory_application::agents::ZeroClawAgent, factory_infrastructure::MockMcpClient, serde_json::json, std::sync::Arc
 
 ### Imported modules
 *
@@ -59,12 +59,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Zeroclaw_sast_integrationService
-    Caller->>Svc: test_zeroclaw_blocks_execution_on_sast_failure()
+    Caller->>Svc: test_zeroclaw_allows_execution_on_sast_pass()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -73,7 +72,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/tests/zeroclaw_sast_integration.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`
-* **Dependencies:** factory_infrastructure::MockMcpClient, factory_application::agents::ZeroClawAgent, std::sync::Arc, serde_json::json
+* **Dependencies:** factory_application::agents::ZeroClawAgent, factory_infrastructure::MockMcpClient, serde_json::json, std::sync::Arc

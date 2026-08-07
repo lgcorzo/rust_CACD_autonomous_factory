@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Detailed documentation for finops.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: finops.rs
@@ -20,7 +20,7 @@ Provides implementation for finops.rs.
 * Handles logic related to finops.
 
 ### Dependencies
-* crate::Agent, factory_core::FinOpsTag, super::*, serde_json::Value, async_trait::async_trait, std::time::Duration, reqwest::Client
+* async_trait::async_trait, crate::Agent, factory_core::FinOpsTag, reqwest::Client, serde_json::Value, std::time::Duration, super::*
 
 ### Imported modules
 *
@@ -136,7 +136,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -144,7 +143,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/agents/finops.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`
-* **Dependencies:** crate::Agent, factory_core::FinOpsTag, super::*, serde_json::Value, async_trait::async_trait, std::time::Duration, reqwest::Client
+* **Dependencies:** async_trait::async_trait, crate::Agent, factory_core::FinOpsTag, reqwest::Client, serde_json::Value, std::time::Duration, super::*

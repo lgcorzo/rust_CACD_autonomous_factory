@@ -4,7 +4,7 @@ title: "execute_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/execute_code.rs"
 description: "Detailed documentation for execute_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: execute_code.rs
@@ -20,7 +20,7 @@ Provides implementation for execute_code.rs.
 * Handles logic related to execute_code.
 
 ### Dependencies
-* crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, async_trait::async_trait, crate::sandbox::SandboxDriver, crate::tools::Tool, std::sync::Arc
+* async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::sandbox::SandboxDriver, crate::tools::Tool, serde_json::{json, Value}, std::sync::Arc
 
 ### Imported modules
 *
@@ -105,7 +105,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -113,7 +112,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/execute_code.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** crate::protocol::{CallToolResult, McpContent}, serde_json::{json, Value}, async_trait::async_trait, crate::sandbox::SandboxDriver, crate::tools::Tool, std::sync::Arc
+* **Dependencies:** async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::sandbox::SandboxDriver, crate::tools::Tool, serde_json::{json, Value}, std::sync::Arc

@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: sentry.rs
@@ -20,7 +20,7 @@ Provides implementation for sentry.rs.
 * Handles logic related to sentry.
 
 ### Dependencies
-* serde_json::json, wiremock::matchers::{header, method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}, serde::{Deserialize, Serialize}, async_trait::async_trait, super::*
+* async_trait::async_trait, serde::{Deserialize, Serialize}, serde_json::json, super::*, wiremock::matchers::{header, method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
 *
@@ -71,34 +71,6 @@ None.
 
 None.
 
-#### SentryClient
-
-**Overview:**
-Why it exists:
-Provides capabilities related to SentryClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-None.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
-
 #### HttpSentryClient
 
 **Overview:**
@@ -132,6 +104,34 @@ None.
 
 * `fetch_recent_crashes(project: &str (Any), since_minutes: u64 (Any)) -> anyhow::Result<Vec<CrashEvent>>`: Internal helper logic.
 
+#### SentryClient
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SentryClient.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 ### Exported Functions
 
 None.
@@ -143,14 +143,14 @@ classDiagram
     direction BT
     class CrashEvent {
     }
-    class SentryClient {
-        <<trait>>
-    }
     class HttpSentryClient {
         +new(url: String:Any, api_token: String:Any) Self
         -fetch_recent_crashes(project: &str:Any, since_minutes: u64:Any) anyhow::Result<Vec<CrashEvent>>
     }
     SentryClient <|-- HttpSentryClient : Inheritance / Specialization
+    class SentryClient {
+        <<trait>>
+    }
 
 ```
 
@@ -167,7 +167,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -175,7 +174,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/sentry.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** serde_json::json, wiremock::matchers::{header, method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}, serde::{Deserialize, Serialize}, async_trait::async_trait, super::*
+* **Dependencies:** async_trait::async_trait, serde::{Deserialize, Serialize}, serde_json::json, super::*, wiremock::matchers::{header, method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}

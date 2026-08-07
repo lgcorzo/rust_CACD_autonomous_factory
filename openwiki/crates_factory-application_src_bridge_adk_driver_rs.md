@@ -4,7 +4,7 @@ title: "adk_driver.rs"
 source_path: "crates/factory-application/src/bridge/adk_driver.rs"
 description: "Detailed documentation for adk_driver.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: adk_driver.rs
@@ -97,14 +97,12 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of adk_driver.rs components
 import { ... } from 'crates/factory-application/src/bridge/adk_driver.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`

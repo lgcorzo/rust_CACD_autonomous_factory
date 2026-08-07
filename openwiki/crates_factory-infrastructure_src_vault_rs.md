@@ -4,7 +4,7 @@ title: "vault.rs"
 source_path: "crates/factory-infrastructure/src/vault.rs"
 description: "Detailed documentation for vault.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: vault.rs
@@ -20,7 +20,7 @@ Provides implementation for vault.rs.
 * Handles logic related to vault.
 
 ### Dependencies
-* serde_json::json, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}, reqwest::Client, factory_core::security::{JitToken, SecurityBounds}, async_trait::async_trait
+* async_trait::async_trait, factory_core::security::{JitToken, SecurityBounds}, reqwest::Client, serde_json::json, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
 *
@@ -103,7 +103,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -111,7 +110,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/vault.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** serde_json::json, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}, reqwest::Client, factory_core::security::{JitToken, SecurityBounds}, async_trait::async_trait
+* **Dependencies:** async_trait::async_trait, factory_core::security::{JitToken, SecurityBounds}, reqwest::Client, serde_json::json, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}

@@ -4,7 +4,7 @@ title: "workflow_tests.rs"
 source_path: "crates/factory-application/tests/workflow_tests.rs"
 description: "Detailed documentation for workflow_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: workflow_tests.rs
@@ -20,7 +20,7 @@ Provides implementation for workflow_tests.rs.
 * Handles logic related to workflow_tests.
 
 ### Dependencies
-* factory_application::agents::RustantAgent, factory_infrastructure::{MockMcpClient, MockR2rClient}, std::sync::Arc, serde_json::json
+* factory_application::agents::RustantAgent, factory_infrastructure::{MockMcpClient, MockR2rClient}, serde_json::json, std::sync::Arc
 
 ### Imported modules
 *
@@ -65,7 +65,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -73,7 +72,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/tests/workflow_tests.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`
-* **Dependencies:** factory_application::agents::RustantAgent, factory_infrastructure::{MockMcpClient, MockR2rClient}, std::sync::Arc, serde_json::json
+* **Dependencies:** factory_application::agents::RustantAgent, factory_infrastructure::{MockMcpClient, MockR2rClient}, serde_json::json, std::sync::Arc
