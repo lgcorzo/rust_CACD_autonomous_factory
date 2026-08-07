@@ -17,9 +17,7 @@ impl UpdateMissionStatusTool {
 }
 
 fn sanitize_markdown_table_field(s: &str) -> String {
-    s.replace('\r', "")
-        .replace('\n', " ")
-        .replace('|', "\\|")
+    s.replace('\r', "").replace('\n', " ").replace('|', "\\|")
 }
 
 #[async_trait]
@@ -181,7 +179,8 @@ mod tests {
         let result = tool.call(params).await.unwrap();
         assert!(result.is_error);
         if let McpContent::Text { text } = &result.content[0] {
-            assert!(text.contains("Error: Invalid mission_id. Path traversal characters are not allowed."));
+            assert!(text
+                .contains("Error: Invalid mission_id. Path traversal characters are not allowed."));
         }
     }
 }
