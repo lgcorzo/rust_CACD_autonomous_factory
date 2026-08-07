@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-cli/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: main.rs
@@ -20,7 +20,7 @@ Provides implementation for main.rs.
 * Handles logic related to main.
 
 ### Dependencies
-* factory_infrastructure::r2r::R2rClient, clap::{Parser, Subcommand}
+* clap::{Parser, Subcommand}, factory_infrastructure::r2r::R2rClient
 
 ### Imported modules
 *
@@ -124,7 +124,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -132,7 +131,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-cli/src/main.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-cli/src`
-* **Dependencies:** factory_infrastructure::r2r::R2rClient, clap::{Parser, Subcommand}
+* **Dependencies:** clap::{Parser, Subcommand}, factory_infrastructure::r2r::R2rClient

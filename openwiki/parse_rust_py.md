@@ -4,7 +4,7 @@ title: "parse_rust.py"
 source_path: "parse_rust.py"
 description: "Detailed documentation for parse_rust.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: parse_rust.py
@@ -20,7 +20,7 @@ Provides implementation for parse_rust.py.
 * Handles logic related to parse_rust.
 
 ### Dependencies
-* tree_sitter_rust, tree_sitter, sys, json
+* json, sys, tree_sitter, tree_sitter_rust
 
 ### Imported modules
 *
@@ -69,7 +69,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -77,7 +76,6 @@ sequenceDiagram
 import { ... } from 'parse_rust.py';
 ```
 
-
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** tree_sitter_rust, tree_sitter, sys, json
+* **Dependencies:** json, sys, tree_sitter, tree_sitter_rust

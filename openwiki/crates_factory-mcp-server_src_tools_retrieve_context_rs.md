@@ -4,7 +4,7 @@ title: "retrieve_context.rs"
 source_path: "crates/factory-mcp-server/src/tools/retrieve_context.rs"
 description: "Detailed documentation for retrieve_context.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: retrieve_context.rs
@@ -20,13 +20,13 @@ Provides implementation for retrieve_context.rs.
 * Handles logic related to retrieve_context.
 
 ### Dependencies
-* factory_infrastructure::R2rClient, std::sync::Arc, crate::protocol::{CallToolResult, McpContent}, async_trait::async_trait, crate::tools::Tool, super::*, serde_json::{json, Value}
+* async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::R2rClient, serde_json::{json, Value}, std::sync::Arc, super::*
 
 ### Imported modules
 *
 
 ### Exported classes
-* RetrieveContextTool, ManualMockR2rClient
+* ManualMockR2rClient, RetrieveContextTool
 
 ### Exported interfaces
 *
@@ -37,6 +37,35 @@ Provides implementation for retrieve_context.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
+
+#### ManualMockR2rClient
+
+**Overview:**
+Why it exists:
+Provides capabilities related to ManualMockR2rClient.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `should_fail` (bool): Purpose - Stores should_fail data. Constraints - Valid bool.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+* `search(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
+* `push_osr_metric(_metric: &factory_core::OsrMetric (Any)) -> anyhow::Result<()>`: Internal helper logic.
 
 #### RetrieveContextTool
 
@@ -72,35 +101,6 @@ None.
 * `input_schema() -> Value`: Internal helper logic.
 * `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 
-#### ManualMockR2rClient
-
-**Overview:**
-Why it exists:
-Provides capabilities related to ManualMockR2rClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `should_fail` (bool): Purpose - Stores should_fail data. Constraints - Valid bool.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-* `search(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
-* `push_osr_metric(_metric: &factory_core::OsrMetric (Any)) -> anyhow::Result<()>`: Internal helper logic.
-
 ### Exported Functions
 
 None.
@@ -110,6 +110,11 @@ None.
 ```mermaid
 classDiagram
     direction BT
+    class ManualMockR2rClient {
+        -search(_query: &str:Any) anyhow::Result<String>
+        -push_osr_metric(_metric: &factory_core::OsrMetric:Any) anyhow::Result<()>
+    }
+    R2rClient <|-- ManualMockR2rClient : Inheritance / Specialization
     class RetrieveContextTool {
         +new(r2r_client: Arc<dyn R2rClient>:Any) Self
         -name() String
@@ -118,11 +123,6 @@ classDiagram
         -call(params: Value:Any) anyhow::Result<CallToolResult>
     }
     Tool <|-- RetrieveContextTool : Inheritance / Specialization
-    class ManualMockR2rClient {
-        -search(_query: &str:Any) anyhow::Result<String>
-        -push_osr_metric(_metric: &factory_core::OsrMetric:Any) anyhow::Result<()>
-    }
-    R2rClient <|-- ManualMockR2rClient : Inheritance / Specialization
 
 ```
 
@@ -133,12 +133,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Retrieve_contextService
-    Caller->>Svc: new()
+    Caller->>Svc: search()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -147,7 +146,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/retrieve_context.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** factory_infrastructure::R2rClient, std::sync::Arc, crate::protocol::{CallToolResult, McpContent}, async_trait::async_trait, crate::tools::Tool, super::*, serde_json::{json, Value}
+* **Dependencies:** async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::R2rClient, serde_json::{json, Value}, std::sync::Arc, super::*

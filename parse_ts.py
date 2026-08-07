@@ -117,7 +117,7 @@ def parse_ts(filepath):
         return {
             "classes": classes,
             "free_functions": free_functions,
-            "dependencies": list(set(dependencies))
+            "dependencies": sorted(list(set(dependencies)))
         }
     except Exception as e:
         print(f"Error parsing {filepath}: {e}", file=sys.stderr)

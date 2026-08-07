@@ -4,7 +4,7 @@ title: "context.rs"
 source_path: "crates/factory-mcp-server/src/skills/context.rs"
 description: "Detailed documentation for context.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: context.rs
@@ -20,7 +20,7 @@ Provides implementation for context.rs.
 * Handles logic related to context.
 
 ### Dependencies
-* super::*, serde_json::{json, Value}
+* serde_json::{json, Value}, super::*
 
 ### Imported modules
 *
@@ -154,7 +154,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -162,7 +161,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/skills/context.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/skills`
-* **Dependencies:** super::*, serde_json::{json, Value}
+* **Dependencies:** serde_json::{json, Value}, super::*

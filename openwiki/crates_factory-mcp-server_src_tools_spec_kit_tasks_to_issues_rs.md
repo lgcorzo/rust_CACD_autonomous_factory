@@ -4,7 +4,7 @@ title: "spec_kit_tasks_to_issues.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs"
 description: "Detailed documentation for spec_kit_tasks_to_issues.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: spec_kit_tasks_to_issues.rs
@@ -20,7 +20,7 @@ Provides implementation for spec_kit_tasks_to_issues.rs.
 * Handles logic related to spec_kit_tasks_to_issues.
 
 ### Dependencies
-* serde_json::{json, Value}, crate::tools::Tool, async_trait::async_trait, std::sync::Arc, factory_infrastructure::GitlabClient, crate::protocol::CallToolResult
+* async_trait::async_trait, crate::protocol::CallToolResult, crate::tools::Tool, factory_infrastructure::GitlabClient, serde_json::{json, Value}, std::sync::Arc
 
 ### Imported modules
 *
@@ -105,7 +105,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -113,7 +112,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** serde_json::{json, Value}, crate::tools::Tool, async_trait::async_trait, std::sync::Arc, factory_infrastructure::GitlabClient, crate::protocol::CallToolResult
+* **Dependencies:** async_trait::async_trait, crate::protocol::CallToolResult, crate::tools::Tool, factory_infrastructure::GitlabClient, serde_json::{json, Value}, std::sync::Arc

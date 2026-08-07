@@ -4,7 +4,7 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: ziti.rs
@@ -20,7 +20,7 @@ Provides implementation for ziti.rs.
 * Handles logic related to ziti.
 
 ### Dependencies
-* super::*, async_trait::async_trait
+* async_trait::async_trait, super::*
 
 ### Imported modules
 *
@@ -37,34 +37,6 @@ Provides implementation for ziti.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
-
-#### ZitiIdentity
-
-**Overview:**
-Why it exists:
-Provides capabilities related to ZitiIdentity.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-None.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
 
 #### OpenZitiIdentity
 
@@ -99,6 +71,34 @@ None.
 * `get_token() -> anyhow::Result<String>`: Internal helper logic.
 * `service_name() -> String`: Internal helper logic.
 
+#### ZitiIdentity
+
+**Overview:**
+Why it exists:
+Provides capabilities related to ZitiIdentity.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 ### Exported Functions
 
 None.
@@ -108,15 +108,15 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class ZitiIdentity {
-        <<trait>>
-    }
     class OpenZitiIdentity {
         +new(service: &str:Any, identity_file: &str:Any) Self
         -get_token() anyhow::Result<String>
         -service_name() String
     }
     ZitiIdentity <|-- OpenZitiIdentity : Inheritance / Specialization
+    class ZitiIdentity {
+        <<trait>>
+    }
 
 ```
 
@@ -127,12 +127,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as ZitiService
-    Caller->>Svc: execute()
+    Caller->>Svc: new()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -141,7 +140,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-infrastructure/src/ziti.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** super::*, async_trait::async_trait
+* **Dependencies:** async_trait::async_trait, super::*

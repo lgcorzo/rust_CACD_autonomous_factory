@@ -4,7 +4,7 @@ title: "launch_sandbox_pod.rs"
 source_path: "crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
 description: "Detailed documentation for launch_sandbox_pod.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: launch_sandbox_pod.rs
@@ -20,13 +20,13 @@ Provides implementation for launch_sandbox_pod.rs.
 * Handles logic related to launch_sandbox_pod.
 
 ### Dependencies
-* crate::tools::Tool, k8s_openapi::api::batch::v1::Job, kube::Client, async_trait::async_trait, kube::api::{Api, DeleteParams, ListParams, PostParams}, tokio::time::{sleep, Duration}, serde_json::{json, Value}, crate::protocol::{CallToolResult, McpContent}, serde::{Deserialize, Serialize}
+* async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, k8s_openapi::api::batch::v1::Job, kube::Client, kube::api::{Api, DeleteParams, ListParams, PostParams}, serde::{Deserialize, Serialize}, serde_json::{json, Value}, tokio::time::{sleep, Duration}
 
 ### Imported modules
 *
 
 ### Exported classes
-* SandboxJobSpec, LaunchSandboxPodTool
+* LaunchSandboxPodTool, SandboxJobSpec
 
 ### Exported interfaces
 *
@@ -37,35 +37,6 @@ Provides implementation for launch_sandbox_pod.rs.
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
-
-#### SandboxJobSpec
-
-**Overview:**
-Why it exists:
-Provides capabilities related to SandboxJobSpec.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
-
-**Constructor:**
-
-Default constructor.
-
-**Attributes:**
-
-* `code` (String): Purpose - Stores code data. Constraints - Valid String.
-* `language` (String): Purpose - Stores language data. Constraints - Valid String.
-
-**Public Methods:**
-
-None.
-
-**Private Methods:**
-
-None.
 
 #### LaunchSandboxPodTool
 
@@ -102,6 +73,35 @@ None.
 * `input_schema() -> Value`: Internal helper logic.
 * `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 
+#### SandboxJobSpec
+
+**Overview:**
+Why it exists:
+Provides capabilities related to SandboxJobSpec.
+
+What business capability it provides:
+Supports core domain concepts.
+
+How it collaborates with other classes:
+Works with related entities to process logic.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `code` (String): Purpose - Stores code data. Constraints - Valid String.
+* `language` (String): Purpose - Stores language data. Constraints - Valid String.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 ### Exported Functions
 
 None.
@@ -111,8 +111,6 @@ None.
 ```mermaid
 classDiagram
     direction BT
-    class SandboxJobSpec {
-    }
     class LaunchSandboxPodTool {
         +new() Self
         -default() Self
@@ -123,6 +121,8 @@ classDiagram
     }
     Default <|-- LaunchSandboxPodTool : Inheritance / Specialization
     Tool <|-- LaunchSandboxPodTool : Inheritance / Specialization
+    class SandboxJobSpec {
+    }
 
 ```
 
@@ -133,12 +133,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Launch_sandbox_podService
-    Caller->>Svc: execute()
+    Caller->>Svc: new()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
-
 
 ## Examples
 
@@ -147,7 +146,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** crate::tools::Tool, k8s_openapi::api::batch::v1::Job, kube::Client, async_trait::async_trait, kube::api::{Api, DeleteParams, ListParams, PostParams}, tokio::time::{sleep, Duration}, serde_json::{json, Value}, crate::protocol::{CallToolResult, McpContent}, serde::{Deserialize, Serialize}
+* **Dependencies:** async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, k8s_openapi::api::batch::v1::Job, kube::Client, kube::api::{Api, DeleteParams, ListParams, PostParams}, serde::{Deserialize, Serialize}, serde_json::{json, Value}, tokio::time::{sleep, Duration}

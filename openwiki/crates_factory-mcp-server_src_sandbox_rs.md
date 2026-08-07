@@ -4,7 +4,7 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-06T17:55:58Z"
+timestamp: "2026-08-07T06:39:28Z"
 ---
 
 # File: sandbox.rs
@@ -20,13 +20,13 @@ Provides implementation for sandbox.rs.
 * Handles logic related to sandbox.
 
 ### Dependencies
-* async_trait::async_trait, std::time::Duration, tokio::time::timeout, crate::tools::Tool, serde::{Deserialize, Serialize}, tokio::process::Command, serde_json::json, super::*, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool
+* async_trait::async_trait, crate::tools::Tool, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool, serde::{Deserialize, Serialize}, serde_json::json, std::time::Duration, super::*, tokio::process::Command, tokio::time::timeout
 
 ### Imported modules
 *
 
 ### Exported classes
-* ExecutionResult, NativeSurgerySandboxDriver, SubprocessDriver, GvisorK8sDriver
+* ExecutionResult, GvisorK8sDriver, NativeSurgerySandboxDriver, SubprocessDriver
 
 ### Exported interfaces
 * SandboxDriver
@@ -69,11 +69,11 @@ None.
 
 None.
 
-#### SandboxDriver
+#### GvisorK8sDriver
 
 **Overview:**
 Why it exists:
-Provides capabilities related to SandboxDriver.
+Provides capabilities related to GvisorK8sDriver.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -95,7 +95,7 @@ None.
 
 **Private Methods:**
 
-None.
+* `execute(code: &str (Any), language: &str (Any)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
 
 #### NativeSurgerySandboxDriver
 
@@ -126,11 +126,11 @@ None.
 * `execute(_code: &str (Any), _language: &str (Any)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
 * `execute_surgery(id: &str (Any), patch: &factory_core::executor::SurgicalPatch (Any)) -> factory_core::error::Result<factory_core::executor::ExecutionResult>`: Internal helper logic.
 
-#### SubprocessDriver
+#### SandboxDriver
 
 **Overview:**
 Why it exists:
-Provides capabilities related to SubprocessDriver.
+Provides capabilities related to SandboxDriver.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -152,7 +152,7 @@ None.
 
 **Private Methods:**
 
-* `execute(code: &str (Any), language: &str (Any)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
+None.
 
 #### SandboxMode
 
@@ -182,11 +182,11 @@ None.
 
 None.
 
-#### GvisorK8sDriver
+#### SubprocessDriver
 
 **Overview:**
 Why it exists:
-Provides capabilities related to GvisorK8sDriver.
+Provides capabilities related to SubprocessDriver.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -221,25 +221,25 @@ classDiagram
     direction BT
     class ExecutionResult {
     }
-    class SandboxDriver {
-        <<trait>>
+    class GvisorK8sDriver {
+        -execute(code: &str:Any, language: &str:Any) anyhow::Result<ExecutionResult>
     }
+    SandboxDriver <|-- GvisorK8sDriver : Inheritance / Specialization
     class NativeSurgerySandboxDriver {
         -execute(_code: &str:Any, _language: &str:Any) anyhow::Result<ExecutionResult>
         -execute_surgery(id: &str:Any, patch: &factory_core::executor::SurgicalPatch:Any) factory_core::error::Result<factory_core::executor::ExecutionResult>
     }
     SandboxDriver <|-- NativeSurgerySandboxDriver : Inheritance / Specialization
+    class SandboxDriver {
+        <<trait>>
+    }
+    class SandboxMode {
+        <<enumeration>>
+    }
     class SubprocessDriver {
         -execute(code: &str:Any, language: &str:Any) anyhow::Result<ExecutionResult>
     }
     SandboxDriver <|-- SubprocessDriver : Inheritance / Specialization
-    class SandboxMode {
-        <<enumeration>>
-    }
-    class GvisorK8sDriver {
-        -execute(code: &str:Any, language: &str:Any) anyhow::Result<ExecutionResult>
-    }
-    SandboxDriver <|-- GvisorK8sDriver : Inheritance / Specialization
 
 ```
 
@@ -256,7 +256,6 @@ sequenceDiagram
 
 ```
 
-
 ## Examples
 
 ```
@@ -264,7 +263,6 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/sandbox.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
-* **Dependencies:** async_trait::async_trait, std::time::Duration, tokio::time::timeout, crate::tools::Tool, serde::{Deserialize, Serialize}, tokio::process::Command, serde_json::json, super::*, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool
+* **Dependencies:** async_trait::async_trait, crate::tools::Tool, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool, serde::{Deserialize, Serialize}, serde_json::json, std::time::Duration, super::*, tokio::process::Command, tokio::time::timeout
