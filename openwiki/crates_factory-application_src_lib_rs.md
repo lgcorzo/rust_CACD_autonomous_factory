@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: lib.rs
@@ -23,10 +23,10 @@ Provides implementation for lib.rs.
 * async_trait::async_trait, serde_json::Value
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
-*
+* None
 
 ### Exported interfaces
 * Agent
@@ -94,12 +94,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of lib.rs components
 import { ... } from 'crates/factory-application/src/lib.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

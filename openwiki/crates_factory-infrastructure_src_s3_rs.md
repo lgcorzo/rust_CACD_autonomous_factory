@@ -4,7 +4,7 @@ title: "s3.rs"
 source_path: "crates/factory-infrastructure/src/s3.rs"
 description: "Detailed documentation for s3.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: s3.rs
@@ -23,13 +23,13 @@ Provides implementation for s3.rs.
 * async_trait::async_trait, aws_sdk_s3::Client, aws_sdk_s3::primitives::ByteStream, crate::S3Storage
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * AwsS3Storage
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -67,8 +67,8 @@ None.
 
 **Private Methods:**
 
-* `put_object(bucket: &str (Any), key: &str (Any), data: Vec<u8> (Any)) -> anyhow::Result<()>`: Internal helper logic.
 * `get_object(bucket: &str (Any), key: &str (Any)) -> anyhow::Result<Vec<u8>>`: Internal helper logic.
+* `put_object(bucket: &str (Any), key: &str (Any), data: Vec<u8> (Any)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -80,9 +80,9 @@ None.
 classDiagram
     direction BT
     class AwsS3Storage {
+        -get_object(bucket: &str:Any, key: &str:Any) anyhow::Result<Vec<u8>>
         +new() Self
         -put_object(bucket: &str:Any, key: &str:Any, data: Vec<u8>:Any) anyhow::Result<()>
-        -get_object(bucket: &str:Any, key: &str:Any) anyhow::Result<Vec<u8>>
     }
     S3Storage <|-- AwsS3Storage : Inheritance / Specialization
 
@@ -95,11 +95,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as S3Service
-    Caller->>Svc: new()
+    Caller->>Svc: get_object()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -107,6 +108,7 @@ sequenceDiagram
 // Example usage of s3.rs components
 import { ... } from 'crates/factory-infrastructure/src/s3.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

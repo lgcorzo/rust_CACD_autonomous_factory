@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-cli/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: main.rs
@@ -23,16 +23,16 @@ Provides implementation for main.rs.
 * clap::{Parser, Subcommand}, factory_infrastructure::r2r::R2rClient
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * Cli
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
-*
+* None
 
 ## Public API
 
@@ -124,12 +124,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of main.rs components
 import { ... } from 'crates/factory-cli/src/main.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-cli/src`

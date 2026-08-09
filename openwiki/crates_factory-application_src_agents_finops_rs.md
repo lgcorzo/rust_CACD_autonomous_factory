@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Detailed documentation for finops.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: finops.rs
@@ -23,13 +23,13 @@ Provides implementation for finops.rs.
 * async_trait::async_trait, crate::Agent, factory_core::FinOpsTag, reqwest::Client, serde_json::Value, std::time::Duration, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * FinOpsAgent
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -59,9 +59,9 @@ Initialization: Sets up FinOpsAgent
 
 **Attributes:**
 
-* `litellm_base_url` (String): Purpose - Stores litellm_base_url data. Constraints - Valid String.
 * `api_key` (String): Purpose - Stores api_key data. Constraints - Valid String.
 * `client` (Client): Purpose - Stores client data. Constraints - Valid Client.
+* `litellm_base_url` (String): Purpose - Stores litellm_base_url data. Constraints - Valid String.
 * `tag` (FinOpsTag): Purpose - Stores tag data. Constraints - Valid FinOpsTag.
 
 **Public Methods:**
@@ -99,8 +99,8 @@ let result = instance.monitor_budget();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
 * `execute(_task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -113,13 +113,13 @@ classDiagram
     direction BT
     class FinOpsAgent {
         -default() Self
-        +new(litellm_base_url: String:Any, api_key: String:Any, tag: FinOpsTag:Any) Self
+        -execute(_task_description: &str:Any) anyhow::Result<Value>
         +monitor_budget() anyhow::Result<()>
         -name() String
-        -execute(_task_description: &str:Any) anyhow::Result<Value>
+        +new(litellm_base_url: String:Any, api_key: String:Any, tag: FinOpsTag:Any) Self
     }
-    Default <|-- FinOpsAgent : Inheritance / Specialization
     Agent <|-- FinOpsAgent : Inheritance / Specialization
+    Default <|-- FinOpsAgent : Inheritance / Specialization
 
 ```
 
@@ -136,12 +136,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of finops.rs components
 import { ... } from 'crates/factory-application/src/agents/finops.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

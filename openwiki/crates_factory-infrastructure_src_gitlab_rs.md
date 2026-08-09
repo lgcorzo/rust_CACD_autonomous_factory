@@ -4,7 +4,7 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: gitlab.rs
@@ -23,7 +23,7 @@ Provides implementation for gitlab.rs.
 * async_trait::async_trait, serde::{Deserialize, Serialize}, serde_json::json, super::*, wiremock::matchers::{body_json, header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * GitlabIssue, HttpGitlabClient
@@ -84,10 +84,10 @@ Default constructor.
 
 **Attributes:**
 
+* `description` (Option<String>): Purpose - Stores description data. Constraints - Valid Option<String>.
 * `id` (u64): Purpose - Stores id data. Constraints - Valid u64.
 * `iid` (u64): Purpose - Stores iid data. Constraints - Valid u64.
 * `title` (String): Purpose - Stores title data. Constraints - Valid String.
-* `description` (Option<String>): Purpose - Stores description data. Constraints - Valid Option<String>.
 * `web_url` (String): Purpose - Stores web_url data. Constraints - Valid String.
 
 **Public Methods:**
@@ -119,9 +119,9 @@ Initialization: Sets up HttpGitlabClient
 
 **Attributes:**
 
-* `url` (String): Purpose - Stores url data. Constraints - Valid String.
 * `api_token` (String): Purpose - Stores api_token data. Constraints - Valid String.
 * `client` (reqwest::Client): Purpose - Stores client data. Constraints - Valid reqwest::Client.
+* `url` (String): Purpose - Stores url data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -146,8 +146,8 @@ classDiagram
     class GitlabIssue {
     }
     class HttpGitlabClient {
-        +new(url: String:Any, api_token: String:Any) Self
         -create_issue(project_id: &str:Any, title: &str:Any, description: &str:Any) anyhow::Result<GitlabIssue>
+        +new(url: String:Any, api_token: String:Any) Self
     }
     GitlabClient <|-- HttpGitlabClient : Inheritance / Specialization
 
@@ -166,12 +166,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of gitlab.rs components
 import { ... } from 'crates/factory-infrastructure/src/gitlab.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

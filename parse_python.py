@@ -92,6 +92,10 @@ def parse_python_file(filepath):
                         implements.append(base.attr)
 
                 doc = ast.get_docstring(node) or ""
+                methods.sort(key=lambda x: x['name'])
+                unique_fields.sort(key=lambda x: x['name'])
+                implements.sort()
+
                 classes.append({
                     'name': node.name,
                     'kind': 'class',
@@ -118,6 +122,9 @@ def parse_python_file(filepath):
                     'args': args,
                     'ret_type': ret_type
                 })
+
+        classes.sort(key=lambda x: x['name'])
+        free_functions.sort(key=lambda x: x['name'])
 
         return {
             "classes": classes,

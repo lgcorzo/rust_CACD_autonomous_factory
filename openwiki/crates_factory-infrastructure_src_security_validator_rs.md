@@ -4,7 +4,7 @@ title: "security_validator.rs"
 source_path: "crates/factory-infrastructure/src/security_validator.rs"
 description: "Detailed documentation for security_validator.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: security_validator.rs
@@ -23,13 +23,13 @@ Provides implementation for security_validator.rs.
 * async_trait::async_trait, crate::mcp_client::McpClient, ed25519_dalek::{Signature, Verifier, VerifyingKey}, ed25519_dalek::{Signer, SigningKey}, factory_core::security::{AuditResult, SecurityValidator}, rand::rngs::OsRng, std::sync::Arc, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * Ed25519Validator
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -59,8 +59,8 @@ Initialization: Sets up Ed25519Validator
 
 **Attributes:**
 
-* `public_key` (VerifyingKey): Purpose - Stores public_key data. Constraints - Valid VerifyingKey.
 * `mcp_client` (Option<Arc<dyn McpClient>>): Purpose - Stores mcp_client data. Constraints - Valid Option<Arc<dyn McpClient>>.
+* `public_key` (VerifyingKey): Purpose - Stores public_key data. Constraints - Valid VerifyingKey.
 
 **Public Methods:**
 
@@ -68,8 +68,8 @@ None.
 
 **Private Methods:**
 
-* `validate_signature(data: &[u8] (Any), signature_hex: &str (Any)) -> factory_core::error::Result<bool>`: Internal helper logic.
 * `audit_content(content: &str (Any)) -> factory_core::error::Result<AuditResult>`: Internal helper logic.
+* `validate_signature(data: &[u8] (Any), signature_hex: &str (Any)) -> factory_core::error::Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -81,9 +81,9 @@ None.
 classDiagram
     direction BT
     class Ed25519Validator {
+        -audit_content(content: &str:Any) factory_core::error::Result<AuditResult>
         +new(public_key_bytes: &[u8]:Any, mcp_client: Option<Arc<dyn McpClient>>:Any) anyhow::Result<Self>
         -validate_signature(data: &[u8]:Any, signature_hex: &str:Any) factory_core::error::Result<bool>
-        -audit_content(content: &str:Any) factory_core::error::Result<AuditResult>
     }
     SecurityValidator <|-- Ed25519Validator : Inheritance / Specialization
 
@@ -96,11 +96,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Security_validatorService
-    Caller->>Svc: new()
+    Caller->>Svc: audit_content()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -108,6 +109,7 @@ sequenceDiagram
 // Example usage of security_validator.rs components
 import { ... } from 'crates/factory-infrastructure/src/security_validator.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

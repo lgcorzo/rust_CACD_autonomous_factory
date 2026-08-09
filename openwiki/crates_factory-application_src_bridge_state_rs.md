@@ -4,7 +4,7 @@ title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Detailed documentation for state.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: state.rs
@@ -23,13 +23,13 @@ Provides implementation for state.rs.
 * chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * BridgeState, StepCheckpoint
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -59,12 +59,12 @@ Initialization: Sets up BridgeState
 
 **Attributes:**
 
+* `checkpoints` (HashMap<String, StepCheckpoint>): Purpose - Stores checkpoints data. Constraints - Valid HashMap<String, StepCheckpoint>.
+* `current_step` (String): Purpose - Stores current_step data. Constraints - Valid String.
+* `last_updated` (u64): Purpose - Stores last_updated data. Constraints - Valid u64.
+* `run_status` (BridgeStatus): Purpose - Stores run_status data. Constraints - Valid BridgeStatus.
 * `session_id` (String): Purpose - Stores session_id data. Constraints - Valid String.
 * `spec_version` (String): Purpose - Stores spec_version data. Constraints - Valid String.
-* `current_step` (String): Purpose - Stores current_step data. Constraints - Valid String.
-* `checkpoints` (HashMap<String, StepCheckpoint>): Purpose - Stores checkpoints data. Constraints - Valid HashMap<String, StepCheckpoint>.
-* `run_status` (BridgeStatus): Purpose - Stores run_status data. Constraints - Valid BridgeStatus.
-* `last_updated` (u64): Purpose - Stores last_updated data. Constraints - Valid u64.
 
 **Public Methods:**
 
@@ -181,10 +181,10 @@ Default constructor.
 
 **Attributes:**
 
-* `step_name` (String): Purpose - Stores step_name data. Constraints - Valid String.
+* `completed_at` (Option<DateTime<Utc>>): Purpose - Stores completed_at data. Constraints - Valid Option<DateTime<Utc>>.
 * `input_snapshot` (serde_json::Value): Purpose - Stores input_snapshot data. Constraints - Valid serde_json::Value.
 * `output_snapshot` (Option<serde_json::Value>): Purpose - Stores output_snapshot data. Constraints - Valid Option<serde_json::Value>.
-* `completed_at` (Option<DateTime<Utc>>): Purpose - Stores completed_at data. Constraints - Valid Option<DateTime<Utc>>.
+* `step_name` (String): Purpose - Stores step_name data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -204,9 +204,9 @@ None.
 classDiagram
     direction BT
     class BridgeState {
-        +new(session_id: String:Any) Self
         -get_checkpoint_key(session_id: &str:Any) String
         +load_checkpoint(session_id: &str:Any, s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) anyhow::Result<Option<Self>>
+        +new(session_id: String:Any) Self
         +save_checkpoint(s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) anyhow::Result<()>
     }
     class BridgeStatus {
@@ -224,11 +224,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as StateService
-    Caller->>Svc: new()
+    Caller->>Svc: get_checkpoint_key()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -236,6 +237,7 @@ sequenceDiagram
 // Example usage of state.rs components
 import { ... } from 'crates/factory-application/src/bridge/state.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`

@@ -4,7 +4,7 @@ title: "protocol.rs"
 source_path: "crates/factory-mcp-server/src/protocol.rs"
 description: "Detailed documentation for protocol.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: protocol.rs
@@ -23,13 +23,13 @@ Provides implementation for protocol.rs.
 * serde::{Deserialize, Serialize}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * CallToolResult, JsonRpcError, JsonRpcRequest, JsonRpcResponse, McpTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -86,8 +86,8 @@ Default constructor.
 **Attributes:**
 
 * `code` (i32): Purpose - Stores code data. Constraints - Valid i32.
-* `message` (String): Purpose - Stores message data. Constraints - Valid String.
 * `data` (Option<serde_json::Value>): Purpose - Stores data data. Constraints - Valid Option<serde_json::Value>.
+* `message` (String): Purpose - Stores message data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -115,10 +115,10 @@ Default constructor.
 
 **Attributes:**
 
+* `id` (Option<serde_json::Value>): Purpose - Stores id data. Constraints - Valid Option<serde_json::Value>.
 * `jsonrpc` (String): Purpose - Stores jsonrpc data. Constraints - Valid String.
 * `method` (String): Purpose - Stores method data. Constraints - Valid String.
 * `params` (Option<serde_json::Value>): Purpose - Stores params data. Constraints - Valid Option<serde_json::Value>.
-* `id` (Option<serde_json::Value>): Purpose - Stores id data. Constraints - Valid Option<serde_json::Value>.
 
 **Public Methods:**
 
@@ -146,10 +146,10 @@ Default constructor.
 
 **Attributes:**
 
-* `jsonrpc` (String): Purpose - Stores jsonrpc data. Constraints - Valid String.
-* `result` (Option<serde_json::Value>): Purpose - Stores result data. Constraints - Valid Option<serde_json::Value>.
 * `error` (Option<JsonRpcError>): Purpose - Stores error data. Constraints - Valid Option<JsonRpcError>.
 * `id` (Option<serde_json::Value>): Purpose - Stores id data. Constraints - Valid Option<serde_json::Value>.
+* `jsonrpc` (String): Purpose - Stores jsonrpc data. Constraints - Valid String.
+* `result` (Option<serde_json::Value>): Purpose - Stores result data. Constraints - Valid Option<serde_json::Value>.
 
 **Public Methods:**
 
@@ -205,9 +205,9 @@ Default constructor.
 
 **Attributes:**
 
-* `name` (String): Purpose - Stores name data. Constraints - Valid String.
 * `description` (String): Purpose - Stores description data. Constraints - Valid String.
 * `input_schema` (serde_json::Value): Purpose - Stores input_schema data. Constraints - Valid serde_json::Value.
+* `name` (String): Purpose - Stores name data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -255,12 +255,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of protocol.rs components
 import { ... } from 'crates/factory-mcp-server/src/protocol.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

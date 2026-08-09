@@ -4,7 +4,7 @@ title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: kafka.rs
@@ -23,7 +23,7 @@ Provides implementation for kafka.rs.
 * async_trait::async_trait, chrono::Utc, rdkafka::config::ClientConfig, rdkafka::producer::{FutureProducer, FutureRecord}, std::time::Duration
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * RdKafkaClient, SimpleMockKafkaClient
@@ -166,12 +166,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of kafka.rs components
 import { ... } from 'crates/factory-infrastructure/src/kafka.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

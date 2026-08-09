@@ -4,7 +4,7 @@ title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: search_jira.rs
@@ -23,13 +23,13 @@ Provides implementation for search_jira.rs.
 * async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::JiraClient, serde_json::{json, Value}, std::sync::Arc, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * ManualMockJiraClient, SearchJiraTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -95,10 +95,10 @@ None.
 
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -114,11 +114,11 @@ classDiagram
     }
     JiraClient <|-- ManualMockJiraClient : Inheritance / Specialization
     class SearchJiraTool {
-        +new(jira_client: Arc<dyn JiraClient>:Any) Self
-        -name() String
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -name() String
+        +new(jira_client: Arc<dyn JiraClient>:Any) Self
     }
     Tool <|-- SearchJiraTool : Inheritance / Specialization
 
@@ -137,12 +137,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of search_jira.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/search_jira.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

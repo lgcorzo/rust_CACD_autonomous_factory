@@ -88,10 +88,17 @@ def write_file_doc(file_path, parsed, now):
 
     deps_str = ", ".join(sorted(parsed['dependencies'])) if parsed['dependencies'] else "None"
 
-    imported_modules_str = ", ".join(sorted([d for d in parsed['dependencies'] if '.' in d])) if parsed['dependencies'] else "None"
-    exported_classes_str = ", ".join([c['name'] for c in parsed['classes'] if c.get('kind', 'class') in ['class', 'struct']]) if parsed['classes'] else "None"
-    exported_interfaces_str = ", ".join([c['name'] for c in parsed['classes'] if c.get('kind', 'class') in ['interface', 'trait']]) if parsed['classes'] else "None"
-    exported_functions_str = ", ".join([f['name'] for f in parsed['free_functions'] if f.get('is_pub', True)]) if parsed['free_functions'] else "None"
+    imported = sorted([d for d in parsed['dependencies'] if '.' in d])
+    imported_modules_str = ", ".join(imported) if imported else "None"
+
+    exported_classes = [c['name'] for c in parsed['classes'] if c.get('kind', 'class') in ['class', 'struct']]
+    exported_classes_str = ", ".join(exported_classes) if exported_classes else "None"
+
+    exported_interfaces = [c['name'] for c in parsed['classes'] if c.get('kind', 'class') in ['interface', 'trait']]
+    exported_interfaces_str = ", ".join(exported_interfaces) if exported_interfaces else "None"
+
+    exported_functions = [f['name'] for f in parsed['free_functions'] if f.get('is_pub', True)]
+    exported_functions_str = ", ".join(exported_functions) if exported_functions else "None"
 
     content = f"""---
 type: "module-documentation"
@@ -269,7 +276,7 @@ import {{ ... }} from '{file_path}';
         start_idx = content.find(marker1)
         end_idx = content.find(marker2, start_idx)
         if start_idx != -1 and end_idx != -1:
-            content = content[:start_idx] + marker1 + existing_execution_flow.strip() + marker2 + content[end_idx + len(marker2):]
+            content = content[:start_idx] + marker1 + existing_execution_flow + marker2 + content[end_idx + len(marker2):]
 
     if existing_examples:
         marker1 = "## Examples\n"
@@ -277,7 +284,7 @@ import {{ ... }} from '{file_path}';
         start_idx = content.find(marker1)
         end_idx = content.find(marker2, start_idx)
         if start_idx != -1 and end_idx != -1:
-            content = content[:start_idx] + marker1 + existing_examples.strip() + "\n" + marker2 + content[end_idx + len(marker2):]
+            content = content[:start_idx] + marker1 + existing_examples + marker2 + content[end_idx + len(marker2):]
 
 
     with open(out_file, 'w', encoding='utf-8') as f:

@@ -4,7 +4,7 @@ title: "security_review.rs"
 source_path: "crates/factory-mcp-server/src/tools/security_review.rs"
 description: "Detailed documentation for security_review.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: security_review.rs
@@ -23,13 +23,13 @@ Provides implementation for security_review.rs.
 * async_openai::Client, async_openai::config::OpenAIConfig, async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::env
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * SecurityReviewTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -67,11 +67,11 @@ None.
 
 **Private Methods:**
 
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `default() -> Self`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -83,12 +83,12 @@ None.
 classDiagram
     direction BT
     class SecurityReviewTool {
-        +new() Self
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -default() Self
-        -name() String
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -name() String
+        +new() Self
     }
     Default <|-- SecurityReviewTool : Inheritance / Specialization
     Tool <|-- SecurityReviewTool : Inheritance / Specialization
@@ -102,11 +102,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Security_reviewService
-    Caller->>Svc: new()
+    Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -114,6 +115,7 @@ sequenceDiagram
 // Example usage of security_review.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/security_review.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
