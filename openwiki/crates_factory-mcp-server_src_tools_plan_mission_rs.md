@@ -4,7 +4,7 @@ title: "plan_mission.rs"
 source_path: "crates/factory-mcp-server/src/tools/plan_mission.rs"
 description: "Detailed documentation for plan_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: plan_mission.rs
@@ -30,13 +30,13 @@ Provides implementation for plan_mission.rs.
 }, async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_core::FinOpsTag, reqwest::header::{HeaderMap, HeaderValue}, serde_json::{json, Value}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * PlanMissionTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -75,10 +75,10 @@ None.
 
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -90,11 +90,11 @@ None.
 classDiagram
     direction BT
     class PlanMissionTool {
-        +new(api_key: String:Any, base_url: String:Any, model: String:Any, finops_tag: FinOpsTag:Any) Self
-        -name() String
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -name() String
+        +new(api_key: String:Any, base_url: String:Any, model: String:Any, finops_tag: FinOpsTag:Any) Self
     }
     Tool <|-- PlanMissionTool : Inheritance / Specialization
 
@@ -107,11 +107,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Plan_missionService
-    Caller->>Svc: new()
+    Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -119,6 +120,7 @@ sequenceDiagram
 // Example usage of plan_mission.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/plan_mission.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

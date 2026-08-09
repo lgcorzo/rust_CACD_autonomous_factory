@@ -4,7 +4,7 @@ title: "context.rs"
 source_path: "crates/factory-mcp-server/src/skills/context.rs"
 description: "Detailed documentation for context.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: context.rs
@@ -23,13 +23,13 @@ Provides implementation for context.rs.
 * serde_json::{json, Value}, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * ContextSkill
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -59,6 +59,36 @@ Default constructor.
 None.
 
 **Public Methods:**
+
+##### `format_for_llm(pruned_context: &str (Any)) -> Value`
+
+###### Description
+Executes format_for_llm.
+
+###### Inputs
+* `pruned_context: &str`: type=Any, meaning=Input for pruned_context: &str, valid values=Any valid Any, optional=No, default value=None
+
+###### Output
+Return type: Value
+Semantic meaning: Result of format_for_llm
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.format_for_llm();
+```
 
 ##### `prune_context(raw_context: &str (Any), max_chars: usize (Any)) -> String`
 
@@ -91,36 +121,6 @@ Space Complexity: O(1) mostly
 let result = instance.prune_context();
 ```
 
-##### `format_for_llm(pruned_context: &str (Any)) -> Value`
-
-###### Description
-Executes format_for_llm.
-
-###### Inputs
-* `pruned_context: &str`: type=Any, meaning=Input for pruned_context: &str, valid values=Any valid Any, optional=No, default value=None
-
-###### Output
-Return type: Value
-Semantic meaning: Result of format_for_llm
-Possible null values: Conditional
-Exceptions: None handled explicitly
-
-###### Side Effects
-Database updates: None
-File operations: None
-Network calls: None
-Cache: None
-State changes: Updates internal variables
-
-###### Complexity
-Time Complexity: O(1) mostly
-Space Complexity: O(1) mostly
-
-###### Example
-```
-let result = instance.format_for_llm();
-```
-
 **Private Methods:**
 
 None.
@@ -135,8 +135,8 @@ None.
 classDiagram
     direction BT
     class ContextSkill {
-        +prune_context(raw_context: &str:Any, max_chars: usize:Any) String
         +format_for_llm(pruned_context: &str:Any) Value
+        +prune_context(raw_context: &str:Any, max_chars: usize:Any) String
     }
 
 ```
@@ -148,11 +148,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as ContextService
-    Caller->>Svc: prune_context()
+    Caller->>Svc: format_for_llm()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -160,6 +161,7 @@ sequenceDiagram
 // Example usage of context.rs components
 import { ... } from 'crates/factory-mcp-server/src/skills/context.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/skills`

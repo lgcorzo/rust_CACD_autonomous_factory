@@ -27,6 +27,7 @@ title: OpenWiki Index
 * [[crates_factory-application_tests_bridge_test_rs]]
 * [[crates_factory-application_tests_workflow_tests_rs]]
 * [[crates_factory-application_tests_zeroclaw_sast_integration_rs]]
+* [[crates_factory-cli_src_bin_trigger_mission_rs]]
 * [[crates_factory-cli_src_main_rs]]
 * [[crates_factory-core_benches_zeroize_benchmark_rs]]
 * [[crates_factory-core_build_rs]]
@@ -76,5 +77,3 @@ title: OpenWiki Index
 * [[parse_python_py]]
 * [[parse_rust_py]]
 * [[parse_ts_py]]
-* [[test_hatchet_py]]
-* [[test_ziti_rs]]

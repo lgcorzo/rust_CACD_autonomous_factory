@@ -4,7 +4,7 @@ title: "execute_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/execute_code.rs"
 description: "Detailed documentation for execute_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: execute_code.rs
@@ -23,13 +23,13 @@ Provides implementation for execute_code.rs.
 * async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::sandbox::SandboxDriver, crate::tools::Tool, serde_json::{json, Value}, std::sync::Arc
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * ExecuteCodeTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -67,10 +67,10 @@ None.
 
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -82,11 +82,11 @@ None.
 classDiagram
     direction BT
     class ExecuteCodeTool {
-        +new(driver: Arc<dyn SandboxDriver>:Any) Self
-        -name() String
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -name() String
+        +new(driver: Arc<dyn SandboxDriver>:Any) Self
     }
     Tool <|-- ExecuteCodeTool : Inheritance / Specialization
 
@@ -99,11 +99,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Execute_codeService
-    Caller->>Svc: new()
+    Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -111,6 +112,7 @@ sequenceDiagram
 // Example usage of execute_code.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/execute_code.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

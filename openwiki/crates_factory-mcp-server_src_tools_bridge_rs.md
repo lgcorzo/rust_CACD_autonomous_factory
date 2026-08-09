@@ -4,7 +4,7 @@ title: "bridge.rs"
 source_path: "crates/factory-mcp-server/src/tools/bridge.rs"
 description: "Detailed documentation for bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: bridge.rs
@@ -23,13 +23,13 @@ Provides implementation for bridge.rs.
 * async_trait::async_trait, crate::protocol::CallToolResult, crate::tools::Tool, serde_json::{json, Value}, std::fs, std::path::PathBuf
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * BridgeTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -123,11 +123,11 @@ let result = instance.save_state();
 
 **Private Methods:**
 
-* `get_checkpoint_path(mission_id: &str (Any)) -> PathBuf`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
-* `description() -> String`: Internal helper logic.
-* `input_schema() -> Value`: Internal helper logic.
 * `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `description() -> String`: Internal helper logic.
+* `get_checkpoint_path(mission_id: &str (Any)) -> PathBuf`: Internal helper logic.
+* `input_schema() -> Value`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -139,13 +139,13 @@ None.
 classDiagram
     direction BT
     class BridgeTool {
-        -get_checkpoint_path(mission_id: &str:Any) PathBuf
-        +load_state(mission_id: &str:Any) anyhow::Result<Value>
-        +save_state(mission_id: &str:Any, state: Value:Any) anyhow::Result<Value>
-        -name() String
-        -description() String
-        -input_schema() Value
         -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -description() String
+        -get_checkpoint_path(mission_id: &str:Any) PathBuf
+        -input_schema() Value
+        +load_state(mission_id: &str:Any) anyhow::Result<Value>
+        -name() String
+        +save_state(mission_id: &str:Any, state: Value:Any) anyhow::Result<Value>
     }
     Tool <|-- BridgeTool : Inheritance / Specialization
 
@@ -158,11 +158,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as BridgeService
-    Caller->>Svc: get_checkpoint_path()
+    Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -170,6 +171,7 @@ sequenceDiagram
 // Example usage of bridge.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/bridge.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

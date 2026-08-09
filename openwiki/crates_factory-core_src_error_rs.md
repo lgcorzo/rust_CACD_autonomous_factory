@@ -4,7 +4,7 @@ title: "error.rs"
 source_path: "crates/factory-core/src/error.rs"
 description: "Detailed documentation for error.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: error.rs
@@ -23,13 +23,13 @@ Provides implementation for error.rs.
 * thiserror::Error
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
-*
+* None
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -94,12 +94,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of error.rs components
 import { ... } from 'crates/factory-core/src/error.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

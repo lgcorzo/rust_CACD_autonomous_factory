@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-core/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: security_tests.rs
@@ -23,16 +23,16 @@ Provides implementation for security_tests.rs.
 * factory_core::error::Result, factory_core::security::JitToken, factory_core::security::SecurityBounds
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * DummyBounds
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
-*
+* None
 
 ## Public API
 
@@ -64,8 +64,8 @@ None.
 
 **Private Methods:**
 
-* `validate_token(_token: &JitToken (Any)) -> Result<bool>`: Internal helper logic.
 * `issue_jit_token(_aud: &str (Any)) -> Result<JitToken>`: Internal helper logic.
+* `validate_token(_token: &JitToken (Any)) -> Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -77,8 +77,8 @@ None.
 classDiagram
     direction BT
     class DummyBounds {
-        -validate_token(_token: &JitToken:Any) Result<bool>
         -issue_jit_token(_aud: &str:Any) Result<JitToken>
+        -validate_token(_token: &JitToken:Any) Result<bool>
     }
     SecurityBounds <|-- DummyBounds : Inheritance / Specialization
 
@@ -91,11 +91,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Security_testsService
-    Caller->>Svc: validate_token()
+    Caller->>Svc: issue_jit_token()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -103,6 +104,7 @@ sequenceDiagram
 // Example usage of security_tests.rs components
 import { ... } from 'crates/factory-core/tests/security_tests.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/tests`

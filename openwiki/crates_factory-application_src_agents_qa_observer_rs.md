@@ -4,7 +4,7 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Detailed documentation for qa_observer.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: qa_observer.rs
@@ -23,13 +23,13 @@ Provides implementation for qa_observer.rs.
 * async_trait::async_trait, crate::Agent, crate::workflows::autonomous_mission::MissionInput, factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}, hatchet_sdk::{Hatchet, Runnable}, serde_json::Value, std::time::Duration, uuid::Uuid
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * QAObserverAgent
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -59,11 +59,11 @@ Initialization: Sets up QAObserverAgent
 
 **Attributes:**
 
-* `sentry_client` (Box<dyn SentryClient>): Purpose - Stores sentry_client data. Constraints - Valid Box<dyn SentryClient>.
 * `gitlab_client` (Box<dyn GitlabClient>): Purpose - Stores gitlab_client data. Constraints - Valid Box<dyn GitlabClient>.
-* `sentry_project` (String): Purpose - Stores sentry_project data. Constraints - Valid String.
 * `gitlab_project` (String): Purpose - Stores gitlab_project data. Constraints - Valid String.
 * `hatchet` (Hatchet): Purpose - Stores hatchet data. Constraints - Valid Hatchet.
+* `sentry_client` (Box<dyn SentryClient>): Purpose - Stores sentry_client data. Constraints - Valid Box<dyn SentryClient>.
+* `sentry_project` (String): Purpose - Stores sentry_project data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -100,8 +100,8 @@ let result = instance.monitor_crashes();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
 * `execute(_task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -114,13 +114,13 @@ classDiagram
     direction BT
     class QAObserverAgent {
         -default() Self
-        +new(sentry_url: String:Any, sentry_token: String:Any, sentry_project: String:Any, gitlab_url: String:Any, gitlab_token: String:Any, gitlab_project: String:Any, hatchet: Hatchet:Any) Self
+        -execute(_task_description: &str:Any) anyhow::Result<Value>
         +monitor_crashes() anyhow::Result<()>
         -name() String
-        -execute(_task_description: &str:Any) anyhow::Result<Value>
+        +new(sentry_url: String:Any, sentry_token: String:Any, sentry_project: String:Any, gitlab_url: String:Any, gitlab_token: String:Any, gitlab_project: String:Any, hatchet: Hatchet:Any) Self
     }
-    Default <|-- QAObserverAgent : Inheritance / Specialization
     Agent <|-- QAObserverAgent : Inheritance / Specialization
+    Default <|-- QAObserverAgent : Inheritance / Specialization
 
 ```
 
@@ -137,12 +137,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of qa_observer.rs components
 import { ... } from 'crates/factory-application/src/agents/qa_observer.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

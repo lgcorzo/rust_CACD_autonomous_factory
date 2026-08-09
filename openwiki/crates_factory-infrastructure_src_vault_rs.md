@@ -4,7 +4,7 @@ title: "vault.rs"
 source_path: "crates/factory-infrastructure/src/vault.rs"
 description: "Detailed documentation for vault.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: vault.rs
@@ -23,13 +23,13 @@ Provides implementation for vault.rs.
 * async_trait::async_trait, factory_core::security::{JitToken, SecurityBounds}, reqwest::Client, serde_json::json, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * VaultSecurityBounds
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -60,8 +60,8 @@ Initialization: Sets up VaultSecurityBounds
 **Attributes:**
 
 * `client` (Client): Purpose - Stores client data. Constraints - Valid Client.
-* `vault_addr` (String): Purpose - Stores vault_addr data. Constraints - Valid String.
 * `role_token` (String): Purpose - Stores role_token data. Constraints - Valid String.
+* `vault_addr` (String): Purpose - Stores vault_addr data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -69,8 +69,8 @@ None.
 
 **Private Methods:**
 
-* `validate_token(token: &JitToken (Any)) -> factory_core::error::Result<bool>`: Internal helper logic.
 * `issue_jit_token(audience: &str (Any)) -> factory_core::error::Result<JitToken>`: Internal helper logic.
+* `validate_token(token: &JitToken (Any)) -> factory_core::error::Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -82,9 +82,9 @@ None.
 classDiagram
     direction BT
     class VaultSecurityBounds {
+        -issue_jit_token(audience: &str:Any) factory_core::error::Result<JitToken>
         +new(vault_addr: String:Any, role_token: String:Any) Self
         -validate_token(token: &JitToken:Any) factory_core::error::Result<bool>
-        -issue_jit_token(audience: &str:Any) factory_core::error::Result<JitToken>
     }
     SecurityBounds <|-- VaultSecurityBounds : Inheritance / Specialization
 
@@ -97,11 +97,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as VaultService
-    Caller->>Svc: new()
+    Caller->>Svc: issue_jit_token()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -109,6 +110,7 @@ sequenceDiagram
 // Example usage of vault.rs components
 import { ... } from 'crates/factory-infrastructure/src/vault.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

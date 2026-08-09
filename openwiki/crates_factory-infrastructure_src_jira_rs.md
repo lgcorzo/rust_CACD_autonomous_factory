@@ -4,7 +4,7 @@ title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Detailed documentation for jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: jira.rs
@@ -23,7 +23,7 @@ Provides implementation for jira.rs.
 * async_trait::async_trait, serde_json::json, super::*, wiremock::matchers::{method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * HttpJiraClient
@@ -59,10 +59,10 @@ Initialization: Sets up HttpJiraClient
 
 **Attributes:**
 
-* `url` (String): Purpose - Stores url data. Constraints - Valid String.
-* `username` (String): Purpose - Stores username data. Constraints - Valid String.
 * `api_token` (String): Purpose - Stores api_token data. Constraints - Valid String.
 * `client` (reqwest::Client): Purpose - Stores client data. Constraints - Valid reqwest::Client.
+* `url` (String): Purpose - Stores url data. Constraints - Valid String.
+* `username` (String): Purpose - Stores username data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -133,12 +133,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of jira.rs components
 import { ... } from 'crates/factory-infrastructure/src/jira.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

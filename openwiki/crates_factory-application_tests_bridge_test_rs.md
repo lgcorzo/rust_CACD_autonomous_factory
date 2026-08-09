@@ -4,7 +4,7 @@ title: "bridge_test.rs"
 source_path: "crates/factory-application/tests/bridge_test.rs"
 description: "Detailed documentation for bridge_test.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: bridge_test.rs
@@ -23,7 +23,7 @@ Provides implementation for bridge_test.rs.
 * factory_application::bridge::{BridgeState, StepCheckpoint}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * None
@@ -32,7 +32,7 @@ Provides implementation for bridge_test.rs.
 * None
 
 ### Exported functions
-*
+* None
 
 ## Public API
 
@@ -65,12 +65,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of bridge_test.rs components
 import { ... } from 'crates/factory-application/tests/bridge_test.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`

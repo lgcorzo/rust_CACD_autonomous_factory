@@ -4,7 +4,7 @@ title: "update_mission_status.rs"
 source_path: "crates/factory-mcp-server/src/tools/update_mission_status.rs"
 description: "Detailed documentation for update_mission_status.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: update_mission_status.rs
@@ -20,16 +20,16 @@ Provides implementation for update_mission_status.rs.
 * Handles logic related to update_mission_status.
 
 ### Dependencies
-* async_trait::async_trait, chrono::Local, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::fs::{File, OpenOptions}, std::io::Write
+* async_trait::async_trait, chrono::Local, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, super::*, tokio::fs::{File, OpenOptions}, tokio::io::AsyncWriteExt
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * UpdateMissionStatusTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -67,10 +67,10 @@ None.
 
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -82,11 +82,11 @@ None.
 classDiagram
     direction BT
     class UpdateMissionStatusTool {
-        +new(docs_path: String:Any) Self
-        -name() String
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -name() String
+        +new(docs_path: String:Any) Self
     }
     Tool <|-- UpdateMissionStatusTool : Inheritance / Specialization
 
@@ -99,11 +99,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Update_mission_statusService
-    Caller->>Svc: new()
+    Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -112,6 +113,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/tools/update_mission_status.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** async_trait::async_trait, chrono::Local, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::fs::{File, OpenOptions}, std::io::Write
+* **Dependencies:** async_trait::async_trait, chrono::Local, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, super::*, tokio::fs::{File, OpenOptions}, tokio::io::AsyncWriteExt

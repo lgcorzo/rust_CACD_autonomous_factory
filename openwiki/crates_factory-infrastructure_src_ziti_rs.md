@@ -4,7 +4,7 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: ziti.rs
@@ -23,7 +23,7 @@ Provides implementation for ziti.rs.
 * async_trait::async_trait, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * OpenZitiIdentity
@@ -59,8 +59,8 @@ Initialization: Sets up OpenZitiIdentity
 
 **Attributes:**
 
-* `service` (String): Purpose - Stores service data. Constraints - Valid String.
 * `identity_file` (String): Purpose - Stores identity_file data. Constraints - Valid String.
+* `service` (String): Purpose - Stores service data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -109,8 +109,8 @@ None.
 classDiagram
     direction BT
     class OpenZitiIdentity {
-        +new(service: &str:Any, identity_file: &str:Any) Self
         -get_token() anyhow::Result<String>
+        +new(service: &str:Any, identity_file: &str:Any) Self
         -service_name() String
     }
     ZitiIdentity <|-- OpenZitiIdentity : Inheritance / Specialization
@@ -127,11 +127,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as ZitiService
-    Caller->>Svc: new()
+    Caller->>Svc: get_token()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -139,6 +140,7 @@ sequenceDiagram
 // Example usage of ziti.rs components
 import { ... } from 'crates/factory-infrastructure/src/ziti.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

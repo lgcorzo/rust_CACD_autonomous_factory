@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: autonomous_mission.rs
@@ -26,13 +26,13 @@ Provides implementation for autonomous_mission.rs.
 }, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Workflow, prost::Message, serde::{Deserialize, Serialize}, std::sync::Arc, super::*, uuid::Uuid
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * MissionInput, MissionOutput
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * create_mission_workflow
@@ -59,8 +59,8 @@ Default constructor.
 
 **Attributes:**
 
-* `mission_id` (Option<String>): Purpose - Stores mission_id data. Constraints - Valid Option<String>.
 * `goal` (String): Purpose - Stores goal data. Constraints - Valid String.
+* `mission_id` (Option<String>): Purpose - Stores mission_id data. Constraints - Valid Option<String>.
 * `repository_path` (String): Purpose - Stores repository_path data. Constraints - Valid String.
 
 **Public Methods:**
@@ -118,9 +118,9 @@ Default constructor.
 **Attributes:**
 
 * `mission_id` (String): Purpose - Stores mission_id data. Constraints - Valid String.
+* `pr_url` (Option<String>): Purpose - Stores pr_url data. Constraints - Valid Option<String>.
 * `status` (String): Purpose - Stores status data. Constraints - Valid String.
 * `summary` (String): Purpose - Stores summary data. Constraints - Valid String.
-* `pr_url` (Option<String>): Purpose - Stores pr_url data. Constraints - Valid Option<String>.
 
 **Public Methods:**
 
@@ -161,12 +161,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of autonomous_mission.rs components
 import { ... } from 'crates/factory-application/src/workflows/autonomous_mission.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

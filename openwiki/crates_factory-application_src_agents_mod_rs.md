@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-application/src/agents/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: mod.rs
@@ -23,7 +23,7 @@ Provides implementation for mod.rs.
 * pub auditor::AuditorAgent, pub doc_agent::DocumentationAgent, pub finops::FinOpsAgent, pub qa_observer::QAObserverAgent, pub rustant::RustantAgent, pub zeroclaw::ZeroClawAgent
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * None
@@ -65,12 +65,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of mod.rs components
 import { ... } from 'crates/factory-application/src/agents/mod.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

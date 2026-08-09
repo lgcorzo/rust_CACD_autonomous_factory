@@ -4,7 +4,7 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: rustant.rs
@@ -23,13 +23,13 @@ Provides implementation for rustant.rs.
 * async_trait::async_trait, crate::Agent, factory_infrastructure::{McpClient, R2rClient}, serde_json::{Value, json}, std::sync::Arc
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * RustantAgent
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -128,8 +128,8 @@ let result = instance.review_mission();
 
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
 * `execute(task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -141,11 +141,11 @@ None.
 classDiagram
     direction BT
     class RustantAgent {
+        -execute(task_description: &str:Any) anyhow::Result<Value>
+        -name() String
         +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any) Self
         +plan_mission(mission_id: &str:Any, goal: &str:Any) anyhow::Result<Value>
         +review_mission(mission_id: &str:Any, mission_results: &str:Any) anyhow::Result<Value>
-        -name() String
-        -execute(task_description: &str:Any) anyhow::Result<Value>
     }
     Agent <|-- RustantAgent : Inheritance / Specialization
 
@@ -158,11 +158,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as RustantService
-    Caller->>Svc: new()
+    Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -170,6 +171,7 @@ sequenceDiagram
 // Example usage of rustant.rs components
 import { ... } from 'crates/factory-application/src/agents/rustant.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

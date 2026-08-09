@@ -4,7 +4,7 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Detailed documentation for r2r.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: r2r.rs
@@ -23,7 +23,7 @@ Provides implementation for r2r.rs.
 * async_trait::async_trait, serde_json::json, super::*, wiremock::matchers::{method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * HttpR2rClient
@@ -59,10 +59,10 @@ Initialization: Sets up HttpR2rClient
 
 **Attributes:**
 
+* `client` (reqwest::Client): Purpose - Stores client data. Constraints - Valid reqwest::Client.
+* `pwd` (String): Purpose - Stores pwd data. Constraints - Valid String.
 * `url` (String): Purpose - Stores url data. Constraints - Valid String.
 * `user` (String): Purpose - Stores user data. Constraints - Valid String.
-* `pwd` (String): Purpose - Stores pwd data. Constraints - Valid String.
-* `client` (reqwest::Client): Purpose - Stores client data. Constraints - Valid reqwest::Client.
 
 **Public Methods:**
 
@@ -71,8 +71,8 @@ None.
 **Private Methods:**
 
 * `get_token() -> anyhow::Result<String>`: Internal helper logic.
-* `search(query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
 * `push_osr_metric(metric: &factory_core::OsrMetric (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `search(query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### R2rClient
 
@@ -112,10 +112,10 @@ None.
 classDiagram
     direction BT
     class HttpR2rClient {
-        +new(url: String:Any, user: String:Any, pwd: String:Any) Self
         -get_token() anyhow::Result<String>
-        -search(query: &str:Any) anyhow::Result<String>
+        +new(url: String:Any, user: String:Any, pwd: String:Any) Self
         -push_osr_metric(metric: &factory_core::OsrMetric:Any) anyhow::Result<()>
+        -search(query: &str:Any) anyhow::Result<String>
     }
     R2rClient <|-- HttpR2rClient : Inheritance / Specialization
     class R2rClient {
@@ -131,11 +131,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as R2rService
-    Caller->>Svc: new()
+    Caller->>Svc: get_token()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -143,6 +144,7 @@ sequenceDiagram
 // Example usage of r2r.rs components
 import { ... } from 'crates/factory-infrastructure/src/r2r.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
