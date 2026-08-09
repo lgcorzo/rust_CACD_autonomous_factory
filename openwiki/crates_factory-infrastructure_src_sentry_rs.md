@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: sentry.rs
@@ -23,7 +23,7 @@ Provides implementation for sentry.rs.
 * async_trait::async_trait, serde::{Deserialize, Serialize}, serde_json::json, super::*, wiremock::matchers::{header, method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * CrashEvent, HttpSentryClient
@@ -56,12 +56,12 @@ Default constructor.
 
 **Attributes:**
 
-* `event_id` (String): Purpose - Stores event_id data. Constraints - Valid String.
-* `project` (String): Purpose - Stores project data. Constraints - Valid String.
-* `message` (String): Purpose - Stores message data. Constraints - Valid String.
-* `level` (String): Purpose - Stores level data. Constraints - Valid String.
-* `timestamp` (String): Purpose - Stores timestamp data. Constraints - Valid String.
 * `culprit` (Option<String>): Purpose - Stores culprit data. Constraints - Valid Option<String>.
+* `event_id` (String): Purpose - Stores event_id data. Constraints - Valid String.
+* `level` (String): Purpose - Stores level data. Constraints - Valid String.
+* `message` (String): Purpose - Stores message data. Constraints - Valid String.
+* `project` (String): Purpose - Stores project data. Constraints - Valid String.
+* `timestamp` (String): Purpose - Stores timestamp data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -92,9 +92,9 @@ Initialization: Sets up HttpSentryClient
 
 **Attributes:**
 
-* `url` (String): Purpose - Stores url data. Constraints - Valid String.
 * `api_token` (String): Purpose - Stores api_token data. Constraints - Valid String.
 * `client` (reqwest::Client): Purpose - Stores client data. Constraints - Valid reqwest::Client.
+* `url` (String): Purpose - Stores url data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -144,8 +144,8 @@ classDiagram
     class CrashEvent {
     }
     class HttpSentryClient {
-        +new(url: String:Any, api_token: String:Any) Self
         -fetch_recent_crashes(project: &str:Any, since_minutes: u64:Any) anyhow::Result<Vec<CrashEvent>>
+        +new(url: String:Any, api_token: String:Any) Self
     }
     SentryClient <|-- HttpSentryClient : Inheritance / Specialization
     class SentryClient {
@@ -167,12 +167,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of sentry.rs components
 import { ... } from 'crates/factory-infrastructure/src/sentry.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

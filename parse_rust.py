@@ -160,6 +160,14 @@ def parse_rust(filepath):
 
         traverse(tree.root_node)
 
+        for c in classes:
+            c['methods'].sort(key=lambda x: x['name'])
+            c['fields'].sort(key=lambda x: x['name'])
+            c['implements'].sort()
+
+        classes.sort(key=lambda x: x['name'])
+        free_functions.sort(key=lambda x: x['name'])
+
         return {
             "classes": classes,
             "free_functions": free_functions,

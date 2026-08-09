@@ -4,7 +4,7 @@ title: "parse_ts.py"
 source_path: "parse_ts.py"
 description: "Detailed documentation for parse_ts.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: parse_ts.py
@@ -20,10 +20,10 @@ Provides implementation for parse_ts.py.
 * Handles logic related to parse_ts.
 
 ### Dependencies
-* json, sys, tree_sitter, tree_sitter_typescript
+* json, os, sys, tree_sitter, tree_sitter_javascript, tree_sitter_typescript
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * None
@@ -69,6 +69,7 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
@@ -76,6 +77,7 @@ sequenceDiagram
 import { ... } from 'parse_ts.py';
 ```
 
+
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** json, sys, tree_sitter, tree_sitter_typescript
+* **Dependencies:** json, os, sys, tree_sitter, tree_sitter_javascript, tree_sitter_typescript

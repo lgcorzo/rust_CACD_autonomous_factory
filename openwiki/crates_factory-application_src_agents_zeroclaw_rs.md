@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: zeroclaw.rs
@@ -23,13 +23,13 @@ Provides implementation for zeroclaw.rs.
 * async_trait::async_trait, crate::Agent, factory_infrastructure::{AethalgardClient, McpClient}, serde_json::{Value, json}, std::sync::Arc
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * ZeroClawAgent
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -59,8 +59,8 @@ Initialization: Sets up ZeroClawAgent
 
 **Attributes:**
 
-* `mcp_client` (Arc<dyn McpClient>): Purpose - Stores mcp_client data. Constraints - Valid Arc<dyn McpClient>.
 * `aethalgard_client` (Arc<dyn AethalgardClient>): Purpose - Stores aethalgard_client data. Constraints - Valid Arc<dyn AethalgardClient>.
+* `mcp_client` (Arc<dyn McpClient>): Purpose - Stores mcp_client data. Constraints - Valid Arc<dyn McpClient>.
 
 **Public Methods:**
 
@@ -96,6 +96,36 @@ Space Complexity: O(1) mostly
 let result = instance.execute_task();
 ```
 
+##### `introspect_k8s(mission_id: &str (Any)) -> anyhow::Result<Value>`
+
+###### Description
+Executes introspect_k8s.
+
+###### Inputs
+* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Value>
+Semantic meaning: Result of introspect_k8s
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.introspect_k8s();
+```
+
 ##### `validate_mission(mission_id: &str (Any), test_command: &str (Any)) -> anyhow::Result<Value>`
 
 ###### Description
@@ -127,40 +157,10 @@ Space Complexity: O(1) mostly
 let result = instance.validate_mission();
 ```
 
-##### `introspect_k8s(mission_id: &str (Any)) -> anyhow::Result<Value>`
-
-###### Description
-Executes introspect_k8s.
-
-###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-
-###### Output
-Return type: anyhow::Result<Value>
-Semantic meaning: Result of introspect_k8s
-Possible null values: Conditional
-Exceptions: None handled explicitly
-
-###### Side Effects
-Database updates: None
-File operations: None
-Network calls: None
-Cache: None
-State changes: Updates internal variables
-
-###### Complexity
-Time Complexity: O(1) mostly
-Space Complexity: O(1) mostly
-
-###### Example
-```
-let result = instance.introspect_k8s();
-```
-
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
 * `execute(task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -172,12 +172,12 @@ None.
 classDiagram
     direction BT
     class ZeroClawAgent {
-        +new(mcp_client: Arc<dyn McpClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) Self
+        -execute(task_description: &str:Any) anyhow::Result<Value>
         +execute_task(mission_id: &str:Any, task_description: &str:Any, _files: &[String]:Any) anyhow::Result<Value>
-        +validate_mission(mission_id: &str:Any, test_command: &str:Any) anyhow::Result<Value>
         +introspect_k8s(mission_id: &str:Any) anyhow::Result<Value>
         -name() String
-        -execute(task_description: &str:Any) anyhow::Result<Value>
+        +new(mcp_client: Arc<dyn McpClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) Self
+        +validate_mission(mission_id: &str:Any, test_command: &str:Any) anyhow::Result<Value>
     }
     Agent <|-- ZeroClawAgent : Inheritance / Specialization
 
@@ -190,11 +190,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as ZeroclawService
-    Caller->>Svc: new()
+    Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -202,6 +203,7 @@ sequenceDiagram
 // Example usage of zeroclaw.rs components
 import { ... } from 'crates/factory-application/src/agents/zeroclaw.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

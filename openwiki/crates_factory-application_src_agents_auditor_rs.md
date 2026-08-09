@@ -4,7 +4,7 @@ title: "auditor.rs"
 source_path: "crates/factory-application/src/agents/auditor.rs"
 description: "Detailed documentation for auditor.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: auditor.rs
@@ -23,13 +23,13 @@ Provides implementation for auditor.rs.
 * async_trait::async_trait, crate::Agent, serde_json::{Value, json}, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * AuditorAgent
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -161,8 +161,8 @@ let result = instance.evaluate_prompts();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
 * `execute(task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -174,16 +174,16 @@ None.
 classDiagram
     direction BT
     class AuditorAgent {
-        -default() Self
-        +new() Self
         +analyze_dag_logs(mission_id: &str:Any) anyhow::Result<Vec<Value>>
         +audit_mission(mission_id: &str:Any, failures: &[Value]:Any) anyhow::Result<Value>
+        -default() Self
         +evaluate_prompts(mission_id: &str:Any, targets: &[factory_core::Targets]:Any, recommendations: &[Value]:Any) anyhow::Result<String>
-        -name() String
         -execute(task_description: &str:Any) anyhow::Result<Value>
+        -name() String
+        +new() Self
     }
-    Default <|-- AuditorAgent : Inheritance / Specialization
     Agent <|-- AuditorAgent : Inheritance / Specialization
+    Default <|-- AuditorAgent : Inheritance / Specialization
 
 ```
 
@@ -194,11 +194,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as AuditorService
-    Caller->>Svc: default()
+    Caller->>Svc: analyze_dag_logs()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -206,6 +207,7 @@ sequenceDiagram
 // Example usage of auditor.rs components
 import { ... } from 'crates/factory-application/src/agents/auditor.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

@@ -4,7 +4,7 @@ title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Detailed documentation for feedback_route.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: feedback_route.rs
@@ -27,7 +27,7 @@ Provides implementation for feedback_route.rs.
 }, crate::McpServer, factory_core::UserFeedbackPayload, factory_infrastructure::GitlabClient, factory_infrastructure::HttpGitlabClient, std::sync::Arc
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * None
@@ -70,12 +70,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of feedback_route.rs components
 import { ... } from 'crates/factory-mcp-server/src/feedback_route.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

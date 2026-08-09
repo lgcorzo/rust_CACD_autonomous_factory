@@ -4,7 +4,7 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: telemetry_export.rs
@@ -23,13 +23,13 @@ Provides implementation for telemetry_export.rs.
 * rdkafka::Message, rdkafka::consumer::{Consumer, StreamConsumer}, reqwest::Client, serde_json::Value, std::sync::Arc
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * TelemetryExporter
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -59,9 +59,9 @@ Initialization: Sets up TelemetryExporter
 
 **Attributes:**
 
+* `http_client` (Client): Purpose - Stores http_client data. Constraints - Valid Client.
 * `kafka_brokers` (String): Purpose - Stores kafka_brokers data. Constraints - Valid String.
 * `openwebui_db_url` (String): Purpose - Stores openwebui_db_url data. Constraints - Valid String.
-* `http_client` (Client): Purpose - Stores http_client data. Constraints - Valid Client.
 
 **Public Methods:**
 
@@ -110,8 +110,8 @@ classDiagram
     direction BT
     class TelemetryExporter {
         +new(kafka_brokers: String:Any, openwebui_db_url: String:Any) Self
-        +start_export_loop(self: Arc<Self>:Any) anyhow::Result<()>
         -push_to_openwebui(thought: &Value:Any) anyhow::Result<()>
+        +start_export_loop(self: Arc<Self>:Any) anyhow::Result<()>
     }
 
 ```
@@ -129,12 +129,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of telemetry_export.rs components
 import { ... } from 'crates/factory-application/src/telemetry_export.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

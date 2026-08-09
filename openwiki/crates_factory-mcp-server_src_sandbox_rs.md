@@ -4,7 +4,7 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: sandbox.rs
@@ -23,7 +23,7 @@ Provides implementation for sandbox.rs.
 * async_trait::async_trait, crate::tools::Tool, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool, serde::{Deserialize, Serialize}, serde_json::json, std::time::Duration, super::*, tokio::process::Command, tokio::time::timeout
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * ExecutionResult, GvisorK8sDriver, NativeSurgerySandboxDriver, SubprocessDriver
@@ -56,10 +56,10 @@ Default constructor.
 
 **Attributes:**
 
-* `stdout` (String): Purpose - Stores stdout data. Constraints - Valid String.
-* `stderr` (String): Purpose - Stores stderr data. Constraints - Valid String.
 * `exit_code` (Option<i32>): Purpose - Stores exit_code data. Constraints - Valid Option<i32>.
 * `is_success` (bool): Purpose - Stores is_success data. Constraints - Valid bool.
+* `stderr` (String): Purpose - Stores stderr data. Constraints - Valid String.
+* `stdout` (String): Purpose - Stores stdout data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -256,12 +256,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of sandbox.rs components
 import { ... } from 'crates/factory-mcp-server/src/sandbox.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

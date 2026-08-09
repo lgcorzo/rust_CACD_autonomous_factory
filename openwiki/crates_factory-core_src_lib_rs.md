@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: lib.rs
@@ -23,13 +23,13 @@ Provides implementation for lib.rs.
 * chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap, uuid::Uuid
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * ComplianceReport, FeatureImportances, FinOpsTag, Inputs, Metadata, Mission, OsrMetric, Outputs, SHAPValues, SpecArtifact, Targets, Task, UserFeedbackPayload
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -56,9 +56,9 @@ Default constructor.
 
 **Attributes:**
 
+* `findings` (Vec<String>): Purpose - Stores findings data. Constraints - Valid Vec<String>.
 * `report_id` (Uuid): Purpose - Stores report_id data. Constraints - Valid Uuid.
 * `status` (String): Purpose - Stores status data. Constraints - Valid String.
-* `findings` (Vec<String>): Purpose - Stores findings data. Constraints - Valid Vec<String>.
 
 **Public Methods:**
 
@@ -115,11 +115,11 @@ Default constructor.
 
 **Attributes:**
 
-* `team` (String): Purpose - Stores team data. Constraints - Valid String.
+* `cost_center` (String): Purpose - Stores cost_center data. Constraints - Valid String.
+* `environment` (String): Purpose - Stores environment data. Constraints - Valid String.
 * `epic` (String): Purpose - Stores epic data. Constraints - Valid String.
 * `microservice` (String): Purpose - Stores microservice data. Constraints - Valid String.
-* `environment` (String): Purpose - Stores environment data. Constraints - Valid String.
-* `cost_center` (String): Purpose - Stores cost_center data. Constraints - Valid String.
+* `team` (String): Purpose - Stores team data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -175,9 +175,9 @@ Default constructor.
 
 **Attributes:**
 
-* `timestamp` (DateTime<Utc>): Purpose - Stores timestamp data. Constraints - Valid DateTime<Utc>.
-* `model_version` (String): Purpose - Stores model_version data. Constraints - Valid String.
 * `extra` (HashMap<String, serde_json::Value>): Purpose - Stores extra data. Constraints - Valid HashMap<String, serde_json::Value>.
+* `model_version` (String): Purpose - Stores model_version data. Constraints - Valid String.
+* `timestamp` (DateTime<Utc>): Purpose - Stores timestamp data. Constraints - Valid DateTime<Utc>.
 
 **Public Methods:**
 
@@ -205,12 +205,12 @@ Default constructor.
 
 **Attributes:**
 
+* `created_at` (DateTime<Utc>): Purpose - Stores created_at data. Constraints - Valid DateTime<Utc>.
+* `description` (String): Purpose - Stores description data. Constraints - Valid String.
 * `id` (Uuid): Purpose - Stores id data. Constraints - Valid Uuid.
 * `name` (String): Purpose - Stores name data. Constraints - Valid String.
-* `description` (String): Purpose - Stores description data. Constraints - Valid String.
-* `created_at` (DateTime<Utc>): Purpose - Stores created_at data. Constraints - Valid DateTime<Utc>.
-* `tasks` (Vec<Task>): Purpose - Stores tasks data. Constraints - Valid Vec<Task>.
 * `status` (MissionStatus): Purpose - Stores status data. Constraints - Valid MissionStatus.
+* `tasks` (Vec<Task>): Purpose - Stores tasks data. Constraints - Valid Vec<Task>.
 
 **Public Methods:**
 
@@ -268,8 +268,8 @@ Default constructor.
 
 * `mission_id` (String): Purpose - Stores mission_id data. Constraints - Valid String.
 * `osr_value` (f32): Purpose - Stores osr_value data. Constraints - Valid f32.
-* `wiki_commit_sha` (String): Purpose - Stores wiki_commit_sha data. Constraints - Valid String.
 * `timestamp` (DateTime<Utc>): Purpose - Stores timestamp data. Constraints - Valid DateTime<Utc>.
+* `wiki_commit_sha` (String): Purpose - Stores wiki_commit_sha data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -297,8 +297,8 @@ Default constructor.
 
 **Attributes:**
 
-* `response` (String): Purpose - Stores response data. Constraints - Valid String.
 * `metadata` (Metadata): Purpose - Stores metadata data. Constraints - Valid Metadata.
+* `response` (String): Purpose - Stores response data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -326,8 +326,8 @@ Default constructor.
 
 **Attributes:**
 
-* `sample` (String): Purpose - Stores sample data. Constraints - Valid String.
 * `explanation` (String): Purpose - Stores explanation data. Constraints - Valid String.
+* `sample` (String): Purpose - Stores sample data. Constraints - Valid String.
 * `shap_value` (f32): Purpose - Stores shap_value data. Constraints - Valid f32.
 
 **Public Methods:**
@@ -356,9 +356,9 @@ Default constructor.
 
 **Attributes:**
 
+* `data` (serde_json::Value): Purpose - Stores data data. Constraints - Valid serde_json::Value.
 * `id` (Uuid): Purpose - Stores id data. Constraints - Valid Uuid.
 * `name` (String): Purpose - Stores name data. Constraints - Valid String.
-* `data` (serde_json::Value): Purpose - Stores data data. Constraints - Valid serde_json::Value.
 
 **Public Methods:**
 
@@ -415,11 +415,11 @@ Default constructor.
 
 **Attributes:**
 
-* `id` (Uuid): Purpose - Stores id data. Constraints - Valid Uuid.
-* `mission_id` (Uuid): Purpose - Stores mission_id data. Constraints - Valid Uuid.
-* `description` (String): Purpose - Stores description data. Constraints - Valid String.
 * `assigned_agent` (Option<String>): Purpose - Stores assigned_agent data. Constraints - Valid Option<String>.
 * `dependencies` (Vec<Uuid>): Purpose - Stores dependencies data. Constraints - Valid Vec<Uuid>.
+* `description` (String): Purpose - Stores description data. Constraints - Valid String.
+* `id` (Uuid): Purpose - Stores id data. Constraints - Valid Uuid.
+* `mission_id` (Uuid): Purpose - Stores mission_id data. Constraints - Valid Uuid.
 * `status` (TaskStatus): Purpose - Stores status data. Constraints - Valid TaskStatus.
 
 **Public Methods:**
@@ -476,11 +476,11 @@ Default constructor.
 
 **Attributes:**
 
-* `user_id` (String): Purpose - Stores user_id data. Constraints - Valid String.
-* `session_id` (Option<String>): Purpose - Stores session_id data. Constraints - Valid Option<String>.
 * `feedback_text` (String): Purpose - Stores feedback_text data. Constraints - Valid String.
-* `sentiment` (String): Purpose - Stores sentiment data. Constraints - Valid String.
 * `metadata` (Option<serde_json::Value>): Purpose - Stores metadata data. Constraints - Valid Option<serde_json::Value>.
+* `sentiment` (String): Purpose - Stores sentiment data. Constraints - Valid String.
+* `session_id` (Option<String>): Purpose - Stores session_id data. Constraints - Valid Option<String>.
+* `user_id` (String): Purpose - Stores user_id data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -547,12 +547,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of lib.rs components
 import { ... } from 'crates/factory-core/src/lib.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

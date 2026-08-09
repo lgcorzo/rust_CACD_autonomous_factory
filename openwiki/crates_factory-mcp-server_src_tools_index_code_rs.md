@@ -4,7 +4,7 @@ title: "index_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/index_code.rs"
 description: "Detailed documentation for index_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: index_code.rs
@@ -23,13 +23,13 @@ Provides implementation for index_code.rs.
 * async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * IndexCodeTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -59,8 +59,8 @@ Initialization: Sets up IndexCodeTool
 
 **Attributes:**
 
-* `r2r_base_url` (String): Purpose - Stores r2r_base_url data. Constraints - Valid String.
 * `http_client` (reqwest::Client): Purpose - Stores http_client data. Constraints - Valid reqwest::Client.
+* `r2r_base_url` (String): Purpose - Stores r2r_base_url data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -68,10 +68,10 @@ None.
 
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -83,11 +83,11 @@ None.
 classDiagram
     direction BT
     class IndexCodeTool {
-        +new(r2r_base_url: String:Any) Self
-        -name() String
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -name() String
+        +new(r2r_base_url: String:Any) Self
     }
     Tool <|-- IndexCodeTool : Inheritance / Specialization
 
@@ -100,11 +100,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Index_codeService
-    Caller->>Svc: new()
+    Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -112,6 +113,7 @@ sequenceDiagram
 // Example usage of index_code.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/index_code.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

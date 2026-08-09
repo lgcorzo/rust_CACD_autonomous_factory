@@ -4,7 +4,7 @@ title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Detailed documentation for doc_agent.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: doc_agent.rs
@@ -23,13 +23,13 @@ Provides implementation for doc_agent.rs.
 * async_trait::async_trait, crate::Agent, factory_infrastructure::{McpClient, R2rClient}, factory_infrastructure::{MockMcpClient, MockR2rClient}, serde_json::{Value, json}, std::sync::Arc, std::time::Duration, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * DocumentationAgent
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -64,36 +64,6 @@ Initialization: Sets up DocumentationAgent
 * `superpowers_skills_root` (std::path::PathBuf): Purpose - Stores superpowers_skills_root data. Constraints - Valid std::path::PathBuf.
 
 **Public Methods:**
-
-##### `run_post_merge_pipeline(mission_id: &str (Any)) -> anyhow::Result<Value>`
-
-###### Description
-Executes run_post_merge_pipeline.
-
-###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-
-###### Output
-Return type: anyhow::Result<Value>
-Semantic meaning: Result of run_post_merge_pipeline
-Possible null values: Conditional
-Exceptions: None handled explicitly
-
-###### Side Effects
-Database updates: None
-File operations: None
-Network calls: None
-Cache: None
-State changes: Updates internal variables
-
-###### Complexity
-Time Complexity: O(1) mostly
-Space Complexity: O(1) mostly
-
-###### Example
-```
-let result = instance.run_post_merge_pipeline();
-```
 
 ##### `extract_code_deltas(commit_sha: &str (Any)) -> anyhow::Result<String>`
 
@@ -155,11 +125,41 @@ Space Complexity: O(1) mostly
 let result = instance.generate_hazitek_report();
 ```
 
+##### `run_post_merge_pipeline(mission_id: &str (Any)) -> anyhow::Result<Value>`
+
+###### Description
+Executes run_post_merge_pipeline.
+
+###### Inputs
+* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Value>
+Semantic meaning: Result of run_post_merge_pipeline
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.run_post_merge_pipeline();
+```
+
 **Private Methods:**
 
-* `verify_osr() -> anyhow::Result<f32>`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
 * `execute(task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
+* `verify_osr() -> anyhow::Result<f32>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -171,13 +171,13 @@ None.
 classDiagram
     direction BT
     class DocumentationAgent {
-        +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any, superpowers_skills_root: std::path::PathBuf:Any) Self
-        +run_post_merge_pipeline(mission_id: &str:Any) anyhow::Result<Value>
-        -verify_osr() anyhow::Result<f32>
+        -execute(task_description: &str:Any) anyhow::Result<Value>
         +extract_code_deltas(commit_sha: &str:Any) anyhow::Result<String>
         +generate_hazitek_report(mission_id: &str:Any) anyhow::Result<factory_core::ComplianceReport>
         -name() String
-        -execute(task_description: &str:Any) anyhow::Result<Value>
+        +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any, superpowers_skills_root: std::path::PathBuf:Any) Self
+        +run_post_merge_pipeline(mission_id: &str:Any) anyhow::Result<Value>
+        -verify_osr() anyhow::Result<f32>
     }
     Agent <|-- DocumentationAgent : Inheritance / Specialization
 
@@ -190,11 +190,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Doc_agentService
-    Caller->>Svc: new()
+    Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -202,6 +203,7 @@ sequenceDiagram
 // Example usage of doc_agent.rs components
 import { ... } from 'crates/factory-application/src/agents/doc_agent.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`
