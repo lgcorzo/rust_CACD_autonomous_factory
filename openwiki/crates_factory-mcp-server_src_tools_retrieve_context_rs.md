@@ -4,7 +4,7 @@ title: "retrieve_context.rs"
 source_path: "crates/factory-mcp-server/src/tools/retrieve_context.rs"
 description: "Detailed documentation for retrieve_context.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: retrieve_context.rs
@@ -23,13 +23,13 @@ Provides implementation for retrieve_context.rs.
 * async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::R2rClient, serde_json::{json, Value}, std::sync::Arc, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * ManualMockR2rClient, RetrieveContextTool
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -64,8 +64,8 @@ None.
 
 **Private Methods:**
 
-* `search(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
 * `push_osr_metric(_metric: &factory_core::OsrMetric (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `search(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### RetrieveContextTool
 
@@ -96,10 +96,10 @@ None.
 
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -111,16 +111,16 @@ None.
 classDiagram
     direction BT
     class ManualMockR2rClient {
-        -search(_query: &str:Any) anyhow::Result<String>
         -push_osr_metric(_metric: &factory_core::OsrMetric:Any) anyhow::Result<()>
+        -search(_query: &str:Any) anyhow::Result<String>
     }
     R2rClient <|-- ManualMockR2rClient : Inheritance / Specialization
     class RetrieveContextTool {
-        +new(r2r_client: Arc<dyn R2rClient>:Any) Self
-        -name() String
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -name() String
+        +new(r2r_client: Arc<dyn R2rClient>:Any) Self
     }
     Tool <|-- RetrieveContextTool : Inheritance / Specialization
 
@@ -133,11 +133,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Retrieve_contextService
-    Caller->>Svc: search()
+    Caller->>Svc: push_osr_metric()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -145,6 +146,7 @@ sequenceDiagram
 // Example usage of retrieve_context.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/retrieve_context.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

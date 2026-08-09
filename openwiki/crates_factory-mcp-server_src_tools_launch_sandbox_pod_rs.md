@@ -4,7 +4,7 @@ title: "launch_sandbox_pod.rs"
 source_path: "crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
 description: "Detailed documentation for launch_sandbox_pod.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: launch_sandbox_pod.rs
@@ -23,13 +23,13 @@ Provides implementation for launch_sandbox_pod.rs.
 * async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, k8s_openapi::api::batch::v1::Job, kube::Client, kube::api::{Api, DeleteParams, ListParams, PostParams}, serde::{Deserialize, Serialize}, serde_json::{json, Value}, tokio::time::{sleep, Duration}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * LaunchSandboxPodTool, SandboxJobSpec
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -67,11 +67,11 @@ None.
 
 **Private Methods:**
 
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `default() -> Self`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 #### SandboxJobSpec
 
@@ -112,12 +112,12 @@ None.
 classDiagram
     direction BT
     class LaunchSandboxPodTool {
-        +new() Self
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -default() Self
-        -name() String
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        -name() String
+        +new() Self
     }
     Default <|-- LaunchSandboxPodTool : Inheritance / Specialization
     Tool <|-- LaunchSandboxPodTool : Inheritance / Specialization
@@ -133,11 +133,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Launch_sandbox_podService
-    Caller->>Svc: new()
+    Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -145,6 +146,7 @@ sequenceDiagram
 // Example usage of launch_sandbox_pod.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

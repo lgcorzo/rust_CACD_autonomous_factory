@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-mcp-server/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: security_tests.rs
@@ -23,7 +23,7 @@ Provides implementation for security_tests.rs.
 * factory_mcp_server::protocol::McpContent, factory_mcp_server::tools::Tool, factory_mcp_server::tools::security_review::SecurityReviewTool, serde_json::{json, Value}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * None
@@ -32,7 +32,7 @@ Provides implementation for security_tests.rs.
 * None
 
 ### Exported functions
-*
+* None
 
 ## Public API
 
@@ -65,12 +65,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of security_tests.rs components
 import { ... } from 'crates/factory-mcp-server/tests/security_tests.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/tests`

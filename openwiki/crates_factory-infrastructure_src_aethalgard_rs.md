@@ -4,7 +4,7 @@ title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Detailed documentation for aethalgard.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: aethalgard.rs
@@ -23,7 +23,7 @@ Provides implementation for aethalgard.rs.
 * async_trait::async_trait, serde_json::json
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * HttpAethalgardClient
@@ -87,8 +87,8 @@ Initialization: Sets up HttpAethalgardClient
 
 **Attributes:**
 
-* `webhook_url` (String): Purpose - Stores webhook_url data. Constraints - Valid String.
 * `client` (reqwest::Client): Purpose - Stores client data. Constraints - Valid reqwest::Client.
+* `webhook_url` (String): Purpose - Stores webhook_url data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -131,12 +131,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of aethalgard.rs components
 import { ... } from 'crates/factory-infrastructure/src/aethalgard.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

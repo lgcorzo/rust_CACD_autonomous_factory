@@ -1,7 +1,9 @@
 import tree_sitter_typescript as tsts
+import tree_sitter_javascript as tsjs
 from tree_sitter import Language, Parser
 import sys
 import json
+import os
 
 def get_node_text(node, source_bytes):
     return source_bytes[node.start_byte:node.end_byte].decode('utf-8')
@@ -11,8 +13,15 @@ def parse_ts(filepath):
         with open(filepath, 'rb') as f:
             source_bytes = f.read()
 
-        TS_LANGUAGE = Language(tsts.language_typescript())
-        parser = Parser(TS_LANGUAGE)
+        ext = os.path.splitext(filepath)[1].lower()
+        if ext == '.js' or ext == '.jsx':
+            lang = Language(tsjs.language())
+        elif ext == '.tsx':
+            lang = Language(tsts.language_tsx())
+        else:
+            lang = Language(tsts.language_typescript())
+
+        parser = Parser(lang)
         tree = parser.parse(source_bytes)
 
         classes = []
@@ -113,6 +122,14 @@ def parse_ts(filepath):
                 traverse(child)
 
         traverse(tree.root_node)
+
+        for c in classes:
+            c['methods'].sort(key=lambda x: x['name'])
+            c['fields'].sort(key=lambda x: x['name'])
+            c['implements'].sort()
+
+        classes.sort(key=lambda x: x['name'])
+        free_functions.sort(key=lambda x: x['name'])
 
         return {
             "classes": classes,

@@ -4,7 +4,7 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: spec_kit_tool.rs
@@ -23,7 +23,7 @@ Provides implementation for spec_kit_tool.rs.
 * async_trait::async_trait, crate::protocol::CallToolResult, crate::tools::Tool, serde::{Deserialize, Serialize}, serde_json::{json, Value}, std::sync::Arc, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * CliSpecProvider, MockSpecProvider, SpecKitTool
@@ -155,36 +155,6 @@ Initialization: Sets up SpecKitTool
 
 **Public Methods:**
 
-##### `with_provider(provider: Arc<dyn SpecProvider> (Any)) -> Self`
-
-###### Description
-Executes with_provider.
-
-###### Inputs
-* `provider: Arc<dyn SpecProvider>`: type=Any, meaning=Input for provider: Arc<dyn SpecProvider>, valid values=Any valid Any, optional=No, default value=None
-
-###### Output
-Return type: Self
-Semantic meaning: Result of with_provider
-Possible null values: Conditional
-Exceptions: None handled explicitly
-
-###### Side Effects
-Database updates: None
-File operations: None
-Network calls: None
-Cache: None
-State changes: Updates internal variables
-
-###### Complexity
-Time Complexity: O(1) mostly
-Space Complexity: O(1) mostly
-
-###### Example
-```
-let result = instance.with_provider();
-```
-
 ##### `invoke_spec_kit(command: SpecKitCommand (Any), args: Vec<String> (Any)) -> anyhow::Result<String>`
 
 ###### Description
@@ -216,12 +186,42 @@ Space Complexity: O(1) mostly
 let result = instance.invoke_spec_kit();
 ```
 
+##### `with_provider(provider: Arc<dyn SpecProvider> (Any)) -> Self`
+
+###### Description
+Executes with_provider.
+
+###### Inputs
+* `provider: Arc<dyn SpecProvider>`: type=Any, meaning=Input for provider: Arc<dyn SpecProvider>, valid values=Any valid Any, optional=No, default value=None
+
+###### Output
+Return type: Self
+Semantic meaning: Result of with_provider
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.with_provider();
+```
+
 **Private Methods:**
 
-* `name() -> String`: Internal helper logic.
+* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `name() -> String`: Internal helper logic.
 
 #### SpecProvider
 
@@ -261,14 +261,14 @@ None.
 classDiagram
     direction BT
     class CliSpecProvider {
-        +new(cli_path: String:Any) Self
         -invoke(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
+        +new(cli_path: String:Any) Self
     }
     SpecProvider <|-- CliSpecProvider : Inheritance / Specialization
     class MockSpecProvider {
-        +new(specs_dir: std::path::PathBuf:Any) Self
         -default() Self
         -invoke(command: SpecKitCommand:Any, _args: Vec<String>:Any) anyhow::Result<String>
+        +new(specs_dir: std::path::PathBuf:Any) Self
     }
     Default <|-- MockSpecProvider : Inheritance / Specialization
     SpecProvider <|-- MockSpecProvider : Inheritance / Specialization
@@ -276,13 +276,13 @@ classDiagram
         <<enumeration>>
     }
     class SpecKitTool {
-        +new(specify_cli_path: String:Any) Self
-        +with_provider(provider: Arc<dyn SpecProvider>:Any) Self
-        +invoke_spec_kit(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
-        -name() String
+        -call(params: Value:Any) anyhow::Result<CallToolResult>
         -description() String
         -input_schema() Value
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
+        +invoke_spec_kit(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
+        -name() String
+        +new(specify_cli_path: String:Any) Self
+        +with_provider(provider: Arc<dyn SpecProvider>:Any) Self
     }
     Tool <|-- SpecKitTool : Inheritance / Specialization
     class SpecProvider {
@@ -298,11 +298,12 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as Spec_kit_toolService
-    Caller->>Svc: new()
+    Caller->>Svc: invoke()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
 ```
+
 
 ## Examples
 
@@ -310,6 +311,7 @@ sequenceDiagram
 // Example usage of spec_kit_tool.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/spec_kit_tool.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

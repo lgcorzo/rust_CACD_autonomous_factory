@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-mcp-server/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: main.rs
@@ -26,7 +26,7 @@ Provides implementation for main.rs.
 }, factory_mcp_server::McpServer, std::net::SocketAddr, std::sync::Arc, tower_http::cors::CorsLayer
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * None
@@ -35,7 +35,7 @@ Provides implementation for main.rs.
 * None
 
 ### Exported functions
-*
+* None
 
 ## Public API
 
@@ -68,12 +68,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of main.rs components
 import { ... } from 'crates/factory-mcp-server/src/main.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

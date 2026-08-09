@@ -4,7 +4,7 @@ title: "zeroize_benchmark.rs"
 source_path: "crates/factory-core/benches/zeroize_benchmark.rs"
 description: "Detailed documentation for zeroize_benchmark.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: zeroize_benchmark.rs
@@ -23,7 +23,7 @@ Provides implementation for zeroize_benchmark.rs.
 * criterion::{black_box, criterion_group, criterion_main, Criterion}, factory_core::security::JitToken, zeroize::Zeroize
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * None
@@ -32,7 +32,7 @@ Provides implementation for zeroize_benchmark.rs.
 * None
 
 ### Exported functions
-*
+* None
 
 ## Public API
 
@@ -65,12 +65,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of zeroize_benchmark.rs components
 import { ... } from 'crates/factory-core/benches/zeroize_benchmark.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/benches`

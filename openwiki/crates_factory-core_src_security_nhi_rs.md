@@ -4,7 +4,7 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Detailed documentation for nhi.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: nhi.rs
@@ -23,13 +23,13 @@ Provides implementation for nhi.rs.
 * base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, chrono::{DateTime, Utc}, ed25519_dalek::Signer, ed25519_dalek::SigningKey, rand::rngs::OsRng, serde::{Deserialize, Serialize}, super::*
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * AgentSubject, CryptographicProof, VerifiableCredential
 
 ### Exported interfaces
-*
+* None
 
 ### Exported functions
 * None
@@ -56,9 +56,9 @@ Default constructor.
 
 **Attributes:**
 
+* `allowed_namespaces` (Vec<String>): Purpose - Stores allowed_namespaces data. Constraints - Valid Vec<String>.
 * `id` (String): Purpose - Stores id data. Constraints - Valid String.
 * `roles` (Vec<String>): Purpose - Stores roles data. Constraints - Valid Vec<String>.
-* `allowed_namespaces` (Vec<String>): Purpose - Stores allowed_namespaces data. Constraints - Valid Vec<String>.
 
 **Public Methods:**
 
@@ -86,11 +86,11 @@ Default constructor.
 
 **Attributes:**
 
-* `proof_type` (String): Purpose - Stores proof_type data. Constraints - Valid String.
 * `created` (DateTime<Utc>): Purpose - Stores created data. Constraints - Valid DateTime<Utc>.
-* `verification_method` (String): Purpose - Stores verification_method data. Constraints - Valid String.
-* `proof_purpose` (String): Purpose - Stores proof_purpose data. Constraints - Valid String.
 * `jws` (String): Purpose - Stores jws data. Constraints - Valid String.
+* `proof_purpose` (String): Purpose - Stores proof_purpose data. Constraints - Valid String.
+* `proof_type` (String): Purpose - Stores proof_type data. Constraints - Valid String.
+* `verification_method` (String): Purpose - Stores verification_method data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -122,11 +122,11 @@ Initialization: Sets up VerifiableCredential
 **Attributes:**
 
 * `context` (Vec<String>): Purpose - Stores context data. Constraints - Valid Vec<String>.
-* `id` (String): Purpose - Stores id data. Constraints - Valid String.
-* `credential_type` (Vec<String>): Purpose - Stores credential_type data. Constraints - Valid Vec<String>.
-* `issuer` (String): Purpose - Stores issuer data. Constraints - Valid String.
-* `issuance_date` (DateTime<Utc>): Purpose - Stores issuance_date data. Constraints - Valid DateTime<Utc>.
 * `credential_subject` (AgentSubject): Purpose - Stores credential_subject data. Constraints - Valid AgentSubject.
+* `credential_type` (Vec<String>): Purpose - Stores credential_type data. Constraints - Valid Vec<String>.
+* `id` (String): Purpose - Stores id data. Constraints - Valid String.
+* `issuance_date` (DateTime<Utc>): Purpose - Stores issuance_date data. Constraints - Valid DateTime<Utc>.
+* `issuer` (String): Purpose - Stores issuer data. Constraints - Valid String.
 * `proof` (Option<CryptographicProof>): Purpose - Stores proof data. Constraints - Valid Option<CryptographicProof>.
 
 **Public Methods:**
@@ -264,12 +264,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of nhi.rs components
 import { ... } from 'crates/factory-core/src/security/nhi.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src/security`

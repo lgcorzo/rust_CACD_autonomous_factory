@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: security.rs
@@ -23,7 +23,7 @@ Provides implementation for security.rs.
 * async_trait::async_trait, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, crate::error::Result, ed25519_dalek::{Signature, Verifier}, zeroize::Zeroize
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * AuditResult, Ed25519SecurityValidator, JitToken, SandboxConstraint
@@ -56,8 +56,8 @@ Default constructor.
 
 **Attributes:**
 
-* `is_safe` (bool): Purpose - Stores is_safe data. Constraints - Valid bool.
 * `findings` (Vec<String>): Purpose - Stores findings data. Constraints - Valid Vec<String>.
+* `is_safe` (bool): Purpose - Stores is_safe data. Constraints - Valid bool.
 
 **Public Methods:**
 
@@ -93,8 +93,8 @@ None.
 
 **Private Methods:**
 
-* `validate_signature(data: &[u8] (Any), signature: &str (Any)) -> Result<bool>`: Internal helper logic.
 * `audit_content(_content: &str (Any)) -> Result<AuditResult>`: Internal helper logic.
+* `validate_signature(data: &[u8] (Any), signature: &str (Any)) -> Result<bool>`: Internal helper logic.
 
 #### JitToken
 
@@ -142,8 +142,8 @@ Default constructor.
 
 **Attributes:**
 
-* `max_memory_mb` (u32): Purpose - Stores max_memory_mb data. Constraints - Valid u32.
 * `max_cpu_cores` (f32): Purpose - Stores max_cpu_cores data. Constraints - Valid f32.
+* `max_memory_mb` (u32): Purpose - Stores max_memory_mb data. Constraints - Valid u32.
 * `network_egress_allowed` (bool): Purpose - Stores network_egress_allowed data. Constraints - Valid bool.
 
 **Public Methods:**
@@ -222,8 +222,8 @@ classDiagram
     class AuditResult {
     }
     class Ed25519SecurityValidator {
-        -validate_signature(data: &[u8]:Any, signature: &str:Any) Result<bool>
         -audit_content(_content: &str:Any) Result<AuditResult>
+        -validate_signature(data: &[u8]:Any, signature: &str:Any) Result<bool>
     }
     SecurityValidator <|-- Ed25519SecurityValidator : Inheritance / Specialization
     class JitToken {
@@ -252,12 +252,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of security.rs components
 import { ... } from 'crates/factory-core/src/security.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

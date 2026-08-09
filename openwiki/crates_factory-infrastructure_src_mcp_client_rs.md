@@ -4,7 +4,7 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-07T06:39:28Z"
+timestamp: "2026-08-09T06:11:32Z"
 ---
 
 # File: mcp_client.rs
@@ -23,7 +23,7 @@ Provides implementation for mcp_client.rs.
 * anyhow::anyhow, futures_util::StreamExt, reqwest::Client, serde_json::{json, Value}, super::*, tokio::sync::OnceCell, wiremock::matchers::{method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
-*
+* None
 
 ### Exported classes
 * McpHttpClient, McpSseClient
@@ -87,8 +87,8 @@ Initialization: Sets up McpHttpClient
 
 **Attributes:**
 
-* `client` (Client): Purpose - Stores client data. Constraints - Valid Client.
 * `base_url` (String): Purpose - Stores base_url data. Constraints - Valid String.
+* `client` (Client): Purpose - Stores client data. Constraints - Valid Client.
 
 **Public Methods:**
 
@@ -112,8 +112,8 @@ Initialization: Sets up McpSseClient
 
 **Attributes:**
 
-* `client` (Client): Purpose - Stores client data. Constraints - Valid Client.
 * `base_url` (String): Purpose - Stores base_url data. Constraints - Valid String.
+* `client` (Client): Purpose - Stores client data. Constraints - Valid Client.
 * `session_url` (OnceCell<String>): Purpose - Stores session_url data. Constraints - Valid OnceCell<String>.
 
 **Public Methods:**
@@ -122,8 +122,8 @@ None.
 
 **Private Methods:**
 
-* `get_session_url() -> anyhow::Result<String>`: Internal helper logic.
 * `call_tool_json(name: &str (Any), arguments: Value (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `get_session_url() -> anyhow::Result<String>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -143,9 +143,9 @@ classDiagram
     }
     McpClient <|-- McpHttpClient : Inheritance / Specialization
     class McpSseClient {
-        +new(base_url: String:Any) Self
-        -get_session_url() anyhow::Result<String>
         -call_tool_json(name: &str:Any, arguments: Value:Any) anyhow::Result<Value>
+        -get_session_url() anyhow::Result<String>
+        +new(base_url: String:Any) Self
     }
     McpClient <|-- McpSseClient : Inheritance / Specialization
 
@@ -164,12 +164,14 @@ sequenceDiagram
 
 ```
 
+
 ## Examples
 
 ```
 // Example usage of mcp_client.rs components
 import { ... } from 'crates/factory-infrastructure/src/mcp_client.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
