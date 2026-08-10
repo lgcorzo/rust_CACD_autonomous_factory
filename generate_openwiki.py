@@ -76,7 +76,8 @@ def write_file_doc(file_path, parsed, now):
     dir_name = os.path.dirname(file_path)
 
     # Flattened name to reside directly in openwiki/ as requested by prompt rules
-    flattened_name = file_path.replace(os.sep, '_').replace('.', '_')
+    name_without_ext = os.path.splitext(file_path)[0]
+    flattened_name = name_without_ext.replace(os.sep, '_').replace('-', '_')
     out_dir = 'openwiki'
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, f"{flattened_name}.md")
@@ -100,13 +101,15 @@ def write_file_doc(file_path, parsed, now):
     exported_functions = [f['name'] for f in parsed['free_functions'] if f.get('is_pub', True)]
     exported_functions_str = ", ".join(exported_functions) if exported_functions else "None"
 
+    git_hash = get_git_hash()
+
     content = f"""---
 type: "module-documentation"
 title: "{file_name}"
 source_path: "{file_path}"
 description: "Detailed documentation for {file_name}"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "{now}"
+last_verified_commit: "{git_hash}"
 ---
 
 # File: {file_name}
@@ -257,18 +260,29 @@ import {{ ... }} from '{file_path}';
             old_content = f.read()
 
         # Extract Execution flow & Sequence explanation
-        flow_match = re.search(r"## Execution flow & Sequence explanation\n(.*?)## Examples\n", old_content, re.DOTALL)
-        if flow_match:
-            existing_execution_flow = flow_match.group(1)
-        else:
-            flow_match = re.search(r"## Execution flow & Sequence explanation\n(.*?)## Cross References\n", old_content, re.DOTALL)
-            if flow_match:
-                existing_execution_flow = flow_match.group(1)
+        start_marker_flow = "## Execution flow & Sequence explanation\n"
+        end_marker_flow_1 = "## Examples\n"
+        end_marker_flow_2 = "## Cross References\n"
+
+        start_idx_flow = old_content.find(start_marker_flow)
+        if start_idx_flow != -1:
+            start_content_flow = start_idx_flow + len(start_marker_flow)
+            end_idx_flow = old_content.find(end_marker_flow_1, start_content_flow)
+            if end_idx_flow == -1:
+                end_idx_flow = old_content.find(end_marker_flow_2, start_content_flow)
+            if end_idx_flow != -1:
+                existing_execution_flow = old_content[start_content_flow:end_idx_flow]
 
         # Extract Examples
-        examples_match = re.search(r"## Examples\n(.*?)## Cross References\n", old_content, re.DOTALL)
-        if examples_match:
-            existing_examples = examples_match.group(1)
+        start_marker_examples = "## Examples\n"
+        end_marker_examples = "## Cross References\n"
+
+        start_idx_examples = old_content.find(start_marker_examples)
+        if start_idx_examples != -1:
+            start_content_examples = start_idx_examples + len(start_marker_examples)
+            end_idx_examples = old_content.find(end_marker_examples, start_content_examples)
+            if end_idx_examples != -1:
+                existing_examples = old_content[start_content_examples:end_idx_examples]
 
     if existing_execution_flow:
         marker1 = "## Execution flow & Sequence explanation\n"
@@ -304,6 +318,12 @@ def setup_okf_structure():
     ]
     for folder in folders:
         os.makedirs(os.path.join("openwiki", folder), exist_ok=True)
+
+def get_git_hash():
+    try:
+        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL).decode("utf-8").strip()
+    except Exception:
+        return "unknown"
 
 def main():
     mode = "diff"
@@ -350,7 +370,8 @@ def main():
 
             # Remove orphaned markdown files
             for f in deleted_files:
-                flattened_name = f.replace(os.sep, '_').replace('.', '_')
+                name_without_ext = os.path.splitext(f)[0]
+                flattened_name = name_without_ext.replace(os.sep, '_').replace('-', '_')
                 orphan_file = os.path.join('openwiki', f"{flattened_name}.md")
                 if os.path.exists(orphan_file):
                     os.remove(orphan_file)
@@ -371,6 +392,64 @@ def main():
         write_file_doc(file_path, parsed, now)
 
     generate_indexes(now)
+    validate_links()
+
+def validate_links():
+    import glob
+    files = glob.glob('openwiki/**/*.md', recursive=True)
+    all_pages = set()
+    for f in files:
+        basename = os.path.basename(f)
+        if basename.endswith('.md'):
+            all_pages.add(basename[:-3])
+
+    print("Validating links...")
+    broken_links = 0
+    orphan_pages = all_pages.copy()
+
+    # Exclude root indexes from orphan check
+    orphan_pages.discard("index")
+    orphan_pages.discard("SUMMARY")
+
+    for f in files:
+        with open(f, 'r', encoding='utf-8') as file:
+            content = file.read()
+            # Simple regex to find wiki links [[link]] or markdown links [text](link)
+            # This is just for validation, not text parsing of the source file
+            wiki_links = re.findall(r'\[\[(.*?)\]\]', content)
+            md_links = re.findall(r'\[.*?\]\((.*?)\)', content)
+
+            for link in wiki_links:
+                if link not in all_pages:
+                    print(f"Warning: Broken wiki link [[{link}]] in {f}")
+                    broken_links += 1
+                orphan_pages.discard(link)
+
+            for link in md_links:
+                # Exclude external links and standard anchor links
+                if not link.startswith('http') and not link.startswith('#'):
+                    link_clean = link
+                    # Handle relative paths from markdown links
+                    if '/' in link:
+                        link_clean = link.split('/')[-1]
+                    if link_clean in all_pages:
+                        orphan_pages.discard(link_clean)
+                    elif not link.endswith('.md'): # it might be linking to a page that isn't found
+                        pass # just simple validation
+
+    if broken_links == 0:
+        print("No broken links found.")
+    else:
+        print(f"Found {broken_links} broken links.")
+
+    if not orphan_pages:
+        print("No orphan pages found.")
+    else:
+        print(f"Found {len(orphan_pages)} orphan pages:")
+        for page in list(orphan_pages)[:5]: # show up to 5
+            print(f"  - {page}")
+        if len(orphan_pages) > 5:
+            print(f"  ... and {len(orphan_pages) - 5} more.")
 
 def generate_indexes(now):
     summary_content = "# SUMMARY\n\n"
