@@ -4,7 +4,7 @@ title: "auditor.rs"
 source_path: "crates/factory-application/src/agents/auditor.rs"
 description: "Detailed documentation for auditor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: auditor.rs
@@ -200,12 +200,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of auditor.rs components
 import { ... } from 'crates/factory-application/src/agents/auditor.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

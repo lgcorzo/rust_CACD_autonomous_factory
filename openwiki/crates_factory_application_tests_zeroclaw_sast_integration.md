@@ -4,7 +4,7 @@ title: "zeroclaw_sast_integration.rs"
 source_path: "crates/factory-application/tests/zeroclaw_sast_integration.rs"
 description: "Detailed documentation for zeroclaw_sast_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: zeroclaw_sast_integration.rs
@@ -65,12 +65,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of zeroclaw_sast_integration.rs components
 import { ... } from 'crates/factory-application/tests/zeroclaw_sast_integration.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`

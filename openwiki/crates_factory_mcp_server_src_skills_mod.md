@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-mcp-server/src/skills/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: mod.rs
@@ -65,12 +65,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of mod.rs components
 import { ... } from 'crates/factory-mcp-server/src/skills/mod.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/skills`

@@ -4,7 +4,7 @@ title: "build.rs"
 source_path: "crates/factory-core/build.rs"
 description: "Detailed documentation for build.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: build.rs
@@ -65,12 +65,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of build.rs components
 import { ... } from 'crates/factory-core/build.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core`

@@ -4,7 +4,7 @@ title: "security_validator.rs"
 source_path: "crates/factory-infrastructure/src/security_validator.rs"
 description: "Detailed documentation for security_validator.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: security_validator.rs
@@ -102,12 +102,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of security_validator.rs components
 import { ... } from 'crates/factory-infrastructure/src/security_validator.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

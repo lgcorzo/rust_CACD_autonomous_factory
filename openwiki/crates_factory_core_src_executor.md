@@ -4,7 +4,7 @@ title: "executor.rs"
 source_path: "crates/factory-core/src/executor.rs"
 description: "Detailed documentation for executor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: executor.rs
@@ -158,12 +158,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of executor.rs components
 import { ... } from 'crates/factory-core/src/executor.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

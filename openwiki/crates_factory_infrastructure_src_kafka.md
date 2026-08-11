@@ -4,7 +4,7 @@ title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: kafka.rs
@@ -166,12 +166,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of kafka.rs components
 import { ... } from 'crates/factory-infrastructure/src/kafka.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

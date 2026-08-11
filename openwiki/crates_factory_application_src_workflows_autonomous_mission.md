@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: autonomous_mission.rs
@@ -161,12 +161,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of autonomous_mission.rs components
 import { ... } from 'crates/factory-application/src/workflows/autonomous_mission.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

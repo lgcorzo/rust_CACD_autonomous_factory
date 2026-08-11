@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: security.rs
@@ -252,12 +252,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of security.rs components
 import { ... } from 'crates/factory-core/src/security.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

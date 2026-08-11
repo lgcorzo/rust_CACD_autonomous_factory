@@ -395,8 +395,11 @@ def main():
     validate_links()
 
 def validate_links():
-    import glob
-    files = glob.glob('openwiki/**/*.md', recursive=True)
+    files = []
+    for root, dirs, filenames in os.walk('openwiki'):
+        for f in filenames:
+            if f.endswith('.md'):
+                files.append(os.path.join(root, f))
     all_pages = set()
     for f in files:
         basename = os.path.basename(f)

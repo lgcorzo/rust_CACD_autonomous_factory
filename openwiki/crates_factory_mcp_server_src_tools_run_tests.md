@@ -4,7 +4,7 @@ title: "run_tests.rs"
 source_path: "crates/factory-mcp-server/src/tools/run_tests.rs"
 description: "Detailed documentation for run_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: run_tests.rs
@@ -105,12 +105,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of run_tests.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/run_tests.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

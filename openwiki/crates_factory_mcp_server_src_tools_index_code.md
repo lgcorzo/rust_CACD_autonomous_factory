@@ -4,7 +4,7 @@ title: "index_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/index_code.rs"
 description: "Detailed documentation for index_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: index_code.rs
@@ -106,12 +106,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of index_code.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/index_code.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

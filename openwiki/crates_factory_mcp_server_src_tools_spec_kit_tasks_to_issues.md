@@ -4,7 +4,7 @@ title: "spec_kit_tasks_to_issues.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs"
 description: "Detailed documentation for spec_kit_tasks_to_issues.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: spec_kit_tasks_to_issues.rs
@@ -105,12 +105,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of spec_kit_tasks_to_issues.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

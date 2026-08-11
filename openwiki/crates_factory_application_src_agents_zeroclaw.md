@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: zeroclaw.rs
@@ -196,12 +196,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of zeroclaw.rs components
 import { ... } from 'crates/factory-application/src/agents/zeroclaw.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

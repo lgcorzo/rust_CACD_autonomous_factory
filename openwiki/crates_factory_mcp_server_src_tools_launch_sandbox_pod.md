@@ -4,7 +4,7 @@ title: "launch_sandbox_pod.rs"
 source_path: "crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
 description: "Detailed documentation for launch_sandbox_pod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: launch_sandbox_pod.rs
@@ -139,12 +139,16 @@ sequenceDiagram
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of launch_sandbox_pod.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
