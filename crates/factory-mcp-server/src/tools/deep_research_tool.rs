@@ -1,10 +1,10 @@
 use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_trait::async_trait;
-use serde_json::{json, Value};
-use uuid::Uuid;
-use std::sync::Arc;
 use factory_infrastructure::KafkaClient;
+use serde_json::{json, Value};
+use std::sync::Arc;
+use uuid::Uuid;
 
 pub struct DeepResearchTool {
     kafka_client: Arc<dyn KafkaClient>,
@@ -40,28 +40,36 @@ impl Tool for DeepResearchTool {
     }
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
-        let query = params["query"].as_str().ok_or_else(|| anyhow::anyhow!("query is required"))?;
-        
+        let query = params["query"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("query is required"))?;
+
         let job_id = Uuid::new_v4().to_string();
-        
+
         // Push an event to Kafka. The research worker or Hatchet event listener will pick up "research:requested"
-        match self.kafka_client.publish_thought(&job_id, query, "research:requested").await {
+        match self
+            .kafka_client
+            .publish_thought(&job_id, query, "research:requested")
+            .await
+        {
             Ok(_) => {
                 let response_text = format!(
                     "Deep research initiated successfully in the background. Job ID: {}. You can continue with other tasks or enter sleep mode. Once the research is complete, the knowledge will be automatically ingested into R2R (GraphRAG) and available for retrieval.",
                     job_id
                 );
-                
+
                 Ok(CallToolResult {
-                    content: vec![McpContent::Text { text: response_text }],
+                    content: vec![McpContent::Text {
+                        text: response_text,
+                    }],
                     is_error: false,
                 })
             }
             Err(e) => {
                 tracing::error!("Failed to dispatch research to event stream: {}", e);
                 Ok(CallToolResult {
-                    content: vec![McpContent::Text { 
-                        text: format!("Failed to dispatch research: {}", e) 
+                    content: vec![McpContent::Text {
+                        text: format!("Failed to dispatch research: {}", e),
                     }],
                     is_error: true,
                 })

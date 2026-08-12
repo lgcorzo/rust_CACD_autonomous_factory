@@ -1,19 +1,19 @@
-use factory_infrastructure::{HttpR2rClient, R2rClient};
-use hatchet_sdk::Hatchet;
-use hatchet_sdk::runnables::Workflow;
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 use async_openai::{
+    Client,
     types::{
         ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
         ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
         CreateChatCompletionRequestArgs,
     },
-    Client,
 };
-use reqwest::header::{HeaderMap, HeaderValue};
-use zeroize::Zeroize;
 use chrono::Utc;
+use factory_infrastructure::{HttpR2rClient, R2rClient};
+use hatchet_sdk::Hatchet;
+use hatchet_sdk::runnables::Workflow;
+use reqwest::header::{HeaderMap, HeaderValue};
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use zeroize::Zeroize;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DeepSearchInput {
@@ -45,9 +45,9 @@ pub fn create_deep_research_workflow(
     hatchet: &Hatchet,
     r2r_url: String,
 ) -> Workflow<DeepSearchInput, DeepSearchOutput> {
-    
     // R2R Client
-    let r2r_user = std::env::var("R2R_SUPERUSER_EMAIL").unwrap_or_else(|_| "admin@darkgravity.com".to_string());
+    let r2r_user = std::env::var("R2R_SUPERUSER_EMAIL")
+        .unwrap_or_else(|_| "admin@darkgravity.com".to_string());
     let r2r_pwd = std::env::var("R2R_SUPERUSER_PASSWORD").unwrap_or_else(|_| "admin".to_string());
     let _r2r_client: Arc<dyn R2rClient> = Arc::new(HttpR2rClient::new(r2r_url, r2r_user, r2r_pwd));
 
@@ -60,9 +60,10 @@ pub fn create_deep_research_workflow(
         "task": task
     });
     if let Ok(tag_json) = serde_json::to_string(&finops_tag)
-        && let Ok(header_val) = HeaderValue::from_str(&tag_json) {
-            headers.insert("litellm-tags", header_val);
-        }
+        && let Ok(header_val) = HeaderValue::from_str(&tag_json)
+    {
+        headers.insert("litellm-tags", header_val);
+    }
 
     let http_client = reqwest::Client::builder()
         .default_headers(headers)
@@ -71,12 +72,13 @@ pub fn create_deep_research_workflow(
 
     let litellm_api_key = std::env::var("LITELLM_API_KEY").expect("LITELLM_API_KEY must be set");
     let litellm_base_url = std::env::var("LITELLM_BASE_URL").expect("LITELLM_BASE_URL must be set");
-    let litellm_model = std::env::var("LITELLM_MODEL").unwrap_or_else(|_| "gpt-4-turbo".to_string());
+    let litellm_model =
+        std::env::var("LITELLM_MODEL").unwrap_or_else(|_| "gpt-4-turbo".to_string());
 
     let config = async_openai::config::OpenAIConfig::new()
         .with_api_key(litellm_api_key)
         .with_api_base(litellm_base_url);
-    
+
     let openai_client = Client::with_config(config).with_http_client(http_client);
     let openai_client_arc = Arc::new(openai_client);
     let openai_client_clone = openai_client_arc.clone();
@@ -115,7 +117,7 @@ pub fn create_deep_research_workflow(
                     .unwrap_or_else(|| "{}".to_string());
 
                 let parsed: serde_json::Value = serde_json::from_str(&content).unwrap_or(serde_json::json!({}));
-                
+
                 let mut sub_queries = vec![];
                 if let Some(arr) = parsed.as_array() {
                     for v in arr {
@@ -126,7 +128,7 @@ pub fn create_deep_research_workflow(
                         if let Some(s) = v.as_str() { sub_queries.push(s.to_string()); }
                     }
                 }
-                
+
                 if sub_queries.is_empty() {
                     sub_queries.push(input.query.clone());
                 }
@@ -136,9 +138,9 @@ pub fn create_deep_research_workflow(
                 if tavily_api_key.is_empty() {
                     return Err(anyhow::anyhow!("TAVILY_API_KEY is empty"));
                 }
-                
+
                 let http = reqwest::Client::new();
-                
+
                 let mut consolidated_summaries = String::new();
 
                 for sq in sub_queries {
@@ -152,7 +154,7 @@ pub fn create_deep_research_workflow(
                     });
 
                     let mut raw_markdown = String::new();
-                    
+
                     match http.post("https://api.tavily.com/search").json(&tavily_req).send().await {
                         Ok(res) => {
                             if let Ok(json_resp) = res.json::<serde_json::Value>().await
@@ -191,7 +193,7 @@ pub fn create_deep_research_workflow(
                         .first()
                         .and_then(|c| c.message.content.clone())
                         .unwrap_or_default();
-                    
+
                     consolidated_summaries.push_str(&format!("### Sub-query: {}\n\n{}\n\n", sq, summary));
 
                     // RAM Clamping: Zeroize the raw markdown buffer securely
@@ -201,7 +203,7 @@ pub fn create_deep_research_workflow(
                 // 3. Knowledge Ingestion Phase (R2R)
                 let date_str = Utc::now().format("%Y-%m-%d").to_string();
                 let okf_content = format!(
-                    "---\ntype: deep_research\ntitle: \"{}\"\ndate: \"{}\"\njob_id: \"{}\"\n---\n\n# Deep Research Report\n\n## Synthesis\n\n{}", 
+                    "---\ntype: deep_research\ntitle: \"{}\"\ndate: \"{}\"\njob_id: \"{}\"\n---\n\n# Deep Research Report\n\n## Synthesis\n\n{}",
                     input.query, date_str, input.job_id, consolidated_summaries
                 );
 
@@ -218,7 +220,7 @@ pub fn create_deep_research_workflow(
                     .body(okf_content.clone())
                     .send()
                     .await;
-                
+
                 match res {
                     Ok(r) if r.status().is_success() => tracing::info!("Ingestion successful"),
                     Ok(r) => tracing::warn!("Ingestion returned status {}", r.status()),
