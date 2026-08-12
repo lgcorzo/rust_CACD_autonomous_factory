@@ -2,7 +2,6 @@ use async_openai::{
     Client,
     types::{
         ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
-        ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
         CreateChatCompletionRequestArgs,
     },
 };
@@ -98,19 +97,18 @@ pub fn create_deep_research_workflow(
                     .messages([
                         ChatCompletionRequestSystemMessageArgs::default()
                             .content("You are a deep search query planner. Break down the user's research topic into a JSON array of 3 to 5 highly specific sub-queries string that can be sent to a search engine.")
-                            .build()?
-                            .into(),
+                            .build().map_err(|e| { tracing::error!("Builder error: {}", e); e })?.into(),
                         ChatCompletionRequestUserMessageArgs::default()
                             .content(input.query.clone())
-                            .build()?
-                            .into(),
+                            .build().map_err(|e| { tracing::error!("Builder error: {}", e); e })?.into(),
                     ])
-                    .response_format(ChatCompletionResponseFormat {
-                        r#type: ChatCompletionResponseFormatType::JsonObject,
-                    })
-                    .build()?;
+                    // REMOVE JSON OBJECT FORMAT to avoid compatibility issues with Ollama models
+                    .build().map_err(|e| { tracing::error!("Builder error: {}", e); e })?;
 
-                let response = client.chat().create(request).await?;
+                let response = client.chat().create(request).await.map_err(|e| {
+                    tracing::error!("LiteLLM Chat Create Error (Planning): {}", e);
+                    e
+                })?;
                 let content = response.choices
                     .first()
                     .and_then(|c| c.message.content.clone())
@@ -179,16 +177,17 @@ pub fn create_deep_research_workflow(
                         .messages([
                             ChatCompletionRequestSystemMessageArgs::default()
                                 .content("You are a technical analyst. Extract the most important facts, code snippets, and architectural decisions from the provided raw text. Discard noise. Output in Markdown.")
-                                .build()?
-                                .into(),
+                                .build().map_err(|e| { tracing::error!("Builder error: {}", e); e })?.into(),
                             ChatCompletionRequestUserMessageArgs::default()
                                 .content(raw_markdown.clone())
-                                .build()?
-                                .into(),
+                                .build().map_err(|e| { tracing::error!("Builder error: {}", e); e })?.into(),
                         ])
-                        .build()?;
+                        .build().map_err(|e| { tracing::error!("Builder error: {}", e); e })?;
 
-                    let response = client.chat().create(request).await?;
+                    let response = client.chat().create(request).await.map_err(|e| {
+                        tracing::error!("LiteLLM Chat Create Error (Extraction): {}", e);
+                        e
+                    })?;
                     let summary = response.choices
                         .first()
                         .and_then(|c| c.message.content.clone())
