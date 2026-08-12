@@ -69,8 +69,8 @@ pub fn create_deep_research_workflow(
         .build()
         .unwrap_or_default();
 
-    let litellm_api_key = std::env::var("LITELLM_API_KEY").unwrap_or_default();
-    let litellm_base_url = std::env::var("LITELLM_BASE_URL").unwrap_or_default();
+    let litellm_api_key = std::env::var("LITELLM_API_KEY").expect("LITELLM_API_KEY must be set");
+    let litellm_base_url = std::env::var("LITELLM_BASE_URL").expect("LITELLM_BASE_URL must be set");
     let litellm_model = std::env::var("LITELLM_MODEL").unwrap_or_else(|_| "gpt-4-turbo".to_string());
 
     let config = async_openai::config::OpenAIConfig::new()
@@ -109,10 +109,9 @@ pub fn create_deep_research_workflow(
                     .build()?;
 
                 let response = client.chat().create(request).await?;
-                let content = response.choices[0]
-                    .message
-                    .content
-                    .clone()
+                let content = response.choices
+                    .first()
+                    .and_then(|c| c.message.content.clone())
                     .unwrap_or_else(|| "{}".to_string());
 
                 let parsed: serde_json::Value = serde_json::from_str(&content).unwrap_or(serde_json::json!({}));
@@ -133,7 +132,11 @@ pub fn create_deep_research_workflow(
                 }
 
                 // 2. Execution Phase (Tavily Sequential Extraction + RAM Clamping)
-                let tavily_api_key = std::env::var("TAVILY_API_KEY").unwrap_or_default();
+                let tavily_api_key = std::env::var("TAVILY_API_KEY").map_err(|_| anyhow::anyhow!("TAVILY_API_KEY must be set"))?;
+                if tavily_api_key.is_empty() {
+                    return Err(anyhow::anyhow!("TAVILY_API_KEY is empty"));
+                }
+                
                 let http = reqwest::Client::new();
                 
                 let mut consolidated_summaries = String::new();
@@ -184,10 +187,9 @@ pub fn create_deep_research_workflow(
                         .build()?;
 
                     let response = client.chat().create(request).await?;
-                    let summary = response.choices[0]
-                        .message
-                        .content
-                        .clone()
+                    let summary = response.choices
+                        .first()
+                        .and_then(|c| c.message.content.clone())
                         .unwrap_or_default();
                     
                     consolidated_summaries.push_str(&format!("### Sub-query: {}\n\n{}\n\n", sq, summary));
@@ -203,12 +205,25 @@ pub fn create_deep_research_workflow(
                     input.query, date_str, input.job_id, consolidated_summaries
                 );
 
-                let tmp_path = format!("/tmp/okf_research_{}.md", input.job_id);
+                let sanitized_job_id = input.job_id.replace(|c: char| !c.is_ascii_alphanumeric() && c != '-', "");
+                let tmp_path = format!("/tmp/okf_research_{}.md", sanitized_job_id);
                 tokio::fs::write(&tmp_path, &okf_content).await?;
 
-                // R2R Ingestion mock via standard reqwest
                 let r2r_ingest_url = std::env::var("R2R_INGEST_URL").unwrap_or_else(|_| "http://localhost:8000/v3/ingestion/documents".to_string());
-                tracing::info!("Would ingest {} to R2R at {}", tmp_path, r2r_ingest_url);
+                tracing::info!("Ingesting research to R2R at {}", r2r_ingest_url);
+
+                let res = reqwest::Client::new()
+                    .post(&r2r_ingest_url)
+                    .header("Content-Type", "text/markdown")
+                    .body(okf_content.clone())
+                    .send()
+                    .await;
+                
+                match res {
+                    Ok(r) if r.status().is_success() => tracing::info!("Ingestion successful"),
+                    Ok(r) => tracing::warn!("Ingestion returned status {}", r.status()),
+                    Err(e) => tracing::error!("Ingestion failed: {}", e),
+                }
 
                 let _ = tokio::fs::remove_file(&tmp_path).await;
 
