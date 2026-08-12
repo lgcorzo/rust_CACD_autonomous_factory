@@ -2,7 +2,6 @@ use async_openai::{
     Client,
     types::{
         ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
-        ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
         CreateChatCompletionRequestArgs,
     },
 };
