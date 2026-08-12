@@ -4,7 +4,7 @@ title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Detailed documentation for aethalgard.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: aethalgard.rs
@@ -18,6 +18,9 @@ Provides implementation for aethalgard.rs.
 
 ### Responsibilities
 * Handles logic related to aethalgard.
+
+### Main Workflow
+* Initialization and execution of aethalgard logic.
 
 ### Dependencies
 * async_trait::async_trait, serde_json::json
@@ -128,6 +131,75 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+interface AethalgardClient <<trait>> {
+}
+class HttpAethalgardClient {
+    +new(webhook_url: String:Any) : Self
+    -notify_remediation(mission_id: &str:Any, error_details: &str:Any) : anyhow::Result<()>
+}
+AethalgardClient <|-- HttpAethalgardClient : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "aethalgard" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "AethalgardService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "aethalgard" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "serde_json::json" as serde_json::json
+comp --> serde_json::json
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[aethalgard]
+[aethalgard] --> [async_trait::async_trait]
+[aethalgard] --> [serde_json::json]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> HttpAethalgardClient::new
+@enduml
 
 ```
 

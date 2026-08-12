@@ -4,7 +4,7 @@ title: "index_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/index_code.rs"
 description: "Detailed documentation for index_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: index_code.rs
@@ -18,6 +18,9 @@ Provides implementation for index_code.rs.
 
 ### Responsibilities
 * Handles logic related to index_code.
+
+### Main Workflow
+* Initialization and execution of index_code logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, super::*
@@ -103,6 +106,85 @@ sequenceDiagram
     Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class IndexCodeTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(r2r_base_url: String:Any) : Self
+}
+Tool <|-- IndexCodeTool : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "index_code" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Index_codeService"
+Caller -> Svc: new()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "index_code" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::protocol::{CallToolResult, McpContent}" as crate::protocol::{CallToolResult, McpContent}
+comp --> crate::protocol::{CallToolResult, McpContent}
+component "crate::tools::Tool" as crate::tools::Tool
+comp --> crate::tools::Tool
+component "serde_json::{json, Value}" as serde_json::{json, Value}
+comp --> serde_json::{json, Value}
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[index_code]
+[index_code] --> [async_trait::async_trait]
+[index_code] --> [crate::protocol::{CallToolResult, McpContent}]
+[index_code] --> [crate::tools::Tool]
+[index_code] --> [serde_json::{json, Value}]
+[index_code] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> IndexCodeTool::new
+@enduml
 
 ```
 

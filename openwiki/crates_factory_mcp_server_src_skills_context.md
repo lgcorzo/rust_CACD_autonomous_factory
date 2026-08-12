@@ -4,7 +4,7 @@ title: "context.rs"
 source_path: "crates/factory-mcp-server/src/skills/context.rs"
 description: "Detailed documentation for context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: context.rs
@@ -18,6 +18,9 @@ Provides implementation for context.rs.
 
 ### Responsibilities
 * Handles logic related to context.
+
+### Main Workflow
+* Initialization and execution of context logic.
 
 ### Dependencies
 * serde_json::{json, Value}, super::*
@@ -151,6 +154,73 @@ sequenceDiagram
     Caller->>Svc: format_for_llm()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class ContextSkill {
+    +format_for_llm(pruned_context: &str:Any) : Value
+    +prune_context(raw_context: &str:Any, max_chars: usize:Any) : String
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "context" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ContextService"
+Caller -> Svc: format_for_llm()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "context" as comp
+component "serde_json::{json, Value}" as serde_json::{json, Value}
+comp --> serde_json::{json, Value}
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[context]
+[context] --> [serde_json::{json, Value}]
+[context] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> ContextSkill::format_for_llm
+[API] --> ContextSkill::prune_context
+@enduml
 
 ```
 

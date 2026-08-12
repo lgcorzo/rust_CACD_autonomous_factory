@@ -4,7 +4,7 @@ title: "bridge.rs"
 source_path: "crates/factory-mcp-server/src/tools/bridge.rs"
 description: "Detailed documentation for bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: bridge.rs
@@ -18,6 +18,9 @@ Provides implementation for bridge.rs.
 
 ### Responsibilities
 * Handles logic related to bridge.
+
+### Main Workflow
+* Initialization and execution of bridge logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::protocol::CallToolResult, crate::tools::Tool, serde_json::{json, Value}, std::fs, std::path::PathBuf
@@ -161,6 +164,91 @@ sequenceDiagram
     Caller->>Svc: call()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class BridgeTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -get_checkpoint_path(mission_id: &str:Any) : PathBuf
+    -input_schema() : Value
+    +load_state(mission_id: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +save_state(mission_id: &str:Any, state: Value:Any) : anyhow::Result<Value>
+}
+Tool <|-- BridgeTool : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "bridge" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "BridgeService"
+Caller -> Svc: load_state()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "bridge" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::protocol::CallToolResult" as crate::protocol::CallToolResult
+comp --> crate::protocol::CallToolResult
+component "crate::tools::Tool" as crate::tools::Tool
+comp --> crate::tools::Tool
+component "serde_json::{json, Value}" as serde_json::{json, Value}
+comp --> serde_json::{json, Value}
+component "std::fs" as std::fs
+comp --> std::fs
+component "std::path::PathBuf" as std::path::PathBuf
+comp --> std::path::PathBuf
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[bridge]
+[bridge] --> [async_trait::async_trait]
+[bridge] --> [crate::protocol::CallToolResult]
+[bridge] --> [crate::tools::Tool]
+[bridge] --> [serde_json::{json, Value}]
+[bridge] --> [std::fs]
+[bridge] --> [std::path::PathBuf]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> BridgeTool::load_state
+[API] --> BridgeTool::save_state
+@enduml
 
 ```
 

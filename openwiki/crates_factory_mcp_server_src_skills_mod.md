@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-mcp-server/src/skills/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: mod.rs
@@ -18,6 +18,9 @@ Provides implementation for mod.rs.
 
 ### Responsibilities
 * Handles logic related to mod.
+
+### Main Workflow
+* Initialization and execution of mod logic.
 
 ### Dependencies
 * None
@@ -62,6 +65,64 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "mod" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ModService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "mod" as comp
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[mod]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

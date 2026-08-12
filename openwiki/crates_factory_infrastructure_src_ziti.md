@@ -4,7 +4,7 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: ziti.rs
@@ -18,6 +18,9 @@ Provides implementation for ziti.rs.
 
 ### Responsibilities
 * Handles logic related to ziti.
+
+### Main Workflow
+* Initialization and execution of ziti logic.
 
 ### Dependencies
 * async_trait::async_trait, super::*
@@ -130,6 +133,76 @@ sequenceDiagram
     Caller->>Svc: get_token()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class OpenZitiIdentity {
+    -get_token() : anyhow::Result<String>
+    +new(service: &str:Any, identity_file: &str:Any) : Self
+    -service_name() : String
+}
+ZitiIdentity <|-- OpenZitiIdentity : Inheritance
+interface ZitiIdentity <<trait>> {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "ziti" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ZitiService"
+Caller -> Svc: new()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "ziti" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[ziti]
+[ziti] --> [async_trait::async_trait]
+[ziti] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> OpenZitiIdentity::new
+@enduml
 
 ```
 

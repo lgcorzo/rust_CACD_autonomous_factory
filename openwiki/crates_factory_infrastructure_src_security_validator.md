@@ -4,7 +4,7 @@ title: "security_validator.rs"
 source_path: "crates/factory-infrastructure/src/security_validator.rs"
 description: "Detailed documentation for security_validator.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: security_validator.rs
@@ -18,6 +18,9 @@ Provides implementation for security_validator.rs.
 
 ### Responsibilities
 * Handles logic related to security_validator.
+
+### Main Workflow
+* Initialization and execution of security_validator logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::mcp_client::McpClient, ed25519_dalek::{Signature, Verifier, VerifyingKey}, ed25519_dalek::{Signer, SigningKey}, factory_core::security::{AuditResult, SecurityValidator}, rand::rngs::OsRng, std::sync::Arc, super::*
@@ -99,6 +102,92 @@ sequenceDiagram
     Caller->>Svc: audit_content()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class Ed25519Validator {
+    -audit_content(content: &str:Any) : factory_core::error::Result<AuditResult>
+    +new(public_key_bytes: &[u8]:Any, mcp_client: Option<Arc<dyn McpClient>>:Any) : anyhow::Result<Self>
+    -validate_signature(data: &[u8]:Any, signature_hex: &str:Any) : factory_core::error::Result<bool>
+}
+SecurityValidator <|-- Ed25519Validator : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "security_validator" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Security_validatorService"
+Caller -> Svc: new()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "security_validator" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::mcp_client::McpClient" as crate::mcp_client::McpClient
+comp --> crate::mcp_client::McpClient
+component "ed25519_dalek::{Signature, Verifier, VerifyingKey}" as ed25519_dalek::{Signature, Verifier, VerifyingKey}
+comp --> ed25519_dalek::{Signature, Verifier, VerifyingKey}
+component "ed25519_dalek::{Signer, SigningKey}" as ed25519_dalek::{Signer, SigningKey}
+comp --> ed25519_dalek::{Signer, SigningKey}
+component "factory_core::security::{AuditResult, SecurityValidator}" as factory_core::security::{AuditResult, SecurityValidator}
+comp --> factory_core::security::{AuditResult, SecurityValidator}
+component "rand::rngs::OsRng" as rand::rngs::OsRng
+comp --> rand::rngs::OsRng
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[security_validator]
+[security_validator] --> [async_trait::async_trait]
+[security_validator] --> [crate::mcp_client::McpClient]
+[security_validator] --> [ed25519_dalek::{Signature, Verifier, VerifyingKey}]
+[security_validator] --> [ed25519_dalek::{Signer, SigningKey}]
+[security_validator] --> [factory_core::security::{AuditResult, SecurityValidator}]
+[security_validator] --> [rand::rngs::OsRng]
+[security_validator] --> [std::sync::Arc]
+[security_validator] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> Ed25519Validator::new
+@enduml
 
 ```
 

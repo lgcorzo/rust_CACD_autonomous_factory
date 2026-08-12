@@ -4,7 +4,7 @@ title: "executor.rs"
 source_path: "crates/factory-core/src/executor.rs"
 description: "Detailed documentation for executor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: executor.rs
@@ -18,6 +18,9 @@ Provides implementation for executor.rs.
 
 ### Responsibilities
 * Handles logic related to executor.
+
+### Main Workflow
+* Initialization and execution of executor logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::error::FactoryError, std::path::PathBuf
@@ -155,6 +158,77 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+interface CodeSurgeryExecutor <<trait>> {
+}
+class ExecutionResult {
+}
+class SurgicalPatch {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "executor" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ExecutorService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "executor" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::error::FactoryError" as crate::error::FactoryError
+comp --> crate::error::FactoryError
+component "std::path::PathBuf" as std::path::PathBuf
+comp --> std::path::PathBuf
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[executor]
+[executor] --> [async_trait::async_trait]
+[executor] --> [crate::error::FactoryError]
+[executor] --> [std::path::PathBuf]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

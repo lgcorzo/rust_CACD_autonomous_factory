@@ -4,7 +4,7 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Detailed documentation for qa_observer.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: qa_observer.rs
@@ -18,6 +18,9 @@ Provides implementation for qa_observer.rs.
 
 ### Responsibilities
 * Handles logic related to qa_observer.
+
+### Main Workflow
+* Initialization and execution of qa_observer logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::Agent, crate::workflows::autonomous_mission::MissionInput, factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}, hatchet_sdk::{Hatchet, Runnable}, serde_json::Value, std::time::Duration, uuid::Uuid
@@ -134,6 +137,96 @@ sequenceDiagram
     Caller->>Svc: default()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class QAObserverAgent {
+    -default() : Self
+    -execute(_task_description: &str:Any) : anyhow::Result<Value>
+    +monitor_crashes() : anyhow::Result<()>
+    -name() : String
+    +new(sentry_url: String:Any, sentry_token: String:Any, sentry_project: String:Any, gitlab_url: String:Any, gitlab_token: String:Any, gitlab_project: String:Any, hatchet: Hatchet:Any) : Self
+}
+Agent <|-- QAObserverAgent : Inheritance
+Default <|-- QAObserverAgent : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "qa_observer" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Qa_observerService"
+Caller -> Svc: monitor_crashes()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "qa_observer" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::Agent" as crate::Agent
+comp --> crate::Agent
+component "crate::workflows::autonomous_mission::MissionInput" as crate::workflows::autonomous_mission::MissionInput
+comp --> crate::workflows::autonomous_mission::MissionInput
+component "factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}" as factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}
+comp --> factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}
+component "hatchet_sdk::{Hatchet, Runnable}" as hatchet_sdk::{Hatchet, Runnable}
+comp --> hatchet_sdk::{Hatchet, Runnable}
+component "serde_json::Value" as serde_json::Value
+comp --> serde_json::Value
+component "std::time::Duration" as std::time::Duration
+comp --> std::time::Duration
+component "uuid::Uuid" as uuid::Uuid
+comp --> uuid::Uuid
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[qa_observer]
+[qa_observer] --> [async_trait::async_trait]
+[qa_observer] --> [crate::Agent]
+[qa_observer] --> [crate::workflows::autonomous_mission::MissionInput]
+[qa_observer] --> [factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}]
+[qa_observer] --> [hatchet_sdk::{Hatchet, Runnable}]
+[qa_observer] --> [serde_json::Value]
+[qa_observer] --> [std::time::Duration]
+[qa_observer] --> [uuid::Uuid]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> QAObserverAgent::monitor_crashes
+[API] --> QAObserverAgent::new
+@enduml
 
 ```
 

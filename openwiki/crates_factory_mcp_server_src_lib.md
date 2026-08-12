@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-mcp-server/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: lib.rs
@@ -18,6 +18,9 @@ Provides implementation for lib.rs.
 
 ### Responsibilities
 * Handles logic related to lib.
+
+### Main Workflow
+* Initialization and execution of lib logic.
 
 ### Dependencies
 * axum::{
@@ -269,6 +272,172 @@ sequenceDiagram
     Caller->>Svc: add_tool()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class McpServer {
+    +add_tool(tool: Box<dyn Tool>:Any) : None
+    -default() : Self
+    -error_response(id: Option<Value>:Any, code: i32:Any, message: &str:Any) : JsonRpcResponse
+    -handle_call_tool(request: JsonRpcRequest:Any) : JsonRpcResponse
+    -handle_list_tools(id: Option<Value>:Any) : JsonRpcResponse
+    +handle_request(request: JsonRpcRequest:Any) : JsonRpcResponse
+    +new() : Self
+    +post_handler(State(server): State<Arc<McpServer>>:Any, Query(params): Query<HashMap<String, String>>:Any, Json(request): Json<JsonRpcRequest>:Any) : Json<JsonRpcResponse>
+    +register_default_tools() : anyhow::Result<()>
+    +sse_handler(State(server): State<Arc<McpServer>>:Any) : Sse<impl Stream<Item = Result<Event, Infallible>>>
+}
+Default <|-- McpServer : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "lib" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "LibService"
+Caller -> Svc: add_tool()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "lib" as comp
+component "axum::{
+    extract::{Query, State},
+    response::sse::{Event, Sse},
+    Json,
+}" as axum::{
+    extract::{Query, State},
+    response::sse::{Event, Sse},
+    Json,
+}
+comp --> axum::{
+    extract::{Query, State},
+    response::sse::{Event, Sse},
+    Json,
+}
+component "crate::protocol::CallToolResult" as crate::protocol::CallToolResult
+comp --> crate::protocol::CallToolResult
+component "crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}" as crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}
+comp --> crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}
+component "crate::tools::MockTool" as crate::tools::MockTool
+comp --> crate::tools::MockTool
+component "crate::tools::Tool" as crate::tools::Tool
+comp --> crate::tools::Tool
+component "crate::tools::{
+            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
+            retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
+            search_jira::SearchJiraTool, security_review::SecurityReviewTool,
+            spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
+            update_mission_status::UpdateMissionStatusTool,
+        }" as crate::tools::{
+            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
+            retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
+            search_jira::SearchJiraTool, security_review::SecurityReviewTool,
+            spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
+            update_mission_status::UpdateMissionStatusTool,
+        }
+comp --> crate::tools::{
+            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
+            retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
+            search_jira::SearchJiraTool, security_review::SecurityReviewTool,
+            spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
+            update_mission_status::UpdateMissionStatusTool,
+        }
+component "factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}" as factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}
+comp --> factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}
+component "serde_json::{json, Value}" as serde_json::{json, Value}
+comp --> serde_json::{json, Value}
+component "std::collections::HashMap" as std::collections::HashMap
+comp --> std::collections::HashMap
+component "std::convert::Infallible" as std::convert::Infallible
+comp --> std::convert::Infallible
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+component "std::time::Duration" as std::time::Duration
+comp --> std::time::Duration
+component "super::*" as super::*
+comp --> super::*
+component "tokio::sync::{mpsc, RwLock}" as tokio::sync::{mpsc, RwLock}
+comp --> tokio::sync::{mpsc, RwLock}
+component "tokio_stream::wrappers::UnboundedReceiverStream" as tokio_stream::wrappers::UnboundedReceiverStream
+comp --> tokio_stream::wrappers::UnboundedReceiverStream
+component "tokio_stream::{Stream, StreamExt}" as tokio_stream::{Stream, StreamExt}
+comp --> tokio_stream::{Stream, StreamExt}
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[lib]
+[lib] --> [axum::{
+    extract::{Query, State},
+    response::sse::{Event, Sse},
+    Json,
+}]
+[lib] --> [crate::protocol::CallToolResult]
+[lib] --> [crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}]
+[lib] --> [crate::tools::MockTool]
+[lib] --> [crate::tools::Tool]
+[lib] --> [crate::tools::{
+            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
+            retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
+            search_jira::SearchJiraTool, security_review::SecurityReviewTool,
+            spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
+            update_mission_status::UpdateMissionStatusTool,
+        }]
+[lib] --> [factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}]
+[lib] --> [serde_json::{json, Value}]
+[lib] --> [std::collections::HashMap]
+[lib] --> [std::convert::Infallible]
+[lib] --> [std::sync::Arc]
+[lib] --> [std::time::Duration]
+[lib] --> [super::*]
+[lib] --> [tokio::sync::{mpsc, RwLock}]
+[lib] --> [tokio_stream::wrappers::UnboundedReceiverStream]
+[lib] --> [tokio_stream::{Stream, StreamExt}]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> McpServer::add_tool
+[API] --> McpServer::handle_request
+[API] --> McpServer::new
+[API] --> McpServer::post_handler
+[API] --> McpServer::register_default_tools
+[API] --> McpServer::sse_handler
+@enduml
 
 ```
 

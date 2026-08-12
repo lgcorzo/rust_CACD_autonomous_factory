@@ -4,7 +4,7 @@ title: "error.rs"
 source_path: "crates/factory-core/src/error.rs"
 description: "Detailed documentation for error.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: error.rs
@@ -18,6 +18,9 @@ Provides implementation for error.rs.
 
 ### Responsibilities
 * Handles logic related to error.
+
+### Main Workflow
+* Initialization and execution of error logic.
 
 ### Dependencies
 * thiserror::Error
@@ -91,6 +94,67 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+enum FactoryError {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "error" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ErrorService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "error" as comp
+component "thiserror::Error" as thiserror::Error
+comp --> thiserror::Error
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[error]
+[error] --> [thiserror::Error]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

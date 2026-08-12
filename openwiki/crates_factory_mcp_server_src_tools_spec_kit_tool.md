@@ -4,7 +4,7 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: spec_kit_tool.rs
@@ -18,6 +18,9 @@ Provides implementation for spec_kit_tool.rs.
 
 ### Responsibilities
 * Handles logic related to spec_kit_tool.
+
+### Main Workflow
+* Initialization and execution of spec_kit_tool logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::protocol::CallToolResult, crate::tools::Tool, serde::{Deserialize, Serialize}, serde_json::{json, Value}, std::sync::Arc, super::*
@@ -301,6 +304,113 @@ sequenceDiagram
     Caller->>Svc: invoke()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class CliSpecProvider {
+    -invoke(command: SpecKitCommand:Any, args: Vec<String>:Any) : anyhow::Result<String>
+    +new(cli_path: String:Any) : Self
+}
+SpecProvider <|-- CliSpecProvider : Inheritance
+class MockSpecProvider {
+    -default() : Self
+    -invoke(command: SpecKitCommand:Any, _args: Vec<String>:Any) : anyhow::Result<String>
+    +new(specs_dir: std::path::PathBuf:Any) : Self
+}
+Default <|-- MockSpecProvider : Inheritance
+SpecProvider <|-- MockSpecProvider : Inheritance
+enum SpecKitCommand {
+}
+class SpecKitTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    +invoke_spec_kit(command: SpecKitCommand:Any, args: Vec<String>:Any) : anyhow::Result<String>
+    -name() : String
+    +new(specify_cli_path: String:Any) : Self
+    +with_provider(provider: Arc<dyn SpecProvider>:Any) : Self
+}
+Tool <|-- SpecKitTool : Inheritance
+interface SpecProvider <<trait>> {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "spec_kit_tool" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Spec_kit_toolService"
+Caller -> Svc: new()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "spec_kit_tool" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::protocol::CallToolResult" as crate::protocol::CallToolResult
+comp --> crate::protocol::CallToolResult
+component "crate::tools::Tool" as crate::tools::Tool
+comp --> crate::tools::Tool
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "serde_json::{json, Value}" as serde_json::{json, Value}
+comp --> serde_json::{json, Value}
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[spec_kit_tool]
+[spec_kit_tool] --> [async_trait::async_trait]
+[spec_kit_tool] --> [crate::protocol::CallToolResult]
+[spec_kit_tool] --> [crate::tools::Tool]
+[spec_kit_tool] --> [serde::{Deserialize, Serialize}]
+[spec_kit_tool] --> [serde_json::{json, Value}]
+[spec_kit_tool] --> [std::sync::Arc]
+[spec_kit_tool] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> CliSpecProvider::new
+[API] --> MockSpecProvider::new
+[API] --> SpecKitTool::invoke_spec_kit
+[API] --> SpecKitTool::new
+[API] --> SpecKitTool::with_provider
+@enduml
 
 ```
 

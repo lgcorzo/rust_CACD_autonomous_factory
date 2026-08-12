@@ -4,7 +4,7 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: gitlab.rs
@@ -18,6 +18,9 @@ Provides implementation for gitlab.rs.
 
 ### Responsibilities
 * Handles logic related to gitlab.
+
+### Main Workflow
+* Initialization and execution of gitlab logic.
 
 ### Dependencies
 * async_trait::async_trait, serde::{Deserialize, Serialize}, serde_json::json, super::*, wiremock::matchers::{body_json, header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
@@ -163,6 +166,89 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+interface GitlabClient <<trait>> {
+}
+class GitlabIssue {
+}
+class HttpGitlabClient {
+    -create_issue(project_id: &str:Any, title: &str:Any, description: &str:Any) : anyhow::Result<GitlabIssue>
+    +new(url: String:Any, api_token: String:Any) : Self
+}
+GitlabClient <|-- HttpGitlabClient : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "gitlab" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "GitlabService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "gitlab" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "serde_json::json" as serde_json::json
+comp --> serde_json::json
+component "super::*" as super::*
+comp --> super::*
+component "wiremock::matchers::{body_json, header, method, path}" as wiremock::matchers::{body_json, header, method, path}
+comp --> wiremock::matchers::{body_json, header, method, path}
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock::{Mock, MockServer, ResponseTemplate}
+comp --> wiremock::{Mock, MockServer, ResponseTemplate}
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[gitlab]
+[gitlab] --> [async_trait::async_trait]
+[gitlab] --> [serde::{Deserialize, Serialize}]
+[gitlab] --> [serde_json::json]
+[gitlab] --> [super::*]
+[gitlab] --> [wiremock::matchers::{body_json, header, method, path}]
+[gitlab] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> HttpGitlabClient::new
+@enduml
 
 ```
 

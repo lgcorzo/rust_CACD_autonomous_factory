@@ -4,7 +4,7 @@ title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Detailed documentation for feedback_route.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: feedback_route.rs
@@ -18,6 +18,9 @@ Provides implementation for feedback_route.rs.
 
 ### Responsibilities
 * Handles logic related to feedback_route.
+
+### Main Workflow
+* Initialization and execution of feedback_route logic.
 
 ### Dependencies
 * axum::{
@@ -67,6 +70,98 @@ sequenceDiagram
     Caller->>Svc: handle_feedback()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "feedback_route" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Feedback_routeService"
+Caller -> Svc: handle_feedback()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "feedback_route" as comp
+component "axum::{
+    extract::{Json, State},
+    http::StatusCode,
+    response::IntoResponse,
+}" as axum::{
+    extract::{Json, State},
+    http::StatusCode,
+    response::IntoResponse,
+}
+comp --> axum::{
+    extract::{Json, State},
+    http::StatusCode,
+    response::IntoResponse,
+}
+component "crate::McpServer" as crate::McpServer
+comp --> crate::McpServer
+component "factory_core::UserFeedbackPayload" as factory_core::UserFeedbackPayload
+comp --> factory_core::UserFeedbackPayload
+component "factory_infrastructure::GitlabClient" as factory_infrastructure::GitlabClient
+comp --> factory_infrastructure::GitlabClient
+component "factory_infrastructure::HttpGitlabClient" as factory_infrastructure::HttpGitlabClient
+comp --> factory_infrastructure::HttpGitlabClient
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[feedback_route]
+[feedback_route] --> [axum::{
+    extract::{Json, State},
+    http::StatusCode,
+    response::IntoResponse,
+}]
+[feedback_route] --> [crate::McpServer]
+[feedback_route] --> [factory_core::UserFeedbackPayload]
+[feedback_route] --> [factory_infrastructure::GitlabClient]
+[feedback_route] --> [factory_infrastructure::HttpGitlabClient]
+[feedback_route] --> [std::sync::Arc]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> handle_feedback
+@enduml
 
 ```
 

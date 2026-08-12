@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-mcp-server/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: main.rs
@@ -18,6 +18,9 @@ Provides implementation for main.rs.
 
 ### Responsibilities
 * Handles logic related to main.
+
+### Main Workflow
+* Initialization and execution of main logic.
 
 ### Dependencies
 * axum::{
@@ -65,6 +68,91 @@ sequenceDiagram
     Caller->>Svc: main()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "main" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "MainService"
+Caller -> Svc: main()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "main" as comp
+component "axum::{
+    routing::{get, post},
+    Router,
+}" as axum::{
+    routing::{get, post},
+    Router,
+}
+comp --> axum::{
+    routing::{get, post},
+    Router,
+}
+component "factory_mcp_server::McpServer" as factory_mcp_server::McpServer
+comp --> factory_mcp_server::McpServer
+component "std::net::SocketAddr" as std::net::SocketAddr
+comp --> std::net::SocketAddr
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+component "tower_http::cors::CorsLayer" as tower_http::cors::CorsLayer
+comp --> tower_http::cors::CorsLayer
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[main]
+[main] --> [axum::{
+    routing::{get, post},
+    Router,
+}]
+[main] --> [factory_mcp_server::McpServer]
+[main] --> [std::net::SocketAddr]
+[main] --> [std::sync::Arc]
+[main] --> [tower_http::cors::CorsLayer]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

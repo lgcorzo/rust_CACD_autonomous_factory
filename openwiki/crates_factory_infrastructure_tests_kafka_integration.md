@@ -4,7 +4,7 @@ title: "kafka_integration.rs"
 source_path: "crates/factory-infrastructure/tests/kafka_integration.rs"
 description: "Detailed documentation for kafka_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: kafka_integration.rs
@@ -18,6 +18,9 @@ Provides implementation for kafka_integration.rs.
 
 ### Responsibilities
 * Handles logic related to kafka_integration.
+
+### Main Workflow
+* Initialization and execution of kafka_integration logic.
 
 ### Dependencies
 * factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}, std::env
@@ -62,6 +65,70 @@ sequenceDiagram
     Caller->>Svc: test_kafka_live_connection()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "kafka_integration" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Kafka_integrationService"
+Caller -> Svc: test_kafka_live_connection()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "kafka_integration" as comp
+component "factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}" as factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}
+comp --> factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}
+component "std::env" as std::env
+comp --> std::env
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[kafka_integration]
+[kafka_integration] --> [factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}]
+[kafka_integration] --> [std::env]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

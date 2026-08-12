@@ -4,7 +4,7 @@ title: "protocol.rs"
 source_path: "crates/factory-mcp-server/src/protocol.rs"
 description: "Detailed documentation for protocol.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: protocol.rs
@@ -18,6 +18,9 @@ Provides implementation for protocol.rs.
 
 ### Responsibilities
 * Handles logic related to protocol.
+
+### Main Workflow
+* Initialization and execution of protocol logic.
 
 ### Dependencies
 * serde::{Deserialize, Serialize}
@@ -252,6 +255,77 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class CallToolResult {
+}
+class JsonRpcError {
+}
+class JsonRpcRequest {
+}
+class JsonRpcResponse {
+}
+enum McpContent {
+}
+class McpTool {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "protocol" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ProtocolService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "protocol" as comp
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[protocol]
+[protocol] --> [serde::{Deserialize, Serialize}]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

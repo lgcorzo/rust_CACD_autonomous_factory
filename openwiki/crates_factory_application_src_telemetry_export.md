@@ -4,7 +4,7 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: telemetry_export.rs
@@ -18,6 +18,9 @@ Provides implementation for telemetry_export.rs.
 
 ### Responsibilities
 * Handles logic related to telemetry_export.
+
+### Main Workflow
+* Initialization and execution of telemetry_export logic.
 
 ### Dependencies
 * rdkafka::Message, rdkafka::consumer::{Consumer, StreamConsumer}, reqwest::Client, serde_json::Value, std::sync::Arc
@@ -126,6 +129,83 @@ sequenceDiagram
     Caller->>Svc: new()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class TelemetryExporter {
+    +new(kafka_brokers: String:Any, openwebui_db_url: String:Any) : Self
+    -push_to_openwebui(thought: &Value:Any) : anyhow::Result<()>
+    +start_export_loop(self: Arc<Self>:Any) : anyhow::Result<()>
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "telemetry_export" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Telemetry_exportService"
+Caller -> Svc: new()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "telemetry_export" as comp
+component "rdkafka::Message" as rdkafka::Message
+comp --> rdkafka::Message
+component "rdkafka::consumer::{Consumer, StreamConsumer}" as rdkafka::consumer::{Consumer, StreamConsumer}
+comp --> rdkafka::consumer::{Consumer, StreamConsumer}
+component "reqwest::Client" as reqwest::Client
+comp --> reqwest::Client
+component "serde_json::Value" as serde_json::Value
+comp --> serde_json::Value
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[telemetry_export]
+[telemetry_export] --> [rdkafka::Message]
+[telemetry_export] --> [rdkafka::consumer::{Consumer, StreamConsumer}]
+[telemetry_export] --> [reqwest::Client]
+[telemetry_export] --> [serde_json::Value]
+[telemetry_export] --> [std::sync::Arc]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> TelemetryExporter::new
+[API] --> TelemetryExporter::start_export_loop
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: sentry.rs
@@ -18,6 +18,9 @@ Provides implementation for sentry.rs.
 
 ### Responsibilities
 * Handles logic related to sentry.
+
+### Main Workflow
+* Initialization and execution of sentry logic.
 
 ### Dependencies
 * async_trait::async_trait, serde::{Deserialize, Serialize}, serde_json::json, super::*, wiremock::matchers::{header, method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}
@@ -164,6 +167,89 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class CrashEvent {
+}
+class HttpSentryClient {
+    -fetch_recent_crashes(project: &str:Any, since_minutes: u64:Any) : anyhow::Result<Vec<CrashEvent>>
+    +new(url: String:Any, api_token: String:Any) : Self
+}
+SentryClient <|-- HttpSentryClient : Inheritance
+interface SentryClient <<trait>> {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "sentry" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "SentryService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "sentry" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "serde_json::json" as serde_json::json
+comp --> serde_json::json
+component "super::*" as super::*
+comp --> super::*
+component "wiremock::matchers::{header, method, path, query_param}" as wiremock::matchers::{header, method, path, query_param}
+comp --> wiremock::matchers::{header, method, path, query_param}
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock::{Mock, MockServer, ResponseTemplate}
+comp --> wiremock::{Mock, MockServer, ResponseTemplate}
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[sentry]
+[sentry] --> [async_trait::async_trait]
+[sentry] --> [serde::{Deserialize, Serialize}]
+[sentry] --> [serde_json::json]
+[sentry] --> [super::*]
+[sentry] --> [wiremock::matchers::{header, method, path, query_param}]
+[sentry] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> HttpSentryClient::new
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: rustant.rs
@@ -18,6 +18,9 @@ Provides implementation for rustant.rs.
 
 ### Responsibilities
 * Handles logic related to rustant.
+
+### Main Workflow
+* Initialization and execution of rustant logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::Agent, factory_infrastructure::{McpClient, R2rClient}, serde_json::{Value, json}, std::sync::Arc
@@ -161,6 +164,87 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class RustantAgent {
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any) : Self
+    +plan_mission(mission_id: &str:Any, goal: &str:Any) : anyhow::Result<Value>
+    +review_mission(mission_id: &str:Any, mission_results: &str:Any) : anyhow::Result<Value>
+}
+Agent <|-- RustantAgent : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "rustant" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "RustantService"
+Caller -> Svc: new()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "rustant" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::Agent" as crate::Agent
+comp --> crate::Agent
+component "factory_infrastructure::{McpClient, R2rClient}" as factory_infrastructure::{McpClient, R2rClient}
+comp --> factory_infrastructure::{McpClient, R2rClient}
+component "serde_json::{Value, json}" as serde_json::{Value, json}
+comp --> serde_json::{Value, json}
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[rustant]
+[rustant] --> [async_trait::async_trait]
+[rustant] --> [crate::Agent]
+[rustant] --> [factory_infrastructure::{McpClient, R2rClient}]
+[rustant] --> [serde_json::{Value, json}]
+[rustant] --> [std::sync::Arc]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> RustantAgent::new
+[API] --> RustantAgent::plan_mission
+[API] --> RustantAgent::review_mission
+@enduml
 
 ```
 

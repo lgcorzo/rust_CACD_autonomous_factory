@@ -4,7 +4,7 @@ title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: kafka.rs
@@ -18,6 +18,9 @@ Provides implementation for kafka.rs.
 
 ### Responsibilities
 * Handles logic related to kafka.
+
+### Main Workflow
+* Initialization and execution of kafka logic.
 
 ### Dependencies
 * async_trait::async_trait, chrono::Utc, rdkafka::config::ClientConfig, rdkafka::producer::{FutureProducer, FutureRecord}, std::time::Duration
@@ -163,6 +166,90 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+interface KafkaClient <<trait>> {
+}
+class RdKafkaClient {
+    +new(brokers: &str:Any) : anyhow::Result<Self>
+    -publish(topic: &str:Any, key: &str:Any, payload: &[u8]:Any) : anyhow::Result<()>
+}
+KafkaClient <|-- RdKafkaClient : Inheritance
+class SimpleMockKafkaClient {
+    +new(_brokers: &str:Any) : anyhow::Result<Self>
+    -publish(topic: &str:Any, key: &str:Any, payload: &[u8]:Any) : anyhow::Result<()>
+}
+KafkaClient <|-- SimpleMockKafkaClient : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "kafka" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "KafkaService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "kafka" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "chrono::Utc" as chrono::Utc
+comp --> chrono::Utc
+component "rdkafka::config::ClientConfig" as rdkafka::config::ClientConfig
+comp --> rdkafka::config::ClientConfig
+component "rdkafka::producer::{FutureProducer, FutureRecord}" as rdkafka::producer::{FutureProducer, FutureRecord}
+comp --> rdkafka::producer::{FutureProducer, FutureRecord}
+component "std::time::Duration" as std::time::Duration
+comp --> std::time::Duration
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[kafka]
+[kafka] --> [async_trait::async_trait]
+[kafka] --> [chrono::Utc]
+[kafka] --> [rdkafka::config::ClientConfig]
+[kafka] --> [rdkafka::producer::{FutureProducer, FutureRecord}]
+[kafka] --> [std::time::Duration]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> RdKafkaClient::new
+[API] --> SimpleMockKafkaClient::new
+@enduml
 
 ```
 

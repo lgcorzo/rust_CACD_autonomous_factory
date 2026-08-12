@@ -4,7 +4,7 @@ title: "retrieve_context.rs"
 source_path: "crates/factory-mcp-server/src/tools/retrieve_context.rs"
 description: "Detailed documentation for retrieve_context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: retrieve_context.rs
@@ -18,6 +18,9 @@ Provides implementation for retrieve_context.rs.
 
 ### Responsibilities
 * Handles logic related to retrieve_context.
+
+### Main Workflow
+* Initialization and execution of retrieve_context logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::R2rClient, serde_json::{json, Value}, std::sync::Arc, super::*
@@ -136,6 +139,96 @@ sequenceDiagram
     Caller->>Svc: push_osr_metric()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class ManualMockR2rClient {
+    -push_osr_metric(_metric: &factory_core::OsrMetric:Any) : anyhow::Result<()>
+    -search(_query: &str:Any) : anyhow::Result<String>
+}
+R2rClient <|-- ManualMockR2rClient : Inheritance
+class RetrieveContextTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(r2r_client: Arc<dyn R2rClient>:Any) : Self
+}
+Tool <|-- RetrieveContextTool : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "retrieve_context" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Retrieve_contextService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "retrieve_context" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::protocol::{CallToolResult, McpContent}" as crate::protocol::{CallToolResult, McpContent}
+comp --> crate::protocol::{CallToolResult, McpContent}
+component "crate::tools::Tool" as crate::tools::Tool
+comp --> crate::tools::Tool
+component "factory_infrastructure::R2rClient" as factory_infrastructure::R2rClient
+comp --> factory_infrastructure::R2rClient
+component "serde_json::{json, Value}" as serde_json::{json, Value}
+comp --> serde_json::{json, Value}
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[retrieve_context]
+[retrieve_context] --> [async_trait::async_trait]
+[retrieve_context] --> [crate::protocol::{CallToolResult, McpContent}]
+[retrieve_context] --> [crate::tools::Tool]
+[retrieve_context] --> [factory_infrastructure::R2rClient]
+[retrieve_context] --> [serde_json::{json, Value}]
+[retrieve_context] --> [std::sync::Arc]
+[retrieve_context] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> RetrieveContextTool::new
+@enduml
 
 ```
 

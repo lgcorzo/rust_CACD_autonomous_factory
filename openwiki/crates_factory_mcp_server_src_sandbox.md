@@ -4,7 +4,7 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: sandbox.rs
@@ -18,6 +18,9 @@ Provides implementation for sandbox.rs.
 
 ### Responsibilities
 * Handles logic related to sandbox.
+
+### Main Workflow
+* Initialization and execution of sandbox logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::tools::Tool, crate::tools::launch_sandbox_pod::LaunchSandboxPodTool, serde::{Deserialize, Serialize}, serde_json::json, std::time::Duration, super::*, tokio::process::Command, tokio::time::timeout
@@ -253,6 +256,108 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class ExecutionResult {
+}
+class GvisorK8sDriver {
+    -execute(code: &str:Any, language: &str:Any) : anyhow::Result<ExecutionResult>
+}
+SandboxDriver <|-- GvisorK8sDriver : Inheritance
+class NativeSurgerySandboxDriver {
+    -execute(_code: &str:Any, _language: &str:Any) : anyhow::Result<ExecutionResult>
+    -execute_surgery(id: &str:Any, patch: &factory_core::executor::SurgicalPatch:Any) : factory_core::error::Result<factory_core::executor::ExecutionResult>
+}
+SandboxDriver <|-- NativeSurgerySandboxDriver : Inheritance
+interface SandboxDriver <<trait>> {
+}
+enum SandboxMode {
+}
+class SubprocessDriver {
+    -execute(code: &str:Any, language: &str:Any) : anyhow::Result<ExecutionResult>
+}
+SandboxDriver <|-- SubprocessDriver : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "sandbox" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "SandboxService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "sandbox" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::tools::Tool" as crate::tools::Tool
+comp --> crate::tools::Tool
+component "crate::tools::launch_sandbox_pod::LaunchSandboxPodTool" as crate::tools::launch_sandbox_pod::LaunchSandboxPodTool
+comp --> crate::tools::launch_sandbox_pod::LaunchSandboxPodTool
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "serde_json::json" as serde_json::json
+comp --> serde_json::json
+component "std::time::Duration" as std::time::Duration
+comp --> std::time::Duration
+component "super::*" as super::*
+comp --> super::*
+component "tokio::process::Command" as tokio::process::Command
+comp --> tokio::process::Command
+component "tokio::time::timeout" as tokio::time::timeout
+comp --> tokio::time::timeout
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[sandbox]
+[sandbox] --> [async_trait::async_trait]
+[sandbox] --> [crate::tools::Tool]
+[sandbox] --> [crate::tools::launch_sandbox_pod::LaunchSandboxPodTool]
+[sandbox] --> [serde::{Deserialize, Serialize}]
+[sandbox] --> [serde_json::json]
+[sandbox] --> [std::time::Duration]
+[sandbox] --> [super::*]
+[sandbox] --> [tokio::process::Command]
+[sandbox] --> [tokio::time::timeout]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

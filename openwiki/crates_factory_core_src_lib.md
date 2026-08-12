@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: lib.rs
@@ -18,6 +18,9 @@ Provides implementation for lib.rs.
 
 ### Responsibilities
 * Handles logic related to lib.
+
+### Main Workflow
+* Initialization and execution of lib logic.
 
 ### Dependencies
 * chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap, uuid::Uuid
@@ -544,6 +547,104 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class ComplianceReport {
+}
+class FeatureImportances {
+}
+class FinOpsTag {
+}
+class Inputs {
+}
+class Metadata {
+}
+class Mission {
+}
+enum MissionStatus {
+}
+class OsrMetric {
+}
+class Outputs {
+}
+class SHAPValues {
+}
+class SpecArtifact {
+}
+class Targets {
+}
+class Task {
+}
+enum TaskStatus {
+}
+class UserFeedbackPayload {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "lib" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "LibService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "lib" as comp
+component "chrono::{DateTime, Utc}" as chrono::{DateTime, Utc}
+comp --> chrono::{DateTime, Utc}
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "std::collections::HashMap" as std::collections::HashMap
+comp --> std::collections::HashMap
+component "uuid::Uuid" as uuid::Uuid
+comp --> uuid::Uuid
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[lib]
+[lib] --> [chrono::{DateTime, Utc}]
+[lib] --> [serde::{Deserialize, Serialize}]
+[lib] --> [std::collections::HashMap]
+[lib] --> [uuid::Uuid]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

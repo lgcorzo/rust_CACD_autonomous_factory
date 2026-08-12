@@ -4,7 +4,7 @@ title: "osr.rs"
 source_path: "crates/factory-application/src/utils/osr.rs"
 description: "Detailed documentation for osr.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: osr.rs
@@ -18,6 +18,9 @@ Provides implementation for osr.rs.
 
 ### Responsibilities
 * Handles logic related to osr.
+
+### Main Workflow
+* Initialization and execution of osr logic.
 
 ### Dependencies
 * super::*
@@ -66,6 +69,68 @@ sequenceDiagram
     Caller->>Svc: calculate_osr()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "osr" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "OsrService"
+Caller -> Svc: calculate_osr()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "osr" as comp
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[osr]
+[osr] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> calculate_osr
+[API] --> levenshtein_distance
+@enduml
 
 ```
 

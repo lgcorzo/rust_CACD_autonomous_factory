@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-cli/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: main.rs
@@ -18,6 +18,9 @@ Provides implementation for main.rs.
 
 ### Responsibilities
 * Handles logic related to main.
+
+### Main Workflow
+* Initialization and execution of main logic.
 
 ### Dependencies
 * clap::{Parser, Subcommand}, factory_infrastructure::r2r::R2rClient
@@ -121,6 +124,72 @@ sequenceDiagram
     Caller->>Svc: main()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class Cli {
+}
+enum Commands {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "main" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "MainService"
+Caller -> Svc: main()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "main" as comp
+component "clap::{Parser, Subcommand}" as clap::{Parser, Subcommand}
+comp --> clap::{Parser, Subcommand}
+component "factory_infrastructure::r2r::R2rClient" as factory_infrastructure::r2r::R2rClient
+comp --> factory_infrastructure::r2r::R2rClient
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[main]
+[main] --> [clap::{Parser, Subcommand}]
+[main] --> [factory_infrastructure::r2r::R2rClient]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

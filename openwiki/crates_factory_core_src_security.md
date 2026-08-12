@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: security.rs
@@ -18,6 +18,9 @@ Provides implementation for security.rs.
 
 ### Responsibilities
 * Handles logic related to security.
+
+### Main Workflow
+* Initialization and execution of security logic.
 
 ### Dependencies
 * async_trait::async_trait, base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, crate::error::Result, ed25519_dalek::{Signature, Verifier}, zeroize::Zeroize
@@ -249,6 +252,92 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class AuditResult {
+}
+class Ed25519SecurityValidator {
+    -audit_content(_content: &str:Any) : Result<AuditResult>
+    -validate_signature(data: &[u8]:Any, signature: &str:Any) : Result<bool>
+}
+SecurityValidator <|-- Ed25519SecurityValidator : Inheritance
+class JitToken {
+}
+class SandboxConstraint {
+}
+interface SecurityBounds <<trait>> {
+}
+interface SecurityValidator <<trait>> {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "security" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "SecurityService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "security" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}" as base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}
+comp --> base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}
+component "crate::error::Result" as crate::error::Result
+comp --> crate::error::Result
+component "ed25519_dalek::{Signature, Verifier}" as ed25519_dalek::{Signature, Verifier}
+comp --> ed25519_dalek::{Signature, Verifier}
+component "zeroize::Zeroize" as zeroize::Zeroize
+comp --> zeroize::Zeroize
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[security]
+[security] --> [async_trait::async_trait]
+[security] --> [base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}]
+[security] --> [crate::error::Result]
+[security] --> [ed25519_dalek::{Signature, Verifier}]
+[security] --> [zeroize::Zeroize]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

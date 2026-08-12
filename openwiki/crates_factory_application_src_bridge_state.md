@@ -4,7 +4,7 @@ title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Detailed documentation for state.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: state.rs
@@ -18,6 +18,9 @@ Provides implementation for state.rs.
 
 ### Responsibilities
 * Handles logic related to state.
+
+### Main Workflow
+* Initialization and execution of state logic.
 
 ### Dependencies
 * chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap
@@ -227,6 +230,83 @@ sequenceDiagram
     Caller->>Svc: get_checkpoint_key()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class BridgeState {
+    -get_checkpoint_key(session_id: &str:Any) : String
+    +load_checkpoint(session_id: &str:Any, s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) : anyhow::Result<Option<Self>>
+    +new(session_id: String:Any) : Self
+    +save_checkpoint(s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) : anyhow::Result<()>
+}
+enum BridgeStatus {
+}
+class StepCheckpoint {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "state" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "StateService"
+Caller -> Svc: load_checkpoint()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "state" as comp
+component "chrono::{DateTime, Utc}" as chrono::{DateTime, Utc}
+comp --> chrono::{DateTime, Utc}
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "std::collections::HashMap" as std::collections::HashMap
+comp --> std::collections::HashMap
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[state]
+[state] --> [chrono::{DateTime, Utc}]
+[state] --> [serde::{Deserialize, Serialize}]
+[state] --> [std::collections::HashMap]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> BridgeState::load_checkpoint
+[API] --> BridgeState::new
+[API] --> BridgeState::save_checkpoint
+@enduml
 
 ```
 

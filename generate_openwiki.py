@@ -13,6 +13,14 @@ def parse_file(filepath):
         cmd = ['python3', 'parse_python.py', filepath]
     elif filepath.endswith(('.ts', '.tsx', '.js', '.jsx')):
         cmd = ['python3', 'parse_ts.py', filepath]
+    elif filepath.endswith('.java'):
+        cmd = ['python3', 'parse_java.py', filepath]
+    elif filepath.endswith('.cs'):
+        cmd = ['python3', 'parse_csharp.py', filepath]
+    elif filepath.endswith(('.c', '.cpp', '.h', '.hpp')):
+        cmd = ['python3', 'parse_cpp.py', filepath]
+    elif filepath.endswith('.go'):
+        cmd = ['python3', 'parse_go.py', filepath]
     else:
         return {"classes": [], "free_functions": [], "dependencies": []}
 
@@ -68,6 +76,82 @@ def generate_sequence_diagram(module_name, classes, free_functions):
     return seq
 
 
+def generate_plantuml_classes(classes):
+    puml = "@startuml\n"
+    if not classes:
+        return puml + "class EmptyModule {\n}\n@enduml\n"
+    for c in classes:
+        kind = c.get('kind', 'class')
+        if kind == 'trait' or kind == 'interface':
+            puml += f"interface {c['name']} <<{kind}>> {{\n"
+        elif kind == 'enum':
+            puml += f"enum {c['name']} {{\n"
+        else:
+            puml += f"class {c['name']} {{\n"
+        for m in c.get('methods', []):
+            visibility = "+" if m.get('is_pub', True) else "-"
+            args_str = ", ".join([f"{a['name']}:{a['type']}" for a in m.get('args', [])])
+            ret_type = m.get('ret_type', 'None').strip()
+            puml += f"    {visibility}{m['name']}({args_str}) : {ret_type}\n"
+        puml += "}\n"
+        for impl in c.get('implements', []):
+            puml += f"{impl} <|-- {c['name']} : Inheritance\n"
+    puml += "@enduml\n"
+    return puml
+
+def generate_plantuml_sequence(module_name, classes, free_functions):
+    seq = "@startuml\nautonumber\nparticipant Caller as \"Client Interface\"\n"
+    svc_name = module_name.capitalize() + "Service"
+    seq += f"participant Svc as \"{svc_name}\"\n"
+    method_name = "execute"
+    if classes and classes[0].get('methods'):
+        for m in classes[0].get('methods'):
+            if m.get('is_pub', True):
+                method_name = m['name']
+                break
+    elif free_functions:
+        method_name = free_functions[0]['name']
+    seq += f"Caller -> Svc: {method_name}()\n"
+    seq += "note over Svc: Processing internal logic\nSvc --> Caller: result\n@enduml\n"
+    return seq
+
+def generate_plantuml_package(module_name):
+    return f"@startuml\npackage \"{module_name}\" {{\n  [Module Components]\n}}\n@enduml\n"
+
+def generate_plantuml_component(module_name, dependencies):
+    puml = "@startuml\n"
+    puml += f"component \"{module_name}\" as comp\n"
+    for dep in dependencies:
+        puml += f"component \"{dep}\" as {dep.replace('.', '_').replace('-', '_')}\n"
+        puml += f"comp --> {dep.replace('.', '_').replace('-', '_')}\n"
+    puml += "@enduml\n"
+    return puml
+
+def generate_plantuml_dependency(module_name, dependencies):
+    puml = "@startuml\n"
+    puml += f"[{module_name}]\n"
+    for dep in dependencies:
+        puml += f"[{module_name}] --> [{dep}]\n"
+    puml += "@enduml\n"
+    return puml
+
+def generate_plantuml_callgraph(classes, free_functions):
+    puml = "@startuml\n"
+    has_nodes = False
+    for c in classes:
+        for m in c.get('methods', []):
+            if m.get('is_pub', True):
+                puml += f"[API] --> {c['name']}::{m['name']}\n"
+                has_nodes = True
+    for f in free_functions:
+        if f.get('is_pub', True):
+            puml += f"[API] --> {f['name']}\n"
+            has_nodes = True
+    if not has_nodes:
+        puml += "[API] --> [No Public API]\n"
+    puml += "@enduml\n"
+    return puml
+
 def write_file_doc(file_path, parsed, now):
     file_name = os.path.basename(file_path)
     base_name = os.path.splitext(file_name)[0]
@@ -86,6 +170,13 @@ def write_file_doc(file_path, parsed, now):
     parsed['free_functions'].sort(key=lambda x: x['name'])
     mermaid_classes = generate_mermaid_classes(parsed['classes'])
     seq_diagram = generate_sequence_diagram(base_name, parsed['classes'], parsed['free_functions'])
+
+    puml_classes = generate_plantuml_classes(parsed['classes'])
+    puml_seq = generate_plantuml_sequence(base_name, parsed['classes'], parsed['free_functions'])
+    puml_pkg = generate_plantuml_package(base_name)
+    puml_comp = generate_plantuml_component(base_name, parsed['dependencies'])
+    puml_dep = generate_plantuml_dependency(base_name, parsed['dependencies'])
+    puml_call = generate_plantuml_callgraph(parsed['classes'], parsed['free_functions'])
 
     deps_str = ", ".join(sorted(parsed['dependencies'])) if parsed['dependencies'] else "None"
 
@@ -123,6 +214,9 @@ Provides implementation for {file_name}.
 
 ### Responsibilities
 * Handles logic related to {base_name}.
+
+### Main Workflow
+* Initialization and execution of {base_name} logic.
 
 ### Dependencies
 * {deps_str}
@@ -241,6 +335,38 @@ Provides implementation for {file_name}.
 {seq_diagram}
 ```
 
+## UML
+
+### Class Diagram
+```plantuml
+{puml_classes}
+```
+
+### Package Diagram
+```plantuml
+{puml_pkg}
+```
+
+### Sequence Diagram
+```plantuml
+{puml_seq}
+```
+
+### Component Diagram
+```plantuml
+{puml_comp}
+```
+
+### Dependency Graph
+```plantuml
+{puml_dep}
+```
+
+### Call Graph
+```plantuml
+{puml_call}
+```
+
 ## Examples
 
 ```
@@ -344,7 +470,7 @@ def main():
             if any(ignored in parts for ignored in ['.git', '.github', '.vscode', '.idea', 'node_modules', 'dist', 'bin', 'obj', 'target', 'coverage', '__pycache__', 'openwiki']):
                 continue
             for f in files:
-                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx')):
+                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx', '.java', '.cs', '.c', '.cpp', '.h', '.hpp', '.go')):
                     files_to_process.append(os.path.normpath(os.path.join(clean_root, f)))
     else:
         setup_okf_structure()
@@ -362,7 +488,7 @@ def main():
             for f in output.splitlines():
                 f = f.strip()
                 if not f: continue
-                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx')):
+                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx', '.java', '.cs', '.c', '.cpp', '.h', '.hpp', '.go')):
                     if os.path.exists(f):
                         files_to_process.append(f)
                     else:
@@ -395,8 +521,11 @@ def main():
     validate_links()
 
 def validate_links():
-    import glob
-    files = glob.glob('openwiki/**/*.md', recursive=True)
+    files = []
+    for root, _, filenames in os.walk('openwiki'):
+        for f in filenames:
+            if f.endswith('.md'):
+                files.append(os.path.join(root, f))
     all_pages = set()
     for f in files:
         basename = os.path.basename(f)

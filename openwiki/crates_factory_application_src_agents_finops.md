@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Detailed documentation for finops.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: finops.rs
@@ -18,6 +18,9 @@ Provides implementation for finops.rs.
 
 ### Responsibilities
 * Handles logic related to finops.
+
+### Main Workflow
+* Initialization and execution of finops logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::Agent, factory_core::FinOpsTag, reqwest::Client, serde_json::Value, std::time::Duration, super::*
@@ -133,6 +136,93 @@ sequenceDiagram
     Caller->>Svc: default()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class FinOpsAgent {
+    -default() : Self
+    -execute(_task_description: &str:Any) : anyhow::Result<Value>
+    +monitor_budget() : anyhow::Result<()>
+    -name() : String
+    +new(litellm_base_url: String:Any, api_key: String:Any, tag: FinOpsTag:Any) : Self
+}
+Agent <|-- FinOpsAgent : Inheritance
+Default <|-- FinOpsAgent : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "finops" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "FinopsService"
+Caller -> Svc: monitor_budget()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "finops" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::Agent" as crate::Agent
+comp --> crate::Agent
+component "factory_core::FinOpsTag" as factory_core::FinOpsTag
+comp --> factory_core::FinOpsTag
+component "reqwest::Client" as reqwest::Client
+comp --> reqwest::Client
+component "serde_json::Value" as serde_json::Value
+comp --> serde_json::Value
+component "std::time::Duration" as std::time::Duration
+comp --> std::time::Duration
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[finops]
+[finops] --> [async_trait::async_trait]
+[finops] --> [crate::Agent]
+[finops] --> [factory_core::FinOpsTag]
+[finops] --> [reqwest::Client]
+[finops] --> [serde_json::Value]
+[finops] --> [std::time::Duration]
+[finops] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> FinOpsAgent::monitor_budget
+[API] --> FinOpsAgent::new
+@enduml
 
 ```
 

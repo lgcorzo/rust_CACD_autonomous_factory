@@ -4,7 +4,7 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Detailed documentation for nhi.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: nhi.rs
@@ -18,6 +18,9 @@ Provides implementation for nhi.rs.
 
 ### Responsibilities
 * Handles logic related to nhi.
+
+### Main Workflow
+* Initialization and execution of nhi logic.
 
 ### Dependencies
 * base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}, chrono::{DateTime, Utc}, ed25519_dalek::Signer, ed25519_dalek::SigningKey, rand::rngs::OsRng, serde::{Deserialize, Serialize}, super::*
@@ -261,6 +264,96 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class AgentSubject {
+}
+class CryptographicProof {
+}
+class VerifiableCredential {
+    +new(id: String:Any, issuer: String:Any, credential_subject: AgentSubject:Any) : Self
+    +sign(signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) : crate::error::Result<()>
+    +sign_async(signing_key: ed25519_dalek::SigningKey:Any, key_id: String:Any) : crate::error::Result<()>
+    +sign_batch_async(credentials: &mut [VerifiableCredential]:Any, signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) : crate::error::Result<()>
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "nhi" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "NhiService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "nhi" as comp
+component "base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}" as base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}
+comp --> base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}
+component "chrono::{DateTime, Utc}" as chrono::{DateTime, Utc}
+comp --> chrono::{DateTime, Utc}
+component "ed25519_dalek::Signer" as ed25519_dalek::Signer
+comp --> ed25519_dalek::Signer
+component "ed25519_dalek::SigningKey" as ed25519_dalek::SigningKey
+comp --> ed25519_dalek::SigningKey
+component "rand::rngs::OsRng" as rand::rngs::OsRng
+comp --> rand::rngs::OsRng
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[nhi]
+[nhi] --> [base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}]
+[nhi] --> [chrono::{DateTime, Utc}]
+[nhi] --> [ed25519_dalek::Signer]
+[nhi] --> [ed25519_dalek::SigningKey]
+[nhi] --> [rand::rngs::OsRng]
+[nhi] --> [serde::{Deserialize, Serialize}]
+[nhi] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> VerifiableCredential::new
+[API] --> VerifiableCredential::sign
+[API] --> VerifiableCredential::sign_async
+[API] --> VerifiableCredential::sign_batch_async
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: autonomous_mission.rs
@@ -18,6 +18,9 @@ Provides implementation for autonomous_mission.rs.
 
 ### Responsibilities
 * Handles logic related to autonomous_mission.
+
+### Main Workflow
+* Initialization and execution of autonomous_mission logic.
 
 ### Dependencies
 * crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}, factory_core::proto::v1::MissionInput as ProtoInput, factory_infrastructure::{
@@ -158,6 +161,110 @@ sequenceDiagram
     Caller->>Svc: from_protobuf()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class MissionInput {
+    +from_protobuf(bytes: &[u8]:Any) : Result<Self, prost::DecodeError>
+}
+class MissionOutput {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "autonomous_mission" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Autonomous_missionService"
+Caller -> Svc: from_protobuf()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "autonomous_mission" as comp
+component "crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}" as crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}
+comp --> crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}
+component "factory_core::proto::v1::MissionInput as ProtoInput" as factory_core::proto::v1::MissionInput as ProtoInput
+comp --> factory_core::proto::v1::MissionInput as ProtoInput
+component "factory_infrastructure::{
+    HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+    aethalgard::{AethalgardClient, HttpAethalgardClient},
+}" as factory_infrastructure::{
+    HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+    aethalgard::{AethalgardClient, HttpAethalgardClient},
+}
+comp --> factory_infrastructure::{
+    HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+    aethalgard::{AethalgardClient, HttpAethalgardClient},
+}
+component "hatchet_sdk::Hatchet" as hatchet_sdk::Hatchet
+comp --> hatchet_sdk::Hatchet
+component "hatchet_sdk::runnables::Workflow" as hatchet_sdk::runnables::Workflow
+comp --> hatchet_sdk::runnables::Workflow
+component "prost::Message" as prost::Message
+comp --> prost::Message
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+component "super::*" as super::*
+comp --> super::*
+component "uuid::Uuid" as uuid::Uuid
+comp --> uuid::Uuid
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[autonomous_mission]
+[autonomous_mission] --> [crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}]
+[autonomous_mission] --> [factory_core::proto::v1::MissionInput as ProtoInput]
+[autonomous_mission] --> [factory_infrastructure::{
+    HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+    aethalgard::{AethalgardClient, HttpAethalgardClient},
+}]
+[autonomous_mission] --> [hatchet_sdk::Hatchet]
+[autonomous_mission] --> [hatchet_sdk::runnables::Workflow]
+[autonomous_mission] --> [prost::Message]
+[autonomous_mission] --> [serde::{Deserialize, Serialize}]
+[autonomous_mission] --> [std::sync::Arc]
+[autonomous_mission] --> [super::*]
+[autonomous_mission] --> [uuid::Uuid]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> MissionInput::from_protobuf
+[API] --> create_mission_workflow
+@enduml
 
 ```
 

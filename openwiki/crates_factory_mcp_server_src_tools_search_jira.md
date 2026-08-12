@@ -4,7 +4,7 @@ title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: search_jira.rs
@@ -18,6 +18,9 @@ Provides implementation for search_jira.rs.
 
 ### Responsibilities
 * Handles logic related to search_jira.
+
+### Main Workflow
+* Initialization and execution of search_jira logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::JiraClient, serde_json::{json, Value}, std::sync::Arc, super::*
@@ -134,6 +137,95 @@ sequenceDiagram
     Caller->>Svc: search_issues()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class ManualMockJiraClient {
+    -search_issues(_query: &str:Any) : anyhow::Result<String>
+}
+JiraClient <|-- ManualMockJiraClient : Inheritance
+class SearchJiraTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(jira_client: Arc<dyn JiraClient>:Any) : Self
+}
+Tool <|-- SearchJiraTool : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "search_jira" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Search_jiraService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "search_jira" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::protocol::{CallToolResult, McpContent}" as crate::protocol::{CallToolResult, McpContent}
+comp --> crate::protocol::{CallToolResult, McpContent}
+component "crate::tools::Tool" as crate::tools::Tool
+comp --> crate::tools::Tool
+component "factory_infrastructure::JiraClient" as factory_infrastructure::JiraClient
+comp --> factory_infrastructure::JiraClient
+component "serde_json::{json, Value}" as serde_json::{json, Value}
+comp --> serde_json::{json, Value}
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+component "super::*" as super::*
+comp --> super::*
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[search_jira]
+[search_jira] --> [async_trait::async_trait]
+[search_jira] --> [crate::protocol::{CallToolResult, McpContent}]
+[search_jira] --> [crate::tools::Tool]
+[search_jira] --> [factory_infrastructure::JiraClient]
+[search_jira] --> [serde_json::{json, Value}]
+[search_jira] --> [std::sync::Arc]
+[search_jira] --> [super::*]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> SearchJiraTool::new
+@enduml
 
 ```
 

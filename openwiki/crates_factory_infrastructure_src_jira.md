@@ -4,7 +4,7 @@ title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Detailed documentation for jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: jira.rs
@@ -18,6 +18,9 @@ Provides implementation for jira.rs.
 
 ### Responsibilities
 * Handles logic related to jira.
+
+### Main Workflow
+* Initialization and execution of jira logic.
 
 ### Dependencies
 * async_trait::async_trait, serde_json::json, super::*, wiremock::matchers::{method, path, query_param}, wiremock::{Mock, MockServer, ResponseTemplate}
@@ -130,6 +133,84 @@ sequenceDiagram
     Caller->>Svc: new()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class HttpJiraClient {
+    +new(url: String:Any, username: String:Any, api_token: String:Any) : Self
+    -search_issues(query: &str:Any) : anyhow::Result<String>
+}
+JiraClient <|-- HttpJiraClient : Inheritance
+interface JiraClient <<trait>> {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "jira" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "JiraService"
+Caller -> Svc: new()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "jira" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "serde_json::json" as serde_json::json
+comp --> serde_json::json
+component "super::*" as super::*
+comp --> super::*
+component "wiremock::matchers::{method, path, query_param}" as wiremock::matchers::{method, path, query_param}
+comp --> wiremock::matchers::{method, path, query_param}
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock::{Mock, MockServer, ResponseTemplate}
+comp --> wiremock::{Mock, MockServer, ResponseTemplate}
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[jira]
+[jira] --> [async_trait::async_trait]
+[jira] --> [serde_json::json]
+[jira] --> [super::*]
+[jira] --> [wiremock::matchers::{method, path, query_param}]
+[jira] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> HttpJiraClient::new
+@enduml
 
 ```
 

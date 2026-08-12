@@ -1,29 +1,29 @@
 ---
 type: "module-documentation"
-title: "test_ziti.rs"
-source_path: "test_ziti.rs"
-description: "Detailed documentation for test_ziti.rs"
+title: "parse_go.py"
+source_path: "parse_go.py"
+description: "Detailed documentation for parse_go.py"
 tags: ["documentation", "ast", "openwiki"]
 last_verified_commit: "dfd90f5"
 ---
 
-# File: test_ziti.rs
+# File: parse_go.py
 
-**Source Path:** `test_ziti.rs`
+**Source Path:** `parse_go.py`
 
 ## Overview
 
 ### Purpose
-Provides implementation for test_ziti.rs.
+Provides implementation for parse_go.py.
 
 ### Responsibilities
-* Handles logic related to test_ziti.
+* Handles logic related to parse_go.
 
 ### Main Workflow
-* Initialization and execution of test_ziti logic.
+* Initialization and execution of parse_go logic.
 
 ### Dependencies
-* ziti_sdk::ZitiConfig
+* json, sys, tree_sitter, tree_sitter_go
 
 ### Imported modules
 * None
@@ -35,7 +35,7 @@ Provides implementation for test_ziti.rs.
 * None
 
 ### Exported functions
-* None
+* get_node_text, parse_go
 
 ## Public API
 
@@ -43,7 +43,11 @@ Provides implementation for test_ziti.rs.
 
 ### Exported Functions
 
-None.
+#### `get_node_text(node (Any), source_bytes (Any)) -> None`
+Executes get_node_text.
+
+#### `parse_go(filepath (Any)) -> None`
+Executes parse_go.
 
 ## Internal architecture
 
@@ -61,8 +65,8 @@ classDiagram
 sequenceDiagram
     autonumber
     participant Caller as Client Interface
-    participant Svc as Test_zitiService
-    Caller->>Svc: main()
+    participant Svc as Parse_goService
+    Caller->>Svc: get_node_text()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
 
@@ -82,7 +86,7 @@ class EmptyModule {
 ### Package Diagram
 ```plantuml
 @startuml
-package "test_ziti" {
+package "parse_go" {
   [Module Components]
 }
 @enduml
@@ -94,8 +98,8 @@ package "test_ziti" {
 @startuml
 autonumber
 participant Caller as "Client Interface"
-participant Svc as "Test_zitiService"
-Caller -> Svc: main()
+participant Svc as "Parse_goService"
+Caller -> Svc: get_node_text()
 note over Svc: Processing internal logic
 Svc --> Caller: result
 @enduml
@@ -105,9 +109,15 @@ Svc --> Caller: result
 ### Component Diagram
 ```plantuml
 @startuml
-component "test_ziti" as comp
-component "ziti_sdk::ZitiConfig" as ziti_sdk::ZitiConfig
-comp --> ziti_sdk::ZitiConfig
+component "parse_go" as comp
+component "json" as json
+comp --> json
+component "sys" as sys
+comp --> sys
+component "tree_sitter" as tree_sitter
+comp --> tree_sitter
+component "tree_sitter_go" as tree_sitter_go
+comp --> tree_sitter_go
 @enduml
 
 ```
@@ -115,8 +125,11 @@ comp --> ziti_sdk::ZitiConfig
 ### Dependency Graph
 ```plantuml
 @startuml
-[test_ziti]
-[test_ziti] --> [ziti_sdk::ZitiConfig]
+[parse_go]
+[parse_go] --> [json]
+[parse_go] --> [sys]
+[parse_go] --> [tree_sitter]
+[parse_go] --> [tree_sitter_go]
 @enduml
 
 ```
@@ -124,7 +137,8 @@ comp --> ziti_sdk::ZitiConfig
 ### Call Graph
 ```plantuml
 @startuml
-[API] --> [No Public API]
+[API] --> get_node_text
+[API] --> parse_go
 @enduml
 
 ```
@@ -132,10 +146,10 @@ comp --> ziti_sdk::ZitiConfig
 ## Examples
 
 ```
-// Example usage of test_ziti.rs components
-import { ... } from 'test_ziti.rs';
+// Example usage of parse_go.py components
+import { ... } from 'parse_go.py';
 ```
 
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** ziti_sdk::ZitiConfig
+* **Dependencies:** json, sys, tree_sitter, tree_sitter_go

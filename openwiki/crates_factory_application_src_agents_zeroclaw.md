@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: zeroclaw.rs
@@ -18,6 +18,9 @@ Provides implementation for zeroclaw.rs.
 
 ### Responsibilities
 * Handles logic related to zeroclaw.
+
+### Main Workflow
+* Initialization and execution of zeroclaw logic.
 
 ### Dependencies
 * async_trait::async_trait, crate::Agent, factory_infrastructure::{AethalgardClient, McpClient}, serde_json::{Value, json}, std::sync::Arc
@@ -193,6 +196,89 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class ZeroClawAgent {
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    +execute_task(mission_id: &str:Any, task_description: &str:Any, _files: &[String]:Any) : anyhow::Result<Value>
+    +introspect_k8s(mission_id: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +new(mcp_client: Arc<dyn McpClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) : Self
+    +validate_mission(mission_id: &str:Any, test_command: &str:Any) : anyhow::Result<Value>
+}
+Agent <|-- ZeroClawAgent : Inheritance
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "zeroclaw" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ZeroclawService"
+Caller -> Svc: execute_task()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "zeroclaw" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "crate::Agent" as crate::Agent
+comp --> crate::Agent
+component "factory_infrastructure::{AethalgardClient, McpClient}" as factory_infrastructure::{AethalgardClient, McpClient}
+comp --> factory_infrastructure::{AethalgardClient, McpClient}
+component "serde_json::{Value, json}" as serde_json::{Value, json}
+comp --> serde_json::{Value, json}
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[zeroclaw]
+[zeroclaw] --> [async_trait::async_trait]
+[zeroclaw] --> [crate::Agent]
+[zeroclaw] --> [factory_infrastructure::{AethalgardClient, McpClient}]
+[zeroclaw] --> [serde_json::{Value, json}]
+[zeroclaw] --> [std::sync::Arc]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> ZeroClawAgent::execute_task
+[API] --> ZeroClawAgent::introspect_k8s
+[API] --> ZeroClawAgent::new
+[API] --> ZeroClawAgent::validate_mission
+@enduml
 
 ```
 

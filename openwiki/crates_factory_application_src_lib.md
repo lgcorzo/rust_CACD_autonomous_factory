@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: lib.rs
@@ -18,6 +18,9 @@ Provides implementation for lib.rs.
 
 ### Responsibilities
 * Handles logic related to lib.
+
+### Main Workflow
+* Initialization and execution of lib logic.
 
 ### Dependencies
 * async_trait::async_trait, serde_json::Value
@@ -91,6 +94,70 @@ sequenceDiagram
     Caller->>Svc: execute()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+interface Agent <<trait>> {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "lib" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "LibService"
+Caller -> Svc: execute()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "lib" as comp
+component "async_trait::async_trait" as async_trait::async_trait
+comp --> async_trait::async_trait
+component "serde_json::Value" as serde_json::Value
+comp --> serde_json::Value
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[lib]
+[lib] --> [async_trait::async_trait]
+[lib] --> [serde_json::Value]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> [No Public API]
+@enduml
 
 ```
 

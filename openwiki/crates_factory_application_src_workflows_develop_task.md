@@ -4,7 +4,7 @@ title: "develop_task.rs"
 source_path: "crates/factory-application/src/workflows/develop_task.rs"
 description: "Detailed documentation for develop_task.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: develop_task.rs
@@ -18,6 +18,9 @@ Provides implementation for develop_task.rs.
 
 ### Responsibilities
 * Handles logic related to develop_task.
+
+### Main Workflow
+* Initialization and execution of develop_task logic.
 
 ### Dependencies
 * crate::agents::ZeroClawAgent, factory_infrastructure::{McpClient, McpHttpClient}, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Task, serde::{Deserialize, Serialize}, std::sync::Arc
@@ -123,6 +126,84 @@ sequenceDiagram
     Caller->>Svc: create_develop_task_workflow()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class TaskInput {
+}
+class TaskOutput {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "develop_task" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Develop_taskService"
+Caller -> Svc: create_develop_task_workflow()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "develop_task" as comp
+component "crate::agents::ZeroClawAgent" as crate::agents::ZeroClawAgent
+comp --> crate::agents::ZeroClawAgent
+component "factory_infrastructure::{McpClient, McpHttpClient}" as factory_infrastructure::{McpClient, McpHttpClient}
+comp --> factory_infrastructure::{McpClient, McpHttpClient}
+component "hatchet_sdk::Hatchet" as hatchet_sdk::Hatchet
+comp --> hatchet_sdk::Hatchet
+component "hatchet_sdk::runnables::Task" as hatchet_sdk::runnables::Task
+comp --> hatchet_sdk::runnables::Task
+component "serde::{Deserialize, Serialize}" as serde::{Deserialize, Serialize}
+comp --> serde::{Deserialize, Serialize}
+component "std::sync::Arc" as std::sync::Arc
+comp --> std::sync::Arc
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[develop_task]
+[develop_task] --> [crate::agents::ZeroClawAgent]
+[develop_task] --> [factory_infrastructure::{McpClient, McpHttpClient}]
+[develop_task] --> [hatchet_sdk::Hatchet]
+[develop_task] --> [hatchet_sdk::runnables::Task]
+[develop_task] --> [serde::{Deserialize, Serialize}]
+[develop_task] --> [std::sync::Arc]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> create_develop_task_workflow
+@enduml
 
 ```
 

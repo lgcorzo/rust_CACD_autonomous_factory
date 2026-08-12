@@ -4,7 +4,7 @@ title: "parse_rust.py"
 source_path: "parse_rust.py"
 description: "Detailed documentation for parse_rust.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "dfd90f5"
 ---
 
 # File: parse_rust.py
@@ -18,6 +18,9 @@ Provides implementation for parse_rust.py.
 
 ### Responsibilities
 * Handles logic related to parse_rust.
+
+### Main Workflow
+* Initialization and execution of parse_rust logic.
 
 ### Dependencies
 * json, sys, tree_sitter, tree_sitter_rust
@@ -66,6 +69,77 @@ sequenceDiagram
     Caller->>Svc: get_node_text()
     Note over Svc: Processing internal logic
     Svc-->>Caller: result
+
+```
+
+## UML
+
+### Class Diagram
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
+
+```
+
+### Package Diagram
+```plantuml
+@startuml
+package "parse_rust" {
+  [Module Components]
+}
+@enduml
+
+```
+
+### Sequence Diagram
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Parse_rustService"
+Caller -> Svc: get_node_text()
+note over Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+### Component Diagram
+```plantuml
+@startuml
+component "parse_rust" as comp
+component "json" as json
+comp --> json
+component "sys" as sys
+comp --> sys
+component "tree_sitter" as tree_sitter
+comp --> tree_sitter
+component "tree_sitter_rust" as tree_sitter_rust
+comp --> tree_sitter_rust
+@enduml
+
+```
+
+### Dependency Graph
+```plantuml
+@startuml
+[parse_rust]
+[parse_rust] --> [json]
+[parse_rust] --> [sys]
+[parse_rust] --> [tree_sitter]
+[parse_rust] --> [tree_sitter_rust]
+@enduml
+
+```
+
+### Call Graph
+```plantuml
+@startuml
+[API] --> get_node_text
+[API] --> parse_rust
+@enduml
 
 ```
 
