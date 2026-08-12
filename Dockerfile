@@ -37,6 +37,8 @@ RUN apt-get update && apt-get install -y \
 # Copy the binaries from the builder
 COPY --from=builder /usr/src/app/target/release/factory-cli .
 COPY --from=builder /usr/src/app/target/release/factory-mcp-server .
+COPY --from=builder /usr/src/app/target/release/trigger_mission .
+COPY --from=builder /usr/src/app/target/release/trigger_deep_search .
 
 # Default command
 CMD ["./factory-cli"]
