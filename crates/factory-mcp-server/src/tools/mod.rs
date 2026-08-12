@@ -13,6 +13,7 @@ pub trait Tool: Send + Sync {
 }
 
 pub mod bridge;
+pub mod deep_research_tool;
 pub mod execute_code;
 pub mod index_code;
 pub mod launch_sandbox_pod;
@@ -26,6 +27,7 @@ pub mod spec_kit_tool;
 pub mod update_mission_status;
 
 pub use bridge::BridgeTool;
+pub use deep_research_tool::DeepResearchTool;
 pub use execute_code::ExecuteCodeTool;
 pub use index_code::IndexCodeTool;
 pub use launch_sandbox_pod::LaunchSandboxPodTool;

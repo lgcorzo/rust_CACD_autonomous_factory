@@ -45,14 +45,14 @@ impl McpServer {
     }
     pub async fn register_default_tools(&self) -> anyhow::Result<()> {
         use crate::tools::{
-            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            bridge::BridgeTool, deep_research_tool::DeepResearchTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
         };
-        use factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient};
+        use factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient, SimpleMockKafkaClient};
 
         let sandbox_mode =
             std::env::var("SANDBOX_MODE").unwrap_or_else(|_| "subprocess".to_string());
@@ -95,6 +95,14 @@ impl McpServer {
         let gitlab_token = std::env::var("GITLAB_API_TOKEN").unwrap_or_else(|_| "".to_string());
         let gitlab_client = Arc::new(HttpGitlabClient::new(gitlab_url, gitlab_token));
 
+        let kafka_brokers = std::env::var("KAFKA_BROKERS").unwrap_or_else(|_| "localhost:9092".to_string());
+        let kafka_client: Arc<dyn KafkaClient> = if kafka_brokers == "mock" || kafka_brokers.is_empty() {
+            Arc::new(SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
+        } else {
+            // In a real application we would use RdKafkaClient, using Mock for simplicity if not production
+            Arc::new(SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
+        };
+
         self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone())))
             .await;
         self.add_tool(Box::new(LaunchSandboxPodTool::new())).await;
@@ -120,6 +128,7 @@ impl McpServer {
             .await;
         self.add_tool(Box::new(SpecKitTasksToIssuesTool::new(gitlab_client)))
             .await;
+        self.add_tool(Box::new(DeepResearchTool::new(kafka_client))).await;
         self.add_tool(Box::new(BridgeTool)).await;
 
         Ok(())
