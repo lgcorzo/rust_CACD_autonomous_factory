@@ -234,7 +234,7 @@ pub fn create_deep_research_workflow(
                 })
             })
         })
-        .with_timeout(Some(std::time::Duration::from_secs(600)))
+        .execution_timeout(std::time::Duration::from_secs(600))
         .build()
         .unwrap();
 
