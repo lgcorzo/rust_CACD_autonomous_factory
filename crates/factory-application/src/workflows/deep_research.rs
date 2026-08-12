@@ -210,19 +210,33 @@ pub fn create_deep_research_workflow(
                 let tmp_path = format!("/tmp/okf_research_{}.md", sanitized_job_id);
                 tokio::fs::write(&tmp_path, &okf_content).await?;
 
-                let r2r_ingest_url = std::env::var("R2R_INGEST_URL").unwrap_or_else(|_| "http://localhost:8000/v3/ingestion/documents".to_string());
+                let r2r_ingest_url = std::env::var("R2R_INGEST_URL").unwrap_or_else(|_| "http://localhost:8000/v3/documents".to_string());
                 tracing::info!("Ingesting research to R2R at {}", r2r_ingest_url);
+
+                let form = reqwest::multipart::Form::new()
+                    .text("raw_text", okf_content.clone())
+                    .text("metadata", serde_json::json!({
+                        "title": input.query.clone(),
+                        "type": "deep_research",
+                        "job_id": input.job_id.clone()
+                    }).to_string());
 
                 let res = reqwest::Client::new()
                     .post(&r2r_ingest_url)
-                    .header("Content-Type", "text/markdown")
-                    .body(okf_content.clone())
+                    .multipart(form)
                     .send()
                     .await;
 
                 match res {
-                    Ok(r) if r.status().is_success() => tracing::info!("Ingestion successful"),
-                    Ok(r) => tracing::warn!("Ingestion returned status {}", r.status()),
+                    Ok(r) if r.status().is_success() => {
+                        let text = r.text().await.unwrap_or_default();
+                        tracing::info!("Ingestion successful: {}", text);
+                    }
+                    Ok(r) => {
+                        let status = r.status();
+                        let body = r.text().await.unwrap_or_default();
+                        tracing::warn!("Ingestion returned status {}: {}", status, body);
+                    }
                     Err(e) => tracing::error!("Ingestion failed: {}", e),
                 }
 
