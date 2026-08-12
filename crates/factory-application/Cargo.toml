@@ -20,9 +20,10 @@ futures = "0.3"
 hatchet-sdk = { workspace = true }
 mockall = { workspace = true }
 prost = { workspace = true }
-reqwest = { version = "0.12", features = ["json"] }
+reqwest = { version = "0.12", features = ["json", "stream"] }
 async-openai = "0.23"
 rdkafka = { workspace = true }
+zeroize = "1.8.1"
 
 tokio-test = { workspace = true }
 chrono.workspace = true

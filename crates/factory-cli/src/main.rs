@@ -89,16 +89,19 @@ async fn main() -> anyhow::Result<()> {
             let mission_wf = factory_application::workflows::create_mission_workflow(
                 &hatchet,
                 mcp_url.clone(),
-                r2r_url,
+                r2r_url.clone(),
                 kafka_brokers,
                 aethalgard_webhook_url,
             );
             let task_wf =
                 factory_application::workflows::create_develop_task_workflow(&hatchet, mcp_url);
+            let deep_research_wf =
+                factory_application::workflows::create_deep_research_workflow(&hatchet, r2r_url);
 
             worker =
                 hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &mission_wf);
             worker = hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &task_wf);
+            worker = hatchet_sdk::worker::worker::Register::add_task_or_workflow(worker, &deep_research_wf);
 
             worker.start().await?;
         }
