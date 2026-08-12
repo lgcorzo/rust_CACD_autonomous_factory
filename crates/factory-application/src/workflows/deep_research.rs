@@ -213,13 +213,20 @@ pub fn create_deep_research_workflow(
                 let r2r_ingest_url = std::env::var("R2R_INGEST_URL").unwrap_or_else(|_| "http://localhost:8000/v3/documents".to_string());
                 tracing::info!("Ingesting research to R2R at {}", r2r_ingest_url);
 
-                let form = reqwest::multipart::Form::new()
-                    .text("raw_text", okf_content.clone())
-                    .text("metadata", serde_json::json!({
+                let raw_text_part = reqwest::multipart::Part::bytes(okf_content.as_bytes().to_vec());
+                let metadata_part = reqwest::multipart::Part::bytes(
+                    serde_json::json!({
                         "title": input.query.clone(),
                         "type": "deep_research",
                         "job_id": input.job_id.clone()
-                    }).to_string());
+                    })
+                    .to_string()
+                    .into_bytes(),
+                );
+
+                let form = reqwest::multipart::Form::new()
+                    .part("raw_text", raw_text_part)
+                    .part("metadata", metadata_part);
 
                 let res = reqwest::Client::new()
                     .post(&r2r_ingest_url)
