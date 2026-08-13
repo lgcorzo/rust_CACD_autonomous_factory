@@ -19,6 +19,12 @@ pub trait GitlabClient: Send + Sync {
         title: &str,
         description: &str,
     ) -> anyhow::Result<GitlabIssue>;
+
+    async fn list_open_issues(
+        &self,
+        project_id: &str,
+        labels: Option<String>,
+    ) -> anyhow::Result<Vec<GitlabIssue>>;
 }
 
 pub struct HttpGitlabClient {
@@ -74,6 +80,39 @@ impl GitlabClient for HttpGitlabClient {
 
         let issue: GitlabIssue = res.json().await?;
         Ok(issue)
+    }
+
+    async fn list_open_issues(
+        &self,
+        project_id: &str,
+        labels: Option<String>,
+    ) -> anyhow::Result<Vec<GitlabIssue>> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let mut list_url = format!(
+            "{}/api/v4/projects/{}/issues?state=opened",
+            self.url.trim_end_matches('/'),
+            encoded_project_id
+        );
+        if let Some(lbl) = labels {
+            list_url.push_str("&labels=");
+            list_url.push_str(&urlencoding::encode(&lbl));
+        }
+
+        let res = self
+            .client
+            .get(&list_url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab list issues failed with status {}", status);
+            anyhow::bail!("GitLab list issues failed with status {}", status);
+        }
+
+        let issues: Vec<GitlabIssue> = res.json().await?;
+        Ok(issues)
     }
 }
 
@@ -139,5 +178,36 @@ mod tests {
         assert!(result.is_err());
         let err_msg = result.unwrap_err().to_string();
         assert!(err_msg.contains("401 Unauthorized"));
+    }
+
+    #[tokio::test]
+    async fn test_gitlab_list_open_issues_success() {
+        let mock_server = MockServer::start().await;
+        let client = HttpGitlabClient::new(mock_server.uri(), "test_token".to_string());
+
+        let response_body = json!([
+            {
+                "id": 101,
+                "iid": 1,
+                "title": "Implement feature X",
+                "description": "Details for feature X",
+                "web_url": "https://gitlab.com/my-org/my-project/-/issues/1"
+            }
+        ]);
+
+        Mock::given(method("GET"))
+            .and(path("/api/v4/projects/my-org%2Fmy-project/issues"))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
+            .mount(&mock_server)
+            .await;
+
+        let issues = client
+            .list_open_issues("my-org/my-project", None)
+            .await
+            .unwrap();
+        assert_eq!(issues.len(), 1);
+        assert_eq!(issues[0].id, 101);
+        assert_eq!(issues[0].title, "Implement feature X");
     }
 }
