@@ -2,15 +2,13 @@ name: CI/CD Pipeline
 
 on:
   push:
-    paths-ignore:
-      - "Wiki/**"
-      - "README.md"
-      - ".gitignore"
+    branches:
+      - main
+      - "feature/**"
   pull_request:
-    paths-ignore:
-      - "Wiki/**"
-      - "README.md"
-      - ".gitignore"
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
   workflow_dispatch:
   release:
     types:
@@ -19,7 +17,6 @@ on:
 
 env:
   DOCKER_IMAGE: lgcorzo/dark-gravity-factory
-
 
 jobs:
   governance-gates:
@@ -50,14 +47,16 @@ jobs:
       - name: Verify OSR Threshold
         run: cargo run -p factory-cli -- verify-osr --r2r-url http://localhost:8000
 
+      - name: Install cargo-audit
+        run: |
+          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+          $HOME/.cargo/bin/cargo-binstall -y cargo-audit
+
       - name: Cargo Audit
-        uses: rustsec/audit-check@v1.4.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: cargo audit -D warnings
 
   rust-ci:
     name: Rust CI (Lint & Test)
-    needs: governance-gates
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -84,15 +83,18 @@ jobs:
 
   docker-publish:
     name: Docker Publish
-    needs: rust-ci
+    needs: [governance-gates, rust-ci]
     if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.event_name == 'release')
     runs-on: ubuntu-latest
-    environment: production
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+      SENTRY_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Login to Docker Hub
+        if: ${{ env.DOCKER_USER != '' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -104,7 +106,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
-          push: true
+          push: ${{ env.DOCKER_USER != '' }}
           context: .
           cache-to: type=gha,mode=max
           cache-from: type=gha
@@ -115,9 +117,13 @@ jobs:
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
       - name: Install Sentry CLI
+        if: ${{ env.SENTRY_TOKEN != '' }}
+        continue-on-error: true
         run: curl -sL https://sentry.io/get-cli/ | bash
 
       - name: Create Sentry Release
+        if: ${{ env.SENTRY_TOKEN != '' }}
+        continue-on-error: true
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: lgcorzo
