@@ -6,6 +6,8 @@ pub trait S3Storage: Send + Sync {
 }
 
 pub mod aethalgard;
+pub mod github;
+
 pub mod gitlab;
 pub mod jira;
 pub mod kafka;
@@ -19,7 +21,12 @@ pub mod vault;
 pub mod ziti;
 
 #[cfg(any(test, feature = "test-utils"))]
+pub use github::MockGithubClient;
+pub use github::{GithubClient, GithubIssue, HttpGithubClient};
+
+#[cfg(any(test, feature = "test-utils"))]
 pub use semantica::MockSemanticaClient;
+
 pub use semantica::{
     Conflict, DecisionRecord, HttpSemanticaClient, MissionPlan, ProvenanceReport, SemanticaClient,
 };

@@ -31,6 +31,10 @@ async fn main() -> anyhow::Result<()> {
         .route(
             "/feedback",
             post(factory_mcp_server::feedback_route::handle_feedback),
+        )
+        .route(
+            "/webhooks/github",
+            post(factory_mcp_server::github_webhook::handle_github_webhook),
         );
 
     let app = if allowed_origins_raw.is_empty() {
