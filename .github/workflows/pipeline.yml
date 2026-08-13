@@ -2,16 +2,12 @@ name: CI/CD Pipeline
 
 on:
   push:
-    paths-ignore:
-      - "Wiki/**"
-      - "README.md"
-      - ".gitignore"
+    branches:
+      - main
+      - "feature/**"
   pull_request:
-    types: [opened, synchronize, reopened]
-    paths-ignore:
-      - "Wiki/**"
-      - "README.md"
-      - ".gitignore"
+    branches:
+      - main
   workflow_dispatch:
   release:
     types:
