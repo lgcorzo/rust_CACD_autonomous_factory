@@ -1,7 +1,6 @@
+use crate::semantica::SemanticaClient;
 use async_trait::async_trait;
 use serde_json::json;
-use crate::semantica::SemanticaClient;
-
 
 #[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait]
@@ -76,5 +75,3 @@ impl AethalgardClient for HttpAethalgardClient {
         Ok(true)
     }
 }
-
-

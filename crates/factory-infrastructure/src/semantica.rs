@@ -72,14 +72,20 @@ impl SemanticaClient for HttpSemanticaClient {
 
         let res = req.send().await?;
         if !res.status().is_success() {
-            anyhow::bail!("Semantica record_decision failed with status: {}", res.status());
+            anyhow::bail!(
+                "Semantica record_decision failed with status: {}",
+                res.status()
+            );
         }
 
         Ok(())
     }
 
     async fn detect_conflicts(&self, plan: &MissionPlan) -> anyhow::Result<Vec<Conflict>> {
-        let url = format!("{}/v1/conflicts/detect", self.endpoint.trim_end_matches('/'));
+        let url = format!(
+            "{}/v1/conflicts/detect",
+            self.endpoint.trim_end_matches('/')
+        );
         let mut req = self.client.post(&url).json(plan);
 
         if let Some(ref nhi) = self.nhi_identity {
@@ -88,7 +94,10 @@ impl SemanticaClient for HttpSemanticaClient {
 
         let res = req.send().await?;
         if !res.status().is_success() {
-            anyhow::bail!("Semantica detect_conflicts failed with status: {}", res.status());
+            anyhow::bail!(
+                "Semantica detect_conflicts failed with status: {}",
+                res.status()
+            );
         }
 
         let conflicts: Vec<Conflict> = res.json().await?;
@@ -109,7 +118,10 @@ impl SemanticaClient for HttpSemanticaClient {
 
         let res = req.send().await?;
         if !res.status().is_success() {
-            anyhow::bail!("Semantica verify_provenance failed with status: {}", res.status());
+            anyhow::bail!(
+                "Semantica verify_provenance failed with status: {}",
+                res.status()
+            );
         }
 
         let report: ProvenanceReport = res.json().await?;
@@ -124,9 +136,7 @@ mod tests {
     #[tokio::test]
     async fn test_mock_semantica_client() {
         let mut mock = MockSemanticaClient::new();
-        mock.expect_record_decision()
-            .times(1)
-            .returning(|_| Ok(()));
+        mock.expect_record_decision().times(1).returning(|_| Ok(()));
 
         let record = DecisionRecord {
             decision_id: "dec-123".to_string(),
@@ -144,16 +154,14 @@ mod tests {
     #[tokio::test]
     async fn test_mock_detect_conflicts() {
         let mut mock = MockSemanticaClient::new();
-        mock.expect_detect_conflicts()
-            .times(1)
-            .returning(|_| {
-                Ok(vec![Conflict {
-                    conflict_id: "conf-1".to_string(),
-                    rule_violated: "constitution_rule_lat_01".to_string(),
-                    description: "Proposed design exceeds max response latency".to_string(),
-                    severity: "HIGH".to_string(),
-                }])
-            });
+        mock.expect_detect_conflicts().times(1).returning(|_| {
+            Ok(vec![Conflict {
+                conflict_id: "conf-1".to_string(),
+                rule_violated: "constitution_rule_lat_01".to_string(),
+                description: "Proposed design exceeds max response latency".to_string(),
+                severity: "HIGH".to_string(),
+            }])
+        });
 
         let plan = MissionPlan {
             mission_id: "m-1".to_string(),
@@ -168,4 +176,3 @@ mod tests {
         assert_eq!(conflicts[0].severity, "HIGH");
     }
 }
-

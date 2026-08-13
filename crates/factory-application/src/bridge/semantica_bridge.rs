@@ -1,5 +1,5 @@
-use std::sync::Arc;
 use factory_infrastructure::{DecisionRecord, SemanticaClient};
+use std::sync::Arc;
 use tracing::{error, info};
 
 pub struct SemanticaBridge {
@@ -11,10 +11,7 @@ impl SemanticaBridge {
         Self { semantica_client }
     }
 
-    pub async fn process_agent_thought_event(
-        &self,
-        event_payload: &str,
-    ) -> anyhow::Result<()> {
+    pub async fn process_agent_thought_event(&self, event_payload: &str) -> anyhow::Result<()> {
         let record: DecisionRecord = match serde_json::from_str(event_payload) {
             Ok(r) => r,
             Err(e) => {
@@ -41,9 +38,7 @@ mod tests {
     #[tokio::test]
     async fn test_process_agent_thought_event_success() {
         let mut mock = MockSemanticaClient::new();
-        mock.expect_record_decision()
-            .times(1)
-            .returning(|_| Ok(()));
+        mock.expect_record_decision().times(1).returning(|_| Ok(()));
 
         let bridge = SemanticaBridge::new(Arc::new(mock));
         let payload = serde_json::json!({
