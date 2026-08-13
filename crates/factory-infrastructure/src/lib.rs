@@ -4,7 +4,7 @@ pub trait S3Storage: Send + Sync {
     async fn put_object(&self, bucket: &str, key: &str, data: Vec<u8>) -> anyhow::Result<()>;
     async fn get_object(&self, bucket: &str, key: &str) -> anyhow::Result<Vec<u8>>;
     async fn list_buckets(&self) -> anyhow::Result<Vec<String>>;
-    async fn list_objects(&self, bucket: &str, prefix: Option<&str>)
+    async fn list_objects(&self, bucket: &str, prefix: Option<String>)
         -> anyhow::Result<Vec<String>>;
 }
 
