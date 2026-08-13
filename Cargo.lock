@@ -1922,11 +1922,13 @@ dependencies = [
  "factory-infrastructure",
  "hatchet-sdk",
  "jemallocator",
+ "reqwest 0.12.28",
  "sentry",
  "serde_json",
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]
