@@ -40,4 +40,32 @@ impl S3Storage for AwsS3Storage {
         let data = response.body.collect().await?.into_bytes();
         Ok(data.to_vec())
     }
+
+    async fn list_buckets(&self) -> anyhow::Result<Vec<String>> {
+        let res = self.client.list_buckets().send().await?;
+        let names = res
+            .buckets()
+            .iter()
+            .filter_map(|b| b.name().map(|n| n.to_string()))
+            .collect();
+        Ok(names)
+    }
+
+    async fn list_objects(
+        &self,
+        bucket: &str,
+        prefix: Option<&str>,
+    ) -> anyhow::Result<Vec<String>> {
+        let mut req = self.client.list_objects_v2().bucket(bucket);
+        if let Some(p) = prefix {
+            req = req.prefix(p);
+        }
+        let res = req.send().await?;
+        let keys = res
+            .contents()
+            .iter()
+            .filter_map(|obj| obj.key().map(|k| k.to_string()))
+            .collect();
+        Ok(keys)
+    }
 }
