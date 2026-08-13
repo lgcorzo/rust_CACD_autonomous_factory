@@ -35,8 +35,10 @@ async fn main() -> anyhow::Result<()> {
     let mut preflight_ok = true;
 
     // Check Hatchet REST Health
-    let hatchet_res: Result<reqwest::Response, reqwest::Error> =
-        client.get(format!("{}/api/v1/health", hatchet_url)).send().await;
+    let hatchet_res: Result<reqwest::Response, reqwest::Error> = client
+        .get(format!("{}/api/v1/health", hatchet_url))
+        .send()
+        .await;
     match hatchet_res {
         Ok(res) if res.status().is_success() || res.status().as_u16() == 403 => {
             println!("  [✓] Hatchet Orchestration Service: OK ({})", res.status());
@@ -66,8 +68,10 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Check LiteLLM Gateway
-    let litellm_res: Result<reqwest::Response, reqwest::Error> =
-        client.get(format!("{}/health/readiness", litellm_url)).send().await;
+    let litellm_res: Result<reqwest::Response, reqwest::Error> = client
+        .get(format!("{}/health/readiness", litellm_url))
+        .send()
+        .await;
     match litellm_res {
         Ok(res) if res.status().is_success() => {
             println!("  [✓] LiteLLM FinOps Gateway: OK ({})", res.status());
@@ -81,7 +85,10 @@ async fn main() -> anyhow::Result<()> {
     }
 
     const RAM_CLAMPING_LIMIT_MIB: u32 = 30;
-    println!("  [✓] gVisor Sandbox RAM Clamping: Limit <= {} MiB", RAM_CLAMPING_LIMIT_MIB);
+    println!(
+        "  [✓] gVisor Sandbox RAM Clamping: Limit <= {} MiB",
+        RAM_CLAMPING_LIMIT_MIB
+    );
 
     if preflight_ok {
         println!("  RESULT: Phase 1 Pre-flight Check PASSED!");
@@ -116,10 +123,14 @@ async fn main() -> anyhow::Result<()> {
             let input = MissionInput {
                 mission_id: Some(mission_id.clone()),
                 goal: "Kubernetes Functional Test Suite Run".to_string(),
-                repository_path: "/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory".to_string(),
+                repository_path: "/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory"
+                    .to_string(),
             };
 
-            println!("  Dispatching workflow 'darkgravitymission-dev-lgcorzo' with ID: {}", mission_id);
+            println!(
+                "  Dispatching workflow 'darkgravitymission-dev-lgcorzo' with ID: {}",
+                mission_id
+            );
             let workflow = hatchet
                 .workflow::<MissionInput, MissionOutput>("darkgravitymission-dev-lgcorzo")
                 .build()?;
@@ -148,8 +159,13 @@ async fn main() -> anyhow::Result<()> {
     total += 1;
     println!("\n[Phase 4] Circuit Breaker & Safety Judge Threshold Test...");
     const SAST_THRESHOLD: f64 = 8.0;
-    println!("  [✓] Verifying Aethelgard SAST Threshold Rule: Score >= {}", SAST_THRESHOLD);
-    println!("  [✓] Verifying Circuit Breaker (3 Consecutive Failures -> Agent-Stuck Vertex 3 Safe Stop)");
+    println!(
+        "  [✓] Verifying Aethelgard SAST Threshold Rule: Score >= {}",
+        SAST_THRESHOLD
+    );
+    println!(
+        "  [✓] Verifying Circuit Breaker (3 Consecutive Failures -> Agent-Stuck Vertex 3 Safe Stop)"
+    );
     println!("  RESULT: Phase 4 Circuit Breaker Test PASSED!");
     passed += 1;
 
