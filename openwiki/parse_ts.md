@@ -4,7 +4,7 @@ title: "parse_ts.py"
 source_path: "parse_ts.py"
 description: "Detailed documentation for parse_ts.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: parse_ts.py

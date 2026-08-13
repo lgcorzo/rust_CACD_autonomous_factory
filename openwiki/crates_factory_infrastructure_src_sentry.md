@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: sentry.rs

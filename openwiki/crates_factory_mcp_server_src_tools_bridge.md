@@ -4,7 +4,7 @@ title: "bridge.rs"
 source_path: "crates/factory-mcp-server/src/tools/bridge.rs"
 description: "Detailed documentation for bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: bridge.rs

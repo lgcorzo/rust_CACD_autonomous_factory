@@ -4,7 +4,7 @@ title: "bridge_test.rs"
 source_path: "crates/factory-application/tests/bridge_test.rs"
 description: "Detailed documentation for bridge_test.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: bridge_test.rs

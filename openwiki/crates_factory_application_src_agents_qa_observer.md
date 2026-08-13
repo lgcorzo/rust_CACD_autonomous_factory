@@ -4,7 +4,7 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Detailed documentation for qa_observer.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: qa_observer.rs

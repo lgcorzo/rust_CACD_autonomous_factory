@@ -4,7 +4,7 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: mcp_client.rs

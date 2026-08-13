@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: autonomous_mission.rs

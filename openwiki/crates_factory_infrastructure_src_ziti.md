@@ -4,7 +4,7 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: ziti.rs

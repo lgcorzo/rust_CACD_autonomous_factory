@@ -4,7 +4,7 @@ title: "zeroize_benchmark.rs"
 source_path: "crates/factory-core/benches/zeroize_benchmark.rs"
 description: "Detailed documentation for zeroize_benchmark.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: zeroize_benchmark.rs

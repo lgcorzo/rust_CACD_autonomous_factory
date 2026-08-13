@@ -4,7 +4,7 @@ title: "gvisor_integration.rs"
 source_path: "crates/factory-mcp-server/tests/gvisor_integration.rs"
 description: "Detailed documentation for gvisor_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: gvisor_integration.rs

@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: zeroclaw.rs

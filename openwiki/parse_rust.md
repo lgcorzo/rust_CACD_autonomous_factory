@@ -4,7 +4,7 @@ title: "parse_rust.py"
 source_path: "parse_rust.py"
 description: "Detailed documentation for parse_rust.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: parse_rust.py

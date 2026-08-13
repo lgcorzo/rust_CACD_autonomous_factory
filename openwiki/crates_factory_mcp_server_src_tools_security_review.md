@@ -4,7 +4,7 @@ title: "security_review.rs"
 source_path: "crates/factory-mcp-server/src/tools/security_review.rs"
 description: "Detailed documentation for security_review.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: security_review.rs

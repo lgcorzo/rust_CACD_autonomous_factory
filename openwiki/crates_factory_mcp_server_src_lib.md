@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-mcp-server/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: lib.rs
@@ -25,13 +25,16 @@ Provides implementation for lib.rs.
     response::sse::{Event, Sse},
     Json,
 }, crate::protocol::CallToolResult, crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}, crate::tools::MockTool, crate::tools::Tool, crate::tools::{
-            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            bridge::BridgeTool, deep_research_tool::DeepResearchTool,
+            execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
-        }, factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}, serde_json::{json, Value}, std::collections::HashMap, std::convert::Infallible, std::sync::Arc, std::time::Duration, super::*, tokio::sync::{mpsc, RwLock}, tokio_stream::wrappers::UnboundedReceiverStream, tokio_stream::{Stream, StreamExt}
+        }, factory_infrastructure::{
+            HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient, SimpleMockKafkaClient,
+        }, serde_json::{json, Value}, std::collections::HashMap, std::convert::Infallible, std::sync::Arc, std::time::Duration, super::*, tokio::sync::{mpsc, RwLock}, tokio_stream::wrappers::UnboundedReceiverStream, tokio_stream::{Stream, StreamExt}
 
 ### Imported modules
 * None
@@ -286,10 +289,13 @@ import { ... } from 'crates/factory-mcp-server/src/lib.rs';
     response::sse::{Event, Sse},
     Json,
 }, crate::protocol::CallToolResult, crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}, crate::tools::MockTool, crate::tools::Tool, crate::tools::{
-            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            bridge::BridgeTool, deep_research_tool::DeepResearchTool,
+            execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
-        }, factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}, serde_json::{json, Value}, std::collections::HashMap, std::convert::Infallible, std::sync::Arc, std::time::Duration, super::*, tokio::sync::{mpsc, RwLock}, tokio_stream::wrappers::UnboundedReceiverStream, tokio_stream::{Stream, StreamExt}
+        }, factory_infrastructure::{
+            HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient, SimpleMockKafkaClient,
+        }, serde_json::{json, Value}, std::collections::HashMap, std::convert::Infallible, std::sync::Arc, std::time::Duration, super::*, tokio::sync::{mpsc, RwLock}, tokio_stream::wrappers::UnboundedReceiverStream, tokio_stream::{Stream, StreamExt}

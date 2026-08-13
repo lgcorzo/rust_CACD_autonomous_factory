@@ -4,7 +4,7 @@ title: "execute_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/execute_code.rs"
 description: "Detailed documentation for execute_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: execute_code.rs

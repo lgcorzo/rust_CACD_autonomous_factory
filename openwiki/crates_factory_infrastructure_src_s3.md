@@ -4,7 +4,7 @@ title: "s3.rs"
 source_path: "crates/factory-infrastructure/src/s3.rs"
 description: "Detailed documentation for s3.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: s3.rs

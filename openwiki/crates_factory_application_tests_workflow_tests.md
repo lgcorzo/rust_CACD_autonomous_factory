@@ -4,7 +4,7 @@ title: "workflow_tests.rs"
 source_path: "crates/factory-application/tests/workflow_tests.rs"
 description: "Detailed documentation for workflow_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: workflow_tests.rs

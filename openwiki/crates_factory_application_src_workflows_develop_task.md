@@ -4,7 +4,7 @@ title: "develop_task.rs"
 source_path: "crates/factory-application/src/workflows/develop_task.rs"
 description: "Detailed documentation for develop_task.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: develop_task.rs

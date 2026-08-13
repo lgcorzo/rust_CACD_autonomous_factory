@@ -4,7 +4,7 @@ title: "kafka_integration.rs"
 source_path: "crates/factory-infrastructure/tests/kafka_integration.rs"
 description: "Detailed documentation for kafka_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: kafka_integration.rs

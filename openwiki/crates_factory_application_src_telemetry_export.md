@@ -4,7 +4,7 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: telemetry_export.rs

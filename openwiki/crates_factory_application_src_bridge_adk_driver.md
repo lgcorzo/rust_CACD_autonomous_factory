@@ -4,7 +4,7 @@ title: "adk_driver.rs"
 source_path: "crates/factory-application/src/bridge/adk_driver.rs"
 description: "Detailed documentation for adk_driver.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: adk_driver.rs

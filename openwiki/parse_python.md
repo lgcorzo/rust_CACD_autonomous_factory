@@ -4,7 +4,7 @@ title: "parse_python.py"
 source_path: "parse_python.py"
 description: "Detailed documentation for parse_python.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: parse_python.py

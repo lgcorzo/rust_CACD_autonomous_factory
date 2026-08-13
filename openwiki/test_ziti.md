@@ -4,7 +4,7 @@ title: "test_ziti.rs"
 source_path: "test_ziti.rs"
 description: "Detailed documentation for test_ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: test_ziti.rs

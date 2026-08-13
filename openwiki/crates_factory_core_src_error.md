@@ -4,7 +4,7 @@ title: "error.rs"
 source_path: "crates/factory-core/src/error.rs"
 description: "Detailed documentation for error.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: error.rs

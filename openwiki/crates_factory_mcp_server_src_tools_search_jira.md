@@ -4,7 +4,7 @@ title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: search_jira.rs

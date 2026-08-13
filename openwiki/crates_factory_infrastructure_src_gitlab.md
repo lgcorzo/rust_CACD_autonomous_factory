@@ -4,7 +4,7 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: gitlab.rs

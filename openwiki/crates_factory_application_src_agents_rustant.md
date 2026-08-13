@@ -4,7 +4,7 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: rustant.rs

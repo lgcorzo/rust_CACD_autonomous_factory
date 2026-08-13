@@ -4,7 +4,7 @@ title: "generate_openwiki.py"
 source_path: "generate_openwiki.py"
 description: "Detailed documentation for generate_openwiki.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: generate_openwiki.py

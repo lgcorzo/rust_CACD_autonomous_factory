@@ -4,7 +4,7 @@ title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Detailed documentation for doc_agent.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: doc_agent.rs

@@ -4,7 +4,7 @@ title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Detailed documentation for feedback_route.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: feedback_route.rs

@@ -4,7 +4,7 @@ title: "plan_mission.rs"
 source_path: "crates/factory-mcp-server/src/tools/plan_mission.rs"
 description: "Detailed documentation for plan_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: plan_mission.rs

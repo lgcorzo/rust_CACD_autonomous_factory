@@ -4,7 +4,7 @@ title: "update_mission_status.rs"
 source_path: "crates/factory-mcp-server/src/tools/update_mission_status.rs"
 description: "Detailed documentation for update_mission_status.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "bcd3299"
 ---
 
 # File: update_mission_status.rs
