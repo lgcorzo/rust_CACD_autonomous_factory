@@ -51,6 +51,33 @@ impl Tool for ListMinioObjectsTool {
             .ok_or_else(|| anyhow::anyhow!("Missing 'bucket' parameter"))?;
         let prefix = params["prefix"].as_str().unwrap_or("");
 
+        // Security Control: Reject Path Traversal sequences (`..`) in bucket or prefix
+        if bucket.contains("..") || prefix.contains("..") || bucket.contains('/') {
+            tracing::warn!(
+                "Security violation: Path traversal detected in bucket or prefix parameter"
+            );
+            anyhow::bail!("Security Violation: Path traversal characters '..' or '/' not allowed in bucket name");
+        }
+
+        // Security Control: Whitelist authorized buckets to prevent unauthorized S3 bucket scanning
+        let allowed_buckets = [
+            "factory-artifacts",
+            "doc-agent-telemetry",
+            "r2r-documents",
+            "semantica-provenance",
+        ];
+
+        if !allowed_buckets.contains(&bucket) {
+            tracing::warn!(
+                "Security violation: Access to bucket '{}' is not authorized",
+                bucket
+            );
+            anyhow::bail!(
+                "Access Denied: Bucket '{}' is not in authorized whitelist",
+                bucket
+            );
+        }
+
         let endpoint = env::var("MINIO_ENDPOINT")
             .unwrap_or_else(|_| "http://minio.llm-apps.svc.cluster.local:9000".to_string());
 
@@ -88,7 +115,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn test_list_minio_objects_tool() {
+    async fn test_list_minio_objects_tool_success() {
         let tool = ListMinioObjectsTool::new();
         let params = json!({ "bucket": "factory-artifacts", "prefix": "mission-01" });
         let result = tool.call(params).await.unwrap();
@@ -99,5 +126,21 @@ mod tests {
         let val: Value = serde_json::from_str(text).unwrap();
         assert_eq!(val["status"], "success");
         assert_eq!(val["bucket"], "factory-artifacts");
+    }
+
+    #[tokio::test]
+    async fn test_list_minio_objects_path_traversal_rejected() {
+        let tool = ListMinioObjectsTool::new();
+        let params = json!({ "bucket": "../etc/passwd", "prefix": "" });
+        let err = tool.call(params).await.unwrap_err();
+        assert!(err.to_string().contains("Path traversal"));
+    }
+
+    #[tokio::test]
+    async fn test_list_minio_objects_unauthorized_bucket_rejected() {
+        let tool = ListMinioObjectsTool::new();
+        let params = json!({ "bucket": "private-customer-vault", "prefix": "" });
+        let err = tool.call(params).await.unwrap_err();
+        assert!(err.to_string().contains("Access Denied"));
     }
 }

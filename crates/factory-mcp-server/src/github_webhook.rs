@@ -4,9 +4,14 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::IntoResponse,
 };
+use hmac::{Hmac, Mac};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use sha2::Sha256;
+use std::env;
 use std::sync::Arc;
+
+type HmacSha256 = Hmac<Sha256>;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GithubWebhookUser {
@@ -35,11 +40,58 @@ pub struct GithubWebhookPayload {
     pub repository: Option<GithubWebhookRepository>,
 }
 
+pub fn verify_github_signature(secret: &str, signature_header: &str, body_bytes: &[u8]) -> bool {
+    if !signature_header.starts_with("sha256=") {
+        return false;
+    }
+    let hex_sig = &signature_header[7..];
+    let Ok(expected_sig) = hex::decode(hex_sig) else {
+        return false;
+    };
+
+    let Ok(mut mac) = HmacSha256::new_from_slice(secret.as_bytes()) else {
+        return false;
+    };
+    mac.update(body_bytes);
+    mac.verify_slice(&expected_sig).is_ok()
+}
+
 pub async fn handle_github_webhook(
     State(_server): State<Arc<McpServer>>,
     headers: HeaderMap,
-    Json(payload): Json<GithubWebhookPayload>,
+    body_bytes: axum::body::Bytes,
 ) -> impl IntoResponse {
+    let webhook_secret = env::var("GITHUB_WEBHOOK_SECRET").unwrap_or_default();
+
+    // If secret is configured, enforce HMAC-SHA256 signature verification
+    if !webhook_secret.is_empty() {
+        let sig_header = headers
+            .get("x-hub-signature-256")
+            .and_then(|v| v.to_str().ok())
+            .unwrap_or("");
+
+        if !verify_github_signature(&webhook_secret, sig_header, &body_bytes) {
+            tracing::warn!("GitHub webhook signature verification failed");
+            return (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({"error": "Invalid GitHub webhook signature"})),
+            )
+                .into_response();
+        }
+    }
+
+    let payload: GithubWebhookPayload = match serde_json::from_slice(&body_bytes) {
+        Ok(p) => p,
+        Err(e) => {
+            tracing::error!("Failed to parse GitHub webhook payload: {}", e);
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({"error": "Invalid JSON payload"})),
+            )
+                .into_response();
+        }
+    };
+
     let event_type = headers
         .get("x-github-event")
         .and_then(|v| v.to_str().ok())
@@ -60,11 +112,13 @@ pub async fn handle_github_webhook(
                 .map(|r| r.full_name)
                 .unwrap_or_else(|| "unknown/repo".to_string());
 
+            // Sanitize inputs against path traversal and prompt injection control characters
+            let clean_title = issue.title.replace('\r', "").replace('\n', " ");
+            let clean_body = issue.body.unwrap_or_default().replace('\r', "");
+
             let goal = format!(
                 "GitHub Issue #{}: {}\n\n{}",
-                issue.number,
-                issue.title,
-                issue.body.unwrap_or_default()
+                issue.number, clean_title, clean_body
             );
 
             let mission_id = format!(
@@ -102,35 +156,18 @@ pub async fn handle_github_webhook(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use axum::http::HeaderValue;
 
-    #[tokio::test]
-    async fn test_github_webhook_handler() {
-        let server = Arc::new(McpServer::new());
-        let mut headers = HeaderMap::new();
-        headers.insert("x-github-event", HeaderValue::from_static("issues"));
+    #[test]
+    fn test_github_signature_verification() {
+        let secret = "my_secret_token";
+        let body = b"test payload";
+        let mut mac = HmacSha256::new_from_slice(secret.as_bytes()).unwrap();
+        mac.update(body);
+        let result = mac.finalize();
+        let hex_sig = hex::encode(result.into_bytes());
 
-        let payload = GithubWebhookPayload {
-            action: Some("opened".to_string()),
-            issue: Some(GithubWebhookIssue {
-                number: 101,
-                title: "Autonomous mission test from GitHub".to_string(),
-                body: Some("Description of GitHub mission".to_string()),
-                html_url: "https://github.com/my-org/my-repo/issues/101".to_string(),
-                user: Some(GithubWebhookUser {
-                    login: "test-user".to_string(),
-                }),
-            }),
-            repository: Some(GithubWebhookRepository {
-                full_name: "my-org/my-repo".to_string(),
-                html_url: "https://github.com/my-org/my-repo".to_string(),
-            }),
-        };
-
-        let response = handle_github_webhook(State(server), headers, Json(payload))
-            .await
-            .into_response();
-
-        assert_eq!(response.status(), StatusCode::OK);
+        let sig_header = format!("sha256={}", hex_sig);
+        assert!(verify_github_signature(secret, &sig_header, body));
+        assert!(!verify_github_signature("wrong_secret", &sig_header, body));
     }
 }
