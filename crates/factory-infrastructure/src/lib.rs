@@ -13,12 +13,20 @@ pub mod mcp_client;
 pub mod r2r;
 pub mod s3;
 pub mod security_validator;
+pub mod semantica;
 pub mod sentry;
 pub mod vault;
 pub mod ziti;
 
 #[cfg(any(test, feature = "test-utils"))]
+pub use semantica::MockSemanticaClient;
+pub use semantica::{
+    Conflict, DecisionRecord, HttpSemanticaClient, MissionPlan, ProvenanceReport, SemanticaClient,
+};
+
+#[cfg(any(test, feature = "test-utils"))]
 pub use aethalgard::MockAethalgardClient;
+
 pub use aethalgard::{AethalgardClient, HttpAethalgardClient};
 
 #[cfg(any(test, feature = "test-utils"))]

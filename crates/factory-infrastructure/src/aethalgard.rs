@@ -1,22 +1,27 @@
 use async_trait::async_trait;
 use serde_json::json;
+use crate::semantica::SemanticaClient;
+
 
 #[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait]
 pub trait AethalgardClient: Send + Sync {
     async fn notify_remediation(&self, mission_id: &str, error_details: &str)
         -> anyhow::Result<()>;
+    async fn verify_causal_provenance(&self, patch_id: &str) -> anyhow::Result<bool>;
 }
 
 pub struct HttpAethalgardClient {
     webhook_url: String,
+    semantica_endpoint: Option<String>,
     client: reqwest::Client,
 }
 
 impl HttpAethalgardClient {
-    pub fn new(webhook_url: String) -> Self {
+    pub fn new(webhook_url: String, semantica_endpoint: Option<String>) -> Self {
         Self {
             webhook_url,
+            semantica_endpoint,
             client: reqwest::Client::new(),
         }
     }
@@ -52,4 +57,24 @@ impl AethalgardClient for HttpAethalgardClient {
         }
         Ok(())
     }
+
+    async fn verify_causal_provenance(&self, patch_id: &str) -> anyhow::Result<bool> {
+        let endpoint = match &self.semantica_endpoint {
+            Some(ep) => ep,
+            None => return Ok(true),
+        };
+        let semantica_client = crate::HttpSemanticaClient::new(endpoint.clone(), None);
+        let report = semantica_client.verify_provenance(patch_id).await?;
+        if !report.is_valid || !report.policy_violations.is_empty() {
+            tracing::warn!(
+                "Causal provenance verification failed for patch {}: violations={:?}",
+                patch_id,
+                report.policy_violations
+            );
+            return Ok(false);
+        }
+        Ok(true)
+    }
 }
+
+
