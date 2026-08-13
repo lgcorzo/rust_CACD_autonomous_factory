@@ -74,7 +74,10 @@ async fn test_dark_gravity_e2e_mission_cycle_success() {
 
     // Phase 1: Autonomous Planning
     let plan_result = rustant
-        .plan_mission("mission-e2e-01", "Add resource clamping check to worker execution")
+        .plan_mission(
+            "mission-e2e-01",
+            "Add resource clamping check to worker execution",
+        )
         .await;
     assert!(plan_result.is_ok());
     let plan_val = plan_result.unwrap();
@@ -136,7 +139,9 @@ async fn test_dark_gravity_circuit_breaker_agent_stuck() {
     let zeroclaw = ZeroClawAgent::new(Arc::new(mock_mcp), Arc::new(mock_aethalgard));
     let faulty_code = "pub fn unsafe_op(ptr: *const u8) -> u8 { unsafe { *ptr } }";
 
-    let result = zeroclaw.execute_task("mission-circuit-breaker", faulty_code, &[]).await;
+    let result = zeroclaw
+        .execute_task("mission-circuit-breaker", faulty_code, &[])
+        .await;
 
     assert!(result.is_err());
     let err_msg = result.unwrap_err().to_string();
@@ -162,9 +167,9 @@ fn test_dark_gravity_preflight_resource_constraints() {
 #[tokio::test]
 #[ignore = "requires live k8s cluster"]
 async fn test_live_k8s_dark_gravity_e2e_mission() {
+    use factory_application::workflows::autonomous_mission::{MissionInput, MissionOutput};
     use hatchet_sdk::Hatchet;
     use hatchet_sdk::Runnable;
-    use factory_application::workflows::autonomous_mission::{MissionInput, MissionOutput};
 
     println!("[Live K8s E2E] Initializing connection to Hatchet cluster orchestrator...");
     let hatchet_res = Hatchet::from_env().await;
@@ -184,8 +189,14 @@ async fn test_live_k8s_dark_gravity_e2e_mission() {
                 .run_no_wait(&input, None)
                 .await;
 
-            assert!(run_res.is_ok(), "Failed to dispatch live mission DAG to Hatchet cluster: {:?}", run_res.err());
-            println!("[Live K8s E2E] Successfully triggered live mission DAG on Kubernetes cluster!");
+            assert!(
+                run_res.is_ok(),
+                "Failed to dispatch live mission DAG to Hatchet cluster: {:?}",
+                run_res.err()
+            );
+            println!(
+                "[Live K8s E2E] Successfully triggered live mission DAG on Kubernetes cluster!"
+            );
         }
         Err(e) => {
             println!("[Live K8s E2E] Hatchet initialization error: {:?}", e);
