@@ -87,12 +87,15 @@ jobs:
     needs: rust-ci
     if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.event_name == 'release')
     runs-on: ubuntu-latest
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+      SENTRY_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Login to Docker Hub
-        if: ${{ secrets.DOCKER_HUB_USERNAME != '' }}
+        if: ${{ env.DOCKER_USER != '' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -104,7 +107,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
-          push: ${{ secrets.DOCKER_HUB_USERNAME != '' }}
+          push: ${{ env.DOCKER_USER != '' }}
           context: .
           cache-to: type=gha,mode=max
           cache-from: type=gha
@@ -115,12 +118,12 @@ jobs:
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
       - name: Install Sentry CLI
-        if: ${{ secrets.SENTRY_AUTH_TOKEN != '' }}
+        if: ${{ env.SENTRY_TOKEN != '' }}
         continue-on-error: true
         run: curl -sL https://sentry.io/get-cli/ | bash
 
       - name: Create Sentry Release
-        if: ${{ secrets.SENTRY_AUTH_TOKEN != '' }}
+        if: ${{ env.SENTRY_TOKEN != '' }}
         continue-on-error: true
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
