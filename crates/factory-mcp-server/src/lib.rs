@@ -138,6 +138,14 @@ impl McpServer {
         self.add_tool(Box::new(DeepResearchTool::new(kafka_client)))
             .await;
         self.add_tool(Box::new(BridgeTool)).await;
+        self.add_tool(Box::new(tools::ListMinioBucketsTool::new()))
+            .await;
+        self.add_tool(Box::new(tools::ListMinioObjectsTool::new()))
+            .await;
+        self.add_tool(Box::new(tools::InspectKafkaTopicTool::new()))
+            .await;
+        self.add_tool(Box::new(tools::GetFactoryStatusTool::new()))
+            .await;
 
         Ok(())
     }
