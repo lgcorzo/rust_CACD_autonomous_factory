@@ -19,7 +19,7 @@ on:
 
 env:
   DOCKER_IMAGE: lgcorzo/dark-gravity-factory
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 
 jobs:
   governance-gates:
