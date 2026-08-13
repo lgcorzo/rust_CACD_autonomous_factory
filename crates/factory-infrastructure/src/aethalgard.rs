@@ -17,12 +17,17 @@ pub struct HttpAethalgardClient {
 }
 
 impl HttpAethalgardClient {
-    pub fn new(webhook_url: String, semantica_endpoint: Option<String>) -> Self {
+    pub fn new(webhook_url: String) -> Self {
         Self {
             webhook_url,
-            semantica_endpoint,
+            semantica_endpoint: std::env::var("SEMANTICA_ENDPOINT").ok(),
             client: reqwest::Client::new(),
         }
+    }
+
+    pub fn with_semantica_endpoint(mut self, endpoint: String) -> Self {
+        self.semantica_endpoint = Some(endpoint);
+        self
     }
 }
 
