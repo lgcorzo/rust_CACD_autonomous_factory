@@ -2,6 +2,7 @@ use factory_application::workflows::autonomous_mission::{MissionInput, MissionOu
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::Runnable;
 use std::time::Duration;
+use uuid::Uuid;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -34,7 +35,9 @@ async fn main() -> anyhow::Result<()> {
     let mut preflight_ok = true;
 
     // Check Hatchet REST Health
-    match client.get(format!("{}/api/v1/health", hatchet_url)).send().await {
+    let hatchet_res: Result<reqwest::Response, reqwest::Error> =
+        client.get(format!("{}/api/v1/health", hatchet_url)).send().await;
+    match hatchet_res {
         Ok(res) if res.status().is_success() || res.status().as_u16() == 403 => {
             println!("  [✓] Hatchet Orchestration Service: OK ({})", res.status());
         }
@@ -48,7 +51,9 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Check R2R GraphRAG Health
-    match client.get(format!("{}/v3/health", r2r_url)).send().await {
+    let r2r_res: Result<reqwest::Response, reqwest::Error> =
+        client.get(format!("{}/v3/health", r2r_url)).send().await;
+    match r2r_res {
         Ok(res) if res.status().is_success() => {
             println!("  [✓] R2R GraphRAG Semantic Memory: OK ({})", res.status());
         }
@@ -61,7 +66,9 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Check LiteLLM Gateway
-    match client.get(format!("{}/health/readiness", litellm_url)).send().await {
+    let litellm_res: Result<reqwest::Response, reqwest::Error> =
+        client.get(format!("{}/health/readiness", litellm_url)).send().await;
+    match litellm_res {
         Ok(res) if res.status().is_success() => {
             println!("  [✓] LiteLLM FinOps Gateway: OK ({})", res.status());
         }
@@ -105,7 +112,7 @@ async fn main() -> anyhow::Result<()> {
     println!("  Connecting to Hatchet Orchestrator...");
     match Hatchet::from_env().await {
         Ok(hatchet) => {
-            let mission_id = format!("k8s-func-suite-{}", uuid::Uuid::new_v4());
+            let mission_id = format!("k8s-func-suite-{}", Uuid::new_v4());
             let input = MissionInput {
                 mission_id: Some(mission_id.clone()),
                 goal: "Kubernetes Functional Test Suite Run".to_string(),
