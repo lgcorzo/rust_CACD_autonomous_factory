@@ -54,7 +54,7 @@ impl S3Storage for AwsS3Storage {
     async fn list_objects(
         &self,
         bucket: &str,
-        prefix: Option<&str>,
+        prefix: Option<String>,
     ) -> anyhow::Result<Vec<String>> {
         let mut req = self.client.list_objects_v2().bucket(bucket);
         if let Some(p) = prefix {
