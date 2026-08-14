@@ -131,6 +131,51 @@ pub struct UserFeedbackPayload {
     pub metadata: Option<serde_json::Value>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct DailyBudgetConfig {
+    pub max_daily_budget_usd: f64,
+    pub hardstop_threshold_ratio: f64,
+    pub velocity_threshold_usd_per_min: f64,
+}
+
+impl Default for DailyBudgetConfig {
+    fn default() -> Self {
+        Self {
+            max_daily_budget_usd: 50.0,
+            hardstop_threshold_ratio: 0.90,
+            velocity_threshold_usd_per_min: 1.0,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SpendVelocityAlert {
+    pub spend_velocity: f64,
+    pub current_spend: f64,
+    pub threshold: f64,
+    pub timestamp: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
+pub struct SentryCrashRecord {
+    pub event_id: String,
+    pub level: String,
+    pub message: String,
+    pub culprit: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CausalProvenanceNode {
+    pub node_id: String,
+    pub issue_id: String,
+    pub constitution_rule_id: String,
+    pub spec_id: String,
+    pub plan_id: String,
+    pub ast_mutation_hash: String,
+    pub test_result: String,
+    pub is_valid: bool,
+}
+
 pub mod proto {
     pub mod v1 {
         include!(concat!(env!("OUT_DIR"), "/dark_gravity.factory.v1.rs"));

@@ -76,6 +76,10 @@ mod tests {
         async fn push_osr_metric(&self, _metric: &factory_core::OsrMetric) -> anyhow::Result<()> {
             Ok(())
         }
+
+        async fn map_stacktrace_to_ast(&self, query: &str) -> anyhow::Result<String> {
+            self.search(query).await
+        }
     }
 
     #[tokio::test]
