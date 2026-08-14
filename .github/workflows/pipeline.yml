@@ -48,9 +48,7 @@ jobs:
         run: cargo run -p factory-cli -- verify-osr --r2r-url http://localhost:8000
 
       - name: Install cargo-audit
-        run: |
-          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-          $HOME/.cargo/bin/cargo-binstall -y cargo-audit
+        run: cargo install cargo-audit
 
       - name: Cargo Audit
         run: cargo audit -D warnings
