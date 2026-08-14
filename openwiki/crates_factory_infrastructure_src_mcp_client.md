@@ -4,7 +4,7 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: mcp_client.rs
@@ -101,7 +101,14 @@ None.
 #### McpSseClient
 
 **Overview:**
+Why it exists:
 /// A client that uses SSE handshake to find the session endpoint
+
+What business capability it provides:
+Described in class documentation.
+
+How it collaborates with other classes:
+Works with dependencies and callers.
 
 **Constructor:**
 
@@ -131,36 +138,36 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class McpClient {
-        <<trait>>
-    }
-    class McpHttpClient {
-        -call_tool_json(name: &str:Any, arguments: Value:Any) anyhow::Result<Value>
-        +new(base_url: String:Any) Self
-    }
-    McpClient <|-- McpHttpClient : Inheritance / Specialization
-    class McpSseClient {
-        -call_tool_json(name: &str:Any, arguments: Value:Any) anyhow::Result<Value>
-        -get_session_url() anyhow::Result<String>
-        +new(base_url: String:Any) Self
-    }
-    McpClient <|-- McpSseClient : Inheritance / Specialization
+```plantuml
+@startuml
+interface McpClient {
+}
+class McpHttpClient {
+    -call_tool_json(name: &str:Any, arguments: Value:Any) : anyhow::Result<Value>
+    +new(base_url: String:Any) : Self
+}
+McpClient <|-- McpHttpClient : Inheritance / Specialization
+class McpSseClient {
+    -call_tool_json(name: &str:Any, arguments: Value:Any) : anyhow::Result<Value>
+    -get_session_url() : anyhow::Result<String>
+    +new(base_url: String:Any) : Self
+}
+McpClient <|-- McpSseClient : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Mcp_clientService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Mcp_clientService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "s3.rs"
 source_path: "crates/factory-infrastructure/src/s3.rs"
 description: "Detailed documentation for s3.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: s3.rs
@@ -68,6 +68,8 @@ None.
 **Private Methods:**
 
 * `get_object(bucket: &str (Any), key: &str (Any)) -> anyhow::Result<Vec<u8>>`: Internal helper logic.
+* `list_buckets() -> anyhow::Result<Vec<String>>`: Internal helper logic.
+* `list_objects(bucket: &str (Any), prefix: Option<String> (Any)) -> anyhow::Result<Vec<String>>`: Internal helper logic.
 * `put_object(bucket: &str (Any), key: &str (Any), data: Vec<u8> (Any)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
@@ -76,28 +78,31 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class AwsS3Storage {
-        -get_object(bucket: &str:Any, key: &str:Any) anyhow::Result<Vec<u8>>
-        +new() Self
-        -put_object(bucket: &str:Any, key: &str:Any, data: Vec<u8>:Any) anyhow::Result<()>
-    }
-    S3Storage <|-- AwsS3Storage : Inheritance / Specialization
+```plantuml
+@startuml
+class AwsS3Storage {
+    -get_object(bucket: &str:Any, key: &str:Any) : anyhow::Result<Vec<u8>>
+    -list_buckets() : anyhow::Result<Vec<String>>
+    -list_objects(bucket: &str:Any, prefix: Option<String>:Any) : anyhow::Result<Vec<String>>
+    +new() : Self
+    -put_object(bucket: &str:Any, key: &str:Any, data: Vec<u8>:Any) : anyhow::Result<()>
+}
+S3Storage <|-- AwsS3Storage : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as S3Service
-    Caller->>Svc: get_object()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "S3Service"
+Caller -> Svc : get_object()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "scratch.rs"
 source_path: "crates/factory-mcp-server/src/scratch.rs"
 description: "Detailed documentation for scratch.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: scratch.rs
@@ -44,24 +44,25 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ScratchService
-    Caller->>Svc: main()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ScratchService"
+Caller -> Svc : main()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

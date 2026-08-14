@@ -4,7 +4,7 @@ title: "zeroize_benchmark.rs"
 source_path: "crates/factory-core/benches/zeroize_benchmark.rs"
 description: "Detailed documentation for zeroize_benchmark.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: zeroize_benchmark.rs
@@ -44,24 +44,25 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Zeroize_benchmarkService
-    Caller->>Svc: bench_zeroize_token()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Zeroize_benchmarkService"
+Caller -> Svc : bench_zeroize_token()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

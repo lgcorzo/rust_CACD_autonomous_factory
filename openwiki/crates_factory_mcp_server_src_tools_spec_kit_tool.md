@@ -4,7 +4,7 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: spec_kit_tool.rs
@@ -257,50 +257,49 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class CliSpecProvider {
-        -invoke(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
-        +new(cli_path: String:Any) Self
-    }
-    SpecProvider <|-- CliSpecProvider : Inheritance / Specialization
-    class MockSpecProvider {
-        -default() Self
-        -invoke(command: SpecKitCommand:Any, _args: Vec<String>:Any) anyhow::Result<String>
-        +new(specs_dir: std::path::PathBuf:Any) Self
-    }
-    Default <|-- MockSpecProvider : Inheritance / Specialization
-    SpecProvider <|-- MockSpecProvider : Inheritance / Specialization
-    class SpecKitCommand {
-        <<enumeration>>
-    }
-    class SpecKitTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        +invoke_spec_kit(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
-        -name() String
-        +new(specify_cli_path: String:Any) Self
-        +with_provider(provider: Arc<dyn SpecProvider>:Any) Self
-    }
-    Tool <|-- SpecKitTool : Inheritance / Specialization
-    class SpecProvider {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class CliSpecProvider {
+    -invoke(command: SpecKitCommand:Any, args: Vec<String>:Any) : anyhow::Result<String>
+    +new(cli_path: String:Any) : Self
+}
+SpecProvider <|-- CliSpecProvider : Inheritance / Specialization
+class MockSpecProvider {
+    -default() : Self
+    -invoke(command: SpecKitCommand:Any, _args: Vec<String>:Any) : anyhow::Result<String>
+    +new(specs_dir: std::path::PathBuf:Any) : Self
+}
+Default <|-- MockSpecProvider : Inheritance / Specialization
+SpecProvider <|-- MockSpecProvider : Inheritance / Specialization
+enum SpecKitCommand {
+}
+class SpecKitTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    +invoke_spec_kit(command: SpecKitCommand:Any, args: Vec<String>:Any) : anyhow::Result<String>
+    -name() : String
+    +new(specify_cli_path: String:Any) : Self
+    +with_provider(provider: Arc<dyn SpecProvider>:Any) : Self
+}
+Tool <|-- SpecKitTool : Inheritance / Specialization
+interface SpecProvider {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Spec_kit_toolService
-    Caller->>Svc: invoke()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Spec_kit_toolService"
+Caller -> Svc : invoke()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: kafka.rs
@@ -134,35 +134,35 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class KafkaClient {
-        <<trait>>
-    }
-    class RdKafkaClient {
-        +new(brokers: &str:Any) anyhow::Result<Self>
-        -publish(topic: &str:Any, key: &str:Any, payload: &[u8]:Any) anyhow::Result<()>
-    }
-    KafkaClient <|-- RdKafkaClient : Inheritance / Specialization
-    class SimpleMockKafkaClient {
-        +new(_brokers: &str:Any) anyhow::Result<Self>
-        -publish(topic: &str:Any, key: &str:Any, payload: &[u8]:Any) anyhow::Result<()>
-    }
-    KafkaClient <|-- SimpleMockKafkaClient : Inheritance / Specialization
+```plantuml
+@startuml
+interface KafkaClient {
+}
+class RdKafkaClient {
+    +new(brokers: &str:Any) : anyhow::Result<Self>
+    -publish(topic: &str:Any, key: &str:Any, payload: &[u8]:Any) : anyhow::Result<()>
+}
+KafkaClient <|-- RdKafkaClient : Inheritance / Specialization
+class SimpleMockKafkaClient {
+    +new(_brokers: &str:Any) : anyhow::Result<Self>
+    -publish(topic: &str:Any, key: &str:Any, payload: &[u8]:Any) : anyhow::Result<()>
+}
+KafkaClient <|-- SimpleMockKafkaClient : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as KafkaService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "KafkaService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "vault.rs"
 source_path: "crates/factory-infrastructure/src/vault.rs"
 description: "Detailed documentation for vault.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: vault.rs
@@ -78,28 +78,29 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class VaultSecurityBounds {
-        -issue_jit_token(audience: &str:Any) factory_core::error::Result<JitToken>
-        +new(vault_addr: String:Any, role_token: String:Any) Self
-        -validate_token(token: &JitToken:Any) factory_core::error::Result<bool>
-    }
-    SecurityBounds <|-- VaultSecurityBounds : Inheritance / Specialization
+```plantuml
+@startuml
+class VaultSecurityBounds {
+    -issue_jit_token(audience: &str:Any) : factory_core::error::Result<JitToken>
+    +new(vault_addr: String:Any, role_token: String:Any) : Self
+    -validate_token(token: &JitToken:Any) : factory_core::error::Result<bool>
+}
+SecurityBounds <|-- VaultSecurityBounds : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as VaultService
-    Caller->>Svc: issue_jit_token()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "VaultService"
+Caller -> Svc : issue_jit_token()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: search_jira.rs
@@ -106,34 +106,35 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ManualMockJiraClient {
-        -search_issues(_query: &str:Any) anyhow::Result<String>
-    }
-    JiraClient <|-- ManualMockJiraClient : Inheritance / Specialization
-    class SearchJiraTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new(jira_client: Arc<dyn JiraClient>:Any) Self
-    }
-    Tool <|-- SearchJiraTool : Inheritance / Specialization
+```plantuml
+@startuml
+class ManualMockJiraClient {
+    -search_issues(_query: &str:Any) : anyhow::Result<String>
+}
+JiraClient <|-- ManualMockJiraClient : Inheritance / Specialization
+class SearchJiraTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(jira_client: Arc<dyn JiraClient>:Any) : Self
+}
+Tool <|-- SearchJiraTool : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Search_jiraService
-    Caller->>Svc: search_issues()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Search_jiraService"
+Caller -> Svc : search_issues()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

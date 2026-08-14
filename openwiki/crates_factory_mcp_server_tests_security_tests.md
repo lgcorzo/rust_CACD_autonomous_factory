@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-mcp-server/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: security_tests.rs
@@ -44,24 +44,25 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Security_testsService
-    Caller->>Svc: test_security_review_command_injection()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Security_testsService"
+Caller -> Svc : test_security_review_command_injection()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

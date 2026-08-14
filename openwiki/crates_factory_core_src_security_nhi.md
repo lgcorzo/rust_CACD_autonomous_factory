@@ -4,7 +4,7 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Detailed documentation for nhi.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: nhi.rs
@@ -235,32 +235,33 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class AgentSubject {
-    }
-    class CryptographicProof {
-    }
-    class VerifiableCredential {
-        +new(id: String:Any, issuer: String:Any, credential_subject: AgentSubject:Any) Self
-        +sign(signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) crate::error::Result<()>
-        +sign_async(signing_key: ed25519_dalek::SigningKey:Any, key_id: String:Any) crate::error::Result<()>
-        +sign_batch_async(credentials: &mut [VerifiableCredential]:Any, signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) crate::error::Result<()>
-    }
+```plantuml
+@startuml
+class AgentSubject {
+}
+class CryptographicProof {
+}
+class VerifiableCredential {
+    +new(id: String:Any, issuer: String:Any, credential_subject: AgentSubject:Any) : Self
+    +sign(signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) : crate::error::Result<()>
+    +sign_async(signing_key: ed25519_dalek::SigningKey:Any, key_id: String:Any) : crate::error::Result<()>
+    +sign_batch_async(credentials: &mut [VerifiableCredential]:Any, signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) : crate::error::Result<()>
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as NhiService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "NhiService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "parse_ts.py"
 source_path: "parse_ts.py"
 description: "Detailed documentation for parse_ts.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: parse_ts.py
@@ -48,24 +48,25 @@ Executes parse_ts.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Parse_tsService
-    Caller->>Svc: get_node_text()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Parse_tsService"
+Caller -> Svc : get_node_text()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

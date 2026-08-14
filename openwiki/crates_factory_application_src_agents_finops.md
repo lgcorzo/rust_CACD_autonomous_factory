@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Detailed documentation for finops.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: finops.rs
@@ -108,31 +108,32 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class FinOpsAgent {
-        -default() Self
-        -execute(_task_description: &str:Any) anyhow::Result<Value>
-        +monitor_budget() anyhow::Result<()>
-        -name() String
-        +new(litellm_base_url: String:Any, api_key: String:Any, tag: FinOpsTag:Any) Self
-    }
-    Agent <|-- FinOpsAgent : Inheritance / Specialization
-    Default <|-- FinOpsAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class FinOpsAgent {
+    -default() : Self
+    -execute(_task_description: &str:Any) : anyhow::Result<Value>
+    +monitor_budget() : anyhow::Result<()>
+    -name() : String
+    +new(litellm_base_url: String:Any, api_key: String:Any, tag: FinOpsTag:Any) : Self
+}
+Agent <|-- FinOpsAgent : Inheritance / Specialization
+Default <|-- FinOpsAgent : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as FinopsService
-    Caller->>Svc: default()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "FinopsService"
+Caller -> Svc : default()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

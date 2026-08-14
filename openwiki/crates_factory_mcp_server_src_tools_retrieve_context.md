@@ -4,7 +4,7 @@ title: "retrieve_context.rs"
 source_path: "crates/factory-mcp-server/src/tools/retrieve_context.rs"
 description: "Detailed documentation for retrieve_context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: retrieve_context.rs
@@ -107,35 +107,36 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ManualMockR2rClient {
-        -push_osr_metric(_metric: &factory_core::OsrMetric:Any) anyhow::Result<()>
-        -search(_query: &str:Any) anyhow::Result<String>
-    }
-    R2rClient <|-- ManualMockR2rClient : Inheritance / Specialization
-    class RetrieveContextTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new(r2r_client: Arc<dyn R2rClient>:Any) Self
-    }
-    Tool <|-- RetrieveContextTool : Inheritance / Specialization
+```plantuml
+@startuml
+class ManualMockR2rClient {
+    -push_osr_metric(_metric: &factory_core::OsrMetric:Any) : anyhow::Result<()>
+    -search(_query: &str:Any) : anyhow::Result<String>
+}
+R2rClient <|-- ManualMockR2rClient : Inheritance / Specialization
+class RetrieveContextTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(r2r_client: Arc<dyn R2rClient>:Any) : Self
+}
+Tool <|-- RetrieveContextTool : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Retrieve_contextService
-    Caller->>Svc: push_osr_metric()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Retrieve_contextService"
+Caller -> Svc : push_osr_metric()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "develop_task.rs"
 source_path: "crates/factory-application/src/workflows/develop_task.rs"
 description: "Detailed documentation for develop_task.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: develop_task.rs
@@ -103,26 +103,27 @@ Executes create_develop_task_workflow.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class TaskInput {
-    }
-    class TaskOutput {
-    }
+```plantuml
+@startuml
+class TaskInput {
+}
+class TaskOutput {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Develop_taskService
-    Caller->>Svc: create_develop_task_workflow()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Develop_taskService"
+Caller -> Svc : create_develop_task_workflow()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -1,32 +1,32 @@
 ---
 type: "module-documentation"
-title: "index_code.rs"
-source_path: "crates/factory-mcp-server/src/tools/index_code.rs"
-description: "Detailed documentation for index_code.rs"
+title: "deep_research_tool.rs"
+source_path: "crates/factory-mcp-server/src/tools/deep_research_tool.rs"
+description: "Detailed documentation for deep_research_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
 last_verified_commit: "7982a81"
 ---
 
-# File: index_code.rs
+# File: deep_research_tool.rs
 
-**Source Path:** `crates/factory-mcp-server/src/tools/index_code.rs`
+**Source Path:** `crates/factory-mcp-server/src/tools/deep_research_tool.rs`
 
 ## Overview
 
 ### Purpose
-Provides implementation for index_code.rs.
+Provides implementation for deep_research_tool.rs.
 
 ### Responsibilities
-* Handles logic related to index_code.
+* Handles logic related to deep_research_tool.
 
 ### Dependencies
-* async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, super::*
+* async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::KafkaClient, serde_json::{json, Value}, std::sync::Arc, uuid::Uuid
 
 ### Imported modules
 * None
 
 ### Exported classes
-* IndexCodeTool
+* DeepResearchTool
 
 ### Exported interfaces
 * None
@@ -38,11 +38,11 @@ Provides implementation for index_code.rs.
 
 ### Exported Classes / Structs / Interfaces
 
-#### IndexCodeTool
+#### DeepResearchTool
 
 **Overview:**
 Why it exists:
-Provides capabilities related to IndexCodeTool.
+Provides capabilities related to DeepResearchTool.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -52,15 +52,14 @@ Works with related entities to process logic.
 
 **Constructor:**
 
-##### `new(r2r_base_url: String (Any))`
-Parameters: r2r_base_url: String (Any)
+##### `new(kafka_client: Arc<dyn KafkaClient> (Any))`
+Parameters: kafka_client: Arc<dyn KafkaClient> (Any)
 Dependencies: Inherited from context
-Initialization: Sets up IndexCodeTool
+Initialization: Sets up DeepResearchTool
 
 **Attributes:**
 
-* `http_client` (reqwest::Client): Purpose - Stores http_client data. Constraints - Valid reqwest::Client.
-* `r2r_base_url` (String): Purpose - Stores r2r_base_url data. Constraints - Valid String.
+* `kafka_client` (Arc<dyn KafkaClient>): Purpose - Stores kafka_client data. Constraints - Valid Arc<dyn KafkaClient>.
 
 **Public Methods:**
 
@@ -81,14 +80,14 @@ None.
 
 ```plantuml
 @startuml
-class IndexCodeTool {
+class DeepResearchTool {
     -call(params: Value:Any) : anyhow::Result<CallToolResult>
     -description() : String
     -input_schema() : Value
     -name() : String
-    +new(r2r_base_url: String:Any) : Self
+    +new(kafka_client: Arc<dyn KafkaClient>:Any) : Self
 }
-Tool <|-- IndexCodeTool : Inheritance / Specialization
+Tool <|-- DeepResearchTool : Inheritance / Specialization
 @enduml
 
 ```
@@ -99,7 +98,7 @@ Tool <|-- IndexCodeTool : Inheritance / Specialization
 @startuml
 autonumber
 participant Caller as "Client Interface"
-participant Svc as "Index_codeService"
+participant Svc as "Deep_research_toolService"
 Caller -> Svc : call()
 note over Svc : Processing internal logic
 Svc --> Caller : result
@@ -110,10 +109,10 @@ Svc --> Caller : result
 ## Examples
 
 ```
-// Example usage of index_code.rs components
-import { ... } from 'crates/factory-mcp-server/src/tools/index_code.rs';
+// Example usage of deep_research_tool.rs components
+import { ... } from 'crates/factory-mcp-server/src/tools/deep_research_tool.rs';
 ```
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, super::*
+* **Dependencies:** async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, factory_infrastructure::KafkaClient, serde_json::{json, Value}, std::sync::Arc, uuid::Uuid

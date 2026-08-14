@@ -4,7 +4,7 @@ title: "parse_python.py"
 source_path: "parse_python.py"
 description: "Detailed documentation for parse_python.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: parse_python.py
@@ -45,24 +45,25 @@ Executes parse_python_file.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Parse_pythonService
-    Caller->>Svc: parse_python_file()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Parse_pythonService"
+Caller -> Svc : parse_python_file()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

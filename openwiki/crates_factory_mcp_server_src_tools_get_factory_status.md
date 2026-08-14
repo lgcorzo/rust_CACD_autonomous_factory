@@ -1,32 +1,32 @@
 ---
 type: "module-documentation"
-title: "run_tests.rs"
-source_path: "crates/factory-mcp-server/src/tools/run_tests.rs"
-description: "Detailed documentation for run_tests.rs"
+title: "get_factory_status.rs"
+source_path: "crates/factory-mcp-server/src/tools/get_factory_status.rs"
+description: "Detailed documentation for get_factory_status.rs"
 tags: ["documentation", "ast", "openwiki"]
 last_verified_commit: "7982a81"
 ---
 
-# File: run_tests.rs
+# File: get_factory_status.rs
 
-**Source Path:** `crates/factory-mcp-server/src/tools/run_tests.rs`
+**Source Path:** `crates/factory-mcp-server/src/tools/get_factory_status.rs`
 
 ## Overview
 
 ### Purpose
-Provides implementation for run_tests.rs.
+Provides implementation for get_factory_status.rs.
 
 ### Responsibilities
-* Handles logic related to run_tests.
+* Handles logic related to get_factory_status.
 
 ### Dependencies
-* async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::sandbox::SandboxDriver, crate::tools::Tool, serde_json::{json, Value}, std::sync::Arc
+* async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::env, super::*
 
 ### Imported modules
 * None
 
 ### Exported classes
-* RunTestsTool
+* GetFactoryStatusTool
 
 ### Exported interfaces
 * None
@@ -38,11 +38,11 @@ Provides implementation for run_tests.rs.
 
 ### Exported Classes / Structs / Interfaces
 
-#### RunTestsTool
+#### GetFactoryStatusTool
 
 **Overview:**
 Why it exists:
-Provides capabilities related to RunTestsTool.
+Provides capabilities related to GetFactoryStatusTool.
 
 What business capability it provides:
 Supports core domain concepts.
@@ -52,14 +52,14 @@ Works with related entities to process logic.
 
 **Constructor:**
 
-##### `new(driver: Arc<dyn SandboxDriver> (Any))`
-Parameters: driver: Arc<dyn SandboxDriver> (Any)
+##### `new()`
+Parameters:
 Dependencies: Inherited from context
-Initialization: Sets up RunTestsTool
+Initialization: Sets up GetFactoryStatusTool
 
 **Attributes:**
 
-* `driver` (Arc<dyn SandboxDriver>): Purpose - Stores driver data. Constraints - Valid Arc<dyn SandboxDriver>.
+None.
 
 **Public Methods:**
 
@@ -68,6 +68,7 @@ None.
 **Private Methods:**
 
 * `call(_params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `default() -> Self`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
@@ -80,14 +81,16 @@ None.
 
 ```plantuml
 @startuml
-class RunTestsTool {
+class GetFactoryStatusTool {
     -call(_params: Value:Any) : anyhow::Result<CallToolResult>
+    -default() : Self
     -description() : String
     -input_schema() : Value
     -name() : String
-    +new(driver: Arc<dyn SandboxDriver>:Any) : Self
+    +new() : Self
 }
-Tool <|-- RunTestsTool : Inheritance / Specialization
+Default <|-- GetFactoryStatusTool : Inheritance / Specialization
+Tool <|-- GetFactoryStatusTool : Inheritance / Specialization
 @enduml
 
 ```
@@ -98,7 +101,7 @@ Tool <|-- RunTestsTool : Inheritance / Specialization
 @startuml
 autonumber
 participant Caller as "Client Interface"
-participant Svc as "Run_testsService"
+participant Svc as "Get_factory_statusService"
 Caller -> Svc : call()
 note over Svc : Processing internal logic
 Svc --> Caller : result
@@ -109,10 +112,10 @@ Svc --> Caller : result
 ## Examples
 
 ```
-// Example usage of run_tests.rs components
-import { ... } from 'crates/factory-mcp-server/src/tools/run_tests.rs';
+// Example usage of get_factory_status.rs components
+import { ... } from 'crates/factory-mcp-server/src/tools/get_factory_status.rs';
 ```
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::sandbox::SandboxDriver, crate::tools::Tool, serde_json::{json, Value}, std::sync::Arc
+* **Dependencies:** async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::env, super::*

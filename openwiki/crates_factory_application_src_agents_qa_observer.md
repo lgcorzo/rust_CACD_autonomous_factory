@@ -4,7 +4,7 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Detailed documentation for qa_observer.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: qa_observer.rs
@@ -109,31 +109,32 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class QAObserverAgent {
-        -default() Self
-        -execute(_task_description: &str:Any) anyhow::Result<Value>
-        +monitor_crashes() anyhow::Result<()>
-        -name() String
-        +new(sentry_url: String:Any, sentry_token: String:Any, sentry_project: String:Any, gitlab_url: String:Any, gitlab_token: String:Any, gitlab_project: String:Any, hatchet: Hatchet:Any) Self
-    }
-    Agent <|-- QAObserverAgent : Inheritance / Specialization
-    Default <|-- QAObserverAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class QAObserverAgent {
+    -default() : Self
+    -execute(_task_description: &str:Any) : anyhow::Result<Value>
+    +monitor_crashes() : anyhow::Result<()>
+    -name() : String
+    +new(sentry_url: String:Any, sentry_token: String:Any, sentry_project: String:Any, gitlab_url: String:Any, gitlab_token: String:Any, gitlab_project: String:Any, hatchet: Hatchet:Any) : Self
+}
+Agent <|-- QAObserverAgent : Inheritance / Specialization
+Default <|-- QAObserverAgent : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Qa_observerService
-    Caller->>Svc: default()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Qa_observerService"
+Caller -> Svc : default()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

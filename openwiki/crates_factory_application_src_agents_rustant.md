@@ -4,7 +4,7 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: rustant.rs
@@ -137,30 +137,31 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class RustantAgent {
-        -execute(task_description: &str:Any) anyhow::Result<Value>
-        -name() String
-        +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any) Self
-        +plan_mission(mission_id: &str:Any, goal: &str:Any) anyhow::Result<Value>
-        +review_mission(mission_id: &str:Any, mission_results: &str:Any) anyhow::Result<Value>
-    }
-    Agent <|-- RustantAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class RustantAgent {
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any) : Self
+    +plan_mission(mission_id: &str:Any, goal: &str:Any) : anyhow::Result<Value>
+    +review_mission(mission_id: &str:Any, mission_results: &str:Any) : anyhow::Result<Value>
+}
+Agent <|-- RustantAgent : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as RustantService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "RustantService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

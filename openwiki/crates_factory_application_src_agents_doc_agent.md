@@ -4,7 +4,7 @@ title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Detailed documentation for doc_agent.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: doc_agent.rs
@@ -167,32 +167,33 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class DocumentationAgent {
-        -execute(task_description: &str:Any) anyhow::Result<Value>
-        +extract_code_deltas(commit_sha: &str:Any) anyhow::Result<String>
-        +generate_hazitek_report(mission_id: &str:Any) anyhow::Result<factory_core::ComplianceReport>
-        -name() String
-        +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any, superpowers_skills_root: std::path::PathBuf:Any) Self
-        +run_post_merge_pipeline(mission_id: &str:Any) anyhow::Result<Value>
-        -verify_osr() anyhow::Result<f32>
-    }
-    Agent <|-- DocumentationAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class DocumentationAgent {
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    +extract_code_deltas(commit_sha: &str:Any) : anyhow::Result<String>
+    +generate_hazitek_report(mission_id: &str:Any) : anyhow::Result<factory_core::ComplianceReport>
+    -name() : String
+    +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any, superpowers_skills_root: std::path::PathBuf:Any) : Self
+    +run_post_merge_pipeline(mission_id: &str:Any) : anyhow::Result<Value>
+    -verify_osr() : anyhow::Result<f32>
+}
+Agent <|-- DocumentationAgent : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Doc_agentService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Doc_agentService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

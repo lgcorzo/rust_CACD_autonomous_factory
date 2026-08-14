@@ -4,7 +4,7 @@ title: "workflow_tests.rs"
 source_path: "crates/factory-application/tests/workflow_tests.rs"
 description: "Detailed documentation for workflow_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: workflow_tests.rs
@@ -44,24 +44,25 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Workflow_testsService
-    Caller->>Svc: test_rustant_agent_with_mock_mcp()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Workflow_testsService"
+Caller -> Svc : test_rustant_agent_with_mock_mcp()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "security_validator.rs"
 source_path: "crates/factory-infrastructure/src/security_validator.rs"
 description: "Detailed documentation for security_validator.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: security_validator.rs
@@ -77,28 +77,29 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class Ed25519Validator {
-        -audit_content(content: &str:Any) factory_core::error::Result<AuditResult>
-        +new(public_key_bytes: &[u8]:Any, mcp_client: Option<Arc<dyn McpClient>>:Any) anyhow::Result<Self>
-        -validate_signature(data: &[u8]:Any, signature_hex: &str:Any) factory_core::error::Result<bool>
-    }
-    SecurityValidator <|-- Ed25519Validator : Inheritance / Specialization
+```plantuml
+@startuml
+class Ed25519Validator {
+    -audit_content(content: &str:Any) : factory_core::error::Result<AuditResult>
+    +new(public_key_bytes: &[u8]:Any, mcp_client: Option<Arc<dyn McpClient>>:Any) : anyhow::Result<Self>
+    -validate_signature(data: &[u8]:Any, signature_hex: &str:Any) : factory_core::error::Result<bool>
+}
+SecurityValidator <|-- Ed25519Validator : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Security_validatorService
-    Caller->>Svc: audit_content()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Security_validatorService"
+Caller -> Svc : audit_content()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

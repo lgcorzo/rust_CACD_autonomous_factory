@@ -24,38 +24,38 @@ def parse_file(filepath):
         return {"classes": [], "free_functions": [], "dependencies": []}
 
 
-def generate_mermaid_classes(classes):
-    mermaid = "classDiagram\n    direction BT\n"
+def generate_plantuml_classes(classes):
+    plantuml = "@startuml\n"
     if not classes:
-        return mermaid + "    class EmptyModule {\n    }\n"
+        return plantuml + "class EmptyModule {\n}\n@enduml\n"
 
     for c in classes:
         kind = c.get('kind', 'class')
         if kind == 'trait' or kind == 'interface':
-            mermaid += f"    class {c['name']} {{\n        <<{kind}>>\n"
+            plantuml += f"interface {c['name']} {{\n"
         elif kind == 'enum':
-            mermaid += f"    class {c['name']} {{\n        <<enumeration>>\n"
+            plantuml += f"enum {c['name']} {{\n"
         else:
-            mermaid += f"    class {c['name']} {{\n"
+            plantuml += f"class {c['name']} {{\n"
 
         for m in c.get('methods', []):
             visibility = "+" if m.get('is_pub', True) else "-"
             args_str = ", ".join([f"{a['name']}:{a['type']}" for a in m.get('args', [])])
             ret_type = m.get('ret_type', 'None').strip()
-            # Mermaid doesn't like some characters, so we just use the name
-            mermaid += f"        {visibility}{m['name']}({args_str}) {ret_type}\n"
+            plantuml += f"    {visibility}{m['name']}({args_str}) : {ret_type}\n"
 
-        mermaid += "    }\n"
+        plantuml += "}\n"
 
         for impl in c.get('implements', []):
-            mermaid += f"    {impl} <|-- {c['name']} : Inheritance / Specialization\n"
+            plantuml += f"{impl} <|-- {c['name']} : Inheritance / Specialization\n"
 
-    return mermaid
+    plantuml += "@enduml\n"
+    return plantuml
 
-def generate_sequence_diagram(module_name, classes, free_functions):
-    seq = "sequenceDiagram\n    autonumber\n    participant Caller as Client Interface\n"
+def generate_plantuml_sequence(module_name, classes, free_functions):
+    seq = "@startuml\nautonumber\nparticipant Caller as \"Client Interface\"\n"
     svc_name = module_name.capitalize() + "Service"
-    seq += f"    participant Svc as {svc_name}\n"
+    seq += f"participant Svc as \"{svc_name}\"\n"
 
     method_name = "execute"
     if classes and classes[0].get('methods'):
@@ -63,8 +63,8 @@ def generate_sequence_diagram(module_name, classes, free_functions):
     elif free_functions:
         method_name = free_functions[0]['name']
 
-    seq += f"    Caller->>Svc: {method_name}()\n"
-    seq += "    Note over Svc: Processing internal logic\n    Svc-->>Caller: result\n"
+    seq += f"Caller -> Svc : {method_name}()\n"
+    seq += "note over Svc : Processing internal logic\nSvc --> Caller : result\n@enduml\n"
     return seq
 
 
@@ -84,8 +84,8 @@ def write_file_doc(file_path, parsed, now):
 
     parsed['classes'].sort(key=lambda x: x['name'])
     parsed['free_functions'].sort(key=lambda x: x['name'])
-    mermaid_classes = generate_mermaid_classes(parsed['classes'])
-    seq_diagram = generate_sequence_diagram(base_name, parsed['classes'], parsed['free_functions'])
+    plantuml_classes = generate_plantuml_classes(parsed['classes'])
+    seq_diagram = generate_plantuml_sequence(base_name, parsed['classes'], parsed['free_functions'])
 
     deps_str = ", ".join(sorted(parsed['dependencies'])) if parsed['dependencies'] else "None"
 
@@ -148,6 +148,8 @@ Provides implementation for {file_name}.
         doc = c.get('doc', '').strip()
         if not doc:
             doc = f"Why it exists:\nProvides capabilities related to {c['name']}.\n\nWhat business capability it provides:\nSupports core domain concepts.\n\nHow it collaborates with other classes:\nWorks with related entities to process logic."
+        else:
+            doc = f"Why it exists:\n{doc}\n\nWhat business capability it provides:\nDescribed in class documentation.\n\nHow it collaborates with other classes:\nWorks with dependencies and callers."
 
         content += f"#### {c['name']}\n\n"
         content += f"**Overview:**\n{doc}\n\n"
@@ -157,10 +159,11 @@ Provides implementation for {file_name}.
         if constructors:
             for m in constructors:
                 args_str = ", ".join([f"{a['name']} ({a['type']})" for a in m.get('args', [])])
+                cdoc = m.get('doc', '').strip() or f"Sets up {c['name']}"
                 content += f"##### `{m['name']}({args_str})`\n"
                 content += f"Parameters: {args_str}\n"
                 content += f"Dependencies: Inherited from context\n"
-                content += f"Initialization: Sets up {c['name']}\n\n"
+                content += f"Initialization: {cdoc}\n\n"
         else:
             content += "Default constructor.\n\n"
 
@@ -208,9 +211,10 @@ Provides implementation for {file_name}.
         private_methods = [m for m in c.get('methods', []) if not m.get('is_pub', True)]
         if private_methods:
             for m in private_methods:
+                pdoc = m.get('doc', '').strip() or "Internal helper logic."
                 args_str = ", ".join([f"{a['name']} ({a['type']})" for a in m.get('args', [])])
                 ret_type = m.get('ret_type', 'None')
-                content += f"* `{m['name']}({args_str}) -> {ret_type}`: Internal helper logic.\n"
+                content += f"* `{m['name']}({args_str}) -> {ret_type}`: {pdoc}\n"
             content += "\n"
         else:
             content += "None.\n\n"
@@ -231,13 +235,13 @@ Provides implementation for {file_name}.
 
     content += f"""## Internal architecture
 
-```mermaid
-{mermaid_classes}
+```plantuml
+{plantuml_classes}
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
+```plantuml
 {seq_diagram}
 ```
 
@@ -395,8 +399,12 @@ def main():
     validate_links()
 
 def validate_links():
-    import glob
-    files = glob.glob('openwiki/**/*.md', recursive=True)
+    files = []
+    for root, dirs, file_names in os.walk('openwiki'):
+        for file_name in file_names:
+            if file_name.endswith('.md'):
+                files.append(os.path.join(root, file_name))
+
     all_pages = set()
     for f in files:
         basename = os.path.basename(f)

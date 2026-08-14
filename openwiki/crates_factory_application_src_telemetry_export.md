@@ -4,7 +4,7 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: telemetry_export.rs
@@ -105,27 +105,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class TelemetryExporter {
-        +new(kafka_brokers: String:Any, openwebui_db_url: String:Any) Self
-        -push_to_openwebui(thought: &Value:Any) anyhow::Result<()>
-        +start_export_loop(self: Arc<Self>:Any) anyhow::Result<()>
-    }
+```plantuml
+@startuml
+class TelemetryExporter {
+    +new(kafka_brokers: String:Any, openwebui_db_url: String:Any) : Self
+    -push_to_openwebui(thought: &Value:Any) : anyhow::Result<()>
+    +start_export_loop(self: Arc<Self>:Any) : anyhow::Result<()>
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Telemetry_exportService
-    Caller->>Svc: new()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Telemetry_exportService"
+Caller -> Svc : new()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

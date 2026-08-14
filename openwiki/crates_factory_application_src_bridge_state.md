@@ -4,7 +4,7 @@ title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Detailed documentation for state.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: state.rs
@@ -200,33 +200,33 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class BridgeState {
-        -get_checkpoint_key(session_id: &str:Any) String
-        +load_checkpoint(session_id: &str:Any, s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) anyhow::Result<Option<Self>>
-        +new(session_id: String:Any) Self
-        +save_checkpoint(s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) anyhow::Result<()>
-    }
-    class BridgeStatus {
-        <<enumeration>>
-    }
-    class StepCheckpoint {
-    }
+```plantuml
+@startuml
+class BridgeState {
+    -get_checkpoint_key(session_id: &str:Any) : String
+    +load_checkpoint(session_id: &str:Any, s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) : anyhow::Result<Option<Self>>
+    +new(session_id: String:Any) : Self
+    +save_checkpoint(s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) : anyhow::Result<()>
+}
+enum BridgeStatus {
+}
+class StepCheckpoint {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as StateService
-    Caller->>Svc: get_checkpoint_key()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "StateService"
+Caller -> Svc : get_checkpoint_key()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

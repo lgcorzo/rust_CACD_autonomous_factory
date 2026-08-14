@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-application/src/workflows/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: mod.rs
@@ -20,7 +20,7 @@ Provides implementation for mod.rs.
 * Handles logic related to mod.
 
 ### Dependencies
-* pub autonomous_mission::{MissionInput, MissionOutput, create_mission_workflow}, pub develop_task::{TaskInput, TaskOutput, create_develop_task_workflow}
+* pub autonomous_mission::{MissionInput, MissionOutput, create_mission_workflow}, pub deep_research::{DeepSearchInput, DeepSearchOutput, create_deep_research_workflow}, pub develop_task::{TaskInput, TaskOutput, create_develop_task_workflow}
 
 ### Imported modules
 * None
@@ -44,24 +44,25 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ModService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ModService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 
@@ -74,4 +75,4 @@ import { ... } from 'crates/factory-application/src/workflows/mod.rs';
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`
-* **Dependencies:** pub autonomous_mission::{MissionInput, MissionOutput, create_mission_workflow}, pub develop_task::{TaskInput, TaskOutput, create_develop_task_workflow}
+* **Dependencies:** pub autonomous_mission::{MissionInput, MissionOutput, create_mission_workflow}, pub deep_research::{DeepSearchInput, DeepSearchOutput, create_deep_research_workflow}, pub develop_task::{TaskInput, TaskOutput, create_develop_task_workflow}

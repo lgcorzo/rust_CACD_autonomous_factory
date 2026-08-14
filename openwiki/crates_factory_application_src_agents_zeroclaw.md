@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: zeroclaw.rs
@@ -168,31 +168,32 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ZeroClawAgent {
-        -execute(task_description: &str:Any) anyhow::Result<Value>
-        +execute_task(mission_id: &str:Any, task_description: &str:Any, _files: &[String]:Any) anyhow::Result<Value>
-        +introspect_k8s(mission_id: &str:Any) anyhow::Result<Value>
-        -name() String
-        +new(mcp_client: Arc<dyn McpClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) Self
-        +validate_mission(mission_id: &str:Any, test_command: &str:Any) anyhow::Result<Value>
-    }
-    Agent <|-- ZeroClawAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class ZeroClawAgent {
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    +execute_task(mission_id: &str:Any, task_description: &str:Any, _files: &[String]:Any) : anyhow::Result<Value>
+    +introspect_k8s(mission_id: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +new(mcp_client: Arc<dyn McpClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) : Self
+    +validate_mission(mission_id: &str:Any, test_command: &str:Any) : anyhow::Result<Value>
+}
+Agent <|-- ZeroClawAgent : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ZeroclawService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ZeroclawService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

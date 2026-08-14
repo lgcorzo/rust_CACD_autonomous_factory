@@ -4,7 +4,7 @@ title: "context.rs"
 source_path: "crates/factory-mcp-server/src/skills/context.rs"
 description: "Detailed documentation for context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: context.rs
@@ -131,26 +131,27 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ContextSkill {
-        +format_for_llm(pruned_context: &str:Any) Value
-        +prune_context(raw_context: &str:Any, max_chars: usize:Any) String
-    }
+```plantuml
+@startuml
+class ContextSkill {
+    +format_for_llm(pruned_context: &str:Any) : Value
+    +prune_context(raw_context: &str:Any, max_chars: usize:Any) : String
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ContextService
-    Caller->>Svc: format_for_llm()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ContextService"
+Caller -> Svc : format_for_llm()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

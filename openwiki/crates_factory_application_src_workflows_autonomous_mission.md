@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: autonomous_mission.rs
@@ -137,27 +137,28 @@ Executes create_mission_workflow.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class MissionInput {
-        +from_protobuf(bytes: &[u8]:Any) Result<Self, prost::DecodeError>
-    }
-    class MissionOutput {
-    }
+```plantuml
+@startuml
+class MissionInput {
+    +from_protobuf(bytes: &[u8]:Any) : Result<Self, prost::DecodeError>
+}
+class MissionOutput {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Autonomous_missionService
-    Caller->>Svc: from_protobuf()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Autonomous_missionService"
+Caller -> Svc : from_protobuf()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

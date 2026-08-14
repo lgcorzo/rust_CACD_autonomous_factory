@@ -4,7 +4,7 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: sandbox.rs
@@ -216,43 +216,42 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ExecutionResult {
-    }
-    class GvisorK8sDriver {
-        -execute(code: &str:Any, language: &str:Any) anyhow::Result<ExecutionResult>
-    }
-    SandboxDriver <|-- GvisorK8sDriver : Inheritance / Specialization
-    class NativeSurgerySandboxDriver {
-        -execute(_code: &str:Any, _language: &str:Any) anyhow::Result<ExecutionResult>
-        -execute_surgery(id: &str:Any, patch: &factory_core::executor::SurgicalPatch:Any) factory_core::error::Result<factory_core::executor::ExecutionResult>
-    }
-    SandboxDriver <|-- NativeSurgerySandboxDriver : Inheritance / Specialization
-    class SandboxDriver {
-        <<trait>>
-    }
-    class SandboxMode {
-        <<enumeration>>
-    }
-    class SubprocessDriver {
-        -execute(code: &str:Any, language: &str:Any) anyhow::Result<ExecutionResult>
-    }
-    SandboxDriver <|-- SubprocessDriver : Inheritance / Specialization
+```plantuml
+@startuml
+class ExecutionResult {
+}
+class GvisorK8sDriver {
+    -execute(code: &str:Any, language: &str:Any) : anyhow::Result<ExecutionResult>
+}
+SandboxDriver <|-- GvisorK8sDriver : Inheritance / Specialization
+class NativeSurgerySandboxDriver {
+    -execute(_code: &str:Any, _language: &str:Any) : anyhow::Result<ExecutionResult>
+    -execute_surgery(id: &str:Any, patch: &factory_core::executor::SurgicalPatch:Any) : factory_core::error::Result<factory_core::executor::ExecutionResult>
+}
+SandboxDriver <|-- NativeSurgerySandboxDriver : Inheritance / Specialization
+interface SandboxDriver {
+}
+enum SandboxMode {
+}
+class SubprocessDriver {
+    -execute(code: &str:Any, language: &str:Any) : anyhow::Result<ExecutionResult>
+}
+SandboxDriver <|-- SubprocessDriver : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as SandboxService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "SandboxService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

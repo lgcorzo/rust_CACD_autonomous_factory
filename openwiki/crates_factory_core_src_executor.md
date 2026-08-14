@@ -4,7 +4,7 @@ title: "executor.rs"
 source_path: "crates/factory-core/src/executor.rs"
 description: "Detailed documentation for executor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: executor.rs
@@ -132,29 +132,29 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class CodeSurgeryExecutor {
-        <<trait>>
-    }
-    class ExecutionResult {
-    }
-    class SurgicalPatch {
-    }
+```plantuml
+@startuml
+interface CodeSurgeryExecutor {
+}
+class ExecutionResult {
+}
+class SurgicalPatch {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ExecutorService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "ExecutorService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

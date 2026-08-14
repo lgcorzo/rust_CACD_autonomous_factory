@@ -4,7 +4,7 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: gitlab.rs
@@ -130,6 +130,7 @@ None.
 **Private Methods:**
 
 * `create_issue(project_id: &str (Any), title: &str (Any), description: &str (Any)) -> anyhow::Result<GitlabIssue>`: Internal helper logic.
+* `list_open_issues(project_id: &str (Any), labels: Option<String> (Any)) -> anyhow::Result<Vec<GitlabIssue>>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -137,32 +138,33 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class GitlabClient {
-        <<trait>>
-    }
-    class GitlabIssue {
-    }
-    class HttpGitlabClient {
-        -create_issue(project_id: &str:Any, title: &str:Any, description: &str:Any) anyhow::Result<GitlabIssue>
-        +new(url: String:Any, api_token: String:Any) Self
-    }
-    GitlabClient <|-- HttpGitlabClient : Inheritance / Specialization
+```plantuml
+@startuml
+interface GitlabClient {
+}
+class GitlabIssue {
+}
+class HttpGitlabClient {
+    -create_issue(project_id: &str:Any, title: &str:Any, description: &str:Any) : anyhow::Result<GitlabIssue>
+    -list_open_issues(project_id: &str:Any, labels: Option<String>:Any) : anyhow::Result<Vec<GitlabIssue>>
+    +new(url: String:Any, api_token: String:Any) : Self
+}
+GitlabClient <|-- HttpGitlabClient : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as GitlabService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "GitlabService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

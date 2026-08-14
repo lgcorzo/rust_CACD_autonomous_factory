@@ -4,7 +4,7 @@ title: "bridge_test.rs"
 source_path: "crates/factory-application/tests/bridge_test.rs"
 description: "Detailed documentation for bridge_test.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: bridge_test.rs
@@ -44,24 +44,25 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Bridge_testService
-    Caller->>Svc: test_bridge_state_crash_resilience()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Bridge_testService"
+Caller -> Svc : test_bridge_state_crash_resilience()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

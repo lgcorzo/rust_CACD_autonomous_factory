@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-core/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: security_tests.rs
@@ -73,27 +73,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class DummyBounds {
-        -issue_jit_token(_aud: &str:Any) Result<JitToken>
-        -validate_token(_token: &JitToken:Any) Result<bool>
-    }
-    SecurityBounds <|-- DummyBounds : Inheritance / Specialization
+```plantuml
+@startuml
+class DummyBounds {
+    -issue_jit_token(_aud: &str:Any) : Result<JitToken>
+    -validate_token(_token: &JitToken:Any) : Result<bool>
+}
+SecurityBounds <|-- DummyBounds : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Security_testsService
-    Caller->>Svc: issue_jit_token()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Security_testsService"
+Caller -> Svc : issue_jit_token()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

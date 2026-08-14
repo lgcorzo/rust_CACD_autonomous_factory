@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-mcp-server/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: main.rs
@@ -47,24 +47,25 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as MainService
-    Caller->>Svc: main()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "MainService"
+Caller -> Svc : main()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

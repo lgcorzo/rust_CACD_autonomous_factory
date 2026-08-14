@@ -4,7 +4,7 @@ title: "osr.rs"
 source_path: "crates/factory-application/src/utils/osr.rs"
 description: "Detailed documentation for osr.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: osr.rs
@@ -48,24 +48,25 @@ Executes levenshtein_distance.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as OsrService
-    Caller->>Svc: calculate_osr()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "OsrService"
+Caller -> Svc : calculate_osr()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

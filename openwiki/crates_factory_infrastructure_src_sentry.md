@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: sentry.rs
@@ -138,32 +138,32 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class CrashEvent {
-    }
-    class HttpSentryClient {
-        -fetch_recent_crashes(project: &str:Any, since_minutes: u64:Any) anyhow::Result<Vec<CrashEvent>>
-        +new(url: String:Any, api_token: String:Any) Self
-    }
-    SentryClient <|-- HttpSentryClient : Inheritance / Specialization
-    class SentryClient {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class CrashEvent {
+}
+class HttpSentryClient {
+    -fetch_recent_crashes(project: &str:Any, since_minutes: u64:Any) : anyhow::Result<Vec<CrashEvent>>
+    +new(url: String:Any, api_token: String:Any) : Self
+}
+SentryClient <|-- HttpSentryClient : Inheritance / Specialization
+interface SentryClient {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as SentryService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "SentryService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

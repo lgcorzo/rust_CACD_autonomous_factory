@@ -4,7 +4,7 @@ title: "security_review.rs"
 source_path: "crates/factory-mcp-server/src/tools/security_review.rs"
 description: "Detailed documentation for security_review.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: security_review.rs
@@ -20,7 +20,11 @@ Provides implementation for security_review.rs.
 * Handles logic related to security_review.
 
 ### Dependencies
-* async_openai::Client, async_openai::config::OpenAIConfig, async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::env
+* async_openai::Client, async_openai::config::OpenAIConfig, async_openai::types::{
+    ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
+    ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
+    CreateChatCompletionRequestArgs,
+}, async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::env, super::*
 
 ### Imported modules
 * None
@@ -60,6 +64,7 @@ Initialization: Sets up SecurityReviewTool
 **Attributes:**
 
 * `client` (Client<OpenAIConfig>): Purpose - Stores client data. Constraints - Valid Client<OpenAIConfig>.
+* `model` (String): Purpose - Stores model data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -70,6 +75,7 @@ None.
 * `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `default() -> Self`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
+* `heuristic_scan(diff: &str (Any)) -> (f64, Vec<String>)`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 
@@ -79,32 +85,34 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class SecurityReviewTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -default() Self
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new() Self
-    }
-    Default <|-- SecurityReviewTool : Inheritance / Specialization
-    Tool <|-- SecurityReviewTool : Inheritance / Specialization
+```plantuml
+@startuml
+class SecurityReviewTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -default() : Self
+    -description() : String
+    -heuristic_scan(diff: &str:Any) : (f64, Vec<String>)
+    -input_schema() : Value
+    -name() : String
+    +new() : Self
+}
+Default <|-- SecurityReviewTool : Inheritance / Specialization
+Tool <|-- SecurityReviewTool : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Security_reviewService
-    Caller->>Svc: call()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Security_reviewService"
+Caller -> Svc : call()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 
@@ -117,4 +125,8 @@ import { ... } from 'crates/factory-mcp-server/src/tools/security_review.rs';
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
-* **Dependencies:** async_openai::Client, async_openai::config::OpenAIConfig, async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::env
+* **Dependencies:** async_openai::Client, async_openai::config::OpenAIConfig, async_openai::types::{
+    ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
+    ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
+    CreateChatCompletionRequestArgs,
+}, async_trait::async_trait, crate::protocol::{CallToolResult, McpContent}, crate::tools::Tool, serde_json::{json, Value}, std::env, super::*

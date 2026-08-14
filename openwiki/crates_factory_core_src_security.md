@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: security.rs
@@ -216,39 +216,38 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class AuditResult {
-    }
-    class Ed25519SecurityValidator {
-        -audit_content(_content: &str:Any) Result<AuditResult>
-        -validate_signature(data: &[u8]:Any, signature: &str:Any) Result<bool>
-    }
-    SecurityValidator <|-- Ed25519SecurityValidator : Inheritance / Specialization
-    class JitToken {
-    }
-    class SandboxConstraint {
-    }
-    class SecurityBounds {
-        <<trait>>
-    }
-    class SecurityValidator {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class AuditResult {
+}
+class Ed25519SecurityValidator {
+    -audit_content(_content: &str:Any) : Result<AuditResult>
+    -validate_signature(data: &[u8]:Any, signature: &str:Any) : Result<bool>
+}
+SecurityValidator <|-- Ed25519SecurityValidator : Inheritance / Specialization
+class JitToken {
+}
+class SandboxConstraint {
+}
+interface SecurityBounds {
+}
+interface SecurityValidator {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as SecurityService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "SecurityService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

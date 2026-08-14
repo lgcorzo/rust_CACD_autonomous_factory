@@ -4,7 +4,7 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Detailed documentation for r2r.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: r2r.rs
@@ -108,32 +108,32 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class HttpR2rClient {
-        -get_token() anyhow::Result<String>
-        +new(url: String:Any, user: String:Any, pwd: String:Any) Self
-        -push_osr_metric(metric: &factory_core::OsrMetric:Any) anyhow::Result<()>
-        -search(query: &str:Any) anyhow::Result<String>
-    }
-    R2rClient <|-- HttpR2rClient : Inheritance / Specialization
-    class R2rClient {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class HttpR2rClient {
+    -get_token() : anyhow::Result<String>
+    +new(url: String:Any, user: String:Any, pwd: String:Any) : Self
+    -push_osr_metric(metric: &factory_core::OsrMetric:Any) : anyhow::Result<()>
+    -search(query: &str:Any) : anyhow::Result<String>
+}
+R2rClient <|-- HttpR2rClient : Inheritance / Specialization
+interface R2rClient {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as R2rService
-    Caller->>Svc: get_token()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "R2rService"
+Caller -> Svc : get_token()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

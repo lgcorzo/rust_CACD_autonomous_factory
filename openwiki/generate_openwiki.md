@@ -4,7 +4,7 @@ title: "generate_openwiki.py"
 source_path: "generate_openwiki.py"
 description: "Detailed documentation for generate_openwiki.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: generate_openwiki.py
@@ -32,7 +32,7 @@ Provides implementation for generate_openwiki.py.
 * None
 
 ### Exported functions
-* generate_indexes, generate_mermaid_classes, generate_sequence_diagram, get_git_hash, main, parse_file, setup_okf_structure, validate_links, write_file_doc
+* generate_indexes, generate_plantuml_classes, generate_plantuml_sequence, get_git_hash, main, parse_file, setup_okf_structure, validate_links, write_file_doc
 
 ## Public API
 
@@ -43,11 +43,11 @@ Provides implementation for generate_openwiki.py.
 #### `generate_indexes(now (Any)) -> None`
 Executes generate_indexes.
 
-#### `generate_mermaid_classes(classes (Any)) -> None`
-Executes generate_mermaid_classes.
+#### `generate_plantuml_classes(classes (Any)) -> None`
+Executes generate_plantuml_classes.
 
-#### `generate_sequence_diagram(module_name (Any), classes (Any), free_functions (Any)) -> None`
-Executes generate_sequence_diagram.
+#### `generate_plantuml_sequence(module_name (Any), classes (Any), free_functions (Any)) -> None`
+Executes generate_plantuml_sequence.
 
 #### `get_git_hash() -> None`
 Executes get_git_hash.
@@ -69,24 +69,25 @@ Executes write_file_doc.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Generate_openwikiService
-    Caller->>Svc: generate_indexes()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Generate_openwikiService"
+Caller -> Svc : generate_indexes()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

@@ -4,7 +4,7 @@ title: "spec_kit_tasks_to_issues.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs"
 description: "Detailed documentation for spec_kit_tasks_to_issues.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: spec_kit_tasks_to_issues.rs
@@ -78,30 +78,31 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class SpecKitTasksToIssuesTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new(gitlab_client: Arc<dyn GitlabClient>:Any) Self
-    }
-    Tool <|-- SpecKitTasksToIssuesTool : Inheritance / Specialization
+```plantuml
+@startuml
+class SpecKitTasksToIssuesTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(gitlab_client: Arc<dyn GitlabClient>:Any) : Self
+}
+Tool <|-- SpecKitTasksToIssuesTool : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Spec_kit_tasks_to_issuesService
-    Caller->>Svc: call()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Spec_kit_tasks_to_issuesService"
+Caller -> Svc : call()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

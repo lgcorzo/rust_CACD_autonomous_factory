@@ -4,7 +4,7 @@ title: "plan_mission.rs"
 source_path: "crates/factory-mcp-server/src/tools/plan_mission.rs"
 description: "Detailed documentation for plan_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: plan_mission.rs
@@ -86,30 +86,31 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class PlanMissionTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new(api_key: String:Any, base_url: String:Any, model: String:Any, finops_tag: FinOpsTag:Any) Self
-    }
-    Tool <|-- PlanMissionTool : Inheritance / Specialization
+```plantuml
+@startuml
+class PlanMissionTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(api_key: String:Any, base_url: String:Any, model: String:Any, finops_tag: FinOpsTag:Any) : Self
+}
+Tool <|-- PlanMissionTool : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Plan_missionService
-    Caller->>Svc: call()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Plan_missionService"
+Caller -> Svc : call()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

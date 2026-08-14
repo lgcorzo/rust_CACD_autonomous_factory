@@ -4,7 +4,7 @@ title: "auditor.rs"
 source_path: "crates/factory-application/src/agents/auditor.rs"
 description: "Detailed documentation for auditor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: auditor.rs
@@ -170,33 +170,34 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class AuditorAgent {
-        +analyze_dag_logs(mission_id: &str:Any) anyhow::Result<Vec<Value>>
-        +audit_mission(mission_id: &str:Any, failures: &[Value]:Any) anyhow::Result<Value>
-        -default() Self
-        +evaluate_prompts(mission_id: &str:Any, targets: &[factory_core::Targets]:Any, recommendations: &[Value]:Any) anyhow::Result<String>
-        -execute(task_description: &str:Any) anyhow::Result<Value>
-        -name() String
-        +new() Self
-    }
-    Agent <|-- AuditorAgent : Inheritance / Specialization
-    Default <|-- AuditorAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class AuditorAgent {
+    +analyze_dag_logs(mission_id: &str:Any) : anyhow::Result<Vec<Value>>
+    +audit_mission(mission_id: &str:Any, failures: &[Value]:Any) : anyhow::Result<Value>
+    -default() : Self
+    +evaluate_prompts(mission_id: &str:Any, targets: &[factory_core::Targets]:Any, recommendations: &[Value]:Any) : anyhow::Result<String>
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +new() : Self
+}
+Agent <|-- AuditorAgent : Inheritance / Specialization
+Default <|-- AuditorAgent : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as AuditorService
-    Caller->>Svc: analyze_dag_logs()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "AuditorService"
+Caller -> Svc : analyze_dag_logs()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

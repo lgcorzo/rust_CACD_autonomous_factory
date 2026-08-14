@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: lib.rs
@@ -496,54 +496,53 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ComplianceReport {
-    }
-    class FeatureImportances {
-    }
-    class FinOpsTag {
-    }
-    class Inputs {
-    }
-    class Metadata {
-    }
-    class Mission {
-    }
-    class MissionStatus {
-        <<enumeration>>
-    }
-    class OsrMetric {
-    }
-    class Outputs {
-    }
-    class SHAPValues {
-    }
-    class SpecArtifact {
-    }
-    class Targets {
-    }
-    class Task {
-    }
-    class TaskStatus {
-        <<enumeration>>
-    }
-    class UserFeedbackPayload {
-    }
+```plantuml
+@startuml
+class ComplianceReport {
+}
+class FeatureImportances {
+}
+class FinOpsTag {
+}
+class Inputs {
+}
+class Metadata {
+}
+class Mission {
+}
+enum MissionStatus {
+}
+class OsrMetric {
+}
+class Outputs {
+}
+class SHAPValues {
+}
+class SpecArtifact {
+}
+class Targets {
+}
+class Task {
+}
+enum TaskStatus {
+}
+class UserFeedbackPayload {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as LibService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "LibService"
+Caller -> Svc : execute()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 

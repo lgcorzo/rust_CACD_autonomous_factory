@@ -4,7 +4,7 @@ title: "adk_driver.rs"
 source_path: "crates/factory-application/src/bridge/adk_driver.rs"
 description: "Detailed documentation for adk_driver.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "7982a81"
 ---
 
 # File: adk_driver.rs
@@ -73,27 +73,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class NativeADKDriver {
-        -apply_patch(_mission_id: &str:Any, patch: &SurgicalPatch:Any) Result<ExecutionResult, FactoryError>
-        -verify_syntax(_file_path: &std::path::Path:Any) Result<bool, FactoryError>
-    }
-    CodeSurgeryExecutor <|-- NativeADKDriver : Inheritance / Specialization
+```plantuml
+@startuml
+class NativeADKDriver {
+    -apply_patch(_mission_id: &str:Any, patch: &SurgicalPatch:Any) : Result<ExecutionResult, FactoryError>
+    -verify_syntax(_file_path: &std::path::Path:Any) : Result<bool, FactoryError>
+}
+CodeSurgeryExecutor <|-- NativeADKDriver : Inheritance / Specialization
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Adk_driverService
-    Caller->>Svc: apply_patch()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant Caller as "Client Interface"
+participant Svc as "Adk_driverService"
+Caller -> Svc : apply_patch()
+note over Svc : Processing internal logic
+Svc --> Caller : result
+@enduml
 
 ```
 
