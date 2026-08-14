@@ -20,6 +20,14 @@ pub trait GitlabClient: Send + Sync {
         description: &str,
     ) -> anyhow::Result<GitlabIssue>;
 
+    async fn create_issue_with_labels(
+        &self,
+        project_id: &str,
+        title: &str,
+        description: &str,
+        labels: &[String],
+    ) -> anyhow::Result<GitlabIssue>;
+
     async fn list_open_issues(
         &self,
         project_id: &str,
@@ -51,6 +59,17 @@ impl GitlabClient for HttpGitlabClient {
         title: &str,
         description: &str,
     ) -> anyhow::Result<GitlabIssue> {
+        self.create_issue_with_labels(project_id, title, description, &[])
+            .await
+    }
+
+    async fn create_issue_with_labels(
+        &self,
+        project_id: &str,
+        title: &str,
+        description: &str,
+        labels: &[String],
+    ) -> anyhow::Result<GitlabIssue> {
         // Project ID in GitLab API can be URL-encoded path like `group%2Fproject` or numeric ID
         let encoded_project_id = urlencoding::encode(project_id);
         let create_url = format!(
@@ -59,10 +78,14 @@ impl GitlabClient for HttpGitlabClient {
             encoded_project_id
         );
 
-        let payload = serde_json::json!({
+        let mut payload = serde_json::json!({
             "title": title,
             "description": description
         });
+
+        if !labels.is_empty() {
+            payload["labels"] = serde_json::Value::String(labels.join(","));
+        }
 
         let res = self
             .client

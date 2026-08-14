@@ -112,20 +112,35 @@ impl FinOpsAgent {
                             consecutive_failures = 0;
                             current_interval = base_interval;
 
+                            let max_daily_budget = std::env::var("FINOPS_MAX_DAILY_BUDGET")
+                                .ok()
+                                .and_then(|v| v.parse::<f64>().ok())
+                                .unwrap_or(50.0);
+                            let hardstop_threshold = max_daily_budget * 0.90;
+
                             // Preventative Anomaly Detection: check velocity
                             let spend_velocity = spend - previous_spend;
                             if spend_velocity > 1.0 {
                                 tracing::error!(
-                                    "ANOMALY DETECTED! High token spend velocity: +${} in 60s! Total: ${}",
+                                    "ANOMALY DETECTED! High token spend velocity: +${:.2} in 60s! Total: ${:.2}",
                                     spend_velocity,
                                     spend
                                 );
-                            } else if spend > 10.0 {
-                                tracing::error!("LIMIT REACHED! High token spend: ${}", spend);
+                            }
+
+                            // HardStop Cutoff at 90% Daily Budget
+                            if spend >= hardstop_threshold {
+                                tracing::error!(
+                                    "HARDSTOP TRIGGERED! Spend ${:.2} reached 90% threshold of daily budget (${:.2}). Halting missions.",
+                                    spend,
+                                    max_daily_budget
+                                );
                             } else {
                                 tracing::info!(
-                                    "Current spend: ${}. Velocity: +${}. Budget is healthy.",
+                                    "Current spend: ${:.2} / ${:.2} (Limit: ${:.2}). Velocity: +${:.2}/min. Budget is healthy.",
                                     spend,
+                                    max_daily_budget,
+                                    hardstop_threshold,
                                     spend_velocity
                                 );
                             }

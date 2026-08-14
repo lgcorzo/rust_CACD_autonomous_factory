@@ -6,6 +6,7 @@ use serde_json::json;
 pub trait R2rClient: Send + Sync {
     async fn search(&self, query: &str) -> anyhow::Result<String>;
     async fn push_osr_metric(&self, metric: &factory_core::OsrMetric) -> anyhow::Result<()>;
+    async fn map_stacktrace_to_ast(&self, stacktrace: &str) -> anyhow::Result<String>;
 }
 
 pub struct HttpR2rClient {
@@ -145,6 +146,14 @@ impl R2rClient for HttpR2rClient {
 
         tracing::info!("Successfully pushed OSR metric: {}", metric.osr_value);
         Ok(())
+    }
+
+    async fn map_stacktrace_to_ast(&self, stacktrace: &str) -> anyhow::Result<String> {
+        let query = format!(
+            "Analyze exception stacktrace to locate culprit file, function, and AST context:\n{}",
+            stacktrace
+        );
+        self.search(&query).await
     }
 }
 
