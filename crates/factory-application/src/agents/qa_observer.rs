@@ -41,8 +41,10 @@ impl QAObserverAgent {
         gitlab_project: String,
         hatchet: Hatchet,
     ) -> Self {
-        let r2r_url = std::env::var("R2R_BASE_URL").unwrap_or_else(|_| "http://r2r.llm-apps.svc.cluster.local:7272".to_string());
-        let r2r_user = std::env::var("R2R_USER").unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
+        let r2r_url = std::env::var("R2R_BASE_URL")
+            .unwrap_or_else(|_| "http://r2r.llm-apps.svc.cluster.local:7272".to_string());
+        let r2r_user =
+            std::env::var("R2R_USER").unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
         let r2r_pwd = std::env::var("R2R_PWD").unwrap_or_else(|_| "admin".to_string());
 
         let r2r_client: Option<Arc<dyn factory_infrastructure::R2rClient>> = Some(Arc::new(
@@ -93,7 +95,10 @@ impl QAObserverAgent {
                         {
                             let mut seen = self.processed_events.lock().await;
                             if seen.contains(&crash.event_id) {
-                                tracing::debug!("Skipping already processed Sentry event: {}", crash.event_id);
+                                tracing::debug!(
+                                    "Skipping already processed Sentry event: {}",
+                                    crash.event_id
+                                );
                                 continue;
                             }
                             seen.insert(crash.event_id.clone());
@@ -125,7 +130,12 @@ impl QAObserverAgent {
 
                         match self
                             .gitlab_client
-                            .create_issue_with_labels(&self.gitlab_project, &title, &description, &labels)
+                            .create_issue_with_labels(
+                                &self.gitlab_project,
+                                &title,
+                                &description,
+                                &labels,
+                            )
                             .await
                         {
                             Ok(issue) => {

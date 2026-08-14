@@ -60,7 +60,10 @@ impl SastScanResult {
             || lower.contains("exec(")
             || lower.contains("eval(")
         {
-            findings.push("Potential Command Injection / Arbitrary Code Execution vector detected".to_string());
+            findings.push(
+                "Potential Command Injection / Arbitrary Code Execution vector detected"
+                    .to_string(),
+            );
             critical = true;
             score -= 5.0;
         }
