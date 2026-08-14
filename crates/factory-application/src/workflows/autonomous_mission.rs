@@ -224,6 +224,7 @@ pub fn create_mission_workflow(
                 let mut attempt = 0;
                 let max_retries = 3;
                 let mut last_error;
+                let mut previous_error_hash: u64 = 0;
 
                 loop {
                     attempt += 1;
@@ -257,6 +258,38 @@ pub fn create_mission_workflow(
                         }
                     }
 
+                    // Compute error signature hash for Deadlock & Stagnation Detection
+                    use std::hash::{Hash, Hasher};
+                    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+                    last_error.hash(&mut hasher);
+                    let current_error_hash = hasher.finish();
+
+                    if attempt > 1 && current_error_hash == previous_error_hash {
+                        tracing::error!(
+                            "DEADLOCK DETECTED in mission {}! ZeroClaw produced identical error hash {} across consecutive attempts. Breaking loop immediately.",
+                            mission_id,
+                            current_error_hash
+                        );
+                        kafka_client
+                            .publish_thought(
+                                &mission_id,
+                                "Deadlock detected: identical failure diff across attempts. Escalating immediately...",
+                                "zeroclaw",
+                            )
+                            .await?;
+                        aethalgard_client
+                            .notify_remediation(&mission_id, &format!("Deadlock detected: {}", last_error))
+                            .await?;
+
+                        // Clean error recovery: stash git state
+                        let _ = std::process::Command::new("git")
+                            .args(["stash", "save", &format!("stuck-mission-{}", mission_id)])
+                            .output();
+
+                        anyhow::bail!("Deadlock detected in validation loop. Escalated to supervisor.");
+                    }
+                    previous_error_hash = current_error_hash;
+
                     if attempt >= max_retries {
                         kafka_client
                             .publish_thought(
@@ -277,6 +310,11 @@ pub fn create_mission_workflow(
                                 let _ = auditor.audit_mission(&m_id, &logs).await;
                             }
                         });
+
+                        // Clean error recovery: stash git state
+                        let _ = std::process::Command::new("git")
+                            .args(["stash", "save", &format!("stuck-mission-{}", mission_id)])
+                            .output();
 
                         anyhow::bail!(
                             "Validation failed permanently. Escalated to Jules Remediator."
@@ -299,6 +337,7 @@ pub fn create_mission_workflow(
                 }
             })
         })
+        .execution_timeout(std::time::Duration::from_secs(1800))
         .build()
         .unwrap()
         .add_parent(&code_task);
