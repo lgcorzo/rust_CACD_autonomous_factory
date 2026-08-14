@@ -7,6 +7,10 @@ use serde_json::Value;
 use std::time::Duration;
 use uuid::Uuid;
 
+use std::collections::HashSet;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+
 /// Circuit breaker threshold: after this many consecutive failures,
 /// downgrade logging from ERROR to WARN and apply maximum backoff.
 const CIRCUIT_BREAKER_THRESHOLD: u32 = 3;
@@ -14,17 +18,15 @@ const CIRCUIT_BREAKER_THRESHOLD: u32 = 3;
 pub struct QAObserverAgent {
     sentry_client: Box<dyn SentryClient>,
     gitlab_client: Box<dyn GitlabClient>,
+    r2r_client: Option<Arc<dyn factory_infrastructure::R2rClient>>,
     sentry_project: String,
     gitlab_project: String,
     hatchet: Hatchet,
+    processed_events: Arc<Mutex<HashSet<String>>>,
 }
 
 impl Default for QAObserverAgent {
     fn default() -> Self {
-        // We will construct this using the environment variables if provided.
-        // It requires a Hatchet client instance.
-        // For default initialization, we will initialize a mock Hatchet if possible,
-        // but typically this should be constructed explicitly.
         panic!("QAObserverAgent should be constructed with ::new()");
     }
 }
@@ -39,12 +41,24 @@ impl QAObserverAgent {
         gitlab_project: String,
         hatchet: Hatchet,
     ) -> Self {
+        let r2r_url = std::env::var("R2R_BASE_URL")
+            .unwrap_or_else(|_| "http://r2r.llm-apps.svc.cluster.local:7272".to_string());
+        let r2r_user =
+            std::env::var("R2R_USER").unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
+        let r2r_pwd = std::env::var("R2R_PWD").unwrap_or_else(|_| "admin".to_string());
+
+        let r2r_client: Option<Arc<dyn factory_infrastructure::R2rClient>> = Some(Arc::new(
+            factory_infrastructure::HttpR2rClient::new(r2r_url, r2r_user, r2r_pwd),
+        ));
+
         Self {
             sentry_client: Box::new(HttpSentryClient::new(sentry_url, sentry_token)),
             gitlab_client: Box::new(HttpGitlabClient::new(gitlab_url, gitlab_token)),
+            r2r_client,
             sentry_project,
             gitlab_project,
             hatchet,
+            processed_events: Arc::new(Mutex::new(HashSet::new())),
         }
     }
 
@@ -77,18 +91,51 @@ impl QAObserverAgent {
                     current_interval = base_interval;
 
                     for crash in crashes {
+                        // In-memory deduplication across polling intervals
+                        {
+                            let mut seen = self.processed_events.lock().await;
+                            if seen.contains(&crash.event_id) {
+                                tracing::debug!(
+                                    "Skipping already processed Sentry event: {}",
+                                    crash.event_id
+                                );
+                                continue;
+                            }
+                            seen.insert(crash.event_id.clone());
+                        }
+
                         tracing::info!("Detected crash: {} - {}", crash.event_id, crash.message);
 
-                        // Create GitLab issue
+                        // Contextual R2R GraphRAG Mapping
+                        let mut ast_context = "No AST context available".to_string();
+                        if let Some(ref r2r) = self.r2r_client {
+                            let query = format!("{} {:?}", crash.message, crash.culprit);
+                            if let Ok(ctx) = r2r.map_stacktrace_to_ast(&query).await {
+                                ast_context = ctx;
+                            }
+                        }
+
+                        // Create GitLab issue with auto-backlog labels
                         let title = format!("Crash Auto-Report: {}", crash.message);
                         let description = format!(
-                            "A crash was detected by Sentry.\n\nEvent ID: {}\nLevel: {}\nMessage: {}\nCulprit: {:?}\n\n[RESOURCE_LIMIT: RAM <= 30Mi]",
-                            crash.event_id, crash.level, crash.message, crash.culprit
+                            "### Sentry Crash Incident Report\n\n**Event ID:** `{}`\n**Level:** `{}`\n**Message:** `{}`\n**Culprit:** `{:?}`\n\n### R2R GraphRAG AST Context\n```\n{}\n```\n\n[RESOURCE_LIMIT: RAM <= 30Mi]",
+                            crash.event_id, crash.level, crash.message, crash.culprit, ast_context
                         );
+
+                        let labels = vec![
+                            "autonomous-plan".to_string(),
+                            "bug".to_string(),
+                            "p0-hotfix".to_string(),
+                        ];
 
                         match self
                             .gitlab_client
-                            .create_issue(&self.gitlab_project, &title, &description)
+                            .create_issue_with_labels(
+                                &self.gitlab_project,
+                                &title,
+                                &description,
+                                &labels,
+                            )
                             .await
                         {
                             Ok(issue) => {
@@ -98,8 +145,8 @@ impl QAObserverAgent {
                                 let mission_input = MissionInput {
                                     mission_id: Some(Uuid::new_v4().to_string()),
                                     goal: format!(
-                                        "Hotfix Crash: {}. Context: {}",
-                                        title, issue.web_url
+                                        "Hotfix Crash: {}.\nAST Context:\n{}\nGitLab Issue: {}",
+                                        title, ast_context, issue.web_url
                                     ),
                                     repository_path: String::new(),
                                 };
