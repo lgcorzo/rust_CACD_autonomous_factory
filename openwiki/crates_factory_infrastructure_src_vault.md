@@ -4,7 +4,7 @@ title: "vault.rs"
 source_path: "crates/factory-infrastructure/src/vault.rs"
 description: "Detailed documentation for vault.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: vault.rs
@@ -41,14 +41,7 @@ Provides implementation for vault.rs.
 #### VaultSecurityBounds
 
 **Overview:**
-Why it exists:
-Provides capabilities related to VaultSecurityBounds.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -78,30 +71,32 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class VaultSecurityBounds {
-        -issue_jit_token(audience: &str:Any) factory_core::error::Result<JitToken>
-        +new(vault_addr: String:Any, role_token: String:Any) Self
-        -validate_token(token: &JitToken:Any) factory_core::error::Result<bool>
-    }
-    SecurityBounds <|-- VaultSecurityBounds : Inheritance / Specialization
+```plantuml
+@startuml
+class VaultSecurityBounds {
+    -issue_jit_token(audience: &str:Any) : factory_core::error::Result<JitToken>
+    +new(vault_addr: String:Any, role_token: String:Any) : Self
+    -validate_token(token: &JitToken:Any) : factory_core::error::Result<bool>
+}
+SecurityBounds <|-- VaultSecurityBounds : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as VaultService
-    Caller->>Svc: issue_jit_token()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "VaultService" as Svc
+Caller -> Svc: issue_jit_token()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -109,6 +104,7 @@ sequenceDiagram
 // Example usage of vault.rs components
 import { ... } from 'crates/factory-infrastructure/src/vault.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

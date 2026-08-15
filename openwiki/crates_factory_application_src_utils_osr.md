@@ -4,7 +4,7 @@ title: "osr.rs"
 source_path: "crates/factory-application/src/utils/osr.rs"
 description: "Detailed documentation for osr.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: osr.rs
@@ -41,33 +41,35 @@ Provides implementation for osr.rs.
 ### Exported Functions
 
 #### `calculate_osr(wiki_content: &str (Any), r2r_text: &str (Any)) -> f32`
-Executes calculate_osr.
+No description provided.
 
 #### `levenshtein_distance(a: &str (Any), b: &str (Any)) -> usize`
-Executes levenshtein_distance.
+No description provided.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as OsrService
-    Caller->>Svc: calculate_osr()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "OsrService" as Svc
+Caller -> Svc: calculate_osr()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -75,6 +77,7 @@ sequenceDiagram
 // Example usage of osr.rs components
 import { ... } from 'crates/factory-application/src/utils/osr.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/utils`

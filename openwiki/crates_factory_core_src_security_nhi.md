@@ -4,7 +4,7 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Detailed documentation for nhi.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: nhi.rs
@@ -41,14 +41,7 @@ Provides implementation for nhi.rs.
 #### AgentSubject
 
 **Overview:**
-Why it exists:
-Provides capabilities related to AgentSubject.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -71,14 +64,7 @@ None.
 #### CryptographicProof
 
 **Overview:**
-Why it exists:
-Provides capabilities related to CryptographicProof.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -103,14 +89,7 @@ None.
 #### VerifiableCredential
 
 **Overview:**
-Why it exists:
-Provides capabilities related to VerifiableCredential.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -235,34 +214,36 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class AgentSubject {
-    }
-    class CryptographicProof {
-    }
-    class VerifiableCredential {
-        +new(id: String:Any, issuer: String:Any, credential_subject: AgentSubject:Any) Self
-        +sign(signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) crate::error::Result<()>
-        +sign_async(signing_key: ed25519_dalek::SigningKey:Any, key_id: String:Any) crate::error::Result<()>
-        +sign_batch_async(credentials: &mut [VerifiableCredential]:Any, signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) crate::error::Result<()>
-    }
+```plantuml
+@startuml
+class AgentSubject {
+}
+class CryptographicProof {
+}
+class VerifiableCredential {
+    +new(id: String:Any, issuer: String:Any, credential_subject: AgentSubject:Any) : Self
+    +sign(signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) : crate::error::Result<()>
+    +sign_async(signing_key: ed25519_dalek::SigningKey:Any, key_id: String:Any) : crate::error::Result<()>
+    +sign_batch_async(credentials: &mut [VerifiableCredential]:Any, signing_key: &ed25519_dalek::SigningKey:Any, key_id: &str:Any) : crate::error::Result<()>
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as NhiService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "NhiService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -270,6 +251,7 @@ sequenceDiagram
 // Example usage of nhi.rs components
 import { ... } from 'crates/factory-core/src/security/nhi.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src/security`

@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Detailed documentation for finops.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: finops.rs
@@ -41,14 +41,7 @@ Provides implementation for finops.rs.
 #### FinOpsAgent
 
 **Overview:**
-Why it exists:
-Provides capabilities related to FinOpsAgent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -69,7 +62,7 @@ Initialization: Sets up FinOpsAgent
 ##### `monitor_budget() -> anyhow::Result<()>`
 
 ###### Description
-Executes monitor_budget.
+No description provided.
 
 ###### Inputs
 None.
@@ -108,33 +101,35 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class FinOpsAgent {
-        -default() Self
-        -execute(_task_description: &str:Any) anyhow::Result<Value>
-        +monitor_budget() anyhow::Result<()>
-        -name() String
-        +new(litellm_base_url: String:Any, api_key: String:Any, tag: FinOpsTag:Any) Self
-    }
-    Agent <|-- FinOpsAgent : Inheritance / Specialization
-    Default <|-- FinOpsAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class FinOpsAgent {
+    -default() : Self
+    -execute(_task_description: &str:Any) : anyhow::Result<Value>
+    +monitor_budget() : anyhow::Result<()>
+    -name() : String
+    +new(litellm_base_url: String:Any, api_key: String:Any, tag: FinOpsTag:Any) : Self
+}
+Agent <|-- FinOpsAgent : extends/implements
+Default <|-- FinOpsAgent : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as FinopsService
-    Caller->>Svc: default()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "FinopsService" as Svc
+Caller -> Svc: default()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -142,6 +137,7 @@ sequenceDiagram
 // Example usage of finops.rs components
 import { ... } from 'crates/factory-application/src/agents/finops.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

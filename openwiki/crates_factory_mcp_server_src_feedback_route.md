@@ -4,7 +4,7 @@ title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Detailed documentation for feedback_route.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: feedback_route.rs
@@ -45,30 +45,32 @@ Provides implementation for feedback_route.rs.
 ### Exported Functions
 
 #### `handle_feedback(State(_server): State<Arc<McpServer>> (Any), Json(payload): Json<UserFeedbackPayload> (Any)) -> impl IntoResponse`
-Executes handle_feedback.
+No description provided.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Feedback_routeService
-    Caller->>Svc: handle_feedback()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Feedback_routeService" as Svc
+Caller -> Svc: handle_feedback()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -76,6 +78,7 @@ sequenceDiagram
 // Example usage of feedback_route.rs components
 import { ... } from 'crates/factory-mcp-server/src/feedback_route.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

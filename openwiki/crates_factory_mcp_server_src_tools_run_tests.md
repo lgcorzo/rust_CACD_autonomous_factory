@@ -4,7 +4,7 @@ title: "run_tests.rs"
 source_path: "crates/factory-mcp-server/src/tools/run_tests.rs"
 description: "Detailed documentation for run_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: run_tests.rs
@@ -41,14 +41,7 @@ Provides implementation for run_tests.rs.
 #### RunTestsTool
 
 **Overview:**
-Why it exists:
-Provides capabilities related to RunTestsTool.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -78,32 +71,34 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class RunTestsTool {
-        -call(_params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new(driver: Arc<dyn SandboxDriver>:Any) Self
-    }
-    Tool <|-- RunTestsTool : Inheritance / Specialization
+```plantuml
+@startuml
+class RunTestsTool {
+    -call(_params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(driver: Arc<dyn SandboxDriver>:Any) : Self
+}
+Tool <|-- RunTestsTool : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Run_testsService
-    Caller->>Svc: call()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Run_testsService" as Svc
+Caller -> Svc: call()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -111,6 +106,7 @@ sequenceDiagram
 // Example usage of run_tests.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/run_tests.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

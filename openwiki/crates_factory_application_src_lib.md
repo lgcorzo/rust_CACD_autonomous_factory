@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: lib.rs
@@ -41,14 +41,7 @@ Provides implementation for lib.rs.
 #### Agent
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Agent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -72,27 +65,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class Agent {
-        <<trait>>
-    }
+```plantuml
+@startuml
+interface Agent {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as LibService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "LibService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -100,6 +94,7 @@ sequenceDiagram
 // Example usage of lib.rs components
 import { ... } from 'crates/factory-application/src/lib.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

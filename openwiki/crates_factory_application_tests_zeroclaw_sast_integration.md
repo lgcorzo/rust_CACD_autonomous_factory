@@ -4,7 +4,7 @@ title: "zeroclaw_sast_integration.rs"
 source_path: "crates/factory-application/tests/zeroclaw_sast_integration.rs"
 description: "Detailed documentation for zeroclaw_sast_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: zeroclaw_sast_integration.rs
@@ -44,26 +44,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Zeroclaw_sast_integrationService
-    Caller->>Svc: test_zeroclaw_allows_execution_on_sast_pass()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Zeroclaw_sast_integrationService" as Svc
+Caller -> Svc: test_zeroclaw_allows_execution_on_sast_pass()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -71,6 +73,7 @@ sequenceDiagram
 // Example usage of zeroclaw_sast_integration.rs components
 import { ... } from 'crates/factory-application/tests/zeroclaw_sast_integration.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`

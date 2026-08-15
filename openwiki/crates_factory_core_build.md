@@ -4,7 +4,7 @@ title: "build.rs"
 source_path: "crates/factory-core/build.rs"
 description: "Detailed documentation for build.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: build.rs
@@ -44,26 +44,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as BuildService
-    Caller->>Svc: main()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "BuildService" as Svc
+Caller -> Svc: main()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -71,6 +73,7 @@ sequenceDiagram
 // Example usage of build.rs components
 import { ... } from 'crates/factory-core/build.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core`

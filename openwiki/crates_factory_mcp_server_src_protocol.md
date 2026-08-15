@@ -4,7 +4,7 @@ title: "protocol.rs"
 source_path: "crates/factory-mcp-server/src/protocol.rs"
 description: "Detailed documentation for protocol.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: protocol.rs
@@ -41,14 +41,7 @@ Provides implementation for protocol.rs.
 #### CallToolResult
 
 **Overview:**
-Why it exists:
-Provides capabilities related to CallToolResult.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -70,14 +63,7 @@ None.
 #### JsonRpcError
 
 **Overview:**
-Why it exists:
-Provides capabilities related to JsonRpcError.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -100,14 +86,7 @@ None.
 #### JsonRpcRequest
 
 **Overview:**
-Why it exists:
-Provides capabilities related to JsonRpcRequest.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -131,14 +110,7 @@ None.
 #### JsonRpcResponse
 
 **Overview:**
-Why it exists:
-Provides capabilities related to JsonRpcResponse.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -162,14 +134,7 @@ None.
 #### McpContent
 
 **Overview:**
-Why it exists:
-Provides capabilities related to McpContent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -190,14 +155,7 @@ None.
 #### McpTool
 
 **Overview:**
-Why it exists:
-Provides capabilities related to McpTool.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -223,37 +181,38 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class CallToolResult {
-    }
-    class JsonRpcError {
-    }
-    class JsonRpcRequest {
-    }
-    class JsonRpcResponse {
-    }
-    class McpContent {
-        <<enumeration>>
-    }
-    class McpTool {
-    }
+```plantuml
+@startuml
+class CallToolResult {
+}
+class JsonRpcError {
+}
+class JsonRpcRequest {
+}
+class JsonRpcResponse {
+}
+enum McpContent {
+}
+class McpTool {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ProtocolService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "ProtocolService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -261,6 +220,7 @@ sequenceDiagram
 // Example usage of protocol.rs components
 import { ... } from 'crates/factory-mcp-server/src/protocol.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

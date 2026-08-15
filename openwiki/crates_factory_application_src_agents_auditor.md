@@ -4,7 +4,7 @@ title: "auditor.rs"
 source_path: "crates/factory-application/src/agents/auditor.rs"
 description: "Detailed documentation for auditor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: auditor.rs
@@ -41,14 +41,7 @@ Provides implementation for auditor.rs.
 #### AuditorAgent
 
 **Overview:**
-Why it exists:
-Provides capabilities related to AuditorAgent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -170,35 +163,37 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class AuditorAgent {
-        +analyze_dag_logs(mission_id: &str:Any) anyhow::Result<Vec<Value>>
-        +audit_mission(mission_id: &str:Any, failures: &[Value]:Any) anyhow::Result<Value>
-        -default() Self
-        +evaluate_prompts(mission_id: &str:Any, targets: &[factory_core::Targets]:Any, recommendations: &[Value]:Any) anyhow::Result<String>
-        -execute(task_description: &str:Any) anyhow::Result<Value>
-        -name() String
-        +new() Self
-    }
-    Agent <|-- AuditorAgent : Inheritance / Specialization
-    Default <|-- AuditorAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class AuditorAgent {
+    +analyze_dag_logs(mission_id: &str:Any) : anyhow::Result<Vec<Value>>
+    +audit_mission(mission_id: &str:Any, failures: &[Value]:Any) : anyhow::Result<Value>
+    -default() : Self
+    +evaluate_prompts(mission_id: &str:Any, targets: &[factory_core::Targets]:Any, recommendations: &[Value]:Any) : anyhow::Result<String>
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +new() : Self
+}
+Agent <|-- AuditorAgent : extends/implements
+Default <|-- AuditorAgent : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as AuditorService
-    Caller->>Svc: analyze_dag_logs()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "AuditorService" as Svc
+Caller -> Svc: analyze_dag_logs()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -206,6 +201,7 @@ sequenceDiagram
 // Example usage of auditor.rs components
 import { ... } from 'crates/factory-application/src/agents/auditor.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

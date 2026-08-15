@@ -4,7 +4,7 @@ title: "test_ziti.rs"
 source_path: "test_ziti.rs"
 description: "Detailed documentation for test_ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: test_ziti.rs
@@ -44,26 +44,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Test_zitiService
-    Caller->>Svc: main()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Test_zitiService" as Svc
+Caller -> Svc: main()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -71,6 +73,7 @@ sequenceDiagram
 // Example usage of test_ziti.rs components
 import { ... } from 'test_ziti.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** ``

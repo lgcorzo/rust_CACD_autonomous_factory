@@ -4,7 +4,7 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: spec_kit_tool.rs
@@ -41,14 +41,7 @@ Provides implementation for spec_kit_tool.rs.
 #### CliSpecProvider
 
 **Overview:**
-Why it exists:
-Provides capabilities related to CliSpecProvider.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -73,14 +66,7 @@ None.
 #### MockSpecProvider
 
 **Overview:**
-Why it exists:
-Provides capabilities related to MockSpecProvider.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -105,14 +91,7 @@ None.
 #### SpecKitCommand
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SpecKitCommand.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -133,14 +112,7 @@ None.
 #### SpecKitTool
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SpecKitTool.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -158,7 +130,7 @@ Initialization: Sets up SpecKitTool
 ##### `invoke_spec_kit(command: SpecKitCommand (Any), args: Vec<String> (Any)) -> anyhow::Result<String>`
 
 ###### Description
-Executes invoke_spec_kit.
+No description provided.
 
 ###### Inputs
 * `command: SpecKitCommand`: type=Any, meaning=Input for command: SpecKitCommand, valid values=Any valid Any, optional=No, default value=None
@@ -189,7 +161,7 @@ let result = instance.invoke_spec_kit();
 ##### `with_provider(provider: Arc<dyn SpecProvider> (Any)) -> Self`
 
 ###### Description
-Executes with_provider.
+No description provided.
 
 ###### Inputs
 * `provider: Arc<dyn SpecProvider>`: type=Any, meaning=Input for provider: Arc<dyn SpecProvider>, valid values=Any valid Any, optional=No, default value=None
@@ -226,14 +198,7 @@ let result = instance.with_provider();
 #### SpecProvider
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SpecProvider.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -257,52 +222,52 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class CliSpecProvider {
-        -invoke(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
-        +new(cli_path: String:Any) Self
-    }
-    SpecProvider <|-- CliSpecProvider : Inheritance / Specialization
-    class MockSpecProvider {
-        -default() Self
-        -invoke(command: SpecKitCommand:Any, _args: Vec<String>:Any) anyhow::Result<String>
-        +new(specs_dir: std::path::PathBuf:Any) Self
-    }
-    Default <|-- MockSpecProvider : Inheritance / Specialization
-    SpecProvider <|-- MockSpecProvider : Inheritance / Specialization
-    class SpecKitCommand {
-        <<enumeration>>
-    }
-    class SpecKitTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        +invoke_spec_kit(command: SpecKitCommand:Any, args: Vec<String>:Any) anyhow::Result<String>
-        -name() String
-        +new(specify_cli_path: String:Any) Self
-        +with_provider(provider: Arc<dyn SpecProvider>:Any) Self
-    }
-    Tool <|-- SpecKitTool : Inheritance / Specialization
-    class SpecProvider {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class CliSpecProvider {
+    -invoke(command: SpecKitCommand:Any, args: Vec<String>:Any) : anyhow::Result<String>
+    +new(cli_path: String:Any) : Self
+}
+SpecProvider <|-- CliSpecProvider : extends/implements
+class MockSpecProvider {
+    -default() : Self
+    -invoke(command: SpecKitCommand:Any, _args: Vec<String>:Any) : anyhow::Result<String>
+    +new(specs_dir: std::path::PathBuf:Any) : Self
+}
+Default <|-- MockSpecProvider : extends/implements
+SpecProvider <|-- MockSpecProvider : extends/implements
+enum SpecKitCommand {
+}
+class SpecKitTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    +invoke_spec_kit(command: SpecKitCommand:Any, args: Vec<String>:Any) : anyhow::Result<String>
+    -name() : String
+    +new(specify_cli_path: String:Any) : Self
+    +with_provider(provider: Arc<dyn SpecProvider>:Any) : Self
+}
+Tool <|-- SpecKitTool : extends/implements
+interface SpecProvider {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Spec_kit_toolService
-    Caller->>Svc: invoke()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Spec_kit_toolService" as Svc
+Caller -> Svc: invoke()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -310,6 +275,7 @@ sequenceDiagram
 // Example usage of spec_kit_tool.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/spec_kit_tool.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
