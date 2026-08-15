@@ -10,6 +10,9 @@ pub trait Agent: Send + Sync {
 
 pub mod agents;
 pub mod bridge;
+pub mod poller_service;
 pub mod telemetry_export;
 pub mod utils;
 pub mod workflows;
+
+pub use poller_service::{PollerCycleStats, PollerDaemonService};
