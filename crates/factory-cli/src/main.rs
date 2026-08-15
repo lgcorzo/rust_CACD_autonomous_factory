@@ -42,10 +42,18 @@ enum Commands {
     },
     /// Start the Outbound Poller daemon for GitHub/GitLab issues and PR comments
     Poller {
-        #[arg(long, env = "GITHUB_REPOS", default_value = "lgcorzo/rust_CACD_autonomous_factory")]
+        #[arg(
+            long,
+            env = "GITHUB_REPOS",
+            default_value = "lgcorzo/rust_CACD_autonomous_factory"
+        )]
         github_repos: String,
 
-        #[arg(long, env = "GITLAB_PROJECTS", default_value = "lgcorzo-lab/autonomous_factory")]
+        #[arg(
+            long,
+            env = "GITLAB_PROJECTS",
+            default_value = "lgcorzo-lab/autonomous_factory"
+        )]
         gitlab_projects: String,
 
         #[arg(long, env = "POLLING_INTERVAL_SECS", default_value = "30")]
@@ -145,10 +153,9 @@ async fn main() -> anyhow::Result<()> {
             use factory_application::poller_service::PollerDaemonService;
             use factory_application::workflows::comment_control::CommentControlService;
             use factory_infrastructure::{
-                GitPlatformPoller, InMemoryCursorStore, PostgresCursorStore,
-                HttpGithubClient, HttpGitlabClient, McpHttpClient,
-                HttpR2rClient, HttpAethalgardClient, HttpSemanticaClient,
-                KafkaClient,
+                GitPlatformPoller, HttpAethalgardClient, HttpGithubClient, HttpGitlabClient,
+                HttpR2rClient, HttpSemanticaClient, InMemoryCursorStore, KafkaClient,
+                McpHttpClient, PostgresCursorStore,
             };
             use std::sync::Arc;
 
@@ -156,20 +163,23 @@ async fn main() -> anyhow::Result<()> {
 
             let github_token = std::env::var("GITHUB_API_TOKEN").unwrap_or_default();
             let gitlab_token = std::env::var("GITLAB_API_TOKEN").unwrap_or_default();
-            let gitlab_url = std::env::var("GITLAB_URL").unwrap_or_else(|_| "https://gitlab.com".to_string());
+            let gitlab_url =
+                std::env::var("GITLAB_URL").unwrap_or_else(|_| "https://gitlab.com".to_string());
             let db_url = std::env::var("DATABASE_URL").unwrap_or_default();
 
-            let gh_client: Option<Arc<dyn factory_infrastructure::GithubClient>> = if !github_token.is_empty() {
-                Some(Arc::new(HttpGithubClient::new(github_token)))
-            } else {
-                None
-            };
+            let gh_client: Option<Arc<dyn factory_infrastructure::GithubClient>> =
+                if !github_token.is_empty() {
+                    Some(Arc::new(HttpGithubClient::new(github_token)))
+                } else {
+                    None
+                };
 
-            let gl_client: Option<Arc<dyn factory_infrastructure::GitlabClient>> = if !gitlab_token.is_empty() {
-                Some(Arc::new(HttpGitlabClient::new(gitlab_url, gitlab_token)))
-            } else {
-                None
-            };
+            let gl_client: Option<Arc<dyn factory_infrastructure::GitlabClient>> =
+                if !gitlab_token.is_empty() {
+                    Some(Arc::new(HttpGitlabClient::new(gitlab_url, gitlab_token)))
+                } else {
+                    None
+                };
 
             let cursor_store: Arc<dyn factory_infrastructure::CursorStore> = if !db_url.is_empty() {
                 Arc::new(PostgresCursorStore::new(db_url))
@@ -184,24 +194,19 @@ async fn main() -> anyhow::Result<()> {
             ));
 
             let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
-            let r2r_user = std::env::var("R2R_SUPERUSER_EMAIL").unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
-            let r2r_pwd = std::env::var("R2R_SUPERUSER_PASSWORD").unwrap_or_else(|_| "admin".to_string());
+            let r2r_user = std::env::var("R2R_SUPERUSER_EMAIL")
+                .unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
+            let r2r_pwd =
+                std::env::var("R2R_SUPERUSER_PASSWORD").unwrap_or_else(|_| "admin".to_string());
             let r2r_client = Arc::new(HttpR2rClient::new(r2r_url, r2r_user, r2r_pwd));
             let aethalgard_client = Arc::new(HttpAethalgardClient::new(aethalgard_webhook_url));
 
-            let kafka_client: Arc<dyn KafkaClient> = if kafka_brokers == "mock" || kafka_brokers.is_empty() {
+            let kafka_client: Arc<dyn KafkaClient> = {
                 #[cfg(not(feature = "production"))]
                 {
-                    Arc::new(factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
-                }
-                #[cfg(feature = "production")]
-                {
-                    Arc::new(factory_infrastructure::RdKafkaClient::new(&kafka_brokers)?)
-                }
-            } else {
-                #[cfg(not(feature = "production"))]
-                {
-                    Arc::new(factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
+                    Arc::new(
+                        factory_infrastructure::SimpleMockKafkaClient::new(&kafka_brokers).unwrap(),
+                    )
                 }
                 #[cfg(feature = "production")]
                 {
@@ -211,7 +216,8 @@ async fn main() -> anyhow::Result<()> {
 
             let semantica_url = std::env::var("SEMANTICA_URL").unwrap_or_default();
             let semantica_client = if !semantica_url.is_empty() {
-                Some(Arc::new(HttpSemanticaClient::new(semantica_url, None)) as Arc<dyn factory_infrastructure::SemanticaClient>)
+                Some(Arc::new(HttpSemanticaClient::new(semantica_url, None))
+                    as Arc<dyn factory_infrastructure::SemanticaClient>)
             } else {
                 None
             };
@@ -224,12 +230,8 @@ async fn main() -> anyhow::Result<()> {
                 aethalgard_client,
             ));
 
-            let daemon = PollerDaemonService::new(
-                poller,
-                kafka_client,
-                semantica_client,
-                comment_service,
-            );
+            let daemon =
+                PollerDaemonService::new(poller, kafka_client, semantica_client, comment_service);
 
             let gh_repos_list: Vec<String> = github_repos
                 .split(',')
@@ -245,7 +247,9 @@ async fn main() -> anyhow::Result<()> {
 
             tracing::info!(
                 "Poller active: interval={}s, github_repos={:?}, gitlab_projects={:?}",
-                interval_secs, gh_repos_list, gl_projects_list
+                interval_secs,
+                gh_repos_list,
+                gl_projects_list
             );
 
             loop {
@@ -253,7 +257,8 @@ async fn main() -> anyhow::Result<()> {
                 if stats.issues_ingested > 0 || stats.directives_processed > 0 {
                     tracing::info!(
                         "Poll cycle: {} issues ingested, {} directives processed",
-                        stats.issues_ingested, stats.directives_processed
+                        stats.issues_ingested,
+                        stats.directives_processed
                     );
                 }
                 if !stats.errors.is_empty() {

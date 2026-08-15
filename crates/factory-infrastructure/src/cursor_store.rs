@@ -100,11 +100,11 @@ mod tests {
         let store = InMemoryCursorStore::new();
         let key = "github:my-org/my-repo:issues";
 
-        assert_eq!(store.get_cursor(key).await.unwrap().is_none(), true);
-        assert_eq!(store.is_event_processed(key, "hash123").await.unwrap(), false);
+        assert!(store.get_cursor(key).await.unwrap().is_none());
+        assert!(!store.is_event_processed(key, "hash123").await.unwrap());
 
         store.mark_event_processed(key, "hash123").await.unwrap();
-        assert_eq!(store.is_event_processed(key, "hash123").await.unwrap(), true);
+        assert!(store.is_event_processed(key, "hash123").await.unwrap());
 
         let cursor = PollerSyncCursor {
             source_key: key.to_string(),

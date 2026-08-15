@@ -161,7 +161,8 @@ impl GitlabClient for HttpGitlabClient {
         project_id: &str,
         labels: Option<String>,
     ) -> anyhow::Result<Vec<GitlabIssue>> {
-        self.list_issues_updated_since(project_id, labels, None).await
+        self.list_issues_updated_since(project_id, labels, None)
+            .await
     }
 
     async fn list_issues_updated_since(
@@ -360,7 +361,9 @@ mod tests {
         ]);
 
         Mock::given(method("GET"))
-            .and(path("/api/v4/projects/my-org%2Fmy-project/merge_requests/7/notes"))
+            .and(path(
+                "/api/v4/projects/my-org%2Fmy-project/merge_requests/7/notes",
+            ))
             .and(header("PRIVATE-TOKEN", "test_token"))
             .respond_with(ResponseTemplate::new(200).set_body_json(notes_resp))
             .mount(&mock_server)
@@ -374,7 +377,9 @@ mod tests {
         });
 
         Mock::given(method("POST"))
-            .and(path("/api/v4/projects/my-org%2Fmy-project/merge_requests/7/notes"))
+            .and(path(
+                "/api/v4/projects/my-org%2Fmy-project/merge_requests/7/notes",
+            ))
             .and(header("PRIVATE-TOKEN", "test_token"))
             .respond_with(ResponseTemplate::new(201).set_body_json(post_note_resp))
             .mount(&mock_server)
@@ -396,4 +401,3 @@ mod tests {
         assert_eq!(posted.body, "DAG restarted.");
     }
 }
-

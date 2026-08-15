@@ -65,13 +65,17 @@ impl PollerDaemonService {
                 Ok(issues) => {
                     for issue in issues {
                         if let Err(e) = self.ingest_issue(&issue).await {
-                            stats.errors.push(format!("GitHub issue ingest error for {}: {}", repo, e));
+                            stats
+                                .errors
+                                .push(format!("GitHub issue ingest error for {}: {}", repo, e));
                         } else {
                             stats.issues_ingested += 1;
                         }
                     }
                 }
-                Err(e) => stats.errors.push(format!("GitHub issue poll error for {}: {}", repo, e)),
+                Err(e) => stats
+                    .errors
+                    .push(format!("GitHub issue poll error for {}: {}", repo, e)),
             }
 
             // GitHub PR Comments
@@ -79,13 +83,17 @@ impl PollerDaemonService {
                 Ok(comments) => {
                     for comment in comments {
                         if let Err(e) = self.process_comment_directive(&comment).await {
-                            stats.errors.push(format!("GitHub comment error for {}: {}", repo, e));
+                            stats
+                                .errors
+                                .push(format!("GitHub comment error for {}: {}", repo, e));
                         } else {
                             stats.directives_processed += 1;
                         }
                     }
                 }
-                Err(e) => stats.errors.push(format!("GitHub comment poll error for {}: {}", repo, e)),
+                Err(e) => stats
+                    .errors
+                    .push(format!("GitHub comment poll error for {}: {}", repo, e)),
             }
         }
 
@@ -95,13 +103,17 @@ impl PollerDaemonService {
                 Ok(issues) => {
                     for issue in issues {
                         if let Err(e) = self.ingest_issue(&issue).await {
-                            stats.errors.push(format!("GitLab issue ingest error for {}: {}", project, e));
+                            stats
+                                .errors
+                                .push(format!("GitLab issue ingest error for {}: {}", project, e));
                         } else {
                             stats.issues_ingested += 1;
                         }
                     }
                 }
-                Err(e) => stats.errors.push(format!("GitLab issue poll error for {}: {}", project, e)),
+                Err(e) => stats
+                    .errors
+                    .push(format!("GitLab issue poll error for {}: {}", project, e)),
             }
 
             // GitLab MR Notes
@@ -109,13 +121,17 @@ impl PollerDaemonService {
                 Ok(notes) => {
                     for note in notes {
                         if let Err(e) = self.process_comment_directive(&note).await {
-                            stats.errors.push(format!("GitLab note error for {}: {}", project, e));
+                            stats
+                                .errors
+                                .push(format!("GitLab note error for {}: {}", project, e));
                         } else {
                             stats.directives_processed += 1;
                         }
                     }
                 }
-                Err(e) => stats.errors.push(format!("GitLab note poll error for {}: {}", project, e)),
+                Err(e) => stats
+                    .errors
+                    .push(format!("GitLab note poll error for {}: {}", project, e)),
             }
         }
 
@@ -154,15 +170,28 @@ impl PollerDaemonService {
 
         let payload_bytes = serde_json::to_vec(&payload)?;
         let msg_key = format!("{}:{}", issue.repository, issue.issue_number);
-        self.kafka_client.publish("mission-input", &msg_key, &payload_bytes).await?;
+        self.kafka_client
+            .publish("mission-input", &msg_key, &payload_bytes)
+            .await?;
 
         // Semantica-AGI Causal Provenance Record
         if let Some(semantica) = &self.semantica_client {
             let record = factory_infrastructure::DecisionRecord {
-                decision_id: format!("dec-{}-{}", issue.repository.replace('/', "-"), issue.issue_number),
+                decision_id: format!(
+                    "dec-{}-{}",
+                    issue.repository.replace('/', "-"),
+                    issue.issue_number
+                ),
                 agent_id: "poller-daemon".to_string(),
-                mission_id: format!("{}-{}", issue.repository.replace('/', "-"), issue.issue_number),
-                reasoning: format!("Mission ingested via native outbound polling from {} issue #{}", issue.source_platform, issue.issue_number),
+                mission_id: format!(
+                    "{}-{}",
+                    issue.repository.replace('/', "-"),
+                    issue.issue_number
+                ),
+                reasoning: format!(
+                    "Mission ingested via native outbound polling from {} issue #{}",
+                    issue.source_platform, issue.issue_number
+                ),
                 ast_node_ids: vec![],
                 timestamp: chrono::Utc::now().to_rfc3339(),
             };
@@ -187,7 +216,9 @@ mod tests {
     use chrono::Utc;
     use factory_infrastructure::aethalgard::MockAethalgardClient;
     use factory_infrastructure::cursor_store::InMemoryCursorStore;
-    use factory_infrastructure::github::{GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient};
+    use factory_infrastructure::github::{
+        GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient,
+    };
     use factory_infrastructure::kafka::SimpleMockKafkaClient;
     use factory_infrastructure::mcp_client::MockMcpClient;
     use factory_infrastructure::r2r::MockR2rClient;
@@ -229,8 +260,11 @@ mod tests {
                 Ok(vec![GithubComment {
                     id: 333,
                     body: "@dark-gravity /status".to_string(),
-                    user: GithubUser { login: "lead-architect".to_string() },
-                    html_url: "https://github.com/my-org/my-repo/pull/22#issuecomment-333".to_string(),
+                    user: GithubUser {
+                        login: "lead-architect".to_string(),
+                    },
+                    html_url: "https://github.com/my-org/my-repo/pull/22#issuecomment-333"
+                        .to_string(),
                     updated_at: Some(Utc::now()),
                 }])
             });
@@ -241,19 +275,21 @@ mod tests {
                 Ok(GithubComment {
                     id: 444,
                     body: body.to_string(),
-                    user: GithubUser { login: "dark-gravity-bot".to_string() },
-                    html_url: "https://github.com/my-org/my-repo/pull/22#issuecomment-444".to_string(),
+                    user: GithubUser {
+                        login: "dark-gravity-bot".to_string(),
+                    },
+                    html_url: "https://github.com/my-org/my-repo/pull/22#issuecomment-444"
+                        .to_string(),
                     updated_at: Some(Utc::now()),
                 })
             });
 
         let gh_arc = Arc::new(mock_gh);
         let cursor_store = Arc::new(InMemoryCursorStore::new());
-        let poller = Arc::new(GitPlatformPoller::new(
-            Some(gh_arc.clone()),
-            None,
-            cursor_store,
-        ).with_labels(vec!["autonomous-mission".to_string()]));
+        let poller = Arc::new(
+            GitPlatformPoller::new(Some(gh_arc.clone()), None, cursor_store)
+                .with_labels(vec!["autonomous-mission".to_string()]),
+        );
 
         let kafka = Arc::new(SimpleMockKafkaClient::new("mock").unwrap());
         let mcp = Arc::new(MockMcpClient::new());
@@ -273,7 +309,6 @@ mod tests {
         let stats = daemon.poll_once(&["my-org/my-repo".to_string()], &[]).await;
         assert_eq!(stats.issues_ingested, 1);
         assert_eq!(stats.directives_processed, 1);
-        assert_eq!(stats.errors.is_empty(), true);
+        assert!(stats.errors.is_empty());
     }
 }
-

@@ -60,10 +60,8 @@ pub trait GithubClient: Send + Sync {
         since: Option<DateTime<Utc>>,
     ) -> anyhow::Result<Vec<GithubIssue>>;
 
-    async fn list_active_pull_requests(
-        &self,
-        repo: &str,
-    ) -> anyhow::Result<Vec<GithubPullRequest>>;
+    async fn list_active_pull_requests(&self, repo: &str)
+        -> anyhow::Result<Vec<GithubPullRequest>>;
 
     async fn list_pull_request_comments(
         &self,
@@ -404,7 +402,11 @@ mod tests {
 
         let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
         let issues = client
-            .list_issues_updated_since("my-org/my-repo", Some("autonomous-mission".to_string()), None)
+            .list_issues_updated_since(
+                "my-org/my-repo",
+                Some("autonomous-mission".to_string()),
+                None,
+            )
             .await
             .unwrap();
         assert_eq!(issues.len(), 1);
@@ -439,7 +441,11 @@ mod tests {
 
         let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
         let comment = client
-            .post_pull_request_comment("my-org/my-repo", 42, "Aethelgard status: DAG healthy, 0 errors.")
+            .post_pull_request_comment(
+                "my-org/my-repo",
+                42,
+                "Aethelgard status: DAG healthy, 0 errors.",
+            )
             .await
             .unwrap();
 
@@ -447,4 +453,3 @@ mod tests {
         assert_eq!(comment.body, "Aethelgard status: DAG healthy, 0 errors.");
     }
 }
-
