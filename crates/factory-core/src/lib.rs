@@ -176,8 +176,94 @@ pub struct CausalProvenanceNode {
     pub is_valid: bool,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "type", content = "payload", rename_all = "snake_case")]
+pub enum PRDirective {
+    Spec { prompt: String },
+    Refine { instruction: String },
+    Retry,
+    Status,
+}
+
+impl PRDirective {
+    pub fn parse(text: &str) -> Option<Self> {
+        let trimmed = text.trim();
+        // Look for @dark-gravity /<cmd> or just /<cmd>
+        let command_str = if let Some(idx) = trimmed.find("@dark-gravity") {
+            &trimmed[idx + "@dark-gravity".len()..].trim()
+        } else if trimmed.starts_with('/') {
+            trimmed
+        } else {
+            return None;
+        };
+
+        if command_str.starts_with("/spec") {
+            let prompt = command_str.trim_start_matches("/spec").trim().to_string();
+            Some(PRDirective::Spec { prompt })
+        } else if command_str.starts_with("/refine") {
+            let instruction = command_str.trim_start_matches("/refine").trim().to_string();
+            Some(PRDirective::Refine { instruction })
+        } else if command_str.starts_with("/retry") {
+            Some(PRDirective::Retry)
+        } else if command_str.starts_with("/status") {
+            Some(PRDirective::Status)
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PolledIssueEvent {
+    pub source_platform: String,
+    pub repository: String,
+    pub issue_id: u64,
+    pub issue_number: u64,
+    pub title: String,
+    pub body: String,
+    pub labels: Vec<String>,
+    pub resource_limits: Option<String>,
+    pub updated_at: DateTime<Utc>,
+    pub html_url: String,
+}
+
+impl PolledIssueEvent {
+    pub fn extract_resource_limits(body: &str) -> Option<String> {
+        let marker = "[RESOURCE_LIMIT:";
+        if let Some(start) = body.find(marker) {
+            let rest = &body[start + marker.len()..];
+            if let Some(end) = rest.find(']') {
+                return Some(rest[..end].trim().to_string());
+            }
+        }
+        None
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PRCommentEvent {
+    pub source_platform: String,
+    pub repository: String,
+    pub pr_number: u64,
+    pub comment_id: u64,
+    pub author: String,
+    pub body: String,
+    pub directive: PRDirective,
+    pub updated_at: DateTime<Utc>,
+    pub html_url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PollerSyncCursor {
+    pub source_key: String,
+    pub last_polled_at: DateTime<Utc>,
+    pub last_processed_id: u64,
+    pub processed_hashes: Vec<String>,
+}
+
 pub mod proto {
     pub mod v1 {
         include!(concat!(env!("OUT_DIR"), "/dark_gravity.factory.v1.rs"));
     }
 }
+

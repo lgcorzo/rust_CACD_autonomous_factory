@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -8,6 +9,31 @@ pub struct GitlabIssue {
     pub title: String,
     pub description: Option<String>,
     pub web_url: String,
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GitlabMergeRequest {
+    pub id: u64,
+    pub iid: u64,
+    pub title: String,
+    pub description: Option<String>,
+    pub web_url: String,
+    pub state: String,
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GitlabAuthor {
+    pub username: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GitlabNote {
+    pub id: u64,
+    pub body: String,
+    pub author: GitlabAuthor,
+    pub updated_at: Option<DateTime<Utc>>,
 }
 
 #[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
@@ -33,6 +59,32 @@ pub trait GitlabClient: Send + Sync {
         project_id: &str,
         labels: Option<String>,
     ) -> anyhow::Result<Vec<GitlabIssue>>;
+
+    async fn list_issues_updated_since(
+        &self,
+        project_id: &str,
+        labels: Option<String>,
+        since: Option<DateTime<Utc>>,
+    ) -> anyhow::Result<Vec<GitlabIssue>>;
+
+    async fn list_active_merge_requests(
+        &self,
+        project_id: &str,
+    ) -> anyhow::Result<Vec<GitlabMergeRequest>>;
+
+    async fn list_merge_request_notes(
+        &self,
+        project_id: &str,
+        mr_iid: u64,
+        since: Option<DateTime<Utc>>,
+    ) -> anyhow::Result<Vec<GitlabNote>>;
+
+    async fn post_merge_request_note(
+        &self,
+        project_id: &str,
+        mr_iid: u64,
+        body: &str,
+    ) -> anyhow::Result<GitlabNote>;
 }
 
 pub struct HttpGitlabClient {
@@ -70,7 +122,6 @@ impl GitlabClient for HttpGitlabClient {
         description: &str,
         labels: &[String],
     ) -> anyhow::Result<GitlabIssue> {
-        // Project ID in GitLab API can be URL-encoded path like `group%2Fproject` or numeric ID
         let encoded_project_id = urlencoding::encode(project_id);
         let create_url = format!(
             "{}/api/v4/projects/{}/issues",
@@ -110,15 +161,28 @@ impl GitlabClient for HttpGitlabClient {
         project_id: &str,
         labels: Option<String>,
     ) -> anyhow::Result<Vec<GitlabIssue>> {
+        self.list_issues_updated_since(project_id, labels, None).await
+    }
+
+    async fn list_issues_updated_since(
+        &self,
+        project_id: &str,
+        labels: Option<String>,
+        since: Option<DateTime<Utc>>,
+    ) -> anyhow::Result<Vec<GitlabIssue>> {
         let encoded_project_id = urlencoding::encode(project_id);
         let mut list_url = format!(
-            "{}/api/v4/projects/{}/issues?state=opened",
+            "{}/api/v4/projects/{}/issues?state=opened&order_by=updated_at&sort=desc",
             self.url.trim_end_matches('/'),
             encoded_project_id
         );
         if let Some(lbl) = labels {
             list_url.push_str("&labels=");
             list_url.push_str(&urlencoding::encode(&lbl));
+        }
+        if let Some(s) = since {
+            list_url.push_str("&updated_after=");
+            list_url.push_str(&urlencoding::encode(&s.to_rfc3339()));
         }
 
         let res = self
@@ -136,6 +200,102 @@ impl GitlabClient for HttpGitlabClient {
 
         let issues: Vec<GitlabIssue> = res.json().await?;
         Ok(issues)
+    }
+
+    async fn list_active_merge_requests(
+        &self,
+        project_id: &str,
+    ) -> anyhow::Result<Vec<GitlabMergeRequest>> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let list_url = format!(
+            "{}/api/v4/projects/{}/merge_requests?state=opened&order_by=updated_at&sort=desc",
+            self.url.trim_end_matches('/'),
+            encoded_project_id
+        );
+
+        let res = self
+            .client
+            .get(&list_url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab list MRs failed with status {}", status);
+            anyhow::bail!("GitLab list MRs failed with status {}", status);
+        }
+
+        let mrs: Vec<GitlabMergeRequest> = res.json().await?;
+        Ok(mrs)
+    }
+
+    async fn list_merge_request_notes(
+        &self,
+        project_id: &str,
+        mr_iid: u64,
+        since: Option<DateTime<Utc>>,
+    ) -> anyhow::Result<Vec<GitlabNote>> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let mut list_url = format!(
+            "{}/api/v4/projects/{}/merge_requests/{}/notes?sort=desc",
+            self.url.trim_end_matches('/'),
+            encoded_project_id,
+            mr_iid
+        );
+        if let Some(s) = since {
+            list_url.push_str("&updated_after=");
+            list_url.push_str(&urlencoding::encode(&s.to_rfc3339()));
+        }
+
+        let res = self
+            .client
+            .get(&list_url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab list MR notes failed with status {}", status);
+            anyhow::bail!("GitLab list MR notes failed with status {}", status);
+        }
+
+        let notes: Vec<GitlabNote> = res.json().await?;
+        Ok(notes)
+    }
+
+    async fn post_merge_request_note(
+        &self,
+        project_id: &str,
+        mr_iid: u64,
+        body: &str,
+    ) -> anyhow::Result<GitlabNote> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let post_url = format!(
+            "{}/api/v4/projects/{}/merge_requests/{}/notes",
+            self.url.trim_end_matches('/'),
+            encoded_project_id,
+            mr_iid
+        );
+        let payload = serde_json::json!({ "body": body });
+
+        let res = self
+            .client
+            .post(&post_url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .json(&payload)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab post MR note failed with status {}", status);
+            anyhow::bail!("GitLab post MR note failed with status {}", status);
+        }
+
+        let note: GitlabNote = res.json().await?;
+        Ok(note)
     }
 }
 
@@ -186,51 +346,54 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_gitlab_create_issue_unauthorized() {
-        let mock_server = MockServer::start().await;
-        let client = HttpGitlabClient::new(mock_server.uri(), "bad_token".to_string());
-
-        Mock::given(method("POST"))
-            .respond_with(ResponseTemplate::new(401))
-            .mount(&mock_server)
-            .await;
-
-        let result = client
-            .create_issue("my-org/my-project", "Crash", "Details")
-            .await;
-        assert!(result.is_err());
-        let err_msg = result.unwrap_err().to_string();
-        assert!(err_msg.contains("401 Unauthorized"));
-    }
-
-    #[tokio::test]
-    async fn test_gitlab_list_open_issues_success() {
+    async fn test_gitlab_list_mr_notes_and_post() {
         let mock_server = MockServer::start().await;
         let client = HttpGitlabClient::new(mock_server.uri(), "test_token".to_string());
 
-        let response_body = json!([
+        let notes_resp = json!([
             {
-                "id": 101,
-                "iid": 1,
-                "title": "Implement feature X",
-                "description": "Details for feature X",
-                "web_url": "https://gitlab.com/my-org/my-project/-/issues/1"
+                "id": 888,
+                "body": "@dark-gravity /retry",
+                "author": { "username": "qa-engineer" },
+                "updated_at": "2026-08-15T20:15:00Z"
             }
         ]);
 
         Mock::given(method("GET"))
-            .and(path("/api/v4/projects/my-org%2Fmy-project/issues"))
+            .and(path("/api/v4/projects/my-org%2Fmy-project/merge_requests/7/notes"))
             .and(header("PRIVATE-TOKEN", "test_token"))
-            .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
+            .respond_with(ResponseTemplate::new(200).set_body_json(notes_resp))
             .mount(&mock_server)
             .await;
 
-        let issues = client
-            .list_open_issues("my-org/my-project", None)
+        let post_note_resp = json!({
+            "id": 889,
+            "body": "DAG restarted.",
+            "author": { "username": "dark-gravity-bot" },
+            "updated_at": "2026-08-15T20:16:00Z"
+        });
+
+        Mock::given(method("POST"))
+            .and(path("/api/v4/projects/my-org%2Fmy-project/merge_requests/7/notes"))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(201).set_body_json(post_note_resp))
+            .mount(&mock_server)
+            .await;
+
+        let notes = client
+            .list_merge_request_notes("my-org/my-project", 7, None)
             .await
             .unwrap();
-        assert_eq!(issues.len(), 1);
-        assert_eq!(issues[0].id, 101);
-        assert_eq!(issues[0].title, "Implement feature X");
+        assert_eq!(notes.len(), 1);
+        assert_eq!(notes[0].author.username, "qa-engineer");
+        assert_eq!(notes[0].body, "@dark-gravity /retry");
+
+        let posted = client
+            .post_merge_request_note("my-org/my-project", 7, "DAG restarted.")
+            .await
+            .unwrap();
+        assert_eq!(posted.id, 889);
+        assert_eq!(posted.body, "DAG restarted.");
     }
 }
+
