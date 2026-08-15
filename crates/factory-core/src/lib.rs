@@ -188,21 +188,22 @@ pub enum PRDirective {
 impl PRDirective {
     pub fn parse(text: &str) -> Option<Self> {
         let trimmed = text.trim();
-        // Look for @dark-gravity /<cmd> or just /<cmd>
         let command_str = if let Some(idx) = trimmed.find("@dark-gravity") {
-            &trimmed[idx + "@dark-gravity".len()..].trim()
+            trimmed[idx + "@dark-gravity".len()..].trim()
         } else if trimmed.starts_with('/') {
             trimmed
         } else {
             return None;
         };
 
-        if command_str.starts_with("/spec") {
-            let prompt = command_str.trim_start_matches("/spec").trim().to_string();
-            Some(PRDirective::Spec { prompt })
-        } else if command_str.starts_with("/refine") {
-            let instruction = command_str.trim_start_matches("/refine").trim().to_string();
-            Some(PRDirective::Refine { instruction })
+        if let Some(prompt) = command_str.strip_prefix("/spec") {
+            Some(PRDirective::Spec {
+                prompt: prompt.trim().to_string(),
+            })
+        } else if let Some(instruction) = command_str.strip_prefix("/refine") {
+            Some(PRDirective::Refine {
+                instruction: instruction.trim().to_string(),
+            })
         } else if command_str.starts_with("/retry") {
             Some(PRDirective::Retry)
         } else if command_str.starts_with("/status") {
@@ -266,4 +267,3 @@ pub mod proto {
         include!(concat!(env!("OUT_DIR"), "/dark_gravity.factory.v1.rs"));
     }
 }
-

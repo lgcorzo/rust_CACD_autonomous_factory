@@ -1,10 +1,10 @@
 use crate::agents::{RustantAgent, ZeroClawAgent};
 use factory_core::{PRCommentEvent, PRDirective};
+use factory_infrastructure::McpClient;
 use factory_infrastructure::aethalgard::AethalgardClient;
 use factory_infrastructure::github::GithubClient;
 use factory_infrastructure::gitlab::GitlabClient;
 use factory_infrastructure::r2r::R2rClient;
-use factory_infrastructure::McpClient;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -46,7 +46,10 @@ impl CommentControlService {
         }
     }
 
-    pub async fn handle_directive(&self, input: &CommentControlInput) -> anyhow::Result<CommentControlOutput> {
+    pub async fn handle_directive(
+        &self,
+        input: &CommentControlInput,
+    ) -> anyhow::Result<CommentControlOutput> {
         let event = &input.event;
         let mission_id = format!("{}-{}", event.repository.replace('/', "-"), event.pr_number);
 
@@ -92,19 +95,33 @@ impl CommentControlService {
         // Post response back to PR/MR thread
         if event.source_platform == "github" {
             if let Some(gh) = &self.github_client {
-                if let Err(e) = gh.post_pull_request_comment(&event.repository, event.pr_number, &response_body).await {
-                    tracing::warn!("Failed to post GitHub comment to PR #{}: {}", event.pr_number, e);
+                if let Err(e) = gh
+                    .post_pull_request_comment(&event.repository, event.pr_number, &response_body)
+                    .await
+                {
+                    tracing::warn!(
+                        "Failed to post GitHub comment to PR #{}: {}",
+                        event.pr_number,
+                        e
+                    );
                 } else {
                     comment_posted = true;
                 }
             }
-        } else if event.source_platform == "gitlab" {
-            if let Some(gl) = &self.gitlab_client {
-                if let Err(e) = gl.post_merge_request_note(&event.repository, event.pr_number, &response_body).await {
-                    tracing::warn!("Failed to post GitLab note to MR !{}: {}", event.pr_number, e);
-                } else {
-                    comment_posted = true;
-                }
+        } else if event.source_platform == "gitlab"
+            && let Some(gl) = &self.gitlab_client
+        {
+            if let Err(e) = gl
+                .post_merge_request_note(&event.repository, event.pr_number, &response_body)
+                .await
+            {
+                tracing::warn!(
+                    "Failed to post GitLab note to MR !{}: {}",
+                    event.pr_number,
+                    e
+                );
+            } else {
+                comment_posted = true;
             }
         }
 
@@ -135,21 +152,22 @@ mod tests {
                 Ok(GithubComment {
                     id: 9999,
                     body: body.to_string(),
-                    user: GithubUser { login: "dark-gravity-bot".to_string() },
-                    html_url: "https://github.com/my-org/my-repo/issues/10#issuecomment-9999".to_string(),
+                    user: GithubUser {
+                        login: "dark-gravity-bot".to_string(),
+                    },
+                    html_url: "https://github.com/my-org/my-repo/issues/10#issuecomment-9999"
+                        .to_string(),
                     updated_at: Some(Utc::now()),
                 })
             });
 
         let mut mock_mcp = MockMcpClient::new();
-        mock_mcp
-            .expect_call_tool_json()
-            .returning(|_tool, _args| {
-                Ok(serde_json::json!({
-                    "is_error": false,
-                    "content": [{"type": "text", "text": "{\"sast_complete\": true}"}]
-                }))
-            });
+        mock_mcp.expect_call_tool_json().returning(|_tool, _args| {
+            Ok(serde_json::json!({
+                "is_error": false,
+                "content": [{"type": "text", "text": "{\"sast_complete\": true}"}]
+            }))
+        });
         let mock_mcp = Arc::new(mock_mcp);
         let mock_r2r = Arc::new(MockR2rClient::new());
         let mock_aeth = Arc::new(MockAethalgardClient::new());
@@ -179,9 +197,8 @@ mod tests {
         };
 
         let output = service.handle_directive(&input_refine).await.unwrap();
-        assert_eq!(output.directive_type, "refine");
-        assert_eq!(output.comment_posted, true);
+        assert!(output.directive_type == "refine");
+        assert!(output.comment_posted);
         assert!(output.response_body.contains("ZeroClaw"));
     }
 }
-

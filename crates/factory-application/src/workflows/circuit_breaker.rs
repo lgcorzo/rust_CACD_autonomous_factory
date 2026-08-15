@@ -38,14 +38,20 @@ impl CircuitBreakerGuard {
     pub fn evaluate_diff(&mut self, diff: &str) -> (CircuitBreakerStatus, SastScanResult) {
         let scan_result = SastScanResult::inspect_diff(diff);
 
-        if scan_result.is_safe && scan_result.score >= self.min_safety_score && !scan_result.critical_vulnerabilities_detected {
+        if scan_result.is_safe
+            && scan_result.score >= self.min_safety_score
+            && !scan_result.critical_vulnerabilities_detected
+        {
             (CircuitBreakerStatus::Passed, scan_result)
         } else {
             self.current_attempt += 1;
             if self.current_attempt >= self.max_attempts {
                 let reason = format!(
                     "Security gate failed score={:.1}/10.0 (required >={:.1}) after {} automatic remediation attempts. Findings: {:?}",
-                    scan_result.score, self.min_safety_score, self.current_attempt, scan_result.findings
+                    scan_result.score,
+                    self.min_safety_score,
+                    self.current_attempt,
+                    scan_result.findings
                 );
                 (CircuitBreakerStatus::AgentStuck { reason }, scan_result)
             } else {

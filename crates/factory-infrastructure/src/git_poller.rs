@@ -22,7 +22,10 @@ impl GitPlatformPoller {
             github_client,
             gitlab_client,
             cursor_store,
-            required_issue_labels: vec!["autonomous-mission".to_string(), "dark-gravity".to_string()],
+            required_issue_labels: vec![
+                "autonomous-mission".to_string(),
+                "dark-gravity".to_string(),
+            ],
         }
     }
 
@@ -51,7 +54,11 @@ impl GitPlatformPoller {
 
             for issue in issues {
                 let event_hash = format!("issue:{}:{}:{}", repo, issue.id, issue.number);
-                if self.cursor_store.is_event_processed(&cursor_key, &event_hash).await? {
+                if self
+                    .cursor_store
+                    .is_event_processed(&cursor_key, &event_hash)
+                    .await?
+                {
                     continue;
                 }
 
@@ -72,7 +79,9 @@ impl GitPlatformPoller {
                     html_url: issue.html_url,
                 };
 
-                self.cursor_store.mark_event_processed(&cursor_key, &event_hash).await?;
+                self.cursor_store
+                    .mark_event_processed(&cursor_key, &event_hash)
+                    .await?;
                 all_events.push(event);
             }
         }
@@ -103,10 +112,16 @@ impl GitPlatformPoller {
         let mut comment_events = Vec::new();
 
         for pr in active_prs {
-            let comments = client.list_pull_request_comments(repo, pr.number, since).await?;
+            let comments = client
+                .list_pull_request_comments(repo, pr.number, since)
+                .await?;
             for comment in comments {
                 let event_hash = format!("comment:{}:{}:{}", repo, pr.number, comment.id);
-                if self.cursor_store.is_event_processed(&cursor_key, &event_hash).await? {
+                if self
+                    .cursor_store
+                    .is_event_processed(&cursor_key, &event_hash)
+                    .await?
+                {
                     continue;
                 }
 
@@ -124,7 +139,9 @@ impl GitPlatformPoller {
                         html_url: comment.html_url,
                     };
 
-                    self.cursor_store.mark_event_processed(&cursor_key, &event_hash).await?;
+                    self.cursor_store
+                        .mark_event_processed(&cursor_key, &event_hash)
+                        .await?;
                     comment_events.push(event);
                 }
             }
@@ -142,7 +159,10 @@ impl GitPlatformPoller {
     }
 
     /// Polls GitLab repository for new/updated issues.
-    pub async fn poll_gitlab_issues(&self, project_id: &str) -> anyhow::Result<Vec<PolledIssueEvent>> {
+    pub async fn poll_gitlab_issues(
+        &self,
+        project_id: &str,
+    ) -> anyhow::Result<Vec<PolledIssueEvent>> {
         let client = match &self.gitlab_client {
             Some(c) => c,
             None => return Ok(vec![]),
@@ -161,7 +181,11 @@ impl GitPlatformPoller {
 
             for issue in issues {
                 let event_hash = format!("issue:{}:{}:{}", project_id, issue.id, issue.iid);
-                if self.cursor_store.is_event_processed(&cursor_key, &event_hash).await? {
+                if self
+                    .cursor_store
+                    .is_event_processed(&cursor_key, &event_hash)
+                    .await?
+                {
                     continue;
                 }
 
@@ -182,7 +206,9 @@ impl GitPlatformPoller {
                     html_url: issue.web_url,
                 };
 
-                self.cursor_store.mark_event_processed(&cursor_key, &event_hash).await?;
+                self.cursor_store
+                    .mark_event_processed(&cursor_key, &event_hash)
+                    .await?;
                 all_events.push(event);
             }
         }
@@ -199,7 +225,10 @@ impl GitPlatformPoller {
     }
 
     /// Polls GitLab merge requests for comments/notes with directives.
-    pub async fn poll_gitlab_mr_notes(&self, project_id: &str) -> anyhow::Result<Vec<PRCommentEvent>> {
+    pub async fn poll_gitlab_mr_notes(
+        &self,
+        project_id: &str,
+    ) -> anyhow::Result<Vec<PRCommentEvent>> {
         let client = match &self.gitlab_client {
             Some(c) => c,
             None => return Ok(vec![]),
@@ -213,10 +242,16 @@ impl GitPlatformPoller {
         let mut note_events = Vec::new();
 
         for mr in mrs {
-            let notes = client.list_merge_request_notes(project_id, mr.iid, since).await?;
+            let notes = client
+                .list_merge_request_notes(project_id, mr.iid, since)
+                .await?;
             for note in notes {
                 let event_hash = format!("note:{}:{}:{}", project_id, mr.iid, note.id);
-                if self.cursor_store.is_event_processed(&cursor_key, &event_hash).await? {
+                if self
+                    .cursor_store
+                    .is_event_processed(&cursor_key, &event_hash)
+                    .await?
+                {
                     continue;
                 }
 
@@ -234,7 +269,9 @@ impl GitPlatformPoller {
                         html_url: format!("{}/#note_{}", mr.web_url, note.id),
                     };
 
-                    self.cursor_store.mark_event_processed(&cursor_key, &event_hash).await?;
+                    self.cursor_store
+                        .mark_event_processed(&cursor_key, &event_hash)
+                        .await?;
                     note_events.push(event);
                 }
             }
@@ -256,8 +293,12 @@ impl GitPlatformPoller {
 mod tests {
     use super::*;
     use crate::cursor_store::InMemoryCursorStore;
-    use crate::github::{GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient};
-    use crate::gitlab::{GitlabAuthor, GitlabIssue, GitlabMergeRequest, GitlabNote, MockGitlabClient};
+    use crate::github::{
+        GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient,
+    };
+    use crate::gitlab::{
+        GitlabAuthor, GitlabIssue, GitlabMergeRequest, GitlabNote, MockGitlabClient,
+    };
 
     #[tokio::test]
     async fn test_github_poller_issue_and_directive_flow() {
@@ -270,7 +311,9 @@ mod tests {
                     id: 1001,
                     number: 55,
                     title: "Implement zero-trust polling".to_string(),
-                    body: Some("Build native Rust poller [RESOURCE_LIMIT: RAM <= 30Mi]".to_string()),
+                    body: Some(
+                        "Build native Rust poller [RESOURCE_LIMIT: RAM <= 30Mi]".to_string(),
+                    ),
                     html_url: "https://github.com/my-org/my-repo/issues/55".to_string(),
                     updated_at: Some(Utc::now()),
                 }])
@@ -300,7 +343,8 @@ mod tests {
                         user: GithubUser {
                             login: "senior-dev".to_string(),
                         },
-                        html_url: "https://github.com/my-org/my-repo/pull/10#comment-3001".to_string(),
+                        html_url: "https://github.com/my-org/my-repo/pull/10#comment-3001"
+                            .to_string(),
                         updated_at: Some(Utc::now()),
                     },
                     GithubComment {
@@ -309,18 +353,16 @@ mod tests {
                         user: GithubUser {
                             login: "reviewer".to_string(),
                         },
-                        html_url: "https://github.com/my-org/my-repo/pull/10#comment-3002".to_string(),
+                        html_url: "https://github.com/my-org/my-repo/pull/10#comment-3002"
+                            .to_string(),
                         updated_at: Some(Utc::now()),
                     },
                 ])
             });
 
         let cursor_store = Arc::new(InMemoryCursorStore::new());
-        let poller = GitPlatformPoller::new(
-            Some(Arc::new(mock_gh)),
-            None,
-            cursor_store.clone(),
-        ).with_labels(vec!["autonomous-mission".to_string()]);
+        let poller = GitPlatformPoller::new(Some(Arc::new(mock_gh)), None, cursor_store.clone())
+            .with_labels(vec!["autonomous-mission".to_string()]);
 
         // First poll: extracts the issue
         let issues = poller.poll_github_issues("my-org/my-repo").await.unwrap();
@@ -333,7 +375,10 @@ mod tests {
         assert_eq!(issues_second.len(), 0);
 
         // Poll comments: extracts only directive comment
-        let comments = poller.poll_github_pr_comments("my-org/my-repo").await.unwrap();
+        let comments = poller
+            .poll_github_pr_comments("my-org/my-repo")
+            .await
+            .unwrap();
         assert_eq!(comments.len(), 1);
         assert_eq!(comments[0].author, "senior-dev");
         assert_eq!(
@@ -389,11 +434,8 @@ mod tests {
             });
 
         let cursor_store = Arc::new(InMemoryCursorStore::new());
-        let poller = GitPlatformPoller::new(
-            None,
-            Some(Arc::new(mock_gl)),
-            cursor_store.clone(),
-        ).with_labels(vec!["dark-gravity".to_string()]);
+        let poller = GitPlatformPoller::new(None, Some(Arc::new(mock_gl)), cursor_store.clone())
+            .with_labels(vec!["dark-gravity".to_string()]);
 
         let issues = poller.poll_gitlab_issues("my-org/my-proj").await.unwrap();
         assert_eq!(issues.len(), 1);
@@ -405,4 +447,3 @@ mod tests {
         assert_eq!(notes[0].directive, PRDirective::Retry);
     }
 }
-
