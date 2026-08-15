@@ -12,8 +12,9 @@ pub trait S3Storage: Send + Sync {
 }
 
 pub mod aethalgard;
+pub mod cursor_store;
+pub mod git_poller;
 pub mod github;
-
 pub mod gitlab;
 pub mod jira;
 pub mod kafka;
@@ -25,6 +26,9 @@ pub mod semantica;
 pub mod sentry;
 pub mod vault;
 pub mod ziti;
+
+pub use cursor_store::{CursorStore, InMemoryCursorStore, PostgresCursorStore};
+pub use git_poller::GitPlatformPoller;
 
 #[cfg(any(test, feature = "test-utils"))]
 pub use github::MockGithubClient;

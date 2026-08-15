@@ -203,14 +203,15 @@ fn test_dark_gravity_preflight_resource_constraints() {
 }
 
 /// 4. Live Kubernetes Cluster Task Matrix Verification (CHK-1 through CHK-7)
+///
 /// Validates all 7 task checks required by 13_Functional_Test_Plan.md in the live K8s environment:
-/// CHK-1: Kafka Ingestion
-/// CHK-2: Spec-Kit SDD Ontology
-/// CHK-3: Semantica Conflict Detection
-/// CHK-4: AST Surgery in gVisor (RAM <= 30MiB)
-/// CHK-5: Sandbox Test Validation
-/// CHK-6: Aethelgard SAST Score >= 8.0/10.0
-/// CHK-7: Semantica Provenance & GitOps PR
+/// - CHK-1: Kafka Ingestion
+/// - CHK-2: Spec-Kit SDD Ontology
+/// - CHK-3: Semantica Conflict Detection
+/// - CHK-4: AST Surgery in gVisor (RAM <= 30MiB)
+/// - CHK-5: Sandbox Test Validation
+/// - CHK-6: Aethelgard SAST Score >= 8.0/10.0
+/// - CHK-7: Semantica Provenance & GitOps PR
 #[test]
 fn test_live_k8s_task_audit_matrix_compliance() {
     let task_checks = vec![
