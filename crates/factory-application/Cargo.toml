@@ -24,6 +24,8 @@ reqwest = { version = "0.12", features = ["json", "stream", "multipart"] }
 async-openai = "0.23"
 rdkafka = { workspace = true }
 zeroize = "1.8.1"
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+rand = "0.8"
 
 tokio-test = { workspace = true }
 chrono.workspace = true
