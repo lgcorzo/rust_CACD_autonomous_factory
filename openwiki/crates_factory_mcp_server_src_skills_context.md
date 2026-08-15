@@ -4,7 +4,7 @@ title: "context.rs"
 source_path: "crates/factory-mcp-server/src/skills/context.rs"
 description: "Detailed documentation for context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: context.rs
@@ -41,14 +41,7 @@ Provides implementation for context.rs.
 #### ContextSkill
 
 **Overview:**
-Why it exists:
-Provides capabilities related to ContextSkill.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -63,7 +56,7 @@ None.
 ##### `format_for_llm(pruned_context: &str (Any)) -> Value`
 
 ###### Description
-Executes format_for_llm.
+No description provided.
 
 ###### Inputs
 * `pruned_context: &str`: type=Any, meaning=Input for pruned_context: &str, valid values=Any valid Any, optional=No, default value=None
@@ -93,7 +86,7 @@ let result = instance.format_for_llm();
 ##### `prune_context(raw_context: &str (Any), max_chars: usize (Any)) -> String`
 
 ###### Description
-Executes prune_context.
+No description provided.
 
 ###### Inputs
 * `raw_context: &str`: type=Any, meaning=Input for raw_context: &str, valid values=Any valid Any, optional=No, default value=None
@@ -131,28 +124,30 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ContextSkill {
-        +format_for_llm(pruned_context: &str:Any) Value
-        +prune_context(raw_context: &str:Any, max_chars: usize:Any) String
-    }
+```plantuml
+@startuml
+class ContextSkill {
+    +format_for_llm(pruned_context: &str:Any) : Value
+    +prune_context(raw_context: &str:Any, max_chars: usize:Any) : String
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ContextService
-    Caller->>Svc: format_for_llm()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "ContextService" as Svc
+Caller -> Svc: format_for_llm()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -160,6 +155,7 @@ sequenceDiagram
 // Example usage of context.rs components
 import { ... } from 'crates/factory-mcp-server/src/skills/context.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/skills`

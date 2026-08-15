@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: security.rs
@@ -26,7 +26,7 @@ Provides implementation for security.rs.
 * None
 
 ### Exported classes
-* AuditResult, Ed25519SecurityValidator, JitToken, SandboxConstraint
+* AuditResult, Ed25519SecurityValidator, JitToken, SandboxConstraint, SastScanResult
 
 ### Exported interfaces
 * SecurityBounds, SecurityValidator
@@ -41,14 +41,7 @@ Provides implementation for security.rs.
 #### AuditResult
 
 **Overview:**
-Why it exists:
-Provides capabilities related to AuditResult.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -70,14 +63,7 @@ None.
 #### Ed25519SecurityValidator
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Ed25519SecurityValidator.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -99,14 +85,7 @@ None.
 #### JitToken
 
 **Overview:**
-Why it exists:
-Provides capabilities related to JitToken.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -127,14 +106,7 @@ None.
 #### SandboxConstraint
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SandboxConstraint.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -154,17 +126,92 @@ None.
 
 None.
 
+#### SastScanResult
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `critical_vulnerabilities_detected` (bool): Purpose - Stores critical_vulnerabilities_detected data. Constraints - Valid bool.
+* `findings` (Vec<String>): Purpose - Stores findings data. Constraints - Valid Vec<String>.
+* `is_safe` (bool): Purpose - Stores is_safe data. Constraints - Valid bool.
+* `score` (f32): Purpose - Stores score data. Constraints - Valid f32.
+
+**Public Methods:**
+
+##### `inspect_diff(diff: &str (Any)) -> Self`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `diff: &str`: type=Any, meaning=Input for diff: &str, valid values=Any valid Any, optional=No, default value=None
+
+###### Output
+Return type: Self
+Semantic meaning: Result of inspect_diff
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.inspect_diff();
+```
+
+##### `passes_gate() -> bool`
+
+###### Description
+No description provided.
+
+###### Inputs
+None.
+
+###### Output
+Return type: bool
+Semantic meaning: Result of passes_gate
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.passes_gate();
+```
+
+**Private Methods:**
+
+None.
+
 #### SecurityBounds
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SecurityBounds.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -185,14 +232,7 @@ None.
 #### SecurityValidator
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SecurityValidator.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -216,41 +256,45 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class AuditResult {
-    }
-    class Ed25519SecurityValidator {
-        -audit_content(_content: &str:Any) Result<AuditResult>
-        -validate_signature(data: &[u8]:Any, signature: &str:Any) Result<bool>
-    }
-    SecurityValidator <|-- Ed25519SecurityValidator : Inheritance / Specialization
-    class JitToken {
-    }
-    class SandboxConstraint {
-    }
-    class SecurityBounds {
-        <<trait>>
-    }
-    class SecurityValidator {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class AuditResult {
+}
+class Ed25519SecurityValidator {
+    -audit_content(_content: &str:Any) : Result<AuditResult>
+    -validate_signature(data: &[u8]:Any, signature: &str:Any) : Result<bool>
+}
+SecurityValidator <|-- Ed25519SecurityValidator : extends/implements
+class JitToken {
+}
+class SandboxConstraint {
+}
+class SastScanResult {
+    +inspect_diff(diff: &str:Any) : Self
+    +passes_gate() : bool
+}
+interface SecurityBounds {
+}
+interface SecurityValidator {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as SecurityService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "SecurityService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -258,6 +302,7 @@ sequenceDiagram
 // Example usage of security.rs components
 import { ... } from 'crates/factory-core/src/security.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

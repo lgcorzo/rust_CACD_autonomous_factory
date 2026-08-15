@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-mcp-server/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: lib.rs
@@ -25,13 +25,16 @@ Provides implementation for lib.rs.
     response::sse::{Event, Sse},
     Json,
 }, crate::protocol::CallToolResult, crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}, crate::tools::MockTool, crate::tools::Tool, crate::tools::{
-            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            bridge::BridgeTool, deep_research_tool::DeepResearchTool,
+            execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
-        }, factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}, serde_json::{json, Value}, std::collections::HashMap, std::convert::Infallible, std::sync::Arc, std::time::Duration, super::*, tokio::sync::{mpsc, RwLock}, tokio_stream::wrappers::UnboundedReceiverStream, tokio_stream::{Stream, StreamExt}
+        }, factory_infrastructure::{
+            HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient, SimpleMockKafkaClient,
+        }, serde_json::{json, Value}, std::collections::HashMap, std::convert::Infallible, std::sync::Arc, std::time::Duration, super::*, tokio::sync::{mpsc, RwLock}, tokio_stream::wrappers::UnboundedReceiverStream, tokio_stream::{Stream, StreamExt}
 
 ### Imported modules
 * None
@@ -52,14 +55,7 @@ Provides implementation for lib.rs.
 #### McpServer
 
 **Overview:**
-Why it exists:
-Provides capabilities related to McpServer.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -78,7 +74,7 @@ Initialization: Sets up McpServer
 ##### `add_tool(tool: Box<dyn Tool> (Any)) -> None`
 
 ###### Description
-Executes add_tool.
+No description provided.
 
 ###### Inputs
 * `tool: Box<dyn Tool>`: type=Any, meaning=Input for tool: Box<dyn Tool>, valid values=Any valid Any, optional=No, default value=None
@@ -108,7 +104,7 @@ let result = instance.add_tool();
 ##### `handle_request(request: JsonRpcRequest (Any)) -> JsonRpcResponse`
 
 ###### Description
-Executes handle_request.
+No description provided.
 
 ###### Inputs
 * `request: JsonRpcRequest`: type=Any, meaning=Input for request: JsonRpcRequest, valid values=Any valid Any, optional=No, default value=None
@@ -138,7 +134,7 @@ let result = instance.handle_request();
 ##### `post_handler(State(server): State<Arc<McpServer>> (Any), Query(params): Query<HashMap<String, String>> (Any), Json(request): Json<JsonRpcRequest> (Any)) -> Json<JsonRpcResponse>`
 
 ###### Description
-Executes post_handler.
+No description provided.
 
 ###### Inputs
 * `State(server): State<Arc<McpServer>>`: type=Any, meaning=Input for State(server): State<Arc<McpServer>>, valid values=Any valid Any, optional=No, default value=None
@@ -170,7 +166,7 @@ let result = instance.post_handler();
 ##### `register_default_tools() -> anyhow::Result<()>`
 
 ###### Description
-Executes register_default_tools.
+No description provided.
 
 ###### Inputs
 None.
@@ -200,7 +196,7 @@ let result = instance.register_default_tools();
 ##### `sse_handler(State(server): State<Arc<McpServer>> (Any)) -> Sse<impl Stream<Item = Result<Event, Infallible>>>`
 
 ###### Description
-Executes sse_handler.
+No description provided.
 
 ###### Inputs
 * `State(server): State<Arc<McpServer>>`: type=Any, meaning=Input for State(server): State<Arc<McpServer>>, valid values=Any valid Any, optional=No, default value=None
@@ -240,37 +236,39 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class McpServer {
-        +add_tool(tool: Box<dyn Tool>:Any) None
-        -default() Self
-        -error_response(id: Option<Value>:Any, code: i32:Any, message: &str:Any) JsonRpcResponse
-        -handle_call_tool(request: JsonRpcRequest:Any) JsonRpcResponse
-        -handle_list_tools(id: Option<Value>:Any) JsonRpcResponse
-        +handle_request(request: JsonRpcRequest:Any) JsonRpcResponse
-        +new() Self
-        +post_handler(State(server): State<Arc<McpServer>>:Any, Query(params): Query<HashMap<String, String>>:Any, Json(request): Json<JsonRpcRequest>:Any) Json<JsonRpcResponse>
-        +register_default_tools() anyhow::Result<()>
-        +sse_handler(State(server): State<Arc<McpServer>>:Any) Sse<impl Stream<Item = Result<Event, Infallible>>>
-    }
-    Default <|-- McpServer : Inheritance / Specialization
+```plantuml
+@startuml
+class McpServer {
+    +add_tool(tool: Box<dyn Tool>:Any) : None
+    -default() : Self
+    -error_response(id: Option<Value>:Any, code: i32:Any, message: &str:Any) : JsonRpcResponse
+    -handle_call_tool(request: JsonRpcRequest:Any) : JsonRpcResponse
+    -handle_list_tools(id: Option<Value>:Any) : JsonRpcResponse
+    +handle_request(request: JsonRpcRequest:Any) : JsonRpcResponse
+    +new() : Self
+    +post_handler(State(server): State<Arc<McpServer>>:Any, Query(params): Query<HashMap<String, String>>:Any, Json(request): Json<JsonRpcRequest>:Any) : Json<JsonRpcResponse>
+    +register_default_tools() : anyhow::Result<()>
+    +sse_handler(State(server): State<Arc<McpServer>>:Any) : Sse<impl Stream<Item = Result<Event, Infallible>>>
+}
+Default <|-- McpServer : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as LibService
-    Caller->>Svc: add_tool()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "LibService" as Svc
+Caller -> Svc: add_tool()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -279,6 +277,7 @@ sequenceDiagram
 import { ... } from 'crates/factory-mcp-server/src/lib.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
 * **Dependencies:** axum::{
@@ -286,10 +285,13 @@ import { ... } from 'crates/factory-mcp-server/src/lib.rs';
     response::sse::{Event, Sse},
     Json,
 }, crate::protocol::CallToolResult, crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool}, crate::tools::MockTool, crate::tools::Tool, crate::tools::{
-            bridge::BridgeTool, execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
+            bridge::BridgeTool, deep_research_tool::DeepResearchTool,
+            execute_code::ExecuteCodeTool, index_code::IndexCodeTool,
             launch_sandbox_pod::LaunchSandboxPodTool, plan_mission::PlanMissionTool,
             retrieve_context::RetrieveContextTool, run_tests::RunTestsTool,
             search_jira::SearchJiraTool, security_review::SecurityReviewTool,
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
-        }, factory_infrastructure::{HttpGitlabClient, HttpJiraClient, HttpR2rClient}, serde_json::{json, Value}, std::collections::HashMap, std::convert::Infallible, std::sync::Arc, std::time::Duration, super::*, tokio::sync::{mpsc, RwLock}, tokio_stream::wrappers::UnboundedReceiverStream, tokio_stream::{Stream, StreamExt}
+        }, factory_infrastructure::{
+            HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient, SimpleMockKafkaClient,
+        }, serde_json::{json, Value}, std::collections::HashMap, std::convert::Infallible, std::sync::Arc, std::time::Duration, super::*, tokio::sync::{mpsc, RwLock}, tokio_stream::wrappers::UnboundedReceiverStream, tokio_stream::{Stream, StreamExt}

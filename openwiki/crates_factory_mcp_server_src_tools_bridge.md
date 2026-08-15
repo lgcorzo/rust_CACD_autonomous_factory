@@ -4,7 +4,7 @@ title: "bridge.rs"
 source_path: "crates/factory-mcp-server/src/tools/bridge.rs"
 description: "Detailed documentation for bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: bridge.rs
@@ -41,14 +41,7 @@ Provides implementation for bridge.rs.
 #### BridgeTool
 
 **Overview:**
-Why it exists:
-Provides capabilities related to BridgeTool.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -63,7 +56,7 @@ None.
 ##### `load_state(mission_id: &str (Any)) -> anyhow::Result<Value>`
 
 ###### Description
-Executes load_state.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -93,7 +86,7 @@ let result = instance.load_state();
 ##### `save_state(mission_id: &str (Any), state: Value (Any)) -> anyhow::Result<Value>`
 
 ###### Description
-Executes save_state.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -135,34 +128,36 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class BridgeTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -get_checkpoint_path(mission_id: &str:Any) PathBuf
-        -input_schema() Value
-        +load_state(mission_id: &str:Any) anyhow::Result<Value>
-        -name() String
-        +save_state(mission_id: &str:Any, state: Value:Any) anyhow::Result<Value>
-    }
-    Tool <|-- BridgeTool : Inheritance / Specialization
+```plantuml
+@startuml
+class BridgeTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -get_checkpoint_path(mission_id: &str:Any) : PathBuf
+    -input_schema() : Value
+    +load_state(mission_id: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +save_state(mission_id: &str:Any, state: Value:Any) : anyhow::Result<Value>
+}
+Tool <|-- BridgeTool : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as BridgeService
-    Caller->>Svc: call()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "BridgeService" as Svc
+Caller -> Svc: call()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -170,6 +165,7 @@ sequenceDiagram
 // Example usage of bridge.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/bridge.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

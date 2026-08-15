@@ -4,7 +4,7 @@ title: "adk_driver.rs"
 source_path: "crates/factory-application/src/bridge/adk_driver.rs"
 description: "Detailed documentation for adk_driver.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: adk_driver.rs
@@ -41,14 +41,7 @@ Provides implementation for adk_driver.rs.
 #### NativeADKDriver
 
 **Overview:**
-Why it exists:
-Provides capabilities related to NativeADKDriver.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -73,29 +66,31 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class NativeADKDriver {
-        -apply_patch(_mission_id: &str:Any, patch: &SurgicalPatch:Any) Result<ExecutionResult, FactoryError>
-        -verify_syntax(_file_path: &std::path::Path:Any) Result<bool, FactoryError>
-    }
-    CodeSurgeryExecutor <|-- NativeADKDriver : Inheritance / Specialization
+```plantuml
+@startuml
+class NativeADKDriver {
+    -apply_patch(_mission_id: &str:Any, patch: &SurgicalPatch:Any) : Result<ExecutionResult, FactoryError>
+    -verify_syntax(_file_path: &std::path::Path:Any) : Result<bool, FactoryError>
+}
+CodeSurgeryExecutor <|-- NativeADKDriver : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Adk_driverService
-    Caller->>Svc: apply_patch()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Adk_driverService" as Svc
+Caller -> Svc: apply_patch()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -103,6 +98,7 @@ sequenceDiagram
 // Example usage of adk_driver.rs components
 import { ... } from 'crates/factory-application/src/bridge/adk_driver.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`

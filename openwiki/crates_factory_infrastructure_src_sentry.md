@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: sentry.rs
@@ -41,14 +41,7 @@ Provides implementation for sentry.rs.
 #### CrashEvent
 
 **Overview:**
-Why it exists:
-Provides capabilities related to CrashEvent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -74,14 +67,7 @@ None.
 #### HttpSentryClient
 
 **Overview:**
-Why it exists:
-Provides capabilities related to HttpSentryClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -107,14 +93,7 @@ None.
 #### SentryClient
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SentryClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -138,34 +117,35 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class CrashEvent {
-    }
-    class HttpSentryClient {
-        -fetch_recent_crashes(project: &str:Any, since_minutes: u64:Any) anyhow::Result<Vec<CrashEvent>>
-        +new(url: String:Any, api_token: String:Any) Self
-    }
-    SentryClient <|-- HttpSentryClient : Inheritance / Specialization
-    class SentryClient {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class CrashEvent {
+}
+class HttpSentryClient {
+    -fetch_recent_crashes(project: &str:Any, since_minutes: u64:Any) : anyhow::Result<Vec<CrashEvent>>
+    +new(url: String:Any, api_token: String:Any) : Self
+}
+SentryClient <|-- HttpSentryClient : extends/implements
+interface SentryClient {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as SentryService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "SentryService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -173,6 +153,7 @@ sequenceDiagram
 // Example usage of sentry.rs components
 import { ... } from 'crates/factory-infrastructure/src/sentry.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

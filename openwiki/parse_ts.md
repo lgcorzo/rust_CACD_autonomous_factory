@@ -4,7 +4,7 @@ title: "parse_ts.py"
 source_path: "parse_ts.py"
 description: "Detailed documentation for parse_ts.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: parse_ts.py
@@ -41,33 +41,35 @@ Provides implementation for parse_ts.py.
 ### Exported Functions
 
 #### `get_node_text(node (Any), source_bytes (Any)) -> None`
-Executes get_node_text.
+No description provided.
 
 #### `parse_ts(filepath (Any)) -> None`
-Executes parse_ts.
+No description provided.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Parse_tsService
-    Caller->>Svc: get_node_text()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Parse_tsService" as Svc
+Caller -> Svc: get_node_text()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -75,6 +77,7 @@ sequenceDiagram
 // Example usage of parse_ts.py components
 import { ... } from 'parse_ts.py';
 ```
+
 
 ## Cross References
 * **Parent module:** ``

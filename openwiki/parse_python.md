@@ -4,7 +4,7 @@ title: "parse_python.py"
 source_path: "parse_python.py"
 description: "Detailed documentation for parse_python.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: parse_python.py
@@ -41,30 +41,32 @@ Provides implementation for parse_python.py.
 ### Exported Functions
 
 #### `parse_python_file(filepath (Any)) -> None`
-Executes parse_python_file.
+No description provided.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Parse_pythonService
-    Caller->>Svc: parse_python_file()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Parse_pythonService" as Svc
+Caller -> Svc: parse_python_file()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -72,6 +74,7 @@ sequenceDiagram
 // Example usage of parse_python.py components
 import { ... } from 'parse_python.py';
 ```
+
 
 ## Cross References
 * **Parent module:** ``
