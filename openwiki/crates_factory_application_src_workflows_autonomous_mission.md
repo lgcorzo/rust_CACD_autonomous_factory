@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: autonomous_mission.rs
@@ -23,7 +23,7 @@ Provides implementation for autonomous_mission.rs.
 * crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}, factory_core::proto::v1::MissionInput as ProtoInput, factory_infrastructure::{
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
     aethalgard::{AethalgardClient, HttpAethalgardClient},
-}, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Workflow, prost::Message, serde::{Deserialize, Serialize}, std::sync::Arc, super::*, uuid::Uuid
+}, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Workflow, prost::Message, serde::{Deserialize, Serialize}, std::hash::{Hash, Hasher}, std::sync::Arc, super::*, uuid::Uuid
 
 ### Imported modules
 * None
@@ -44,14 +44,7 @@ Provides implementation for autonomous_mission.rs.
 #### MissionInput
 
 **Overview:**
-Why it exists:
-Provides capabilities related to MissionInput.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -68,7 +61,7 @@ Default constructor.
 ##### `from_protobuf(bytes: &[u8] (Any)) -> Result<Self, prost::DecodeError>`
 
 ###### Description
-Executes from_protobuf.
+No description provided.
 
 ###### Inputs
 * `bytes: &[u8]`: type=Any, meaning=Input for bytes: &[u8], valid values=Any valid Any, optional=No, default value=None
@@ -102,14 +95,7 @@ None.
 #### MissionOutput
 
 **Overview:**
-Why it exists:
-Provides capabilities related to MissionOutput.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -133,33 +119,35 @@ None.
 ### Exported Functions
 
 #### `create_mission_workflow(hatchet: &Hatchet (Any), mcp_url: String (Any), r2r_url: String (Any), kafka_brokers: String (Any), aethalgard_webhook_url: String (Any)) -> Workflow<MissionInput, MissionOutput>`
-Executes create_mission_workflow.
+No description provided.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class MissionInput {
-        +from_protobuf(bytes: &[u8]:Any) Result<Self, prost::DecodeError>
-    }
-    class MissionOutput {
-    }
+```plantuml
+@startuml
+class MissionInput {
+    +from_protobuf(bytes: &[u8]:Any) : Result<Self, prost::DecodeError>
+}
+class MissionOutput {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Autonomous_missionService
-    Caller->>Svc: from_protobuf()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Autonomous_missionService" as Svc
+Caller -> Svc: from_protobuf()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -168,9 +156,10 @@ sequenceDiagram
 import { ... } from 'crates/factory-application/src/workflows/autonomous_mission.rs';
 ```
 
+
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`
 * **Dependencies:** crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}, factory_core::proto::v1::MissionInput as ProtoInput, factory_infrastructure::{
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
     aethalgard::{AethalgardClient, HttpAethalgardClient},
-}, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Workflow, prost::Message, serde::{Deserialize, Serialize}, std::sync::Arc, super::*, uuid::Uuid
+}, hatchet_sdk::Hatchet, hatchet_sdk::runnables::Workflow, prost::Message, serde::{Deserialize, Serialize}, std::hash::{Hash, Hasher}, std::sync::Arc, super::*, uuid::Uuid

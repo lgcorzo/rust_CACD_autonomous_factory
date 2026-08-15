@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: zeroclaw.rs
@@ -41,14 +41,7 @@ Provides implementation for zeroclaw.rs.
 #### ZeroClawAgent
 
 **Overview:**
-Why it exists:
-Provides capabilities related to ZeroClawAgent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -67,7 +60,7 @@ Initialization: Sets up ZeroClawAgent
 ##### `execute_task(mission_id: &str (Any), task_description: &str (Any), _files: &[String] (Any)) -> anyhow::Result<Value>`
 
 ###### Description
-Executes execute_task.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -99,7 +92,7 @@ let result = instance.execute_task();
 ##### `introspect_k8s(mission_id: &str (Any)) -> anyhow::Result<Value>`
 
 ###### Description
-Executes introspect_k8s.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -129,7 +122,7 @@ let result = instance.introspect_k8s();
 ##### `validate_mission(mission_id: &str (Any), test_command: &str (Any)) -> anyhow::Result<Value>`
 
 ###### Description
-Executes validate_mission.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -168,33 +161,35 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ZeroClawAgent {
-        -execute(task_description: &str:Any) anyhow::Result<Value>
-        +execute_task(mission_id: &str:Any, task_description: &str:Any, _files: &[String]:Any) anyhow::Result<Value>
-        +introspect_k8s(mission_id: &str:Any) anyhow::Result<Value>
-        -name() String
-        +new(mcp_client: Arc<dyn McpClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) Self
-        +validate_mission(mission_id: &str:Any, test_command: &str:Any) anyhow::Result<Value>
-    }
-    Agent <|-- ZeroClawAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class ZeroClawAgent {
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    +execute_task(mission_id: &str:Any, task_description: &str:Any, _files: &[String]:Any) : anyhow::Result<Value>
+    +introspect_k8s(mission_id: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +new(mcp_client: Arc<dyn McpClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) : Self
+    +validate_mission(mission_id: &str:Any, test_command: &str:Any) : anyhow::Result<Value>
+}
+Agent <|-- ZeroClawAgent : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ZeroclawService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "ZeroclawService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -202,6 +197,7 @@ sequenceDiagram
 // Example usage of zeroclaw.rs components
 import { ... } from 'crates/factory-application/src/agents/zeroclaw.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

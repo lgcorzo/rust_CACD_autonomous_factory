@@ -4,7 +4,7 @@ title: "generate_openwiki.py"
 source_path: "generate_openwiki.py"
 description: "Detailed documentation for generate_openwiki.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: generate_openwiki.py
@@ -32,7 +32,7 @@ Provides implementation for generate_openwiki.py.
 * None
 
 ### Exported functions
-* generate_indexes, generate_mermaid_classes, generate_sequence_diagram, get_git_hash, main, parse_file, setup_okf_structure, validate_links, write_file_doc
+* generate_ai_description, generate_indexes, generate_plantuml_classes, generate_plantuml_sequence, get_git_hash, main, parse_file, setup_okf_structure, validate_links, write_file_doc
 
 ## Public API
 
@@ -40,55 +40,60 @@ Provides implementation for generate_openwiki.py.
 
 ### Exported Functions
 
+#### `generate_ai_description(entity_name (Any), file_name (Any), entity_type (Any)) -> None`
+No description provided.
+
 #### `generate_indexes(now (Any)) -> None`
-Executes generate_indexes.
+No description provided.
 
-#### `generate_mermaid_classes(classes (Any)) -> None`
-Executes generate_mermaid_classes.
+#### `generate_plantuml_classes(classes (Any)) -> None`
+No description provided.
 
-#### `generate_sequence_diagram(module_name (Any), classes (Any), free_functions (Any)) -> None`
-Executes generate_sequence_diagram.
+#### `generate_plantuml_sequence(module_name (Any), classes (Any), free_functions (Any)) -> None`
+No description provided.
 
 #### `get_git_hash() -> None`
-Executes get_git_hash.
+No description provided.
 
 #### `main() -> None`
-Executes main.
+No description provided.
 
 #### `parse_file(filepath (Any)) -> None`
-Executes parse_file.
+No description provided.
 
 #### `setup_okf_structure() -> None`
-Executes setup_okf_structure.
+No description provided.
 
 #### `validate_links() -> None`
-Executes validate_links.
+No description provided.
 
 #### `write_file_doc(file_path (Any), parsed (Any), now (Any)) -> None`
-Executes write_file_doc.
+No description provided.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Generate_openwikiService
-    Caller->>Svc: generate_indexes()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Generate_openwikiService" as Svc
+Caller -> Svc: generate_ai_description()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -96,6 +101,7 @@ sequenceDiagram
 // Example usage of generate_openwiki.py components
 import { ... } from 'generate_openwiki.py';
 ```
+
 
 ## Cross References
 * **Parent module:** ``

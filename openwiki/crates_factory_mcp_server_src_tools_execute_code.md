@@ -4,7 +4,7 @@ title: "execute_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/execute_code.rs"
 description: "Detailed documentation for execute_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: execute_code.rs
@@ -41,14 +41,7 @@ Provides implementation for execute_code.rs.
 #### ExecuteCodeTool
 
 **Overview:**
-Why it exists:
-Provides capabilities related to ExecuteCodeTool.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -78,32 +71,34 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ExecuteCodeTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new(driver: Arc<dyn SandboxDriver>:Any) Self
-    }
-    Tool <|-- ExecuteCodeTool : Inheritance / Specialization
+```plantuml
+@startuml
+class ExecuteCodeTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(driver: Arc<dyn SandboxDriver>:Any) : Self
+}
+Tool <|-- ExecuteCodeTool : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Execute_codeService
-    Caller->>Svc: call()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Execute_codeService" as Svc
+Caller -> Svc: call()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -111,6 +106,7 @@ sequenceDiagram
 // Example usage of execute_code.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/execute_code.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

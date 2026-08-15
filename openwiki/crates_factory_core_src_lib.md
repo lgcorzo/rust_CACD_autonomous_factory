@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: lib.rs
@@ -26,7 +26,7 @@ Provides implementation for lib.rs.
 * None
 
 ### Exported classes
-* ComplianceReport, FeatureImportances, FinOpsTag, Inputs, Metadata, Mission, OsrMetric, Outputs, SHAPValues, SpecArtifact, Targets, Task, UserFeedbackPayload
+* CausalProvenanceNode, ComplianceReport, DailyBudgetConfig, FeatureImportances, FinOpsTag, Inputs, Metadata, Mission, OsrMetric, Outputs, SHAPValues, SentryCrashRecord, SpecArtifact, SpendVelocityAlert, Targets, Task, UserFeedbackPayload
 
 ### Exported interfaces
 * None
@@ -38,17 +38,38 @@ Provides implementation for lib.rs.
 
 ### Exported Classes / Structs / Interfaces
 
+#### CausalProvenanceNode
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `ast_mutation_hash` (String): Purpose - Stores ast_mutation_hash data. Constraints - Valid String.
+* `constitution_rule_id` (String): Purpose - Stores constitution_rule_id data. Constraints - Valid String.
+* `is_valid` (bool): Purpose - Stores is_valid data. Constraints - Valid bool.
+* `issue_id` (String): Purpose - Stores issue_id data. Constraints - Valid String.
+* `node_id` (String): Purpose - Stores node_id data. Constraints - Valid String.
+* `plan_id` (String): Purpose - Stores plan_id data. Constraints - Valid String.
+* `spec_id` (String): Purpose - Stores spec_id data. Constraints - Valid String.
+* `test_result` (String): Purpose - Stores test_result data. Constraints - Valid String.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 #### ComplianceReport
 
 **Overview:**
-Why it exists:
-Provides capabilities related to ComplianceReport.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -68,17 +89,33 @@ None.
 
 None.
 
+#### DailyBudgetConfig
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `hardstop_threshold_ratio` (f64): Purpose - Stores hardstop_threshold_ratio data. Constraints - Valid f64.
+* `max_daily_budget_usd` (f64): Purpose - Stores max_daily_budget_usd data. Constraints - Valid f64.
+* `velocity_threshold_usd_per_min` (f64): Purpose - Stores velocity_threshold_usd_per_min data. Constraints - Valid f64.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+* `default() -> Self`: Internal helper logic.
+
 #### FeatureImportances
 
 **Overview:**
-Why it exists:
-Provides capabilities related to FeatureImportances.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -100,14 +137,7 @@ None.
 #### FinOpsTag
 
 **Overview:**
-Why it exists:
-Provides capabilities related to FinOpsTag.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -132,14 +162,7 @@ None.
 #### Inputs
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Inputs.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -160,14 +183,7 @@ None.
 #### Metadata
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Metadata.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -190,14 +206,7 @@ None.
 #### Mission
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Mission.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -223,14 +232,7 @@ None.
 #### MissionStatus
 
 **Overview:**
-Why it exists:
-Provides capabilities related to MissionStatus.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -251,14 +253,7 @@ None.
 #### OsrMetric
 
 **Overview:**
-Why it exists:
-Provides capabilities related to OsrMetric.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -282,14 +277,7 @@ None.
 #### Outputs
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Outputs.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -311,14 +299,7 @@ None.
 #### SHAPValues
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SHAPValues.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -338,17 +319,34 @@ None.
 
 None.
 
+#### SentryCrashRecord
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `culprit` (Option<String>): Purpose - Stores culprit data. Constraints - Valid Option<String>.
+* `event_id` (String): Purpose - Stores event_id data. Constraints - Valid String.
+* `level` (String): Purpose - Stores level data. Constraints - Valid String.
+* `message` (String): Purpose - Stores message data. Constraints - Valid String.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 #### SpecArtifact
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SpecArtifact.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -368,17 +366,34 @@ None.
 
 None.
 
+#### SpendVelocityAlert
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `current_spend` (f64): Purpose - Stores current_spend data. Constraints - Valid f64.
+* `spend_velocity` (f64): Purpose - Stores spend_velocity data. Constraints - Valid f64.
+* `threshold` (f64): Purpose - Stores threshold data. Constraints - Valid f64.
+* `timestamp` (DateTime<Utc>): Purpose - Stores timestamp data. Constraints - Valid DateTime<Utc>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 #### Targets
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Targets.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -400,14 +415,7 @@ None.
 #### Task
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Task.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -433,14 +441,7 @@ None.
 #### TaskStatus
 
 **Overview:**
-Why it exists:
-Provides capabilities related to TaskStatus.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -461,14 +462,7 @@ None.
 #### UserFeedbackPayload
 
 **Overview:**
-Why it exists:
-Provides capabilities related to UserFeedbackPayload.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -496,56 +490,66 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ComplianceReport {
-    }
-    class FeatureImportances {
-    }
-    class FinOpsTag {
-    }
-    class Inputs {
-    }
-    class Metadata {
-    }
-    class Mission {
-    }
-    class MissionStatus {
-        <<enumeration>>
-    }
-    class OsrMetric {
-    }
-    class Outputs {
-    }
-    class SHAPValues {
-    }
-    class SpecArtifact {
-    }
-    class Targets {
-    }
-    class Task {
-    }
-    class TaskStatus {
-        <<enumeration>>
-    }
-    class UserFeedbackPayload {
-    }
+```plantuml
+@startuml
+class CausalProvenanceNode {
+}
+class ComplianceReport {
+}
+class DailyBudgetConfig {
+    -default() : Self
+}
+Default <|-- DailyBudgetConfig : extends/implements
+class FeatureImportances {
+}
+class FinOpsTag {
+}
+class Inputs {
+}
+class Metadata {
+}
+class Mission {
+}
+enum MissionStatus {
+}
+class OsrMetric {
+}
+class Outputs {
+}
+class SHAPValues {
+}
+class SentryCrashRecord {
+}
+class SpecArtifact {
+}
+class SpendVelocityAlert {
+}
+class Targets {
+}
+class Task {
+}
+enum TaskStatus {
+}
+class UserFeedbackPayload {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as LibService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "LibService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -553,6 +557,7 @@ sequenceDiagram
 // Example usage of lib.rs components
 import { ... } from 'crates/factory-core/src/lib.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

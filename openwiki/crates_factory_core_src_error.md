@@ -4,7 +4,7 @@ title: "error.rs"
 source_path: "crates/factory-core/src/error.rs"
 description: "Detailed documentation for error.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: error.rs
@@ -41,14 +41,7 @@ Provides implementation for error.rs.
 #### FactoryError
 
 **Overview:**
-Why it exists:
-Provides capabilities related to FactoryError.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -72,27 +65,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class FactoryError {
-        <<enumeration>>
-    }
+```plantuml
+@startuml
+enum FactoryError {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ErrorService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "ErrorService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -100,6 +94,7 @@ sequenceDiagram
 // Example usage of error.rs components
 import { ... } from 'crates/factory-core/src/error.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

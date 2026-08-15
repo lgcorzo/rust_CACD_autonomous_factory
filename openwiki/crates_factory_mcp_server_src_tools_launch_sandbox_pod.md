@@ -4,7 +4,7 @@ title: "launch_sandbox_pod.rs"
 source_path: "crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
 description: "Detailed documentation for launch_sandbox_pod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: launch_sandbox_pod.rs
@@ -41,14 +41,7 @@ Provides implementation for launch_sandbox_pod.rs.
 #### LaunchSandboxPodTool
 
 **Overview:**
-Why it exists:
-Provides capabilities related to LaunchSandboxPodTool.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -76,14 +69,7 @@ None.
 #### SandboxJobSpec
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SandboxJobSpec.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -108,36 +94,38 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class LaunchSandboxPodTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -default() Self
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new() Self
-    }
-    Default <|-- LaunchSandboxPodTool : Inheritance / Specialization
-    Tool <|-- LaunchSandboxPodTool : Inheritance / Specialization
-    class SandboxJobSpec {
-    }
+```plantuml
+@startuml
+class LaunchSandboxPodTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -default() : Self
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new() : Self
+}
+Default <|-- LaunchSandboxPodTool : extends/implements
+Tool <|-- LaunchSandboxPodTool : extends/implements
+class SandboxJobSpec {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Launch_sandbox_podService
-    Caller->>Svc: call()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Launch_sandbox_podService" as Svc
+Caller -> Svc: call()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -145,6 +133,7 @@ sequenceDiagram
 // Example usage of launch_sandbox_pod.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

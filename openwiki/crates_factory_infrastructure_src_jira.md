@@ -4,7 +4,7 @@ title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Detailed documentation for jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: jira.rs
@@ -41,14 +41,7 @@ Provides implementation for jira.rs.
 #### HttpJiraClient
 
 **Overview:**
-Why it exists:
-Provides capabilities related to HttpJiraClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -75,14 +68,7 @@ None.
 #### JiraClient
 
 **Overview:**
-Why it exists:
-Provides capabilities related to JiraClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -106,32 +92,33 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class HttpJiraClient {
-        +new(url: String:Any, username: String:Any, api_token: String:Any) Self
-        -search_issues(query: &str:Any) anyhow::Result<String>
-    }
-    JiraClient <|-- HttpJiraClient : Inheritance / Specialization
-    class JiraClient {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class HttpJiraClient {
+    +new(url: String:Any, username: String:Any, api_token: String:Any) : Self
+    -search_issues(query: &str:Any) : anyhow::Result<String>
+}
+JiraClient <|-- HttpJiraClient : extends/implements
+interface JiraClient {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as JiraService
-    Caller->>Svc: new()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "JiraService" as Svc
+Caller -> Svc: new()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -139,6 +126,7 @@ sequenceDiagram
 // Example usage of jira.rs components
 import { ... } from 'crates/factory-infrastructure/src/jira.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
