@@ -4,7 +4,7 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: ziti.rs
@@ -41,14 +41,7 @@ Provides implementation for ziti.rs.
 #### OpenZitiIdentity
 
 **Overview:**
-Why it exists:
-Provides capabilities related to OpenZitiIdentity.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -74,14 +67,7 @@ None.
 #### ZitiIdentity
 
 **Overview:**
-Why it exists:
-Provides capabilities related to ZitiIdentity.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -105,33 +91,34 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class OpenZitiIdentity {
-        -get_token() anyhow::Result<String>
-        +new(service: &str:Any, identity_file: &str:Any) Self
-        -service_name() String
-    }
-    ZitiIdentity <|-- OpenZitiIdentity : Inheritance / Specialization
-    class ZitiIdentity {
-        <<trait>>
-    }
+```plantuml
+@startuml
+class OpenZitiIdentity {
+    -get_token() : anyhow::Result<String>
+    +new(service: &str:Any, identity_file: &str:Any) : Self
+    -service_name() : String
+}
+ZitiIdentity <|-- OpenZitiIdentity : extends/implements
+interface ZitiIdentity {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as ZitiService
-    Caller->>Svc: get_token()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "ZitiService" as Svc
+Caller -> Svc: get_token()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -139,6 +126,7 @@ sequenceDiagram
 // Example usage of ziti.rs components
 import { ... } from 'crates/factory-infrastructure/src/ziti.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

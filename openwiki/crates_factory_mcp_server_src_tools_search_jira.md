@@ -4,7 +4,7 @@ title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: search_jira.rs
@@ -41,14 +41,7 @@ Provides implementation for search_jira.rs.
 #### ManualMockJiraClient
 
 **Overview:**
-Why it exists:
-Provides capabilities related to ManualMockJiraClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -69,14 +62,7 @@ None.
 #### SearchJiraTool
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SearchJiraTool.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -106,36 +92,38 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ManualMockJiraClient {
-        -search_issues(_query: &str:Any) anyhow::Result<String>
-    }
-    JiraClient <|-- ManualMockJiraClient : Inheritance / Specialization
-    class SearchJiraTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new(jira_client: Arc<dyn JiraClient>:Any) Self
-    }
-    Tool <|-- SearchJiraTool : Inheritance / Specialization
+```plantuml
+@startuml
+class ManualMockJiraClient {
+    -search_issues(_query: &str:Any) : anyhow::Result<String>
+}
+JiraClient <|-- ManualMockJiraClient : extends/implements
+class SearchJiraTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(jira_client: Arc<dyn JiraClient>:Any) : Self
+}
+Tool <|-- SearchJiraTool : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Search_jiraService
-    Caller->>Svc: search_issues()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Search_jiraService" as Svc
+Caller -> Svc: search_issues()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -143,6 +131,7 @@ sequenceDiagram
 // Example usage of search_jira.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/search_jira.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

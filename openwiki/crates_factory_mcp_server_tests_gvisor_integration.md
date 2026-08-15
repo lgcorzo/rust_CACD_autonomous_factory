@@ -4,7 +4,7 @@ title: "gvisor_integration.rs"
 source_path: "crates/factory-mcp-server/tests/gvisor_integration.rs"
 description: "Detailed documentation for gvisor_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: gvisor_integration.rs
@@ -47,26 +47,28 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class EmptyModule {
-    }
+```plantuml
+@startuml
+class EmptyModule {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Gvisor_integrationService
-    Caller->>Svc: test_gvisor_k8s_driver_live_connection()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Gvisor_integrationService" as Svc
+Caller -> Svc: test_gvisor_k8s_driver_live_connection()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -74,6 +76,7 @@ sequenceDiagram
 // Example usage of gvisor_integration.rs components
 import { ... } from 'crates/factory-mcp-server/tests/gvisor_integration.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/tests`

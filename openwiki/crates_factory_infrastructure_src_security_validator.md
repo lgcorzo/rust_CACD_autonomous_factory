@@ -4,7 +4,7 @@ title: "security_validator.rs"
 source_path: "crates/factory-infrastructure/src/security_validator.rs"
 description: "Detailed documentation for security_validator.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: security_validator.rs
@@ -41,14 +41,7 @@ Provides implementation for security_validator.rs.
 #### Ed25519Validator
 
 **Overview:**
-Why it exists:
-Provides capabilities related to Ed25519Validator.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -77,30 +70,32 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class Ed25519Validator {
-        -audit_content(content: &str:Any) factory_core::error::Result<AuditResult>
-        +new(public_key_bytes: &[u8]:Any, mcp_client: Option<Arc<dyn McpClient>>:Any) anyhow::Result<Self>
-        -validate_signature(data: &[u8]:Any, signature_hex: &str:Any) factory_core::error::Result<bool>
-    }
-    SecurityValidator <|-- Ed25519Validator : Inheritance / Specialization
+```plantuml
+@startuml
+class Ed25519Validator {
+    -audit_content(content: &str:Any) : factory_core::error::Result<AuditResult>
+    +new(public_key_bytes: &[u8]:Any, mcp_client: Option<Arc<dyn McpClient>>:Any) : anyhow::Result<Self>
+    -validate_signature(data: &[u8]:Any, signature_hex: &str:Any) : factory_core::error::Result<bool>
+}
+SecurityValidator <|-- Ed25519Validator : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Security_validatorService
-    Caller->>Svc: audit_content()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Security_validatorService" as Svc
+Caller -> Svc: audit_content()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -108,6 +103,7 @@ sequenceDiagram
 // Example usage of security_validator.rs components
 import { ... } from 'crates/factory-infrastructure/src/security_validator.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

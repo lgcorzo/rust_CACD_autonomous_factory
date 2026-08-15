@@ -6,6 +6,30 @@ import subprocess
 import shutil
 from datetime import datetime, timezone
 
+def generate_ai_description(entity_name, file_name, entity_type):
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        return "No description provided."
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        prompt = f"Write a clear, concise natural language description for the {entity_type} named '{entity_name}' in the file '{file_name}'. Explain its purpose and intent based on its name."
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a technical documentation assistant. Provide only the description, without quotes or conversational filler."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=150
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error generating AI description: {e}", file=sys.stderr)
+        return "No description provided."
+
+
 def parse_file(filepath):
     if filepath.endswith('.rs'):
         cmd = ['python3', 'parse_rust.py', filepath]
@@ -13,6 +37,16 @@ def parse_file(filepath):
         cmd = ['python3', 'parse_python.py', filepath]
     elif filepath.endswith(('.ts', '.tsx', '.js', '.jsx')):
         cmd = ['python3', 'parse_ts.py', filepath]
+    elif filepath.endswith('.java'):
+        cmd = ['python3', 'parse_java.py', filepath]
+    elif filepath.endswith('.cs'):
+        cmd = ['python3', 'parse_csharp.py', filepath]
+    elif filepath.endswith('.c'):
+        cmd = ['python3', 'parse_c.py', filepath]
+    elif filepath.endswith('.cpp'):
+        cmd = ['python3', 'parse_cpp.py', filepath]
+    elif filepath.endswith('.go'):
+        cmd = ['python3', 'parse_go.py', filepath]
     else:
         return {"classes": [], "free_functions": [], "dependencies": []}
 
@@ -24,38 +58,38 @@ def parse_file(filepath):
         return {"classes": [], "free_functions": [], "dependencies": []}
 
 
-def generate_mermaid_classes(classes):
-    mermaid = "classDiagram\n    direction BT\n"
+def generate_plantuml_classes(classes):
+    puml = "@startuml\n"
     if not classes:
-        return mermaid + "    class EmptyModule {\n    }\n"
+        return puml + "class EmptyModule {\n}\n@enduml\n"
 
     for c in classes:
         kind = c.get('kind', 'class')
         if kind == 'trait' or kind == 'interface':
-            mermaid += f"    class {c['name']} {{\n        <<{kind}>>\n"
+            puml += f"interface {c['name']} {{\n"
         elif kind == 'enum':
-            mermaid += f"    class {c['name']} {{\n        <<enumeration>>\n"
+            puml += f"enum {c['name']} {{\n"
         else:
-            mermaid += f"    class {c['name']} {{\n"
+            puml += f"class {c['name']} {{\n"
 
         for m in c.get('methods', []):
             visibility = "+" if m.get('is_pub', True) else "-"
             args_str = ", ".join([f"{a['name']}:{a['type']}" for a in m.get('args', [])])
             ret_type = m.get('ret_type', 'None').strip()
-            # Mermaid doesn't like some characters, so we just use the name
-            mermaid += f"        {visibility}{m['name']}({args_str}) {ret_type}\n"
+            puml += f"    {visibility}{m['name']}({args_str}) : {ret_type}\n"
 
-        mermaid += "    }\n"
+        puml += "}\n"
 
         for impl in c.get('implements', []):
-            mermaid += f"    {impl} <|-- {c['name']} : Inheritance / Specialization\n"
+            puml += f"{impl} <|-- {c['name']} : extends/implements\n"
 
-    return mermaid
+    puml += "@enduml\n"
+    return puml
 
-def generate_sequence_diagram(module_name, classes, free_functions):
-    seq = "sequenceDiagram\n    autonumber\n    participant Caller as Client Interface\n"
+def generate_plantuml_sequence(module_name, classes, free_functions):
+    seq = "@startuml\nautonumber\nparticipant \"Client Interface\" as Caller\n"
     svc_name = module_name.capitalize() + "Service"
-    seq += f"    participant Svc as {svc_name}\n"
+    seq += f"participant \"{svc_name}\" as Svc\n"
 
     method_name = "execute"
     if classes and classes[0].get('methods'):
@@ -63,8 +97,9 @@ def generate_sequence_diagram(module_name, classes, free_functions):
     elif free_functions:
         method_name = free_functions[0]['name']
 
-    seq += f"    Caller->>Svc: {method_name}()\n"
-    seq += "    Note over Svc: Processing internal logic\n    Svc-->>Caller: result\n"
+    seq += f"Caller -> Svc: {method_name}()\n"
+    seq += "note right of Svc: Processing internal logic\nSvc --> Caller: result\n"
+    seq += "@enduml\n"
     return seq
 
 
@@ -84,8 +119,8 @@ def write_file_doc(file_path, parsed, now):
 
     parsed['classes'].sort(key=lambda x: x['name'])
     parsed['free_functions'].sort(key=lambda x: x['name'])
-    mermaid_classes = generate_mermaid_classes(parsed['classes'])
-    seq_diagram = generate_sequence_diagram(base_name, parsed['classes'], parsed['free_functions'])
+    plantuml_classes = generate_plantuml_classes(parsed['classes'])
+    seq_diagram = generate_plantuml_sequence(base_name, parsed['classes'], parsed['free_functions'])
 
     deps_str = ", ".join(sorted(parsed['dependencies'])) if parsed['dependencies'] else "None"
 
@@ -147,7 +182,7 @@ Provides implementation for {file_name}.
     for c in parsed['classes']:
         doc = c.get('doc', '').strip()
         if not doc:
-            doc = f"Why it exists:\nProvides capabilities related to {c['name']}.\n\nWhat business capability it provides:\nSupports core domain concepts.\n\nHow it collaborates with other classes:\nWorks with related entities to process logic."
+            doc = generate_ai_description(c['name'], file_name, "class")
 
         content += f"#### {c['name']}\n\n"
         content += f"**Overview:**\n{doc}\n\n"
@@ -177,7 +212,9 @@ Provides implementation for {file_name}.
         public_methods = [m for m in c.get('methods', []) if m.get('is_pub', True) and not m.get('is_constructor')]
         if public_methods:
             for m in public_methods:
-                mdoc = m.get('doc', '').strip() or f"Executes {m['name']}."
+                mdoc = m.get('doc', '').strip()
+                if not mdoc:
+                    mdoc = generate_ai_description(m['name'], file_name, "method")
                 args_str = ", ".join([f"{a['name']} ({a['type']})" for a in m.get('args', [])])
                 ret_type = m.get('ret_type', 'None')
                 content += f"##### `{m['name']}({args_str}) -> {ret_type}`\n\n"
@@ -220,7 +257,9 @@ Provides implementation for {file_name}.
     for f in parsed['free_functions']:
         if f.get('is_pub', True):
             has_funcs = True
-            fdoc = f.get('doc', '').strip() or f"Executes {f['name']}."
+            fdoc = f.get('doc', '').strip()
+            if not fdoc:
+                fdoc = generate_ai_description(f['name'], file_name, "function")
             args_str = ", ".join([f"{a['name']} ({a['type']})" for a in f.get('args', [])])
             ret_type = f.get('ret_type', 'None')
             content += f"#### `{f['name']}({args_str}) -> {ret_type}`\n"
@@ -231,13 +270,13 @@ Provides implementation for {file_name}.
 
     content += f"""## Internal architecture
 
-```mermaid
-{mermaid_classes}
+```plantuml
+{plantuml_classes}
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
+```plantuml
 {seq_diagram}
 ```
 
@@ -344,7 +383,7 @@ def main():
             if any(ignored in parts for ignored in ['.git', '.github', '.vscode', '.idea', 'node_modules', 'dist', 'bin', 'obj', 'target', 'coverage', '__pycache__', 'openwiki']):
                 continue
             for f in files:
-                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx')):
+                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx', '.java', '.cs', '.c', '.cpp', '.go')):
                     files_to_process.append(os.path.normpath(os.path.join(clean_root, f)))
     else:
         setup_okf_structure()
@@ -362,7 +401,7 @@ def main():
             for f in output.splitlines():
                 f = f.strip()
                 if not f: continue
-                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx')):
+                if f.endswith(('.rs', '.py', '.ts', '.js', '.tsx', '.jsx', '.java', '.cs', '.c', '.cpp', '.go')):
                     if os.path.exists(f):
                         files_to_process.append(f)
                     else:
@@ -395,8 +434,12 @@ def main():
     validate_links()
 
 def validate_links():
-    import glob
-    files = glob.glob('openwiki/**/*.md', recursive=True)
+    files = []
+    for root, _, filenames in os.walk('openwiki'):
+        for filename in filenames:
+            if filename.endswith('.md'):
+                files.append(os.path.join(root, filename))
+
     all_pages = set()
     for f in files:
         basename = os.path.basename(f)

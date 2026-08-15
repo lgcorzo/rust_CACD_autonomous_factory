@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-core/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: security_tests.rs
@@ -41,14 +41,7 @@ Provides implementation for security_tests.rs.
 #### DummyBounds
 
 **Overview:**
-Why it exists:
-Provides capabilities related to DummyBounds.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -73,29 +66,31 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class DummyBounds {
-        -issue_jit_token(_aud: &str:Any) Result<JitToken>
-        -validate_token(_token: &JitToken:Any) Result<bool>
-    }
-    SecurityBounds <|-- DummyBounds : Inheritance / Specialization
+```plantuml
+@startuml
+class DummyBounds {
+    -issue_jit_token(_aud: &str:Any) : Result<JitToken>
+    -validate_token(_token: &JitToken:Any) : Result<bool>
+}
+SecurityBounds <|-- DummyBounds : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Security_testsService
-    Caller->>Svc: issue_jit_token()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Security_testsService" as Svc
+Caller -> Svc: issue_jit_token()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -103,6 +98,7 @@ sequenceDiagram
 // Example usage of security_tests.rs components
 import { ... } from 'crates/factory-core/tests/security_tests.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/tests`

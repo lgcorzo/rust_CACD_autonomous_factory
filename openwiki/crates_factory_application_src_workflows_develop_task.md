@@ -4,7 +4,7 @@ title: "develop_task.rs"
 source_path: "crates/factory-application/src/workflows/develop_task.rs"
 description: "Detailed documentation for develop_task.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: develop_task.rs
@@ -41,14 +41,7 @@ Provides implementation for develop_task.rs.
 #### TaskInput
 
 **Overview:**
-Why it exists:
-Provides capabilities related to TaskInput.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -71,14 +64,7 @@ None.
 #### TaskOutput
 
 **Overview:**
-Why it exists:
-Provides capabilities related to TaskOutput.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -99,32 +85,34 @@ None.
 ### Exported Functions
 
 #### `create_develop_task_workflow(hatchet: &Hatchet (Any), mcp_url: String (Any)) -> Task<TaskInput, TaskOutput>`
-Executes create_develop_task_workflow.
+No description provided.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class TaskInput {
-    }
-    class TaskOutput {
-    }
+```plantuml
+@startuml
+class TaskInput {
+}
+class TaskOutput {
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Develop_taskService
-    Caller->>Svc: create_develop_task_workflow()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Develop_taskService" as Svc
+Caller -> Svc: create_develop_task_workflow()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -132,6 +120,7 @@ sequenceDiagram
 // Example usage of develop_task.rs components
 import { ... } from 'crates/factory-application/src/workflows/develop_task.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

@@ -4,7 +4,7 @@ title: "s3.rs"
 source_path: "crates/factory-infrastructure/src/s3.rs"
 description: "Detailed documentation for s3.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: s3.rs
@@ -41,14 +41,7 @@ Provides implementation for s3.rs.
 #### AwsS3Storage
 
 **Overview:**
-Why it exists:
-Provides capabilities related to AwsS3Storage.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -68,6 +61,8 @@ None.
 **Private Methods:**
 
 * `get_object(bucket: &str (Any), key: &str (Any)) -> anyhow::Result<Vec<u8>>`: Internal helper logic.
+* `list_buckets() -> anyhow::Result<Vec<String>>`: Internal helper logic.
+* `list_objects(bucket: &str (Any), prefix: Option<String> (Any)) -> anyhow::Result<Vec<String>>`: Internal helper logic.
 * `put_object(bucket: &str (Any), key: &str (Any), data: Vec<u8> (Any)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
@@ -76,30 +71,34 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class AwsS3Storage {
-        -get_object(bucket: &str:Any, key: &str:Any) anyhow::Result<Vec<u8>>
-        +new() Self
-        -put_object(bucket: &str:Any, key: &str:Any, data: Vec<u8>:Any) anyhow::Result<()>
-    }
-    S3Storage <|-- AwsS3Storage : Inheritance / Specialization
+```plantuml
+@startuml
+class AwsS3Storage {
+    -get_object(bucket: &str:Any, key: &str:Any) : anyhow::Result<Vec<u8>>
+    -list_buckets() : anyhow::Result<Vec<String>>
+    -list_objects(bucket: &str:Any, prefix: Option<String>:Any) : anyhow::Result<Vec<String>>
+    +new() : Self
+    -put_object(bucket: &str:Any, key: &str:Any, data: Vec<u8>:Any) : anyhow::Result<()>
+}
+S3Storage <|-- AwsS3Storage : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as S3Service
-    Caller->>Svc: get_object()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "S3Service" as Svc
+Caller -> Svc: get_object()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -107,6 +106,7 @@ sequenceDiagram
 // Example usage of s3.rs components
 import { ... } from 'crates/factory-infrastructure/src/s3.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

@@ -4,7 +4,7 @@ title: "retrieve_context.rs"
 source_path: "crates/factory-mcp-server/src/tools/retrieve_context.rs"
 description: "Detailed documentation for retrieve_context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: retrieve_context.rs
@@ -41,14 +41,7 @@ Provides implementation for retrieve_context.rs.
 #### ManualMockR2rClient
 
 **Overview:**
-Why it exists:
-Provides capabilities related to ManualMockR2rClient.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -64,20 +57,14 @@ None.
 
 **Private Methods:**
 
+* `map_stacktrace_to_ast(query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
 * `push_osr_metric(_metric: &factory_core::OsrMetric (Any)) -> anyhow::Result<()>`: Internal helper logic.
 * `search(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### RetrieveContextTool
 
 **Overview:**
-Why it exists:
-Provides capabilities related to RetrieveContextTool.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -107,37 +94,40 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ManualMockR2rClient {
-        -push_osr_metric(_metric: &factory_core::OsrMetric:Any) anyhow::Result<()>
-        -search(_query: &str:Any) anyhow::Result<String>
-    }
-    R2rClient <|-- ManualMockR2rClient : Inheritance / Specialization
-    class RetrieveContextTool {
-        -call(params: Value:Any) anyhow::Result<CallToolResult>
-        -description() String
-        -input_schema() Value
-        -name() String
-        +new(r2r_client: Arc<dyn R2rClient>:Any) Self
-    }
-    Tool <|-- RetrieveContextTool : Inheritance / Specialization
+```plantuml
+@startuml
+class ManualMockR2rClient {
+    -map_stacktrace_to_ast(query: &str:Any) : anyhow::Result<String>
+    -push_osr_metric(_metric: &factory_core::OsrMetric:Any) : anyhow::Result<()>
+    -search(_query: &str:Any) : anyhow::Result<String>
+}
+R2rClient <|-- ManualMockR2rClient : extends/implements
+class RetrieveContextTool {
+    -call(params: Value:Any) : anyhow::Result<CallToolResult>
+    -description() : String
+    -input_schema() : Value
+    -name() : String
+    +new(r2r_client: Arc<dyn R2rClient>:Any) : Self
+}
+Tool <|-- RetrieveContextTool : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Retrieve_contextService
-    Caller->>Svc: push_osr_metric()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Retrieve_contextService" as Svc
+Caller -> Svc: map_stacktrace_to_ast()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -145,6 +135,7 @@ sequenceDiagram
 // Example usage of retrieve_context.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/retrieve_context.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

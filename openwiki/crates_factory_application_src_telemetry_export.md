@@ -4,7 +4,7 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: telemetry_export.rs
@@ -41,14 +41,7 @@ Provides implementation for telemetry_export.rs.
 #### TelemetryExporter
 
 **Overview:**
-Why it exists:
-Provides capabilities related to TelemetryExporter.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -105,29 +98,31 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class TelemetryExporter {
-        +new(kafka_brokers: String:Any, openwebui_db_url: String:Any) Self
-        -push_to_openwebui(thought: &Value:Any) anyhow::Result<()>
-        +start_export_loop(self: Arc<Self>:Any) anyhow::Result<()>
-    }
+```plantuml
+@startuml
+class TelemetryExporter {
+    +new(kafka_brokers: String:Any, openwebui_db_url: String:Any) : Self
+    -push_to_openwebui(thought: &Value:Any) : anyhow::Result<()>
+    +start_export_loop(self: Arc<Self>:Any) : anyhow::Result<()>
+}
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Telemetry_exportService
-    Caller->>Svc: new()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Telemetry_exportService" as Svc
+Caller -> Svc: new()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -135,6 +130,7 @@ sequenceDiagram
 // Example usage of telemetry_export.rs components
 import { ... } from 'crates/factory-application/src/telemetry_export.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

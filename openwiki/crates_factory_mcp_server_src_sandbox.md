@@ -4,7 +4,7 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: sandbox.rs
@@ -41,14 +41,7 @@ Provides implementation for sandbox.rs.
 #### ExecutionResult
 
 **Overview:**
-Why it exists:
-Provides capabilities related to ExecutionResult.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -72,14 +65,7 @@ None.
 #### GvisorK8sDriver
 
 **Overview:**
-Why it exists:
-Provides capabilities related to GvisorK8sDriver.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -100,14 +86,7 @@ None.
 #### NativeSurgerySandboxDriver
 
 **Overview:**
-Why it exists:
-Provides capabilities related to NativeSurgerySandboxDriver.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -129,14 +108,7 @@ None.
 #### SandboxDriver
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SandboxDriver.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -157,14 +129,7 @@ None.
 #### SandboxMode
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SandboxMode.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -185,14 +150,7 @@ None.
 #### SubprocessDriver
 
 **Overview:**
-Why it exists:
-Provides capabilities related to SubprocessDriver.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -216,45 +174,45 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class ExecutionResult {
-    }
-    class GvisorK8sDriver {
-        -execute(code: &str:Any, language: &str:Any) anyhow::Result<ExecutionResult>
-    }
-    SandboxDriver <|-- GvisorK8sDriver : Inheritance / Specialization
-    class NativeSurgerySandboxDriver {
-        -execute(_code: &str:Any, _language: &str:Any) anyhow::Result<ExecutionResult>
-        -execute_surgery(id: &str:Any, patch: &factory_core::executor::SurgicalPatch:Any) factory_core::error::Result<factory_core::executor::ExecutionResult>
-    }
-    SandboxDriver <|-- NativeSurgerySandboxDriver : Inheritance / Specialization
-    class SandboxDriver {
-        <<trait>>
-    }
-    class SandboxMode {
-        <<enumeration>>
-    }
-    class SubprocessDriver {
-        -execute(code: &str:Any, language: &str:Any) anyhow::Result<ExecutionResult>
-    }
-    SandboxDriver <|-- SubprocessDriver : Inheritance / Specialization
+```plantuml
+@startuml
+class ExecutionResult {
+}
+class GvisorK8sDriver {
+    -execute(code: &str:Any, language: &str:Any) : anyhow::Result<ExecutionResult>
+}
+SandboxDriver <|-- GvisorK8sDriver : extends/implements
+class NativeSurgerySandboxDriver {
+    -execute(_code: &str:Any, _language: &str:Any) : anyhow::Result<ExecutionResult>
+    -execute_surgery(id: &str:Any, patch: &factory_core::executor::SurgicalPatch:Any) : factory_core::error::Result<factory_core::executor::ExecutionResult>
+}
+SandboxDriver <|-- NativeSurgerySandboxDriver : extends/implements
+interface SandboxDriver {
+}
+enum SandboxMode {
+}
+class SubprocessDriver {
+    -execute(code: &str:Any, language: &str:Any) : anyhow::Result<ExecutionResult>
+}
+SandboxDriver <|-- SubprocessDriver : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as SandboxService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "SandboxService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -262,6 +220,7 @@ sequenceDiagram
 // Example usage of sandbox.rs components
 import { ... } from 'crates/factory-mcp-server/src/sandbox.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

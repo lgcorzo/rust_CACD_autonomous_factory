@@ -4,7 +4,7 @@ title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Detailed documentation for doc_agent.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: doc_agent.rs
@@ -41,14 +41,7 @@ Provides implementation for doc_agent.rs.
 #### DocumentationAgent
 
 **Overview:**
-Why it exists:
-Provides capabilities related to DocumentationAgent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -68,7 +61,7 @@ Initialization: Sets up DocumentationAgent
 ##### `extract_code_deltas(commit_sha: &str (Any)) -> anyhow::Result<String>`
 
 ###### Description
-Executes extract_code_deltas.
+No description provided.
 
 ###### Inputs
 * `commit_sha: &str`: type=Any, meaning=Input for commit_sha: &str, valid values=Any valid Any, optional=No, default value=None
@@ -98,7 +91,7 @@ let result = instance.extract_code_deltas();
 ##### `generate_hazitek_report(mission_id: &str (Any)) -> anyhow::Result<factory_core::ComplianceReport>`
 
 ###### Description
-Executes generate_hazitek_report.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -128,7 +121,7 @@ let result = instance.generate_hazitek_report();
 ##### `run_post_merge_pipeline(mission_id: &str (Any)) -> anyhow::Result<Value>`
 
 ###### Description
-Executes run_post_merge_pipeline.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -167,34 +160,36 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class DocumentationAgent {
-        -execute(task_description: &str:Any) anyhow::Result<Value>
-        +extract_code_deltas(commit_sha: &str:Any) anyhow::Result<String>
-        +generate_hazitek_report(mission_id: &str:Any) anyhow::Result<factory_core::ComplianceReport>
-        -name() String
-        +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any, superpowers_skills_root: std::path::PathBuf:Any) Self
-        +run_post_merge_pipeline(mission_id: &str:Any) anyhow::Result<Value>
-        -verify_osr() anyhow::Result<f32>
-    }
-    Agent <|-- DocumentationAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class DocumentationAgent {
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    +extract_code_deltas(commit_sha: &str:Any) : anyhow::Result<String>
+    +generate_hazitek_report(mission_id: &str:Any) : anyhow::Result<factory_core::ComplianceReport>
+    -name() : String
+    +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any, superpowers_skills_root: std::path::PathBuf:Any) : Self
+    +run_post_merge_pipeline(mission_id: &str:Any) : anyhow::Result<Value>
+    -verify_osr() : anyhow::Result<f32>
+}
+Agent <|-- DocumentationAgent : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as Doc_agentService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Doc_agentService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -202,6 +197,7 @@ sequenceDiagram
 // Example usage of doc_agent.rs components
 import { ... } from 'crates/factory-application/src/agents/doc_agent.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

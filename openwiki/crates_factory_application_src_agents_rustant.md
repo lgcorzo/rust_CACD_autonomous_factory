@@ -4,7 +4,7 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "1358b47"
+last_verified_commit: "9c1db1c"
 ---
 
 # File: rustant.rs
@@ -41,14 +41,7 @@ Provides implementation for rustant.rs.
 #### RustantAgent
 
 **Overview:**
-Why it exists:
-Provides capabilities related to RustantAgent.
-
-What business capability it provides:
-Supports core domain concepts.
-
-How it collaborates with other classes:
-Works with related entities to process logic.
+No description provided.
 
 **Constructor:**
 
@@ -67,7 +60,7 @@ Initialization: Sets up RustantAgent
 ##### `plan_mission(mission_id: &str (Any), goal: &str (Any)) -> anyhow::Result<Value>`
 
 ###### Description
-Executes plan_mission.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -98,7 +91,7 @@ let result = instance.plan_mission();
 ##### `review_mission(mission_id: &str (Any), mission_results: &str (Any)) -> anyhow::Result<Value>`
 
 ###### Description
-Executes review_mission.
+No description provided.
 
 ###### Inputs
 * `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
@@ -137,32 +130,34 @@ None.
 
 ## Internal architecture
 
-```mermaid
-classDiagram
-    direction BT
-    class RustantAgent {
-        -execute(task_description: &str:Any) anyhow::Result<Value>
-        -name() String
-        +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any) Self
-        +plan_mission(mission_id: &str:Any, goal: &str:Any) anyhow::Result<Value>
-        +review_mission(mission_id: &str:Any, mission_results: &str:Any) anyhow::Result<Value>
-    }
-    Agent <|-- RustantAgent : Inheritance / Specialization
+```plantuml
+@startuml
+class RustantAgent {
+    -execute(task_description: &str:Any) : anyhow::Result<Value>
+    -name() : String
+    +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any) : Self
+    +plan_mission(mission_id: &str:Any, goal: &str:Any) : anyhow::Result<Value>
+    +review_mission(mission_id: &str:Any, mission_results: &str:Any) : anyhow::Result<Value>
+}
+Agent <|-- RustantAgent : extends/implements
+@enduml
 
 ```
 
 ## Execution flow & Sequence explanation
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Caller as Client Interface
-    participant Svc as RustantService
-    Caller->>Svc: execute()
-    Note over Svc: Processing internal logic
-    Svc-->>Caller: result
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "RustantService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
 
 ```
+
 
 ## Examples
 
@@ -170,6 +165,7 @@ sequenceDiagram
 // Example usage of rustant.rs components
 import { ... } from 'crates/factory-application/src/agents/rustant.rs';
 ```
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`
