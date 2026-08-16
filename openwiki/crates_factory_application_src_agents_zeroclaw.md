@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: zeroclaw.rs
@@ -190,14 +190,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of zeroclaw.rs components
 import { ... } from 'crates/factory-application/src/agents/zeroclaw.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

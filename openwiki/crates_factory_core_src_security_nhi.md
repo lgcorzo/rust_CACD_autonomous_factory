@@ -4,7 +4,7 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Detailed documentation for nhi.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: nhi.rs
@@ -244,14 +244,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of nhi.rs components
 import { ... } from 'crates/factory-core/src/security/nhi.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src/security`

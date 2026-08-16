@@ -4,7 +4,7 @@ title: "list_minio_buckets.rs"
 source_path: "crates/factory-mcp-server/src/tools/list_minio_buckets.rs"
 description: "Detailed documentation for list_minio_buckets.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: list_minio_buckets.rs
@@ -102,14 +102,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of list_minio_buckets.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/list_minio_buckets.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

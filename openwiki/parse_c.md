@@ -4,7 +4,7 @@ title: "parse_c.py"
 source_path: "parse_c.py"
 description: "Detailed documentation for parse_c.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: parse_c.py
@@ -20,7 +20,7 @@ Provides implementation for parse_c.py.
 * Handles logic related to parse_c.
 
 ### Dependencies
-* json, sys, tree_sitter, tree_sitter_c
+* json, os, sys, tree_sitter, tree_sitter_c
 
 ### Imported modules
 * None
@@ -32,13 +32,16 @@ Provides implementation for parse_c.py.
 * None
 
 ### Exported functions
-* parse_c
+* get_node_text, parse_c
 
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
 
 ### Exported Functions
+
+#### `get_node_text(node (Any), source_bytes (Any)) -> None`
+No description provided.
 
 #### `parse_c(filepath (Any)) -> None`
 No description provided.
@@ -60,7 +63,7 @@ class EmptyModule {
 autonumber
 participant "Client Interface" as Caller
 participant "Parse_cService" as Svc
-Caller -> Svc: parse_c()
+Caller -> Svc: get_node_text()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml
@@ -76,4 +79,4 @@ import { ... } from 'parse_c.py';
 
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** json, sys, tree_sitter, tree_sitter_c
+* **Dependencies:** json, os, sys, tree_sitter, tree_sitter_c

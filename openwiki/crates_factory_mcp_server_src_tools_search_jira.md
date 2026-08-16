@@ -4,7 +4,7 @@ title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: search_jira.rs
@@ -124,14 +124,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of search_jira.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/search_jira.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
