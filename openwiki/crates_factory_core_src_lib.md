@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: lib.rs
@@ -26,7 +26,7 @@ Provides implementation for lib.rs.
 * None
 
 ### Exported classes
-* CausalProvenanceNode, ComplianceReport, DailyBudgetConfig, FeatureImportances, FinOpsTag, Inputs, Metadata, Mission, OsrMetric, Outputs, SHAPValues, SentryCrashRecord, SpecArtifact, SpendVelocityAlert, Targets, Task, UserFeedbackPayload
+* CausalProvenanceNode, ComplianceReport, DailyBudgetConfig, FeatureImportances, FinOpsTag, Inputs, Metadata, Mission, OsrMetric, Outputs, PRCommentEvent, PolledIssueEvent, PollerSyncCursor, SHAPValues, SentryCrashRecord, SpecArtifact, SpendVelocityAlert, Targets, Task, UserFeedbackPayload
 
 ### Exported interfaces
 * None
@@ -115,7 +115,7 @@ None.
 #### FeatureImportances
 
 **Overview:**
-No description provided.
+/// Feature importance rankings.
 
 **Constructor:**
 
@@ -162,7 +162,7 @@ None.
 #### Inputs
 
 **Overview:**
-No description provided.
+/// Generic container for inputs.
 
 **Constructor:**
 
@@ -183,7 +183,7 @@ None.
 #### Metadata
 
 **Overview:**
-No description provided.
+/// Metadata for tracing and versioning.
 
 **Constructor:**
 
@@ -206,7 +206,7 @@ None.
 #### Mission
 
 **Overview:**
-No description provided.
+/// Representation of a mission in the factory.
 
 **Constructor:**
 
@@ -277,7 +277,7 @@ None.
 #### Outputs
 
 **Overview:**
-No description provided.
+/// Structured response from an agent or mission.
 
 **Constructor:**
 
@@ -296,10 +296,170 @@ None.
 
 None.
 
-#### SHAPValues
+#### PRCommentEvent
 
 **Overview:**
 No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `author` (String): Purpose - Stores author data. Constraints - Valid String.
+* `body` (String): Purpose - Stores body data. Constraints - Valid String.
+* `comment_id` (u64): Purpose - Stores comment_id data. Constraints - Valid u64.
+* `directive` (PRDirective): Purpose - Stores directive data. Constraints - Valid PRDirective.
+* `html_url` (String): Purpose - Stores html_url data. Constraints - Valid String.
+* `pr_number` (u64): Purpose - Stores pr_number data. Constraints - Valid u64.
+* `repository` (String): Purpose - Stores repository data. Constraints - Valid String.
+* `source_platform` (String): Purpose - Stores source_platform data. Constraints - Valid String.
+* `updated_at` (DateTime<Utc>): Purpose - Stores updated_at data. Constraints - Valid DateTime<Utc>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### PRDirective
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+##### `parse(text: &str (Any)) -> Option<Self>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `text: &str`: type=Any, meaning=Input for text: &str, valid values=Any valid Any, optional=No, default value=None
+
+###### Output
+Return type: Option<Self>
+Semantic meaning: Result of parse
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.parse();
+```
+
+**Private Methods:**
+
+None.
+
+#### PolledIssueEvent
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `body` (String): Purpose - Stores body data. Constraints - Valid String.
+* `html_url` (String): Purpose - Stores html_url data. Constraints - Valid String.
+* `issue_id` (u64): Purpose - Stores issue_id data. Constraints - Valid u64.
+* `issue_number` (u64): Purpose - Stores issue_number data. Constraints - Valid u64.
+* `labels` (Vec<String>): Purpose - Stores labels data. Constraints - Valid Vec<String>.
+* `repository` (String): Purpose - Stores repository data. Constraints - Valid String.
+* `resource_limits` (Option<String>): Purpose - Stores resource_limits data. Constraints - Valid Option<String>.
+* `source_platform` (String): Purpose - Stores source_platform data. Constraints - Valid String.
+* `title` (String): Purpose - Stores title data. Constraints - Valid String.
+* `updated_at` (DateTime<Utc>): Purpose - Stores updated_at data. Constraints - Valid DateTime<Utc>.
+
+**Public Methods:**
+
+##### `extract_resource_limits(body: &str (Any)) -> Option<String>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `body: &str`: type=Any, meaning=Input for body: &str, valid values=Any valid Any, optional=No, default value=None
+
+###### Output
+Return type: Option<String>
+Semantic meaning: Result of extract_resource_limits
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.extract_resource_limits();
+```
+
+**Private Methods:**
+
+None.
+
+#### PollerSyncCursor
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `last_polled_at` (DateTime<Utc>): Purpose - Stores last_polled_at data. Constraints - Valid DateTime<Utc>.
+* `last_processed_id` (u64): Purpose - Stores last_processed_id data. Constraints - Valid u64.
+* `processed_hashes` (Vec<String>): Purpose - Stores processed_hashes data. Constraints - Valid Vec<String>.
+* `source_key` (String): Purpose - Stores source_key data. Constraints - Valid String.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### SHAPValues
+
+**Overview:**
+/// Explanation results (SHAP).
 
 **Constructor:**
 
@@ -393,7 +553,7 @@ None.
 #### Targets
 
 **Overview:**
-No description provided.
+/// Target/Ground truth for training or evaluation.
 
 **Constructor:**
 
@@ -415,7 +575,7 @@ None.
 #### Task
 
 **Overview:**
-No description provided.
+/// Individual unit of work within a mission.
 
 **Constructor:**
 
@@ -516,6 +676,16 @@ class OsrMetric {
 }
 class Outputs {
 }
+class PRCommentEvent {
+}
+enum PRDirective {
+    +parse(text: &str:Any) : Option<Self>
+}
+class PolledIssueEvent {
+    +extract_resource_limits(body: &str:Any) : Option<String>
+}
+class PollerSyncCursor {
+}
 class SHAPValues {
 }
 class SentryCrashRecord {
@@ -550,14 +720,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of lib.rs components
 import { ... } from 'crates/factory-core/src/lib.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

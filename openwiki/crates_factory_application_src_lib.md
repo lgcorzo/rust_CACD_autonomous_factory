@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: lib.rs
@@ -20,7 +20,7 @@ Provides implementation for lib.rs.
 * Handles logic related to lib.
 
 ### Dependencies
-* async_trait::async_trait, serde_json::Value
+* async_trait::async_trait, pub poller_service::{PollerCycleStats, PollerDaemonService}, serde_json::Value
 
 ### Imported modules
 * None
@@ -87,7 +87,6 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
@@ -95,7 +94,6 @@ Svc --> Caller: result
 import { ... } from 'crates/factory-application/src/lib.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-application/src`
-* **Dependencies:** async_trait::async_trait, serde_json::Value
+* **Dependencies:** async_trait::async_trait, pub poller_service::{PollerCycleStats, PollerDaemonService}, serde_json::Value

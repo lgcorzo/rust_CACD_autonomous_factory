@@ -4,7 +4,7 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: ziti.rs
@@ -119,14 +119,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of ziti.rs components
 import { ... } from 'crates/factory-infrastructure/src/ziti.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

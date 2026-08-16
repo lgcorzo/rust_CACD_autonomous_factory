@@ -4,7 +4,7 @@ title: "parse_csharp.py"
 source_path: "parse_csharp.py"
 description: "Detailed documentation for parse_csharp.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: parse_csharp.py
@@ -20,7 +20,7 @@ Provides implementation for parse_csharp.py.
 * Handles logic related to parse_csharp.
 
 ### Dependencies
-* json, sys, tree_sitter, tree_sitter_c_sharp
+* json, os, sys, tree_sitter, tree_sitter_c_sharp
 
 ### Imported modules
 * None
@@ -32,13 +32,16 @@ Provides implementation for parse_csharp.py.
 * None
 
 ### Exported functions
-* parse_csharp
+* get_node_text, parse_csharp
 
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
 
 ### Exported Functions
+
+#### `get_node_text(node (Any), source_bytes (Any)) -> None`
+No description provided.
 
 #### `parse_csharp(filepath (Any)) -> None`
 No description provided.
@@ -60,7 +63,7 @@ class EmptyModule {
 autonumber
 participant "Client Interface" as Caller
 participant "Parse_csharpService" as Svc
-Caller -> Svc: parse_csharp()
+Caller -> Svc: get_node_text()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml
@@ -76,4 +79,4 @@ import { ... } from 'parse_csharp.py';
 
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** json, sys, tree_sitter, tree_sitter_c_sharp
+* **Dependencies:** json, os, sys, tree_sitter, tree_sitter_c_sharp

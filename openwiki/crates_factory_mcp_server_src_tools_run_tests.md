@@ -4,7 +4,7 @@ title: "run_tests.rs"
 source_path: "crates/factory-mcp-server/src/tools/run_tests.rs"
 description: "Detailed documentation for run_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: run_tests.rs
@@ -99,14 +99,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of run_tests.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/run_tests.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

@@ -4,7 +4,7 @@ title: "kafka_integration.rs"
 source_path: "crates/factory-infrastructure/tests/kafka_integration.rs"
 description: "Detailed documentation for kafka_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: kafka_integration.rs
@@ -66,14 +66,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of kafka_integration.rs components
 import { ... } from 'crates/factory-infrastructure/tests/kafka_integration.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/tests`

@@ -4,7 +4,7 @@ title: "security_review.rs"
 source_path: "crates/factory-mcp-server/src/tools/security_review.rs"
 description: "Detailed documentation for security_review.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: security_review.rs
@@ -109,14 +109,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of security_review.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/security_review.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

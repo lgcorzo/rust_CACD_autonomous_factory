@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-cli/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: main.rs
@@ -20,7 +20,11 @@ Provides implementation for main.rs.
 * Handles logic related to main.
 
 ### Dependencies
-* clap::{Parser, Subcommand}, factory_infrastructure::r2r::R2rClient
+* clap::{Parser, Subcommand}, factory_application::poller_service::PollerDaemonService, factory_application::workflows::comment_control::CommentControlService, factory_infrastructure::r2r::R2rClient, factory_infrastructure::{
+                GitPlatformPoller, HttpAethalgardClient, HttpGithubClient, HttpGitlabClient,
+                HttpR2rClient, HttpSemanticaClient, InMemoryCursorStore, KafkaClient,
+                McpHttpClient, PostgresCursorStore,
+            }, std::sync::Arc
 
 ### Imported modules
 * None
@@ -110,7 +114,6 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
@@ -118,7 +121,10 @@ Svc --> Caller: result
 import { ... } from 'crates/factory-cli/src/main.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-cli/src`
-* **Dependencies:** clap::{Parser, Subcommand}, factory_infrastructure::r2r::R2rClient
+* **Dependencies:** clap::{Parser, Subcommand}, factory_application::poller_service::PollerDaemonService, factory_application::workflows::comment_control::CommentControlService, factory_infrastructure::r2r::R2rClient, factory_infrastructure::{
+                GitPlatformPoller, HttpAethalgardClient, HttpGithubClient, HttpGitlabClient,
+                HttpR2rClient, HttpSemanticaClient, InMemoryCursorStore, KafkaClient,
+                McpHttpClient, PostgresCursorStore,
+            }, std::sync::Arc

@@ -4,7 +4,7 @@ title: "gvisor_integration.rs"
 source_path: "crates/factory-mcp-server/tests/gvisor_integration.rs"
 description: "Detailed documentation for gvisor_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: gvisor_integration.rs
@@ -69,14 +69,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of gvisor_integration.rs components
 import { ... } from 'crates/factory-mcp-server/tests/gvisor_integration.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/tests`
