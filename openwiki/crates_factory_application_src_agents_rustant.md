@@ -4,7 +4,7 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: rustant.rs
@@ -158,14 +158,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of rustant.rs components
 import { ... } from 'crates/factory-application/src/agents/rustant.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

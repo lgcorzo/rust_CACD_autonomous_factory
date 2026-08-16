@@ -4,7 +4,7 @@ title: "deep_research.rs"
 source_path: "crates/factory-application/src/workflows/deep_research.rs"
 description: "Detailed documentation for deep_research.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: deep_research.rs
@@ -169,14 +169,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of deep_research.rs components
 import { ... } from 'crates/factory-application/src/workflows/deep_research.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

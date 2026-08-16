@@ -6,10 +6,10 @@ import subprocess
 import shutil
 from datetime import datetime, timezone
 
-def generate_ai_description(entity_name, file_name, entity_type):
+def generate_ai_description(entity_name, file_name, entity_type, original_doc=""):
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
-        return "No description provided."
+        return original_doc if original_doc else "No description provided."
 
     try:
         from openai import OpenAI
@@ -27,7 +27,7 @@ def generate_ai_description(entity_name, file_name, entity_type):
         return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"Error generating AI description: {e}", file=sys.stderr)
-        return "No description provided."
+        return original_doc if original_doc else "No description provided."
 
 
 def parse_file(filepath):
@@ -182,7 +182,7 @@ Provides implementation for {file_name}.
     for c in parsed['classes']:
         doc = c.get('doc', '').strip()
         if not doc:
-            doc = generate_ai_description(c['name'], file_name, "class")
+            doc = generate_ai_description(c['name'], file_name, "class", doc)
 
         content += f"#### {c['name']}\n\n"
         content += f"**Overview:**\n{doc}\n\n"
@@ -214,7 +214,7 @@ Provides implementation for {file_name}.
             for m in public_methods:
                 mdoc = m.get('doc', '').strip()
                 if not mdoc:
-                    mdoc = generate_ai_description(m['name'], file_name, "method")
+                    mdoc = generate_ai_description(m['name'], file_name, "method", mdoc)
                 args_str = ", ".join([f"{a['name']} ({a['type']})" for a in m.get('args', [])])
                 ret_type = m.get('ret_type', 'None')
                 content += f"##### `{m['name']}({args_str}) -> {ret_type}`\n\n"
@@ -259,7 +259,7 @@ Provides implementation for {file_name}.
             has_funcs = True
             fdoc = f.get('doc', '').strip()
             if not fdoc:
-                fdoc = generate_ai_description(f['name'], file_name, "function")
+                fdoc = generate_ai_description(f['name'], file_name, "function", fdoc)
             args_str = ", ".join([f"{a['name']} ({a['type']})" for a in f.get('args', [])])
             ret_type = f.get('ret_type', 'None')
             content += f"#### `{f['name']}({args_str}) -> {ret_type}`\n"

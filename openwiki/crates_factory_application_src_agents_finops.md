@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Detailed documentation for finops.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: finops.rs
@@ -130,14 +130,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of finops.rs components
 import { ... } from 'crates/factory-application/src/agents/finops.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

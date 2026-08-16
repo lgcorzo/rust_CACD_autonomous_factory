@@ -4,7 +4,7 @@ title: "semantica_bridge.rs"
 source_path: "crates/factory-application/src/bridge/semantica_bridge.rs"
 description: "Detailed documentation for semantica_bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: semantica_bridge.rs
@@ -120,14 +120,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of semantica_bridge.rs components
 import { ... } from 'crates/factory-application/src/bridge/semantica_bridge.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`

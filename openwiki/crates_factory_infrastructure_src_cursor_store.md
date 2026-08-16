@@ -1,0 +1,171 @@
+---
+type: "module-documentation"
+title: "cursor_store.rs"
+source_path: "crates/factory-infrastructure/src/cursor_store.rs"
+description: "Detailed documentation for cursor_store.rs"
+tags: ["documentation", "ast", "openwiki"]
+last_verified_commit: "e48839f"
+---
+
+# File: cursor_store.rs
+
+**Source Path:** `crates/factory-infrastructure/src/cursor_store.rs`
+
+## Overview
+
+### Purpose
+Provides implementation for cursor_store.rs.
+
+### Responsibilities
+* Handles logic related to cursor_store.
+
+### Dependencies
+* async_trait::async_trait, chrono::Utc, factory_core::PollerSyncCursor, std::collections::{HashMap, HashSet}, std::sync::Arc, super::*, tokio::sync::RwLock
+
+### Imported modules
+* None
+
+### Exported classes
+* InMemoryCursorStore, PostgresCursorStore
+
+### Exported interfaces
+* CursorStore
+
+### Exported functions
+* None
+
+## Public API
+
+### Exported Classes / Structs / Interfaces
+
+#### CursorStore
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+None.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### InMemoryCursorStore
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+##### `new()`
+Parameters:
+Dependencies: Inherited from context
+Initialization: Sets up InMemoryCursorStore
+
+**Attributes:**
+
+* `cursors` (Arc<RwLock<HashMap<String, PollerSyncCursor>>>): Purpose - Stores cursors data. Constraints - Valid Arc<RwLock<HashMap<String, PollerSyncCursor>>>.
+* `processed_events` (Arc<RwLock<HashMap<String, HashSet<String>>>>): Purpose - Stores processed_events data. Constraints - Valid Arc<RwLock<HashMap<String, HashSet<String>>>>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+* `get_cursor(source_key: &str (Any)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
+* `is_event_processed(source_key: &str (Any), event_hash: &str (Any)) -> anyhow::Result<bool>`: Internal helper logic.
+* `mark_event_processed(source_key: &str (Any), event_hash: &str (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `save_cursor(cursor: &PollerSyncCursor (Any)) -> anyhow::Result<()>`: Internal helper logic.
+
+#### PostgresCursorStore
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+##### `new(database_url: String (Any))`
+Parameters: database_url: String (Any)
+Dependencies: Inherited from context
+Initialization: Sets up PostgresCursorStore
+
+**Attributes:**
+
+* `database_url` (String): Purpose - Stores database_url data. Constraints - Valid String.
+* `fallback_store` (InMemoryCursorStore): Purpose - Stores fallback_store data. Constraints - Valid InMemoryCursorStore.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+* `get_cursor(source_key: &str (Any)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
+* `is_event_processed(source_key: &str (Any), event_hash: &str (Any)) -> anyhow::Result<bool>`: Internal helper logic.
+* `mark_event_processed(source_key: &str (Any), event_hash: &str (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `save_cursor(cursor: &PollerSyncCursor (Any)) -> anyhow::Result<()>`: Internal helper logic.
+
+### Exported Functions
+
+None.
+
+## Internal architecture
+
+```plantuml
+@startuml
+interface CursorStore {
+}
+class InMemoryCursorStore {
+    -get_cursor(source_key: &str:Any) : anyhow::Result<Option<PollerSyncCursor>>
+    -is_event_processed(source_key: &str:Any, event_hash: &str:Any) : anyhow::Result<bool>
+    -mark_event_processed(source_key: &str:Any, event_hash: &str:Any) : anyhow::Result<()>
+    +new() : Self
+    -save_cursor(cursor: &PollerSyncCursor:Any) : anyhow::Result<()>
+}
+CursorStore <|-- InMemoryCursorStore : extends/implements
+class PostgresCursorStore {
+    -get_cursor(source_key: &str:Any) : anyhow::Result<Option<PollerSyncCursor>>
+    -is_event_processed(source_key: &str:Any, event_hash: &str:Any) : anyhow::Result<bool>
+    -mark_event_processed(source_key: &str:Any, event_hash: &str:Any) : anyhow::Result<()>
+    +new(database_url: String:Any) : Self
+    -save_cursor(cursor: &PollerSyncCursor:Any) : anyhow::Result<()>
+}
+CursorStore <|-- PostgresCursorStore : extends/implements
+@enduml
+
+```
+
+## Execution flow & Sequence explanation
+
+```plantuml
+@startuml
+autonumber
+participant "Client Interface" as Caller
+participant "Cursor_storeService" as Svc
+Caller -> Svc: execute()
+note right of Svc: Processing internal logic
+Svc --> Caller: result
+@enduml
+
+```
+
+## Examples
+
+```
+// Example usage of cursor_store.rs components
+import { ... } from 'crates/factory-infrastructure/src/cursor_store.rs';
+```
+
+## Cross References
+* **Parent module:** `crates/factory-infrastructure/src`
+* **Dependencies:** async_trait::async_trait, chrono::Utc, factory_core::PollerSyncCursor, std::collections::{HashMap, HashSet}, std::sync::Arc, super::*, tokio::sync::RwLock
