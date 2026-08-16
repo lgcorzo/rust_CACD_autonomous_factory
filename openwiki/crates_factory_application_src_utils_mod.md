@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-application/src/utils/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: mod.rs
@@ -66,14 +66,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of mod.rs components
 import { ... } from 'crates/factory-application/src/utils/mod.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/utils`

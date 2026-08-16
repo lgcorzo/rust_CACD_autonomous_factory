@@ -4,7 +4,7 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Detailed documentation for r2r.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: r2r.rs
@@ -125,14 +125,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of r2r.rs components
 import { ... } from 'crates/factory-infrastructure/src/r2r.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

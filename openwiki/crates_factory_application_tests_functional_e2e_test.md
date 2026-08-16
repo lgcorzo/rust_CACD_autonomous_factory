@@ -4,7 +4,7 @@ title: "functional_e2e_test.rs"
 source_path: "crates/factory-application/tests/functional_e2e_test.rs"
 description: "Detailed documentation for functional_e2e_test.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: functional_e2e_test.rs
@@ -69,14 +69,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of functional_e2e_test.rs components
 import { ... } from 'crates/factory-application/tests/functional_e2e_test.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`

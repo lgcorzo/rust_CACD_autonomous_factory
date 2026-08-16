@@ -4,7 +4,7 @@ title: "github.rs"
 source_path: "crates/factory-infrastructure/src/github.rs"
 description: "Detailed documentation for github.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: github.rs
@@ -20,13 +20,13 @@ Provides implementation for github.rs.
 * Handles logic related to github.
 
 ### Dependencies
-* async_trait::async_trait, serde::{Deserialize, Serialize}, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
+* async_trait::async_trait, chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
 
 ### Imported modules
 * None
 
 ### Exported classes
-* GithubIssue, HttpGithubClient
+* GithubComment, GithubIssue, GithubPullRequest, GithubUser, HttpGithubClient
 
 ### Exported interfaces
 * GithubClient
@@ -59,6 +59,31 @@ None.
 
 None.
 
+#### GithubComment
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `body` (String): Purpose - Stores body data. Constraints - Valid String.
+* `html_url` (String): Purpose - Stores html_url data. Constraints - Valid String.
+* `id` (u64): Purpose - Stores id data. Constraints - Valid u64.
+* `updated_at` (Option<DateTime<Utc>>): Purpose - Stores updated_at data. Constraints - Valid Option<DateTime<Utc>>.
+* `user` (GithubUser): Purpose - Stores user data. Constraints - Valid GithubUser.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
 #### GithubIssue
 
 **Overview:**
@@ -75,6 +100,55 @@ Default constructor.
 * `id` (u64): Purpose - Stores id data. Constraints - Valid u64.
 * `number` (u64): Purpose - Stores number data. Constraints - Valid u64.
 * `title` (String): Purpose - Stores title data. Constraints - Valid String.
+* `updated_at` (Option<DateTime<Utc>>): Purpose - Stores updated_at data. Constraints - Valid Option<DateTime<Utc>>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### GithubPullRequest
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `body` (Option<String>): Purpose - Stores body data. Constraints - Valid Option<String>.
+* `html_url` (String): Purpose - Stores html_url data. Constraints - Valid String.
+* `id` (u64): Purpose - Stores id data. Constraints - Valid u64.
+* `number` (u64): Purpose - Stores number data. Constraints - Valid u64.
+* `state` (String): Purpose - Stores state data. Constraints - Valid String.
+* `title` (String): Purpose - Stores title data. Constraints - Valid String.
+* `updated_at` (Option<DateTime<Utc>>): Purpose - Stores updated_at data. Constraints - Valid Option<DateTime<Utc>>.
+
+**Public Methods:**
+
+None.
+
+**Private Methods:**
+
+None.
+
+#### GithubUser
+
+**Overview:**
+No description provided.
+
+**Constructor:**
+
+Default constructor.
+
+**Attributes:**
+
+* `login` (String): Purpose - Stores login data. Constraints - Valid String.
 
 **Public Methods:**
 
@@ -139,7 +213,11 @@ let result = instance.with_url();
 
 * `create_issue(repo: &str (Any), title: &str (Any), body: &str (Any)) -> anyhow::Result<GithubIssue>`: Internal helper logic.
 * `create_pull_request(repo: &str (Any), title: &str (Any), head: &str (Any), base: &str (Any), body: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
+* `list_active_pull_requests(repo: &str (Any)) -> anyhow::Result<Vec<GithubPullRequest>>`: Internal helper logic.
+* `list_issues_updated_since(repo: &str (Any), labels: Option<String> (Any), since: Option<DateTime<Utc>> (Any)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
 * `list_open_issues(repo: &str (Any), labels: Option<String> (Any)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
+* `list_pull_request_comments(repo: &str (Any), pr_number: u64 (Any), since: Option<DateTime<Utc>> (Any)) -> anyhow::Result<Vec<GithubComment>>`: Internal helper logic.
+* `post_pull_request_comment(repo: &str (Any), pr_number: u64 (Any), body: &str (Any)) -> anyhow::Result<GithubComment>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -151,13 +229,23 @@ None.
 @startuml
 interface GithubClient {
 }
+class GithubComment {
+}
 class GithubIssue {
+}
+class GithubPullRequest {
+}
+class GithubUser {
 }
 class HttpGithubClient {
     -create_issue(repo: &str:Any, title: &str:Any, body: &str:Any) : anyhow::Result<GithubIssue>
     -create_pull_request(repo: &str:Any, title: &str:Any, head: &str:Any, base: &str:Any, body: &str:Any) : anyhow::Result<String>
+    -list_active_pull_requests(repo: &str:Any) : anyhow::Result<Vec<GithubPullRequest>>
+    -list_issues_updated_since(repo: &str:Any, labels: Option<String>:Any, since: Option<DateTime<Utc>>:Any) : anyhow::Result<Vec<GithubIssue>>
     -list_open_issues(repo: &str:Any, labels: Option<String>:Any) : anyhow::Result<Vec<GithubIssue>>
+    -list_pull_request_comments(repo: &str:Any, pr_number: u64:Any, since: Option<DateTime<Utc>>:Any) : anyhow::Result<Vec<GithubComment>>
     +new(api_token: String:Any) : Self
+    -post_pull_request_comment(repo: &str:Any, pr_number: u64:Any, body: &str:Any) : anyhow::Result<GithubComment>
     +with_url(api_url: String:Any, api_token: String:Any) : Self
 }
 GithubClient <|-- HttpGithubClient : extends/implements
@@ -179,7 +267,6 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
@@ -187,7 +274,6 @@ Svc --> Caller: result
 import { ... } from 'crates/factory-infrastructure/src/github.rs';
 ```
 
-
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
-* **Dependencies:** async_trait::async_trait, serde::{Deserialize, Serialize}, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}
+* **Dependencies:** async_trait::async_trait, chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, super::*, wiremock::matchers::{header, method, path}, wiremock::{Mock, MockServer, ResponseTemplate}

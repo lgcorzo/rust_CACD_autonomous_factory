@@ -30,8 +30,9 @@ def parse_rust(filepath):
                     name = get_node_text(name_node, source_bytes)
                     doc_comments = []
                     prev_sibling = node.prev_sibling
-                    while prev_sibling and prev_sibling.type == 'line_comment':
-                        doc_comments.append(get_node_text(prev_sibling, source_bytes))
+                    while prev_sibling and prev_sibling.type in ['line_comment', 'attribute_item']:
+                        if prev_sibling.type == 'line_comment':
+                            doc_comments.append(get_node_text(prev_sibling, source_bytes))
                         prev_sibling = prev_sibling.prev_sibling
 
                     kind = node.type.split('_')[0]
@@ -94,8 +95,9 @@ def parse_rust(filepath):
 
                                     func_doc = []
                                     ps = b_child.prev_sibling
-                                    while ps and ps.type == 'line_comment':
-                                        func_doc.append(get_node_text(ps, source_bytes))
+                                    while ps and ps.type in ['line_comment', 'attribute_item']:
+                                        if ps.type == 'line_comment':
+                                            func_doc.append(get_node_text(ps, source_bytes))
                                         ps = ps.prev_sibling
 
                                     is_constructor = func_name == "new"
@@ -132,8 +134,9 @@ def parse_rust(filepath):
 
                         doc_comments = []
                         ps = node.prev_sibling
-                        while ps and ps.type == 'line_comment':
-                            doc_comments.append(get_node_text(ps, source_bytes))
+                        while ps and ps.type in ['line_comment', 'attribute_item']:
+                            if ps.type == 'line_comment':
+                                doc_comments.append(get_node_text(ps, source_bytes))
                             ps = ps.prev_sibling
 
                         args = []

@@ -4,7 +4,7 @@ title: "parse_java.py"
 source_path: "parse_java.py"
 description: "Detailed documentation for parse_java.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: parse_java.py
@@ -20,7 +20,7 @@ Provides implementation for parse_java.py.
 * Handles logic related to parse_java.
 
 ### Dependencies
-* json, sys, tree_sitter, tree_sitter_java
+* json, os, sys, tree_sitter, tree_sitter_java
 
 ### Imported modules
 * None
@@ -32,13 +32,16 @@ Provides implementation for parse_java.py.
 * None
 
 ### Exported functions
-* parse_java
+* get_node_text, parse_java
 
 ## Public API
 
 ### Exported Classes / Structs / Interfaces
 
 ### Exported Functions
+
+#### `get_node_text(node (Any), source_bytes (Any)) -> None`
+No description provided.
 
 #### `parse_java(filepath (Any)) -> None`
 No description provided.
@@ -60,7 +63,7 @@ class EmptyModule {
 autonumber
 participant "Client Interface" as Caller
 participant "Parse_javaService" as Svc
-Caller -> Svc: parse_java()
+Caller -> Svc: get_node_text()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml
@@ -76,4 +79,4 @@ import { ... } from 'parse_java.py';
 
 ## Cross References
 * **Parent module:** ``
-* **Dependencies:** json, sys, tree_sitter, tree_sitter_java
+* **Dependencies:** json, os, sys, tree_sitter, tree_sitter_java

@@ -4,7 +4,7 @@ title: "generate_openwiki.py"
 source_path: "generate_openwiki.py"
 description: "Detailed documentation for generate_openwiki.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: generate_openwiki.py
@@ -40,7 +40,7 @@ Provides implementation for generate_openwiki.py.
 
 ### Exported Functions
 
-#### `generate_ai_description(entity_name (Any), file_name (Any), entity_type (Any)) -> None`
+#### `generate_ai_description(entity_name (Any), file_name (Any), entity_type (Any), original_doc (Any)) -> None`
 No description provided.
 
 #### `generate_indexes(now (Any)) -> None`
@@ -94,14 +94,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of generate_openwiki.py components
 import { ... } from 'generate_openwiki.py';
 ```
-
 
 ## Cross References
 * **Parent module:** ``

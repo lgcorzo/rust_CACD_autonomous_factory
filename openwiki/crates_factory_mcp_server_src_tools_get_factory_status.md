@@ -4,7 +4,7 @@ title: "get_factory_status.rs"
 source_path: "crates/factory-mcp-server/src/tools/get_factory_status.rs"
 description: "Detailed documentation for get_factory_status.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "9c1db1c"
+last_verified_commit: "e48839f"
 ---
 
 # File: get_factory_status.rs
@@ -102,14 +102,12 @@ Svc --> Caller: result
 
 ```
 
-
 ## Examples
 
 ```
 // Example usage of get_factory_status.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/get_factory_status.rs';
 ```
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
