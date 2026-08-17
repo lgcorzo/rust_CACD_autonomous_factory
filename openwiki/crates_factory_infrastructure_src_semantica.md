@@ -4,7 +4,7 @@ title: "semantica.rs"
 source_path: "crates/factory-infrastructure/src/semantica.rs"
 description: "Detailed documentation for semantica.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: semantica.rs
@@ -229,12 +229,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of semantica.rs components
 import { ... } from 'crates/factory-infrastructure/src/semantica.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

@@ -4,7 +4,7 @@ title: "auditor.rs"
 source_path: "crates/factory-application/src/agents/auditor.rs"
 description: "Detailed documentation for auditor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: auditor.rs
@@ -194,12 +194,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of auditor.rs components
 import { ... } from 'crates/factory-application/src/agents/auditor.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

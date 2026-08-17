@@ -4,7 +4,7 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: telemetry_export.rs
@@ -123,12 +123,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of telemetry_export.rs components
 import { ... } from 'crates/factory-application/src/telemetry_export.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

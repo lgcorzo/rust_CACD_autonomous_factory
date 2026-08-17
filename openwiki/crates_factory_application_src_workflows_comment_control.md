@@ -4,7 +4,7 @@ title: "comment_control.rs"
 source_path: "crates/factory-application/src/workflows/comment_control.rs"
 description: "Detailed documentation for comment_control.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: comment_control.rs
@@ -173,12 +173,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of comment_control.rs components
 import { ... } from 'crates/factory-application/src/workflows/comment_control.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

@@ -4,7 +4,7 @@ title: "github_webhook.rs"
 source_path: "crates/factory-mcp-server/src/github_webhook.rs"
 description: "Detailed documentation for github_webhook.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: github_webhook.rs
@@ -171,12 +171,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of github_webhook.rs components
 import { ... } from 'crates/factory-mcp-server/src/github_webhook.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

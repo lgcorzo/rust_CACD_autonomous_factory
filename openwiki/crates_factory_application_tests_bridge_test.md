@@ -4,7 +4,7 @@ title: "bridge_test.rs"
 source_path: "crates/factory-application/tests/bridge_test.rs"
 description: "Detailed documentation for bridge_test.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: bridge_test.rs
@@ -66,12 +66,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of bridge_test.rs components
 import { ... } from 'crates/factory-application/tests/bridge_test.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`

@@ -4,7 +4,7 @@ title: "protocol.rs"
 source_path: "crates/factory-mcp-server/src/protocol.rs"
 description: "Detailed documentation for protocol.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: protocol.rs
@@ -213,12 +213,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of protocol.rs components
 import { ... } from 'crates/factory-mcp-server/src/protocol.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
