@@ -85,8 +85,12 @@ jobs:
   docker-publish:
     name: Docker Publish
     needs: [governance-gates, rust-ci]
-    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.event_name == 'release')
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.event_name == 'release' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: write
     env:
       DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
       SENTRY_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -101,13 +105,20 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+      - name: Login to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
-          push: ${{ env.DOCKER_USER != '' }}
+          push: true
           context: .
           cache-to: type=gha,mode=max
           cache-from: type=gha
@@ -116,6 +127,8 @@ jobs:
           tags: |
             ${{ env.DOCKER_IMAGE }}:latest
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/dark-gravity-factory:latest
+            ghcr.io/${{ github.repository_owner }}/dark-gravity-factory:${{ github.sha }}
 
       - name: Install Sentry CLI
         if: ${{ env.SENTRY_TOKEN != '' }}
