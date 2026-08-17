@@ -4,7 +4,7 @@ title: "circuit_breaker.rs"
 source_path: "crates/factory-application/src/workflows/circuit_breaker.rs"
 description: "Detailed documentation for circuit_breaker.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: circuit_breaker.rs
@@ -180,12 +180,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of circuit_breaker.rs components
 import { ... } from 'crates/factory-application/src/workflows/circuit_breaker.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

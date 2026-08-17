@@ -4,7 +4,7 @@ title: "git_poller.rs"
 source_path: "crates/factory-infrastructure/src/git_poller.rs"
 description: "Detailed documentation for git_poller.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: git_poller.rs
@@ -251,12 +251,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of git_poller.rs components
 import { ... } from 'crates/factory-infrastructure/src/git_poller.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

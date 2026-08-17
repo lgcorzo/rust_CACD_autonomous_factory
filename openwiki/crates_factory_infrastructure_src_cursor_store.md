@@ -4,7 +4,7 @@ title: "cursor_store.rs"
 source_path: "crates/factory-infrastructure/src/cursor_store.rs"
 description: "Detailed documentation for cursor_store.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: cursor_store.rs
@@ -159,12 +159,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of cursor_store.rs components
 import { ... } from 'crates/factory-infrastructure/src/cursor_store.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

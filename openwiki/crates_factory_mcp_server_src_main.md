@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-mcp-server/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: main.rs
@@ -69,12 +69,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of main.rs components
 import { ... } from 'crates/factory-mcp-server/src/main.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`
