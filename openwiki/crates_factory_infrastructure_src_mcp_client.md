@@ -4,7 +4,7 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: mcp_client.rs
@@ -150,12 +150,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of mcp_client.rs components
 import { ... } from 'crates/factory-infrastructure/src/mcp_client.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

@@ -4,7 +4,7 @@ title: "error.rs"
 source_path: "crates/factory-core/src/error.rs"
 description: "Detailed documentation for error.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: error.rs
@@ -87,12 +87,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of error.rs components
 import { ... } from 'crates/factory-core/src/error.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

@@ -4,7 +4,7 @@ title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Detailed documentation for feedback_route.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: feedback_route.rs
@@ -71,12 +71,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of feedback_route.rs components
 import { ... } from 'crates/factory-mcp-server/src/feedback_route.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

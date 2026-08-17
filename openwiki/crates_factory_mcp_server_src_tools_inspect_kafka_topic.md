@@ -4,7 +4,7 @@ title: "inspect_kafka_topic.rs"
 source_path: "crates/factory-mcp-server/src/tools/inspect_kafka_topic.rs"
 description: "Detailed documentation for inspect_kafka_topic.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: inspect_kafka_topic.rs
@@ -102,12 +102,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of inspect_kafka_topic.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/inspect_kafka_topic.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

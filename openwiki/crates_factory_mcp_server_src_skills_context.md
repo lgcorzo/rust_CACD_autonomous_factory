@@ -4,7 +4,7 @@ title: "context.rs"
 source_path: "crates/factory-mcp-server/src/skills/context.rs"
 description: "Detailed documentation for context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: context.rs
@@ -148,12 +148,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of context.rs components
 import { ... } from 'crates/factory-mcp-server/src/skills/context.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/skills`
