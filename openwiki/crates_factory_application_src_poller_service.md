@@ -4,7 +4,7 @@ title: "poller_service.rs"
 source_path: "crates/factory-application/src/poller_service.rs"
 description: "Detailed documentation for poller_service.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: poller_service.rs
@@ -188,12 +188,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of poller_service.rs components
 import { ... } from 'crates/factory-application/src/poller_service.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

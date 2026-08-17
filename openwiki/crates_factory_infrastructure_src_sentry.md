@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: sentry.rs
@@ -146,12 +146,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of sentry.rs components
 import { ... } from 'crates/factory-infrastructure/src/sentry.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

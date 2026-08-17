@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-core/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: security_tests.rs
@@ -91,12 +91,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of security_tests.rs components
 import { ... } from 'crates/factory-core/tests/security_tests.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-core/tests`

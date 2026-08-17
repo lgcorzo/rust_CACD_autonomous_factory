@@ -4,7 +4,7 @@ title: "execute_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/execute_code.rs"
 description: "Detailed documentation for execute_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: execute_code.rs
@@ -99,12 +99,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of execute_code.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/execute_code.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

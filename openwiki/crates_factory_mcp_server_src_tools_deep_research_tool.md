@@ -4,7 +4,7 @@ title: "deep_research_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/deep_research_tool.rs"
 description: "Detailed documentation for deep_research_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: deep_research_tool.rs
@@ -99,12 +99,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of deep_research_tool.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/deep_research_tool.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

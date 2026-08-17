@@ -4,7 +4,7 @@ title: "list_minio_objects.rs"
 source_path: "crates/factory-mcp-server/src/tools/list_minio_objects.rs"
 description: "Detailed documentation for list_minio_objects.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "e48839f"
+last_verified_commit: "198b215"
 ---
 
 # File: list_minio_objects.rs
@@ -102,12 +102,16 @@ Svc --> Caller: result
 
 ```
 
+
+
 ## Examples
 
 ```
 // Example usage of list_minio_objects.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/list_minio_objects.rs';
 ```
+
+
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
