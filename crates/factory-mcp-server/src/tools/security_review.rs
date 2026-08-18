@@ -18,10 +18,14 @@ pub struct SecurityReviewTool {
 
 impl SecurityReviewTool {
     pub fn new() -> Self {
+        let model_cfg = factory_core::AgentModelConfig::load();
+        Self::with_model(model_cfg.get_model("security_review").to_string())
+    }
+
+    pub fn with_model(model: String) -> Self {
         let api_base = env::var("LITELLM_API_BASE")
             .unwrap_or_else(|_| "http://litellm.llm-apps.svc.cluster.local:4000".to_string());
         let api_key = env::var("LITELLM_API_KEY").unwrap_or_else(|_| "sk-dummy".to_string());
-        let model = env::var("LITELLM_MODEL").unwrap_or_else(|_| "gpt-4o-mini".to_string());
 
         let config = OpenAIConfig::new()
             .with_api_base(api_base)

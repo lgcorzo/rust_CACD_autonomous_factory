@@ -70,9 +70,15 @@ impl McpServer {
 
         let specify_cli_path =
             std::env::var("SPECIFY_CLI_PATH").unwrap_or_else(|_| "specify".to_string());
-        let litellm_api_key = std::env::var("LITELLM_API_KEY")?;
-        let litellm_base_url = std::env::var("LITELLM_BASE_URL")?;
-        let litellm_model = std::env::var("LITELLM_MODEL")?;
+        let litellm_api_key =
+            std::env::var("LITELLM_API_KEY").unwrap_or_else(|_| "sk-dummy".to_string());
+        let litellm_base_url = std::env::var("LITELLM_BASE_URL")
+            .or_else(|_| std::env::var("LITELLM_API_BASE"))
+            .unwrap_or_else(|_| "http://litellm.llm-apps.svc.cluster.local:4000".to_string());
+
+        let model_config = factory_core::AgentModelConfig::load();
+        let planner_model = model_config.get_planner_model().to_string();
+        let security_model = model_config.get_model("security_review").to_string();
 
         let finops_tag = factory_core::FinOpsTag {
             team: std::env::var("FINOPS_TEAM").unwrap_or_else(|_| "dark-gravity-ops".to_string()),
@@ -116,7 +122,7 @@ impl McpServer {
         self.add_tool(Box::new(PlanMissionTool::new(
             litellm_api_key,
             litellm_base_url,
-            litellm_model,
+            planner_model,
             finops_tag,
         )))
         .await;
@@ -128,7 +134,8 @@ impl McpServer {
             .await;
         self.add_tool(Box::new(RunTestsTool::new(sandbox_driver)))
             .await;
-        self.add_tool(Box::new(SecurityReviewTool::new())).await;
+        self.add_tool(Box::new(SecurityReviewTool::with_model(security_model)))
+            .await;
         self.add_tool(Box::new(UpdateMissionStatusTool::new("wiki".to_string())))
             .await;
         self.add_tool(Box::new(SpecKitTool::new(specify_cli_path)))
