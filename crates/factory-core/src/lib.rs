@@ -3,9 +3,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
+pub mod config;
 pub mod error;
 pub mod executor;
 pub mod security;
+
+pub use config::AgentModelConfig;
 
 /// Metadata for tracing and versioning.
 #[derive(Debug, Serialize, Deserialize, Clone)]

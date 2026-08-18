@@ -125,8 +125,11 @@ impl AuditorAgent {
             .content(format!("Failure logs:\n{}", failures_json))
             .build()?;
 
+        let model_cfg = factory_core::AgentModelConfig::load();
+        let model = model_cfg.get_model("auditor");
+
         let request = async_openai::types::CreateChatCompletionRequestArgs::default()
-            .model("qwen2.5")
+            .model(model)
             .messages([system_msg.into(), user_msg.into()])
             .build()?;
 
@@ -196,8 +199,11 @@ impl AuditorAgent {
             ))
             .build()?;
 
+        let model_cfg = factory_core::AgentModelConfig::load();
+        let model = model_cfg.get_model("auditor");
+
         let request = async_openai::types::CreateChatCompletionRequestArgs::default()
-            .model("qwen2.5")
+            .model(model)
             .messages([system_msg.into(), user_msg.into()])
             .build()?;
 

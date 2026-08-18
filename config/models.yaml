@@ -1,0 +1,17 @@
+# Dark Gravity Autonomous Factory - Agent Model Configuration
+# Planner routes to gpt-oss-120b; all other factory agents route to ollama/qwen2.5:7b via LiteLLM.
+
+default_model: "ollama/qwen2.5:7b"
+planner_model: "gpt-oss-120b"
+
+agents:
+  planner: "gpt-oss-120b"
+  plan_mission: "gpt-oss-120b"
+  auditor: "ollama/qwen2.5:7b"
+  security_review: "ollama/qwen2.5:7b"
+  deep_research: "ollama/qwen2.5:7b"
+  rustant: "ollama/qwen2.5:7b"
+  zeroclaw: "ollama/qwen2.5:7b"
+  doc_agent: "ollama/qwen2.5:7b"
+  qa_observer: "ollama/qwen2.5:7b"
+  finops: "ollama/qwen2.5:7b"

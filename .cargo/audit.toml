@@ -11,4 +11,5 @@ ignore = [
     "RUSTSEC-2026-0097", # rand
     "RUSTSEC-2026-0190", # anyhow
     "RUSTSEC-2026-0253", # lru
+    "RUSTSEC-2026-0258", # h2
 ]
