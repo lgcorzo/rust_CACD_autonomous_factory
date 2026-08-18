@@ -41,10 +41,11 @@ jobs:
           fi
           echo "Spec artifacts verified."
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install System Dependencies
+        run: |
+          sudo sed -i 's/azure\.archive\.ubuntu\.com/archive\.ubuntu\.com/g' /etc/apt/apt-mirrors.txt /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout="15"
+          sudo apt-get install -y --no-install-recommends protobuf-compiler libcurl4-openssl-dev
 
       - name: Verify OSR Threshold
         run: cargo run -p factory-cli -- verify-osr --r2r-url http://localhost:8000
@@ -73,9 +74,10 @@ jobs:
           components: rustfmt, clippy
           
       - name: Install Protoc
-        uses: arduino/setup-protoc@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sudo sed -i 's/azure\.archive\.ubuntu\.com/archive\.ubuntu\.com/g' /etc/apt/apt-mirrors.txt /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout="15"
+          sudo apt-get install -y --no-install-recommends protobuf-compiler libcurl4-openssl-dev
 
       - name: Check Formatting
         run: cargo fmt --all -- --check
