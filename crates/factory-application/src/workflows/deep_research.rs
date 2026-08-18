@@ -71,8 +71,10 @@ pub fn create_deep_research_workflow(
 
     let litellm_api_key = std::env::var("LITELLM_API_KEY").expect("LITELLM_API_KEY must be set");
     let litellm_base_url = std::env::var("LITELLM_BASE_URL").expect("LITELLM_BASE_URL must be set");
-    let litellm_model =
-        std::env::var("LITELLM_MODEL").unwrap_or_else(|_| "gpt-4-turbo".to_string());
+
+    let model_cfg = factory_core::AgentModelConfig::load();
+    let planner_model = model_cfg.get_planner_model().to_string();
+    let extraction_model = model_cfg.get_model("deep_research").to_string();
 
     let config = async_openai::config::OpenAIConfig::new()
         .with_api_key(litellm_api_key)
@@ -81,19 +83,21 @@ pub fn create_deep_research_workflow(
     let openai_client = Client::with_config(config).with_http_client(http_client);
     let openai_client_arc = Arc::new(openai_client);
     let openai_client_clone = openai_client_arc.clone();
-    let model_clone = litellm_model.clone();
+    let planner_model_clone = planner_model.clone();
+    let extraction_model_clone = extraction_model.clone();
 
     // Deep Research Task (Planning + Execution + Ingestion)
     let research_task = hatchet
         .task("deep_research_task", move |input: DeepSearchInput, _ctx| {
             let client = openai_client_clone.clone();
-            let model = model_clone.clone();
+            let planner_model = planner_model_clone.clone();
+            let extraction_model = extraction_model_clone.clone();
             Box::pin(async move {
                 tracing::info!("DeepSearch Phase started for job {}", input.job_id);
 
-                // 1. Planning Phase
+                // 1. Planning Phase (routes to planner model: gpt-oss-120b)
                 let request = CreateChatCompletionRequestArgs::default()
-                    .model(&model)
+                    .model(&planner_model)
                     .messages([
                         ChatCompletionRequestSystemMessageArgs::default()
                             .content("You are a deep search query planner. Break down the user's research topic into a JSON array of 3 to 5 highly specific sub-queries string that can be sent to a search engine.")
@@ -173,7 +177,7 @@ pub fn create_deep_research_workflow(
                     }
 
                     let request = CreateChatCompletionRequestArgs::default()
-                        .model(&model)
+                        .model(&extraction_model)
                         .messages([
                             ChatCompletionRequestSystemMessageArgs::default()
                                 .content("You are a technical analyst. Extract the most important facts, code snippets, and architectural decisions from the provided raw text. Discard noise. Output in Markdown.")
