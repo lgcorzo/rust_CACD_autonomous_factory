@@ -6,7 +6,7 @@ This document details the **GitOps** and **Kubernetes** operations for the **Dar
 
 ## GitOps Delivery Model
 
-The factory is deployed using a GitOps controller (FluxCD **planned**) to ensure the cluster state matches the git repository.
+The factory is deployed using a GitOps controller (FluxCD) to ensure the cluster state matches the git repository.
 
 ---
 
@@ -60,7 +60,7 @@ The `wiki/` folder is synced to the GitHub Wiki via `.github/workflows/docs-to-w
 | :--- | :--- | :--- |
 | **System Health** | CPU, Memory, Pod Status | Prometheus / Grafana |
 | **Agent Thought** | Reasoning & Strategies | Kafka (`agent-thought` stream) |
-| **Error Tracking** | Production Exception Capturing | Sentry **(planned)** |
+| **Error Tracking** | Production Exception Capturing | Sentry |
 | **Documentation Quality** | Code Structure & Accuracy | CRG + Graphify |
 
 ---

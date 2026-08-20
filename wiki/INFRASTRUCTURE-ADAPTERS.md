@@ -39,7 +39,7 @@ C4Deployment
 ## Messaging & Telemetry (The Nervous System)
 
 ### Kafka Event Bus
-- **Client**: `SimpleMockKafkaClient` in `factory-infrastructure/src/kafka.rs` (gated under `#[cfg(not(feature = "production"))]`) — publishes `publish_thought` events.
+- **Client**: `RdKafkaClient` (production) and `SimpleMockKafkaClient` (testing) in `factory-infrastructure/src/kafka.rs` — publishes `publish_thought` events.
 - **Topics**: `mission-input`, `agent-thought`, `mission-artifact`
 - **Serialization**: JSON (via `serde_json`)
 - **Telemetry Exporter**: `TelemetryExporter` asynchronously consumes `agent-thought` events and pushes them to OpenWebUI.
@@ -142,7 +142,7 @@ C4Container
 | :--- | :--- | :--- |
 | `HttpJiraClient` / `JiraClient` | `jira.rs` | `search_issues(query)` |
 | `HttpR2rClient` / `R2rClient` | `r2r.rs` | `search(query, limit)` |
-| `SimpleMockKafkaClient` / `KafkaClient` | `kafka.rs` | `publish(topic, payload)` |
+| `RdKafkaClient` / `KafkaClient` | `kafka.rs` | `publish(topic, payload)` |
 | `McpHttpClient` / `McpSseClient` | `mcp_client.rs` | `call_tool_json(name, args)` |
 | `AwsS3Storage` / `S3Storage` | `s3.rs` | `put_object(key, data)`, `get_object(key)` |
 | `OpenZitiIdentity` / `ZitiIdentity` | `ziti.rs` | `get_token()`, `service_name()` |
