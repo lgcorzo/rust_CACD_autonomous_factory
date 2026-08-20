@@ -55,7 +55,7 @@ The "Muscle" of the system. Operates within the **Execution Context**.
 - **File**: `crates/factory-application/src/agents/zeroclaw.rs` (lines 11-98)
 - **Key Methods**: `new()`, `execute_task()`, `validate_mission()`, `introspect_k8s()`
 - **Dependencies**: `McpClient`
-- **Sandbox Drivers**: `SubprocessDriver` (local), `FirecrackerDriver` (micro-VM via KVM)
+- **Sandbox Drivers**: `SubprocessDriver` (local)
 - **Agent trait**: Implements `Agent` (`name`, `execute`)
 
 #### ZeroClaw Execution Sequence
@@ -141,7 +141,7 @@ The "Treasurer". Governs the **Cost Context**.
 
 ## DevOps Agent (Aethelgard Loop)
 
-> **Status: Planned (Not yet implemented)**
+> **Status: Active**
 
 The "Immune System". Governs the **Remediation Context**.
 
@@ -213,7 +213,7 @@ classDiagram
         +monitor_budget()
     }
     class DevOpsAgent {
-        <<planned>>
+        <<active>>
         +remediate_ci_failure()
     }
     

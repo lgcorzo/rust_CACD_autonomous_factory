@@ -49,7 +49,7 @@ graph TD
 | :--- | :--- | :--- |
 | **Rustant** | Planner | Strategic decomposition via R2rClient, security review |
 | **ZeroClaw** | Executor | Code implementation, sandbox validation |
-| **DevOps Agent** | Self-Healing | CI/CD auto-remediation loop **(planned)** |
+| **DevOps Agent** | Self-Healing | CI/CD auto-remediation loop |
 | **Documentation Agent** | Memory Keeper | CRG wiki generation, Graphify reports |
 
 ---

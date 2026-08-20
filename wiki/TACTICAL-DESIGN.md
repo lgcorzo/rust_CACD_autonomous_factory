@@ -107,7 +107,7 @@ C4Component
 - **Telemetry**: Agent thoughts published to Kafka (`agent-thought` topic).
 
 ### Outbound (Delivery)
-- **Adapter**: GitHub App (planned) via `create_pull_request`.
+- **Adapter**: GitHub App via `create_pull_request`.
 - **Protocol**: REST API.
 
 ---
