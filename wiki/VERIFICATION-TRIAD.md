@@ -22,7 +22,7 @@ We ensure mission reliability via **Sandbox Execution**.
 
 - **Environment**: 
   - **SubprocessDriver**: `tokio::process::Command` for local execution
-  - **FirecrackerDriver**: Micro-VM via KVM (planned implementation)
+  - **FirecrackerDriver**: Micro-VM via KVM
 - **Workflow**:
   1. ZeroClaw generates code + unit tests.
   2. Runs tests via `run_tests` MCP tool inside the isolated Sandbox.
@@ -47,7 +47,7 @@ The final gate before delivery.
 - **Automated Scanning**:
   - `security_review` MCP tool: LLM-as-a-Judge analysis of code diffs
   - `SecurityValidator` cryptographic verification: Using `Ed25519Validator` to strictly check Ed25519 signatures
-- **Dependency Checking**: `cargo deny` / `cargo audit` (planned)
+- **Dependency Checking**: `cargo deny` / `cargo audit`
 - **Sandbox Isolation**: Code executes in isolated Firecracker micro-VMs
 
 ---
