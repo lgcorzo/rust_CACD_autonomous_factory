@@ -4,7 +4,7 @@ title: "comment_control.rs"
 source_path: "crates/factory-application/src/workflows/comment_control.rs"
 description: "Detailed documentation for comment_control.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: comment_control.rs
@@ -159,6 +159,96 @@ class CommentControlService {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "workflows" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "comment_control" as Main
+component "chrono::Utc" as chrono__Utc
+Main --> chrono__Utc : uses
+component "crate::agents::{RustantAgent, ZeroClawAgent}" as crate__agents___RustantAgent__ZeroClawAgent_
+Main --> crate__agents___RustantAgent__ZeroClawAgent_ : uses
+component "factory_core::{PRCommentEvent, PRDirective}" as factory_core___PRCommentEvent__PRDirective_
+Main --> factory_core___PRCommentEvent__PRDirective_ : uses
+component "factory_infrastructure::McpClient" as factory_infrastructure__McpClient
+Main --> factory_infrastructure__McpClient : uses
+component "factory_infrastructure::aethalgard::AethalgardClient" as factory_infrastructure__aethalgard__AethalgardClient
+Main --> factory_infrastructure__aethalgard__AethalgardClient : uses
+component "factory_infrastructure::aethalgard::MockAethalgardClient" as factory_infrastructure__aethalgard__MockAethalgardClient
+Main --> factory_infrastructure__aethalgard__MockAethalgardClient : uses
+component "factory_infrastructure::github::GithubClient" as factory_infrastructure__github__GithubClient
+Main --> factory_infrastructure__github__GithubClient : uses
+component "factory_infrastructure::github::{GithubComment, GithubUser, MockGithubClient}" as factory_infrastructure__github___GithubComment__GithubUser__MockGithubClient_
+Main --> factory_infrastructure__github___GithubComment__GithubUser__MockGithubClient_ : uses
+component "factory_infrastructure::gitlab::GitlabClient" as factory_infrastructure__gitlab__GitlabClient
+Main --> factory_infrastructure__gitlab__GitlabClient : uses
+component "factory_infrastructure::mcp_client::MockMcpClient" as factory_infrastructure__mcp_client__MockMcpClient
+Main --> factory_infrastructure__mcp_client__MockMcpClient : uses
+component "factory_infrastructure::r2r::MockR2rClient" as factory_infrastructure__r2r__MockR2rClient
+Main --> factory_infrastructure__r2r__MockR2rClient : uses
+component "factory_infrastructure::r2r::R2rClient" as factory_infrastructure__r2r__R2rClient
+Main --> factory_infrastructure__r2r__R2rClient : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[comment_control]
+[comment_control] --> [chrono::Utc]
+[comment_control] --> [crate::agents::{RustantAgent, ZeroClawAgent}]
+[comment_control] --> [factory_core::{PRCommentEvent, PRDirective}]
+[comment_control] --> [factory_infrastructure::McpClient]
+[comment_control] --> [factory_infrastructure::aethalgard::AethalgardClient]
+[comment_control] --> [factory_infrastructure::aethalgard::MockAethalgardClient]
+[comment_control] --> [factory_infrastructure::github::GithubClient]
+[comment_control] --> [factory_infrastructure::github::{GithubComment, GithubUser, MockGithubClient}]
+[comment_control] --> [factory_infrastructure::gitlab::GitlabClient]
+[comment_control] --> [factory_infrastructure::mcp_client::MockMcpClient]
+[comment_control] --> [factory_infrastructure::r2r::MockR2rClient]
+[comment_control] --> [factory_infrastructure::r2r::R2rClient]
+[comment_control] --> [serde::{Deserialize, Serialize}]
+[comment_control] --> [std::sync::Arc]
+[comment_control] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> CommentControlService::handle_directive
+Caller --> CommentControlService::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -173,16 +263,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of comment_control.rs components
 import { ... } from 'crates/factory-application/src/workflows/comment_control.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

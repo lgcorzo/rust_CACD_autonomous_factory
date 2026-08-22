@@ -4,7 +4,7 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: telemetry_export.rs
@@ -109,6 +109,64 @@ class TelemetryExporter {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "telemetry_export" as Main
+component "rdkafka::Message" as rdkafka__Message
+Main --> rdkafka__Message : uses
+component "rdkafka::consumer::{Consumer, StreamConsumer}" as rdkafka__consumer___Consumer__StreamConsumer_
+Main --> rdkafka__consumer___Consumer__StreamConsumer_ : uses
+component "reqwest::Client" as reqwest__Client
+Main --> reqwest__Client : uses
+component "serde_json::Value" as serde_json__Value
+Main --> serde_json__Value : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[telemetry_export]
+[telemetry_export] --> [rdkafka::Message]
+[telemetry_export] --> [rdkafka::consumer::{Consumer, StreamConsumer}]
+[telemetry_export] --> [reqwest::Client]
+[telemetry_export] --> [serde_json::Value]
+[telemetry_export] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> TelemetryExporter::new
+Caller --> TelemetryExporter::start_export_loop
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -123,16 +181,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of telemetry_export.rs components
 import { ... } from 'crates/factory-application/src/telemetry_export.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

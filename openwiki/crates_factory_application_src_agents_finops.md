@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Detailed documentation for finops.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: finops.rs
@@ -116,6 +116,72 @@ Default <|-- FinOpsAgent : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "agents" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "finops" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::Agent" as crate__Agent
+Main --> crate__Agent : uses
+component "factory_core::FinOpsTag" as factory_core__FinOpsTag
+Main --> factory_core__FinOpsTag : uses
+component "reqwest::Client" as reqwest__Client
+Main --> reqwest__Client : uses
+component "serde_json::Value" as serde_json__Value
+Main --> serde_json__Value : uses
+component "std::time::Duration" as std__time__Duration
+Main --> std__time__Duration : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[finops]
+[finops] --> [async_trait::async_trait]
+[finops] --> [crate::Agent]
+[finops] --> [factory_core::FinOpsTag]
+[finops] --> [reqwest::Client]
+[finops] --> [serde_json::Value]
+[finops] --> [std::time::Duration]
+[finops] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> FinOpsAgent::monitor_budget
+Caller --> FinOpsAgent::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -130,16 +196,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of finops.rs components
 import { ... } from 'crates/factory-application/src/agents/finops.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

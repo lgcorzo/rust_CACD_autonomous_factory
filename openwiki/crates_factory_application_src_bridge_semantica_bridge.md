@@ -4,7 +4,7 @@ title: "semantica_bridge.rs"
 source_path: "crates/factory-application/src/bridge/semantica_bridge.rs"
 description: "Detailed documentation for semantica_bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: semantica_bridge.rs
@@ -106,6 +106,66 @@ class SemanticaBridge {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "bridge" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "semantica_bridge" as Main
+component "factory_infrastructure::MockSemanticaClient" as factory_infrastructure__MockSemanticaClient
+Main --> factory_infrastructure__MockSemanticaClient : uses
+component "factory_infrastructure::{DecisionRecord, SemanticaClient}" as factory_infrastructure___DecisionRecord__SemanticaClient_
+Main --> factory_infrastructure___DecisionRecord__SemanticaClient_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "tracing::{error, info}" as tracing___error__info_
+Main --> tracing___error__info_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[semantica_bridge]
+[semantica_bridge] --> [factory_infrastructure::MockSemanticaClient]
+[semantica_bridge] --> [factory_infrastructure::{DecisionRecord, SemanticaClient}]
+[semantica_bridge] --> [std::sync::Arc]
+[semantica_bridge] --> [super::*]
+[semantica_bridge] --> [tracing::{error, info}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> SemanticaBridge::new
+Caller --> SemanticaBridge::process_agent_thought_event
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -120,16 +180,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of semantica_bridge.rs components
 import { ... } from 'crates/factory-application/src/bridge/semantica_bridge.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`

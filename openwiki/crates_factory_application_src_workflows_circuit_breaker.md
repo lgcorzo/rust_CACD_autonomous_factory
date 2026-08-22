@@ -4,7 +4,7 @@ title: "circuit_breaker.rs"
 source_path: "crates/factory-application/src/workflows/circuit_breaker.rs"
 description: "Detailed documentation for circuit_breaker.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: circuit_breaker.rs
@@ -166,6 +166,61 @@ enum CircuitBreakerStatus {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "workflows" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "circuit_breaker" as Main
+component "factory_core::security::SastScanResult" as factory_core__security__SastScanResult
+Main --> factory_core__security__SastScanResult : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[circuit_breaker]
+[circuit_breaker] --> [factory_core::security::SastScanResult]
+[circuit_breaker] --> [serde::{Deserialize, Serialize}]
+[circuit_breaker] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> CircuitBreakerGuard::evaluate_diff
+Caller --> CircuitBreakerGuard::format_stuck_alert
+Caller --> CircuitBreakerGuard::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -180,16 +235,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of circuit_breaker.rs components
 import { ... } from 'crates/factory-application/src/workflows/circuit_breaker.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

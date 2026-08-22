@@ -4,7 +4,7 @@ title: "run_tests.rs"
 source_path: "crates/factory-mcp-server/src/tools/run_tests.rs"
 description: "Detailed documentation for run_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: run_tests.rs
@@ -85,6 +85,68 @@ Tool <|-- RunTestsTool : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "tools" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "run_tests" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::protocol::{CallToolResult, McpContent}" as crate__protocol___CallToolResult__McpContent_
+Main --> crate__protocol___CallToolResult__McpContent_ : uses
+component "crate::sandbox::SandboxDriver" as crate__sandbox__SandboxDriver
+Main --> crate__sandbox__SandboxDriver : uses
+component "crate::tools::Tool" as crate__tools__Tool
+Main --> crate__tools__Tool : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[run_tests]
+[run_tests] --> [async_trait::async_trait]
+[run_tests] --> [crate::protocol::{CallToolResult, McpContent}]
+[run_tests] --> [crate::sandbox::SandboxDriver]
+[run_tests] --> [crate::tools::Tool]
+[run_tests] --> [serde_json::{json, Value}]
+[run_tests] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> RunTestsTool::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -99,16 +161,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of run_tests.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/run_tests.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

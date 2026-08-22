@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: security.rs
@@ -281,6 +281,64 @@ interface SecurityValidator {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-core" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "security" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}" as base64___engine__general_purpose__URL_SAFE_NO_PAD__Engine_as___
+Main --> base64___engine__general_purpose__URL_SAFE_NO_PAD__Engine_as___ : uses
+component "crate::error::Result" as crate__error__Result
+Main --> crate__error__Result : uses
+component "ed25519_dalek::{Signature, Verifier}" as ed25519_dalek___Signature__Verifier_
+Main --> ed25519_dalek___Signature__Verifier_ : uses
+component "zeroize::Zeroize" as zeroize__Zeroize
+Main --> zeroize__Zeroize : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[security]
+[security] --> [async_trait::async_trait]
+[security] --> [base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}]
+[security] --> [crate::error::Result]
+[security] --> [ed25519_dalek::{Signature, Verifier}]
+[security] --> [zeroize::Zeroize]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> SastScanResult::inspect_diff
+Caller --> SastScanResult::passes_gate
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -295,16 +353,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of security.rs components
 import { ... } from 'crates/factory-core/src/security.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

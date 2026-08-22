@@ -4,7 +4,7 @@ title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Detailed documentation for state.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: state.rs
@@ -195,6 +195,61 @@ class StepCheckpoint {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "bridge" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "state" as Main
+component "chrono::{DateTime, Utc}" as chrono___DateTime__Utc_
+Main --> chrono___DateTime__Utc_ : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "std::collections::HashMap" as std__collections__HashMap
+Main --> std__collections__HashMap : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[state]
+[state] --> [chrono::{DateTime, Utc}]
+[state] --> [serde::{Deserialize, Serialize}]
+[state] --> [std::collections::HashMap]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> BridgeState::load_checkpoint
+Caller --> BridgeState::new
+Caller --> BridgeState::save_checkpoint
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -209,16 +264,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of state.rs components
 import { ... } from 'crates/factory-application/src/bridge/state.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`

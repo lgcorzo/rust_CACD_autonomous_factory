@@ -4,7 +4,7 @@ title: "parse_java.py"
 source_path: "parse_java.py"
 description: "Detailed documentation for parse_java.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: parse_java.py
@@ -56,6 +56,60 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "parse_java" as Main
+component "json" as json
+Main --> json : uses
+component "os" as os
+Main --> os : uses
+component "sys" as sys
+Main --> sys : uses
+component "tree_sitter" as tree_sitter
+Main --> tree_sitter : uses
+component "tree_sitter_java" as tree_sitter_java
+Main --> tree_sitter_java : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[parse_java]
+[parse_java] --> [json]
+[parse_java] --> [os]
+[parse_java] --> [sys]
+[parse_java] --> [tree_sitter]
+[parse_java] --> [tree_sitter_java]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> get_node_text
+Caller --> parse_java
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -70,16 +124,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of parse_java.py components
 import { ... } from 'parse_java.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

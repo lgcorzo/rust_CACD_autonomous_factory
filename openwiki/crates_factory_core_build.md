@@ -4,7 +4,7 @@ title: "build.rs"
 source_path: "crates/factory-core/build.rs"
 description: "Detailed documentation for build.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: build.rs
@@ -52,6 +52,48 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-core" {
+        class Module
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "build" as Main
+note right of Main: No internal components
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[build]
+note right of [build]: No dependencies
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +108,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of build.rs components
 import { ... } from 'crates/factory-core/build.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core`

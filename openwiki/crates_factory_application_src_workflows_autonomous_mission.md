@@ -4,7 +4,7 @@ title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: autonomous_mission.rs
@@ -134,6 +134,90 @@ class MissionOutput {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "workflows" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "autonomous_mission" as Main
+component "crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}" as crate__agents___AuditorAgent__FinOpsAgent__RustantAgent__ZeroClawAgent_
+Main --> crate__agents___AuditorAgent__FinOpsAgent__RustantAgent__ZeroClawAgent_ : uses
+component "factory_core::proto::v1::MissionInput as ProtoInput" as factory_core__proto__v1__MissionInput_as_ProtoInput
+Main --> factory_core__proto__v1__MissionInput_as_ProtoInput : uses
+component "factory_infrastructure::{
+    HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+    aethalgard::{AethalgardClient, HttpAethalgardClient},
+}" as factory_infrastructure________HttpR2rClient__KafkaClient__McpClient__McpHttpClient__R2rClient______aethalgard___AethalgardClient__HttpAethalgardClient____
+Main --> factory_infrastructure________HttpR2rClient__KafkaClient__McpClient__McpHttpClient__R2rClient______aethalgard___AethalgardClient__HttpAethalgardClient____ : uses
+component "hatchet_sdk::Hatchet" as hatchet_sdk__Hatchet
+Main --> hatchet_sdk__Hatchet : uses
+component "hatchet_sdk::runnables::Workflow" as hatchet_sdk__runnables__Workflow
+Main --> hatchet_sdk__runnables__Workflow : uses
+component "prost::Message" as prost__Message
+Main --> prost__Message : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "std::hash::{Hash, Hasher}" as std__hash___Hash__Hasher_
+Main --> std__hash___Hash__Hasher_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "uuid::Uuid" as uuid__Uuid
+Main --> uuid__Uuid : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[autonomous_mission]
+[autonomous_mission] --> [crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent}]
+[autonomous_mission] --> [factory_core::proto::v1::MissionInput as ProtoInput]
+[autonomous_mission] --> [factory_infrastructure::{
+    HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+    aethalgard::{AethalgardClient, HttpAethalgardClient},
+}]
+[autonomous_mission] --> [hatchet_sdk::Hatchet]
+[autonomous_mission] --> [hatchet_sdk::runnables::Workflow]
+[autonomous_mission] --> [prost::Message]
+[autonomous_mission] --> [serde::{Deserialize, Serialize}]
+[autonomous_mission] --> [std::hash::{Hash, Hasher}]
+[autonomous_mission] --> [std::sync::Arc]
+[autonomous_mission] --> [super::*]
+[autonomous_mission] --> [uuid::Uuid]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> MissionInput::from_protobuf
+Caller --> create_mission_workflow
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -148,16 +232,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of autonomous_mission.rs components
 import { ... } from 'crates/factory-application/src/workflows/autonomous_mission.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

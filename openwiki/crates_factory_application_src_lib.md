@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: lib.rs
@@ -73,6 +73,57 @@ interface Agent {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "lib" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "pub poller_service::{PollerCycleStats, PollerDaemonService}" as pub_poller_service___PollerCycleStats__PollerDaemonService_
+Main --> pub_poller_service___PollerCycleStats__PollerDaemonService_ : uses
+component "serde_json::Value" as serde_json__Value
+Main --> serde_json__Value : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[lib]
+[lib] --> [async_trait::async_trait]
+[lib] --> [pub poller_service::{PollerCycleStats, PollerDaemonService}]
+[lib] --> [serde_json::Value]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -87,16 +138,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of lib.rs components
 import { ... } from 'crates/factory-application/src/lib.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

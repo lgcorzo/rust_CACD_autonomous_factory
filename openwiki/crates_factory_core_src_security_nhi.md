@@ -4,7 +4,7 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Detailed documentation for nhi.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: nhi.rs
@@ -230,6 +230,74 @@ class VerifiableCredential {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-core" {
+        package "src" {
+            package "security" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "nhi" as Main
+component "base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}" as base64___engine__general_purpose__URL_SAFE_NO_PAD__Engine_as___
+Main --> base64___engine__general_purpose__URL_SAFE_NO_PAD__Engine_as___ : uses
+component "chrono::{DateTime, Utc}" as chrono___DateTime__Utc_
+Main --> chrono___DateTime__Utc_ : uses
+component "ed25519_dalek::Signer" as ed25519_dalek__Signer
+Main --> ed25519_dalek__Signer : uses
+component "ed25519_dalek::SigningKey" as ed25519_dalek__SigningKey
+Main --> ed25519_dalek__SigningKey : uses
+component "rand::rngs::OsRng" as rand__rngs__OsRng
+Main --> rand__rngs__OsRng : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[nhi]
+[nhi] --> [base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _}]
+[nhi] --> [chrono::{DateTime, Utc}]
+[nhi] --> [ed25519_dalek::Signer]
+[nhi] --> [ed25519_dalek::SigningKey]
+[nhi] --> [rand::rngs::OsRng]
+[nhi] --> [serde::{Deserialize, Serialize}]
+[nhi] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> VerifiableCredential::new
+Caller --> VerifiableCredential::sign
+Caller --> VerifiableCredential::sign_async
+Caller --> VerifiableCredential::sign_batch_async
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -244,16 +312,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of nhi.rs components
 import { ... } from 'crates/factory-core/src/security/nhi.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src/security`

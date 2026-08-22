@@ -4,7 +4,7 @@ title: "zeroclaw_sast_integration.rs"
 source_path: "crates/factory-application/tests/zeroclaw_sast_integration.rs"
 description: "Detailed documentation for zeroclaw_sast_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: zeroclaw_sast_integration.rs
@@ -52,6 +52,60 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "tests" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "zeroclaw_sast_integration" as Main
+component "factory_application::agents::ZeroClawAgent" as factory_application__agents__ZeroClawAgent
+Main --> factory_application__agents__ZeroClawAgent : uses
+component "factory_infrastructure::MockMcpClient" as factory_infrastructure__MockMcpClient
+Main --> factory_infrastructure__MockMcpClient : uses
+component "serde_json::json" as serde_json__json
+Main --> serde_json__json : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[zeroclaw_sast_integration]
+[zeroclaw_sast_integration] --> [factory_application::agents::ZeroClawAgent]
+[zeroclaw_sast_integration] --> [factory_infrastructure::MockMcpClient]
+[zeroclaw_sast_integration] --> [serde_json::json]
+[zeroclaw_sast_integration] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +120,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of zeroclaw_sast_integration.rs components
 import { ... } from 'crates/factory-application/tests/zeroclaw_sast_integration.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`

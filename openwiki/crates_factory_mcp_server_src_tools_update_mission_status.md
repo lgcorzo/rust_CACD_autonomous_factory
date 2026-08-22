@@ -4,7 +4,7 @@ title: "update_mission_status.rs"
 source_path: "crates/factory-mcp-server/src/tools/update_mission_status.rs"
 description: "Detailed documentation for update_mission_status.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: update_mission_status.rs
@@ -85,6 +85,74 @@ Tool <|-- UpdateMissionStatusTool : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "tools" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "update_mission_status" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "chrono::Local" as chrono__Local
+Main --> chrono__Local : uses
+component "crate::protocol::{CallToolResult, McpContent}" as crate__protocol___CallToolResult__McpContent_
+Main --> crate__protocol___CallToolResult__McpContent_ : uses
+component "crate::tools::Tool" as crate__tools__Tool
+Main --> crate__tools__Tool : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "tokio::fs::{File, OpenOptions}" as tokio__fs___File__OpenOptions_
+Main --> tokio__fs___File__OpenOptions_ : uses
+component "tokio::io::AsyncWriteExt" as tokio__io__AsyncWriteExt
+Main --> tokio__io__AsyncWriteExt : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[update_mission_status]
+[update_mission_status] --> [async_trait::async_trait]
+[update_mission_status] --> [chrono::Local]
+[update_mission_status] --> [crate::protocol::{CallToolResult, McpContent}]
+[update_mission_status] --> [crate::tools::Tool]
+[update_mission_status] --> [serde_json::{json, Value}]
+[update_mission_status] --> [super::*]
+[update_mission_status] --> [tokio::fs::{File, OpenOptions}]
+[update_mission_status] --> [tokio::io::AsyncWriteExt]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> UpdateMissionStatusTool::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -99,16 +167,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of update_mission_status.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/update_mission_status.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

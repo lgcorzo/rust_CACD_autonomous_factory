@@ -4,7 +4,7 @@ title: "inspect_kafka_topic.rs"
 source_path: "crates/factory-mcp-server/src/tools/inspect_kafka_topic.rs"
 description: "Detailed documentation for inspect_kafka_topic.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: inspect_kafka_topic.rs
@@ -88,6 +88,68 @@ Tool <|-- InspectKafkaTopicTool : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "tools" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "inspect_kafka_topic" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::protocol::{CallToolResult, McpContent}" as crate__protocol___CallToolResult__McpContent_
+Main --> crate__protocol___CallToolResult__McpContent_ : uses
+component "crate::tools::Tool" as crate__tools__Tool
+Main --> crate__tools__Tool : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+component "std::env" as std__env
+Main --> std__env : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[inspect_kafka_topic]
+[inspect_kafka_topic] --> [async_trait::async_trait]
+[inspect_kafka_topic] --> [crate::protocol::{CallToolResult, McpContent}]
+[inspect_kafka_topic] --> [crate::tools::Tool]
+[inspect_kafka_topic] --> [serde_json::{json, Value}]
+[inspect_kafka_topic] --> [std::env]
+[inspect_kafka_topic] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> InspectKafkaTopicTool::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -102,16 +164,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of inspect_kafka_topic.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/inspect_kafka_topic.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

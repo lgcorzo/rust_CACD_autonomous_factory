@@ -4,7 +4,7 @@ title: "parse_python.py"
 source_path: "parse_python.py"
 description: "Detailed documentation for parse_python.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: parse_python.py
@@ -53,6 +53,53 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "parse_python" as Main
+component "ast" as ast
+Main --> ast : uses
+component "json" as json
+Main --> json : uses
+component "sys" as sys
+Main --> sys : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[parse_python]
+[parse_python] --> [ast]
+[parse_python] --> [json]
+[parse_python] --> [sys]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> parse_python_file
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -67,16 +114,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of parse_python.py components
 import { ... } from 'parse_python.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

@@ -4,7 +4,7 @@ title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Detailed documentation for jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: jira.rs
@@ -105,6 +105,63 @@ interface JiraClient {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "jira" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "serde_json::json" as serde_json__json
+Main --> serde_json__json : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "wiremock::matchers::{method, path, query_param}" as wiremock__matchers___method__path__query_param_
+Main --> wiremock__matchers___method__path__query_param_ : uses
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock___Mock__MockServer__ResponseTemplate_
+Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[jira]
+[jira] --> [async_trait::async_trait]
+[jira] --> [serde_json::json]
+[jira] --> [super::*]
+[jira] --> [wiremock::matchers::{method, path, query_param}]
+[jira] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> HttpJiraClient::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -119,16 +176,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of jira.rs components
 import { ... } from 'crates/factory-infrastructure/src/jira.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

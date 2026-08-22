@@ -4,7 +4,7 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Detailed documentation for r2r.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: r2r.rs
@@ -111,6 +111,63 @@ interface R2rClient {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "r2r" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "serde_json::json" as serde_json__json
+Main --> serde_json__json : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "wiremock::matchers::{method, path}" as wiremock__matchers___method__path_
+Main --> wiremock__matchers___method__path_ : uses
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock___Mock__MockServer__ResponseTemplate_
+Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[r2r]
+[r2r] --> [async_trait::async_trait]
+[r2r] --> [serde_json::json]
+[r2r] --> [super::*]
+[r2r] --> [wiremock::matchers::{method, path}]
+[r2r] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> HttpR2rClient::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -125,16 +182,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of r2r.rs components
 import { ... } from 'crates/factory-infrastructure/src/r2r.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

@@ -4,7 +4,7 @@ title: "vault.rs"
 source_path: "crates/factory-infrastructure/src/vault.rs"
 description: "Detailed documentation for vault.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: vault.rs
@@ -83,6 +83,69 @@ SecurityBounds <|-- VaultSecurityBounds : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "vault" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "factory_core::security::{JitToken, SecurityBounds}" as factory_core__security___JitToken__SecurityBounds_
+Main --> factory_core__security___JitToken__SecurityBounds_ : uses
+component "reqwest::Client" as reqwest__Client
+Main --> reqwest__Client : uses
+component "serde_json::json" as serde_json__json
+Main --> serde_json__json : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "wiremock::matchers::{header, method, path}" as wiremock__matchers___header__method__path_
+Main --> wiremock__matchers___header__method__path_ : uses
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock___Mock__MockServer__ResponseTemplate_
+Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[vault]
+[vault] --> [async_trait::async_trait]
+[vault] --> [factory_core::security::{JitToken, SecurityBounds}]
+[vault] --> [reqwest::Client]
+[vault] --> [serde_json::json]
+[vault] --> [super::*]
+[vault] --> [wiremock::matchers::{header, method, path}]
+[vault] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> VaultSecurityBounds::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -97,16 +160,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of vault.rs components
 import { ... } from 'crates/factory-infrastructure/src/vault.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

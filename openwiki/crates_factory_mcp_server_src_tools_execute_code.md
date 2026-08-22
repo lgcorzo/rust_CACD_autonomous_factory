@@ -4,7 +4,7 @@ title: "execute_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/execute_code.rs"
 description: "Detailed documentation for execute_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: execute_code.rs
@@ -85,6 +85,68 @@ Tool <|-- ExecuteCodeTool : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "tools" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "execute_code" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::protocol::{CallToolResult, McpContent}" as crate__protocol___CallToolResult__McpContent_
+Main --> crate__protocol___CallToolResult__McpContent_ : uses
+component "crate::sandbox::SandboxDriver" as crate__sandbox__SandboxDriver
+Main --> crate__sandbox__SandboxDriver : uses
+component "crate::tools::Tool" as crate__tools__Tool
+Main --> crate__tools__Tool : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[execute_code]
+[execute_code] --> [async_trait::async_trait]
+[execute_code] --> [crate::protocol::{CallToolResult, McpContent}]
+[execute_code] --> [crate::sandbox::SandboxDriver]
+[execute_code] --> [crate::tools::Tool]
+[execute_code] --> [serde_json::{json, Value}]
+[execute_code] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> ExecuteCodeTool::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -99,16 +161,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of execute_code.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/execute_code.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

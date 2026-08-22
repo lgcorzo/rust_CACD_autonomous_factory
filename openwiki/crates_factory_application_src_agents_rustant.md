@@ -4,7 +4,7 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: rustant.rs
@@ -144,6 +144,67 @@ Agent <|-- RustantAgent : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "agents" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "rustant" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::Agent" as crate__Agent
+Main --> crate__Agent : uses
+component "factory_infrastructure::{McpClient, R2rClient}" as factory_infrastructure___McpClient__R2rClient_
+Main --> factory_infrastructure___McpClient__R2rClient_ : uses
+component "serde_json::{Value, json}" as serde_json___Value__json_
+Main --> serde_json___Value__json_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[rustant]
+[rustant] --> [async_trait::async_trait]
+[rustant] --> [crate::Agent]
+[rustant] --> [factory_infrastructure::{McpClient, R2rClient}]
+[rustant] --> [serde_json::{Value, json}]
+[rustant] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> RustantAgent::new
+Caller --> RustantAgent::plan_mission
+Caller --> RustantAgent::review_mission
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -158,16 +219,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of rustant.rs components
 import { ... } from 'crates/factory-application/src/agents/rustant.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

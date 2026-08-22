@@ -4,7 +4,7 @@ title: "cursor_store.rs"
 source_path: "crates/factory-infrastructure/src/cursor_store.rs"
 description: "Detailed documentation for cursor_store.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: cursor_store.rs
@@ -145,6 +145,70 @@ CursorStore <|-- PostgresCursorStore : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "cursor_store" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "chrono::Utc" as chrono__Utc
+Main --> chrono__Utc : uses
+component "factory_core::PollerSyncCursor" as factory_core__PollerSyncCursor
+Main --> factory_core__PollerSyncCursor : uses
+component "std::collections::{HashMap, HashSet}" as std__collections___HashMap__HashSet_
+Main --> std__collections___HashMap__HashSet_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "tokio::sync::RwLock" as tokio__sync__RwLock
+Main --> tokio__sync__RwLock : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[cursor_store]
+[cursor_store] --> [async_trait::async_trait]
+[cursor_store] --> [chrono::Utc]
+[cursor_store] --> [factory_core::PollerSyncCursor]
+[cursor_store] --> [std::collections::{HashMap, HashSet}]
+[cursor_store] --> [std::sync::Arc]
+[cursor_store] --> [super::*]
+[cursor_store] --> [tokio::sync::RwLock]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> InMemoryCursorStore::new
+Caller --> PostgresCursorStore::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -159,16 +223,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of cursor_store.rs components
 import { ... } from 'crates/factory-infrastructure/src/cursor_store.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
