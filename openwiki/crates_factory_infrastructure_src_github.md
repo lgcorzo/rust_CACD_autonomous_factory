@@ -4,7 +4,7 @@ title: "github.rs"
 source_path: "crates/factory-infrastructure/src/github.rs"
 description: "Detailed documentation for github.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: github.rs
@@ -253,6 +253,67 @@ GithubClient <|-- HttpGithubClient : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "github" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "chrono::{DateTime, Utc}" as chrono___DateTime__Utc_
+Main --> chrono___DateTime__Utc_ : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "wiremock::matchers::{header, method, path}" as wiremock__matchers___header__method__path_
+Main --> wiremock__matchers___header__method__path_ : uses
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock___Mock__MockServer__ResponseTemplate_
+Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[github]
+[github] --> [async_trait::async_trait]
+[github] --> [chrono::{DateTime, Utc}]
+[github] --> [serde::{Deserialize, Serialize}]
+[github] --> [super::*]
+[github] --> [wiremock::matchers::{header, method, path}]
+[github] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> HttpGithubClient::new
+Caller --> HttpGithubClient::with_url
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -267,16 +328,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of github.rs components
 import { ... } from 'crates/factory-infrastructure/src/github.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

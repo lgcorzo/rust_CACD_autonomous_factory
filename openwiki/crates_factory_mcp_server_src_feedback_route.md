@@ -4,7 +4,7 @@ title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Detailed documentation for feedback_route.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: feedback_route.rs
@@ -57,6 +57,74 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "feedback_route" as Main
+component "axum::{
+    extract::{Json, State},
+    http::StatusCode,
+    response::IntoResponse,
+}" as axum________extract___Json__State_______http__StatusCode______response__IntoResponse___
+Main --> axum________extract___Json__State_______http__StatusCode______response__IntoResponse___ : uses
+component "crate::McpServer" as crate__McpServer
+Main --> crate__McpServer : uses
+component "factory_core::UserFeedbackPayload" as factory_core__UserFeedbackPayload
+Main --> factory_core__UserFeedbackPayload : uses
+component "factory_infrastructure::GitlabClient" as factory_infrastructure__GitlabClient
+Main --> factory_infrastructure__GitlabClient : uses
+component "factory_infrastructure::HttpGitlabClient" as factory_infrastructure__HttpGitlabClient
+Main --> factory_infrastructure__HttpGitlabClient : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[feedback_route]
+[feedback_route] --> [axum::{
+    extract::{Json, State},
+    http::StatusCode,
+    response::IntoResponse,
+}]
+[feedback_route] --> [crate::McpServer]
+[feedback_route] --> [factory_core::UserFeedbackPayload]
+[feedback_route] --> [factory_infrastructure::GitlabClient]
+[feedback_route] --> [factory_infrastructure::HttpGitlabClient]
+[feedback_route] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> handle_feedback
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -71,16 +139,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of feedback_route.rs components
 import { ... } from 'crates/factory-mcp-server/src/feedback_route.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

@@ -4,7 +4,7 @@ title: "deep_research.rs"
 source_path: "crates/factory-application/src/workflows/deep_research.rs"
 description: "Detailed documentation for deep_research.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: deep_research.rs
@@ -155,6 +155,89 @@ class PlanOutput {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "workflows" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "deep_research" as Main
+component "async_openai::{
+    Client,
+    types::{
+        ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
+        CreateChatCompletionRequestArgs,
+    },
+}" as async_openai________Client______types____________ChatCompletionRequestSystemMessageArgs__ChatCompletionRequestUserMessageArgs__________CreateChatCompletionRequestArgs__________
+Main --> async_openai________Client______types____________ChatCompletionRequestSystemMessageArgs__ChatCompletionRequestUserMessageArgs__________CreateChatCompletionRequestArgs__________ : uses
+component "chrono::Utc" as chrono__Utc
+Main --> chrono__Utc : uses
+component "factory_infrastructure::{HttpR2rClient, R2rClient}" as factory_infrastructure___HttpR2rClient__R2rClient_
+Main --> factory_infrastructure___HttpR2rClient__R2rClient_ : uses
+component "hatchet_sdk::Hatchet" as hatchet_sdk__Hatchet
+Main --> hatchet_sdk__Hatchet : uses
+component "hatchet_sdk::runnables::Workflow" as hatchet_sdk__runnables__Workflow
+Main --> hatchet_sdk__runnables__Workflow : uses
+component "reqwest::header::{HeaderMap, HeaderValue}" as reqwest__header___HeaderMap__HeaderValue_
+Main --> reqwest__header___HeaderMap__HeaderValue_ : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "zeroize::Zeroize" as zeroize__Zeroize
+Main --> zeroize__Zeroize : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[deep_research]
+[deep_research] --> [async_openai::{
+    Client,
+    types::{
+        ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
+        CreateChatCompletionRequestArgs,
+    },
+}]
+[deep_research] --> [chrono::Utc]
+[deep_research] --> [factory_infrastructure::{HttpR2rClient, R2rClient}]
+[deep_research] --> [hatchet_sdk::Hatchet]
+[deep_research] --> [hatchet_sdk::runnables::Workflow]
+[deep_research] --> [reqwest::header::{HeaderMap, HeaderValue}]
+[deep_research] --> [serde::{Deserialize, Serialize}]
+[deep_research] --> [std::sync::Arc]
+[deep_research] --> [zeroize::Zeroize]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> create_deep_research_workflow
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -169,16 +252,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of deep_research.rs components
 import { ... } from 'crates/factory-application/src/workflows/deep_research.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

@@ -4,7 +4,7 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Detailed documentation for qa_observer.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: qa_observer.rs
@@ -119,6 +119,84 @@ Default <|-- QAObserverAgent : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "agents" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "qa_observer" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::Agent" as crate__Agent
+Main --> crate__Agent : uses
+component "crate::workflows::autonomous_mission::MissionInput" as crate__workflows__autonomous_mission__MissionInput
+Main --> crate__workflows__autonomous_mission__MissionInput : uses
+component "factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}" as factory_infrastructure___GitlabClient__HttpGitlabClient__HttpSentryClient__SentryClient_
+Main --> factory_infrastructure___GitlabClient__HttpGitlabClient__HttpSentryClient__SentryClient_ : uses
+component "hatchet_sdk::{Hatchet, Runnable}" as hatchet_sdk___Hatchet__Runnable_
+Main --> hatchet_sdk___Hatchet__Runnable_ : uses
+component "serde_json::Value" as serde_json__Value
+Main --> serde_json__Value : uses
+component "std::collections::HashSet" as std__collections__HashSet
+Main --> std__collections__HashSet : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "std::time::Duration" as std__time__Duration
+Main --> std__time__Duration : uses
+component "tokio::sync::Mutex" as tokio__sync__Mutex
+Main --> tokio__sync__Mutex : uses
+component "uuid::Uuid" as uuid__Uuid
+Main --> uuid__Uuid : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[qa_observer]
+[qa_observer] --> [async_trait::async_trait]
+[qa_observer] --> [crate::Agent]
+[qa_observer] --> [crate::workflows::autonomous_mission::MissionInput]
+[qa_observer] --> [factory_infrastructure::{GitlabClient, HttpGitlabClient, HttpSentryClient, SentryClient}]
+[qa_observer] --> [hatchet_sdk::{Hatchet, Runnable}]
+[qa_observer] --> [serde_json::Value]
+[qa_observer] --> [std::collections::HashSet]
+[qa_observer] --> [std::sync::Arc]
+[qa_observer] --> [std::time::Duration]
+[qa_observer] --> [tokio::sync::Mutex]
+[qa_observer] --> [uuid::Uuid]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> QAObserverAgent::monitor_crashes
+Caller --> QAObserverAgent::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -133,16 +211,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of qa_observer.rs components
 import { ... } from 'crates/factory-application/src/agents/qa_observer.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

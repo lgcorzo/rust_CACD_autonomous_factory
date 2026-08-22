@@ -4,7 +4,7 @@ title: "parse_c.py"
 source_path: "parse_c.py"
 description: "Detailed documentation for parse_c.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: parse_c.py
@@ -56,6 +56,60 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "parse_c" as Main
+component "json" as json
+Main --> json : uses
+component "os" as os
+Main --> os : uses
+component "sys" as sys
+Main --> sys : uses
+component "tree_sitter" as tree_sitter
+Main --> tree_sitter : uses
+component "tree_sitter_c" as tree_sitter_c
+Main --> tree_sitter_c : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[parse_c]
+[parse_c] --> [json]
+[parse_c] --> [os]
+[parse_c] --> [sys]
+[parse_c] --> [tree_sitter]
+[parse_c] --> [tree_sitter_c]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> get_node_text
+Caller --> parse_c
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -70,16 +124,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of parse_c.py components
 import { ... } from 'parse_c.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

@@ -4,7 +4,7 @@ title: "parse_ts.py"
 source_path: "parse_ts.py"
 description: "Detailed documentation for parse_ts.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: parse_ts.py
@@ -56,6 +56,63 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "parse_ts" as Main
+component "json" as json
+Main --> json : uses
+component "os" as os
+Main --> os : uses
+component "sys" as sys
+Main --> sys : uses
+component "tree_sitter" as tree_sitter
+Main --> tree_sitter : uses
+component "tree_sitter_javascript" as tree_sitter_javascript
+Main --> tree_sitter_javascript : uses
+component "tree_sitter_typescript" as tree_sitter_typescript
+Main --> tree_sitter_typescript : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[parse_ts]
+[parse_ts] --> [json]
+[parse_ts] --> [os]
+[parse_ts] --> [sys]
+[parse_ts] --> [tree_sitter]
+[parse_ts] --> [tree_sitter_javascript]
+[parse_ts] --> [tree_sitter_typescript]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> get_node_text
+Caller --> parse_ts
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -70,16 +127,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of parse_ts.py components
 import { ... } from 'parse_ts.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-mcp-server/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: security_tests.rs
@@ -52,6 +52,60 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "tests" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "security_tests" as Main
+component "factory_mcp_server::protocol::McpContent" as factory_mcp_server__protocol__McpContent
+Main --> factory_mcp_server__protocol__McpContent : uses
+component "factory_mcp_server::tools::Tool" as factory_mcp_server__tools__Tool
+Main --> factory_mcp_server__tools__Tool : uses
+component "factory_mcp_server::tools::security_review::SecurityReviewTool" as factory_mcp_server__tools__security_review__SecurityReviewTool
+Main --> factory_mcp_server__tools__security_review__SecurityReviewTool : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[security_tests]
+[security_tests] --> [factory_mcp_server::protocol::McpContent]
+[security_tests] --> [factory_mcp_server::tools::Tool]
+[security_tests] --> [factory_mcp_server::tools::security_review::SecurityReviewTool]
+[security_tests] --> [serde_json::{json, Value}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +120,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of security_tests.rs components
 import { ... } from 'crates/factory-mcp-server/tests/security_tests.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/tests`

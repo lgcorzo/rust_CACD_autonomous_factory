@@ -4,7 +4,7 @@ title: "github_webhook.rs"
 source_path: "crates/factory-mcp-server/src/github_webhook.rs"
 description: "Detailed documentation for github_webhook.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: github_webhook.rs
@@ -157,6 +157,84 @@ class GithubWebhookUser {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "github_webhook" as Main
+component "axum::{
+    extract::{Json, State},
+    http::{HeaderMap, StatusCode},
+    response::IntoResponse,
+}" as axum________extract___Json__State_______http___HeaderMap__StatusCode_______response__IntoResponse___
+Main --> axum________extract___Json__State_______http___HeaderMap__StatusCode_______response__IntoResponse___ : uses
+component "crate::McpServer" as crate__McpServer
+Main --> crate__McpServer : uses
+component "hmac::{Hmac, Mac}" as hmac___Hmac__Mac_
+Main --> hmac___Hmac__Mac_ : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "serde_json::json" as serde_json__json
+Main --> serde_json__json : uses
+component "sha2::Sha256" as sha2__Sha256
+Main --> sha2__Sha256 : uses
+component "std::env" as std__env
+Main --> std__env : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[github_webhook]
+[github_webhook] --> [axum::{
+    extract::{Json, State},
+    http::{HeaderMap, StatusCode},
+    response::IntoResponse,
+}]
+[github_webhook] --> [crate::McpServer]
+[github_webhook] --> [hmac::{Hmac, Mac}]
+[github_webhook] --> [serde::{Deserialize, Serialize}]
+[github_webhook] --> [serde_json::json]
+[github_webhook] --> [sha2::Sha256]
+[github_webhook] --> [std::env]
+[github_webhook] --> [std::sync::Arc]
+[github_webhook] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> handle_github_webhook
+Caller --> verify_github_signature
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -171,16 +249,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of github_webhook.rs components
 import { ... } from 'crates/factory-mcp-server/src/github_webhook.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

@@ -4,7 +4,7 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: sentry.rs
@@ -132,6 +132,66 @@ interface SentryClient {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "sentry" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "serde_json::json" as serde_json__json
+Main --> serde_json__json : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "wiremock::matchers::{header, method, path, query_param}" as wiremock__matchers___header__method__path__query_param_
+Main --> wiremock__matchers___header__method__path__query_param_ : uses
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock___Mock__MockServer__ResponseTemplate_
+Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[sentry]
+[sentry] --> [async_trait::async_trait]
+[sentry] --> [serde::{Deserialize, Serialize}]
+[sentry] --> [serde_json::json]
+[sentry] --> [super::*]
+[sentry] --> [wiremock::matchers::{header, method, path, query_param}]
+[sentry] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> HttpSentryClient::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -146,16 +206,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of sentry.rs components
 import { ... } from 'crates/factory-infrastructure/src/sentry.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

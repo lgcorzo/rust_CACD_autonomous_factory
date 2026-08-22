@@ -4,7 +4,7 @@ title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Detailed documentation for doc_agent.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: doc_agent.rs
@@ -176,6 +176,77 @@ Agent <|-- DocumentationAgent : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "agents" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "doc_agent" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::Agent" as crate__Agent
+Main --> crate__Agent : uses
+component "factory_infrastructure::{McpClient, R2rClient}" as factory_infrastructure___McpClient__R2rClient_
+Main --> factory_infrastructure___McpClient__R2rClient_ : uses
+component "factory_infrastructure::{MockMcpClient, MockR2rClient}" as factory_infrastructure___MockMcpClient__MockR2rClient_
+Main --> factory_infrastructure___MockMcpClient__MockR2rClient_ : uses
+component "serde_json::{Value, json}" as serde_json___Value__json_
+Main --> serde_json___Value__json_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "std::time::Duration" as std__time__Duration
+Main --> std__time__Duration : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[doc_agent]
+[doc_agent] --> [async_trait::async_trait]
+[doc_agent] --> [crate::Agent]
+[doc_agent] --> [factory_infrastructure::{McpClient, R2rClient}]
+[doc_agent] --> [factory_infrastructure::{MockMcpClient, MockR2rClient}]
+[doc_agent] --> [serde_json::{Value, json}]
+[doc_agent] --> [std::sync::Arc]
+[doc_agent] --> [std::time::Duration]
+[doc_agent] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> DocumentationAgent::extract_code_deltas
+Caller --> DocumentationAgent::generate_hazitek_report
+Caller --> DocumentationAgent::new
+Caller --> DocumentationAgent::run_post_merge_pipeline
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -190,16 +261,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of doc_agent.rs components
 import { ... } from 'crates/factory-application/src/agents/doc_agent.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

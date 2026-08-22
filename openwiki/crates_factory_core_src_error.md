@@ -4,7 +4,7 @@ title: "error.rs"
 source_path: "crates/factory-core/src/error.rs"
 description: "Detailed documentation for error.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: error.rs
@@ -73,6 +73,51 @@ enum FactoryError {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-core" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "error" as Main
+component "thiserror::Error" as thiserror__Error
+Main --> thiserror__Error : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[error]
+[error] --> [thiserror::Error]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -87,16 +132,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of error.rs components
 import { ... } from 'crates/factory-core/src/error.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`

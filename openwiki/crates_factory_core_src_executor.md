@@ -4,7 +4,7 @@ title: "executor.rs"
 source_path: "crates/factory-core/src/executor.rs"
 description: "Detailed documentation for executor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: executor.rs
@@ -123,6 +123,57 @@ class SurgicalPatch {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-core" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "executor" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::error::FactoryError" as crate__error__FactoryError
+Main --> crate__error__FactoryError : uses
+component "std::path::PathBuf" as std__path__PathBuf
+Main --> std__path__PathBuf : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[executor]
+[executor] --> [async_trait::async_trait]
+[executor] --> [crate::error::FactoryError]
+[executor] --> [std::path::PathBuf]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -137,16 +188,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of executor.rs components
 import { ... } from 'crates/factory-core/src/executor.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/src`
