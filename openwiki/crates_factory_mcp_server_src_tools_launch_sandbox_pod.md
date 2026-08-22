@@ -4,7 +4,7 @@ title: "launch_sandbox_pod.rs"
 source_path: "crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
 description: "Detailed documentation for launch_sandbox_pod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: launch_sandbox_pod.rs
@@ -112,6 +112,77 @@ class SandboxJobSpec {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "tools" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "launch_sandbox_pod" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::protocol::{CallToolResult, McpContent}" as crate__protocol___CallToolResult__McpContent_
+Main --> crate__protocol___CallToolResult__McpContent_ : uses
+component "crate::tools::Tool" as crate__tools__Tool
+Main --> crate__tools__Tool : uses
+component "k8s_openapi::api::batch::v1::Job" as k8s_openapi__api__batch__v1__Job
+Main --> k8s_openapi__api__batch__v1__Job : uses
+component "kube::Client" as kube__Client
+Main --> kube__Client : uses
+component "kube::api::{Api, DeleteParams, ListParams, PostParams}" as kube__api___Api__DeleteParams__ListParams__PostParams_
+Main --> kube__api___Api__DeleteParams__ListParams__PostParams_ : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+component "tokio::time::{sleep, Duration}" as tokio__time___sleep__Duration_
+Main --> tokio__time___sleep__Duration_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[launch_sandbox_pod]
+[launch_sandbox_pod] --> [async_trait::async_trait]
+[launch_sandbox_pod] --> [crate::protocol::{CallToolResult, McpContent}]
+[launch_sandbox_pod] --> [crate::tools::Tool]
+[launch_sandbox_pod] --> [k8s_openapi::api::batch::v1::Job]
+[launch_sandbox_pod] --> [kube::Client]
+[launch_sandbox_pod] --> [kube::api::{Api, DeleteParams, ListParams, PostParams}]
+[launch_sandbox_pod] --> [serde::{Deserialize, Serialize}]
+[launch_sandbox_pod] --> [serde_json::{json, Value}]
+[launch_sandbox_pod] --> [tokio::time::{sleep, Duration}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> LaunchSandboxPodTool::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -126,16 +197,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of launch_sandbox_pod.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

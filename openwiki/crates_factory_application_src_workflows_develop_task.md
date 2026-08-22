@@ -4,7 +4,7 @@ title: "develop_task.rs"
 source_path: "crates/factory-application/src/workflows/develop_task.rs"
 description: "Detailed documentation for develop_task.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: develop_task.rs
@@ -99,6 +99,68 @@ class TaskOutput {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "workflows" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "develop_task" as Main
+component "crate::agents::ZeroClawAgent" as crate__agents__ZeroClawAgent
+Main --> crate__agents__ZeroClawAgent : uses
+component "factory_infrastructure::{McpClient, McpHttpClient}" as factory_infrastructure___McpClient__McpHttpClient_
+Main --> factory_infrastructure___McpClient__McpHttpClient_ : uses
+component "hatchet_sdk::Hatchet" as hatchet_sdk__Hatchet
+Main --> hatchet_sdk__Hatchet : uses
+component "hatchet_sdk::runnables::Task" as hatchet_sdk__runnables__Task
+Main --> hatchet_sdk__runnables__Task : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[develop_task]
+[develop_task] --> [crate::agents::ZeroClawAgent]
+[develop_task] --> [factory_infrastructure::{McpClient, McpHttpClient}]
+[develop_task] --> [hatchet_sdk::Hatchet]
+[develop_task] --> [hatchet_sdk::runnables::Task]
+[develop_task] --> [serde::{Deserialize, Serialize}]
+[develop_task] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> create_develop_task_workflow
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -113,16 +175,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of develop_task.rs components
 import { ... } from 'crates/factory-application/src/workflows/develop_task.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/workflows`

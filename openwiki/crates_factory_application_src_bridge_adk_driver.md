@@ -4,7 +4,7 @@ title: "adk_driver.rs"
 source_path: "crates/factory-application/src/bridge/adk_driver.rs"
 description: "Detailed documentation for adk_driver.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: adk_driver.rs
@@ -77,6 +77,62 @@ CodeSurgeryExecutor <|-- NativeADKDriver : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "bridge" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "adk_driver" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "factory_core::error::FactoryError" as factory_core__error__FactoryError
+Main --> factory_core__error__FactoryError : uses
+component "factory_core::executor::{CodeSurgeryExecutor, ExecutionResult, SurgicalPatch}" as factory_core__executor___CodeSurgeryExecutor__ExecutionResult__SurgicalPatch_
+Main --> factory_core__executor___CodeSurgeryExecutor__ExecutionResult__SurgicalPatch_ : uses
+component "std::fs" as std__fs
+Main --> std__fs : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[adk_driver]
+[adk_driver] --> [async_trait::async_trait]
+[adk_driver] --> [factory_core::error::FactoryError]
+[adk_driver] --> [factory_core::executor::{CodeSurgeryExecutor, ExecutionResult, SurgicalPatch}]
+[adk_driver] --> [std::fs]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -91,16 +147,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of adk_driver.rs components
 import { ... } from 'crates/factory-application/src/bridge/adk_driver.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`

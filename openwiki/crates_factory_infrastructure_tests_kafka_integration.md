@@ -4,7 +4,7 @@ title: "kafka_integration.rs"
 source_path: "crates/factory-infrastructure/tests/kafka_integration.rs"
 description: "Detailed documentation for kafka_integration.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: kafka_integration.rs
@@ -52,6 +52,54 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "tests" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "kafka_integration" as Main
+component "factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}" as factory_infrastructure__kafka___KafkaClient__RdKafkaClient_
+Main --> factory_infrastructure__kafka___KafkaClient__RdKafkaClient_ : uses
+component "std::env" as std__env
+Main --> std__env : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[kafka_integration]
+[kafka_integration] --> [factory_infrastructure::kafka::{KafkaClient, RdKafkaClient}]
+[kafka_integration] --> [std::env]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +114,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of kafka_integration.rs components
 import { ... } from 'crates/factory-infrastructure/tests/kafka_integration.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/tests`

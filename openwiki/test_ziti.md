@@ -4,7 +4,7 @@ title: "test_ziti.rs"
 source_path: "test_ziti.rs"
 description: "Detailed documentation for test_ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: test_ziti.rs
@@ -52,6 +52,47 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "test_ziti" as Main
+component "ziti_sdk::ZitiConfig" as ziti_sdk__ZitiConfig
+Main --> ziti_sdk__ZitiConfig : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[test_ziti]
+[test_ziti] --> [ziti_sdk::ZitiConfig]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +107,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of test_ziti.rs components
 import { ... } from 'test_ziti.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

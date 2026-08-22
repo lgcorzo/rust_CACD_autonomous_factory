@@ -4,7 +4,7 @@ title: "test_hatchet.py"
 source_path: "test_hatchet.py"
 description: "Detailed documentation for test_hatchet.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: test_hatchet.py
@@ -52,6 +52,47 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "test_hatchet" as Main
+component "requests" as requests
+Main --> requests : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[test_hatchet]
+[test_hatchet] --> [requests]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +107,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of test_hatchet.py components
 import { ... } from 'test_hatchet.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

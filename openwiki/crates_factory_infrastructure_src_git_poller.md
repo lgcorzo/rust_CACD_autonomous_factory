@@ -4,7 +4,7 @@ title: "git_poller.rs"
 source_path: "crates/factory-infrastructure/src/git_poller.rs"
 description: "Detailed documentation for git_poller.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: git_poller.rs
@@ -237,6 +237,91 @@ class GitPlatformPoller {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "git_poller" as Main
+component "chrono::Utc" as chrono__Utc
+Main --> chrono__Utc : uses
+component "crate::cursor_store::CursorStore" as crate__cursor_store__CursorStore
+Main --> crate__cursor_store__CursorStore : uses
+component "crate::cursor_store::InMemoryCursorStore" as crate__cursor_store__InMemoryCursorStore
+Main --> crate__cursor_store__InMemoryCursorStore : uses
+component "crate::github::GithubClient" as crate__github__GithubClient
+Main --> crate__github__GithubClient : uses
+component "crate::github::{
+        GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient,
+    }" as crate__github____________GithubComment__GithubIssue__GithubPullRequest__GithubUser__MockGithubClient_______
+Main --> crate__github____________GithubComment__GithubIssue__GithubPullRequest__GithubUser__MockGithubClient_______ : uses
+component "crate::gitlab::GitlabClient" as crate__gitlab__GitlabClient
+Main --> crate__gitlab__GitlabClient : uses
+component "crate::gitlab::{
+        GitlabAuthor, GitlabIssue, GitlabMergeRequest, GitlabNote, MockGitlabClient,
+    }" as crate__gitlab____________GitlabAuthor__GitlabIssue__GitlabMergeRequest__GitlabNote__MockGitlabClient_______
+Main --> crate__gitlab____________GitlabAuthor__GitlabIssue__GitlabMergeRequest__GitlabNote__MockGitlabClient_______ : uses
+component "factory_core::{PRCommentEvent, PRDirective, PolledIssueEvent, PollerSyncCursor}" as factory_core___PRCommentEvent__PRDirective__PolledIssueEvent__PollerSyncCursor_
+Main --> factory_core___PRCommentEvent__PRDirective__PolledIssueEvent__PollerSyncCursor_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[git_poller]
+[git_poller] --> [chrono::Utc]
+[git_poller] --> [crate::cursor_store::CursorStore]
+[git_poller] --> [crate::cursor_store::InMemoryCursorStore]
+[git_poller] --> [crate::github::GithubClient]
+[git_poller] --> [crate::github::{
+        GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient,
+    }]
+[git_poller] --> [crate::gitlab::GitlabClient]
+[git_poller] --> [crate::gitlab::{
+        GitlabAuthor, GitlabIssue, GitlabMergeRequest, GitlabNote, MockGitlabClient,
+    }]
+[git_poller] --> [factory_core::{PRCommentEvent, PRDirective, PolledIssueEvent, PollerSyncCursor}]
+[git_poller] --> [std::sync::Arc]
+[git_poller] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> GitPlatformPoller::new
+Caller --> GitPlatformPoller::poll_github_issues
+Caller --> GitPlatformPoller::poll_github_pr_comments
+Caller --> GitPlatformPoller::poll_gitlab_issues
+Caller --> GitPlatformPoller::poll_gitlab_mr_notes
+Caller --> GitPlatformPoller::with_labels
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -251,16 +336,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of git_poller.rs components
 import { ... } from 'crates/factory-infrastructure/src/git_poller.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

@@ -4,7 +4,7 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: gitlab.rs
@@ -222,6 +222,69 @@ GitlabClient <|-- HttpGitlabClient : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "gitlab" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "chrono::{DateTime, Utc}" as chrono___DateTime__Utc_
+Main --> chrono___DateTime__Utc_ : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "serde_json::json" as serde_json__json
+Main --> serde_json__json : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "wiremock::matchers::{body_json, header, method, path}" as wiremock__matchers___body_json__header__method__path_
+Main --> wiremock__matchers___body_json__header__method__path_ : uses
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock___Mock__MockServer__ResponseTemplate_
+Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[gitlab]
+[gitlab] --> [async_trait::async_trait]
+[gitlab] --> [chrono::{DateTime, Utc}]
+[gitlab] --> [serde::{Deserialize, Serialize}]
+[gitlab] --> [serde_json::json]
+[gitlab] --> [super::*]
+[gitlab] --> [wiremock::matchers::{body_json, header, method, path}]
+[gitlab] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> HttpGitlabClient::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -236,16 +299,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of gitlab.rs components
 import { ... } from 'crates/factory-infrastructure/src/gitlab.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

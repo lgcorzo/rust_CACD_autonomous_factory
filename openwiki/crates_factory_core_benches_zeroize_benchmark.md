@@ -4,7 +4,7 @@ title: "zeroize_benchmark.rs"
 source_path: "crates/factory-core/benches/zeroize_benchmark.rs"
 description: "Detailed documentation for zeroize_benchmark.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: zeroize_benchmark.rs
@@ -52,6 +52,57 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-core" {
+        package "benches" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "zeroize_benchmark" as Main
+component "criterion::{black_box, criterion_group, criterion_main, Criterion}" as criterion___black_box__criterion_group__criterion_main__Criterion_
+Main --> criterion___black_box__criterion_group__criterion_main__Criterion_ : uses
+component "factory_core::security::JitToken" as factory_core__security__JitToken
+Main --> factory_core__security__JitToken : uses
+component "zeroize::Zeroize" as zeroize__Zeroize
+Main --> zeroize__Zeroize : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[zeroize_benchmark]
+[zeroize_benchmark] --> [criterion::{black_box, criterion_group, criterion_main, Criterion}]
+[zeroize_benchmark] --> [factory_core::security::JitToken]
+[zeroize_benchmark] --> [zeroize::Zeroize]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +117,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of zeroize_benchmark.rs components
 import { ... } from 'crates/factory-core/benches/zeroize_benchmark.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/benches`

@@ -4,7 +4,7 @@ title: "s3.rs"
 source_path: "crates/factory-infrastructure/src/s3.rs"
 description: "Detailed documentation for s3.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: s3.rs
@@ -85,6 +85,60 @@ S3Storage <|-- AwsS3Storage : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "s3" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "aws_sdk_s3::Client" as aws_sdk_s3__Client
+Main --> aws_sdk_s3__Client : uses
+component "aws_sdk_s3::primitives::ByteStream" as aws_sdk_s3__primitives__ByteStream
+Main --> aws_sdk_s3__primitives__ByteStream : uses
+component "crate::S3Storage" as crate__S3Storage
+Main --> crate__S3Storage : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[s3]
+[s3] --> [async_trait::async_trait]
+[s3] --> [aws_sdk_s3::Client]
+[s3] --> [aws_sdk_s3::primitives::ByteStream]
+[s3] --> [crate::S3Storage]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> AwsS3Storage::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -99,16 +153,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of s3.rs components
 import { ... } from 'crates/factory-infrastructure/src/s3.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

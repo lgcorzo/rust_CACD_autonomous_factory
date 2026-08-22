@@ -4,7 +4,7 @@ title: "parse_go.py"
 source_path: "parse_go.py"
 description: "Detailed documentation for parse_go.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: parse_go.py
@@ -56,6 +56,60 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "parse_go" as Main
+component "json" as json
+Main --> json : uses
+component "os" as os
+Main --> os : uses
+component "sys" as sys
+Main --> sys : uses
+component "tree_sitter" as tree_sitter
+Main --> tree_sitter : uses
+component "tree_sitter_go" as tree_sitter_go
+Main --> tree_sitter_go : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[parse_go]
+[parse_go] --> [json]
+[parse_go] --> [os]
+[parse_go] --> [sys]
+[parse_go] --> [tree_sitter]
+[parse_go] --> [tree_sitter_go]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> get_node_text
+Caller --> parse_go
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -70,16 +124,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of parse_go.py components
 import { ... } from 'parse_go.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

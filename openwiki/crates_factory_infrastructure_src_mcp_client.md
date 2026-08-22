@@ -4,7 +4,7 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: mcp_client.rs
@@ -136,6 +136,73 @@ McpClient <|-- McpSseClient : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "mcp_client" as Main
+component "anyhow::anyhow" as anyhow__anyhow
+Main --> anyhow__anyhow : uses
+component "futures_util::StreamExt" as futures_util__StreamExt
+Main --> futures_util__StreamExt : uses
+component "reqwest::Client" as reqwest__Client
+Main --> reqwest__Client : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+component "super::*" as super___
+Main --> super___ : uses
+component "tokio::sync::OnceCell" as tokio__sync__OnceCell
+Main --> tokio__sync__OnceCell : uses
+component "wiremock::matchers::{method, path}" as wiremock__matchers___method__path_
+Main --> wiremock__matchers___method__path_ : uses
+component "wiremock::{Mock, MockServer, ResponseTemplate}" as wiremock___Mock__MockServer__ResponseTemplate_
+Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[mcp_client]
+[mcp_client] --> [anyhow::anyhow]
+[mcp_client] --> [futures_util::StreamExt]
+[mcp_client] --> [reqwest::Client]
+[mcp_client] --> [serde_json::{json, Value}]
+[mcp_client] --> [super::*]
+[mcp_client] --> [tokio::sync::OnceCell]
+[mcp_client] --> [wiremock::matchers::{method, path}]
+[mcp_client] --> [wiremock::{Mock, MockServer, ResponseTemplate}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> McpHttpClient::new
+Caller --> McpSseClient::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -150,16 +217,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of mcp_client.rs components
 import { ... } from 'crates/factory-infrastructure/src/mcp_client.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

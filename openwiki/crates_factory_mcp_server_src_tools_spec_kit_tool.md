@@ -4,7 +4,7 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: spec_kit_tool.rs
@@ -254,6 +254,75 @@ interface SpecProvider {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "tools" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "spec_kit_tool" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::protocol::CallToolResult" as crate__protocol__CallToolResult
+Main --> crate__protocol__CallToolResult : uses
+component "crate::tools::Tool" as crate__tools__Tool
+Main --> crate__tools__Tool : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[spec_kit_tool]
+[spec_kit_tool] --> [async_trait::async_trait]
+[spec_kit_tool] --> [crate::protocol::CallToolResult]
+[spec_kit_tool] --> [crate::tools::Tool]
+[spec_kit_tool] --> [serde::{Deserialize, Serialize}]
+[spec_kit_tool] --> [serde_json::{json, Value}]
+[spec_kit_tool] --> [std::sync::Arc]
+[spec_kit_tool] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> CliSpecProvider::new
+Caller --> MockSpecProvider::new
+Caller --> SpecKitTool::invoke_spec_kit
+Caller --> SpecKitTool::new
+Caller --> SpecKitTool::with_provider
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -268,16 +337,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of spec_kit_tool.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/spec_kit_tool.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

@@ -4,7 +4,7 @@ title: "security_tests.rs"
 source_path: "crates/factory-core/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: security_tests.rs
@@ -77,6 +77,57 @@ SecurityBounds <|-- DummyBounds : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-core" {
+        package "tests" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "security_tests" as Main
+component "factory_core::error::Result" as factory_core__error__Result
+Main --> factory_core__error__Result : uses
+component "factory_core::security::JitToken" as factory_core__security__JitToken
+Main --> factory_core__security__JitToken : uses
+component "factory_core::security::SecurityBounds" as factory_core__security__SecurityBounds
+Main --> factory_core__security__SecurityBounds : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[security_tests]
+[security_tests] --> [factory_core::error::Result]
+[security_tests] --> [factory_core::security::JitToken]
+[security_tests] --> [factory_core::security::SecurityBounds]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -91,16 +142,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of security_tests.rs components
 import { ... } from 'crates/factory-core/tests/security_tests.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-core/tests`

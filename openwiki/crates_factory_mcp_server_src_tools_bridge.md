@@ -4,7 +4,7 @@ title: "bridge.rs"
 source_path: "crates/factory-mcp-server/src/tools/bridge.rs"
 description: "Detailed documentation for bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: bridge.rs
@@ -144,6 +144,69 @@ Tool <|-- BridgeTool : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "tools" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "bridge" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::protocol::CallToolResult" as crate__protocol__CallToolResult
+Main --> crate__protocol__CallToolResult : uses
+component "crate::tools::Tool" as crate__tools__Tool
+Main --> crate__tools__Tool : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+component "std::fs" as std__fs
+Main --> std__fs : uses
+component "std::path::PathBuf" as std__path__PathBuf
+Main --> std__path__PathBuf : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[bridge]
+[bridge] --> [async_trait::async_trait]
+[bridge] --> [crate::protocol::CallToolResult]
+[bridge] --> [crate::tools::Tool]
+[bridge] --> [serde_json::{json, Value}]
+[bridge] --> [std::fs]
+[bridge] --> [std::path::PathBuf]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> BridgeTool::load_state
+Caller --> BridgeTool::save_state
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -158,16 +221,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of bridge.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/bridge.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`
