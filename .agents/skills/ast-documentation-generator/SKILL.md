@@ -178,6 +178,15 @@ src/
 
 Produces
 
+```
+openwiki/
+
+    api.md
+
+    models.md
+
+    auth.md
+```
 
 ---
 
