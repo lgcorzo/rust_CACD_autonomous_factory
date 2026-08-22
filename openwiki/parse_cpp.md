@@ -4,7 +4,7 @@ title: "parse_cpp.py"
 source_path: "parse_cpp.py"
 description: "Detailed documentation for parse_cpp.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: parse_cpp.py
@@ -56,6 +56,60 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "parse_cpp" as Main
+component "json" as json
+Main --> json : uses
+component "os" as os
+Main --> os : uses
+component "sys" as sys
+Main --> sys : uses
+component "tree_sitter" as tree_sitter
+Main --> tree_sitter : uses
+component "tree_sitter_cpp" as tree_sitter_cpp
+Main --> tree_sitter_cpp : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[parse_cpp]
+[parse_cpp] --> [json]
+[parse_cpp] --> [os]
+[parse_cpp] --> [sys]
+[parse_cpp] --> [tree_sitter]
+[parse_cpp] --> [tree_sitter_cpp]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> get_node_text
+Caller --> parse_cpp
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -70,16 +124,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of parse_cpp.py components
 import { ... } from 'parse_cpp.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-infrastructure/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: lib.rs
@@ -75,6 +75,121 @@ interface S3Storage {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "lib" as Main
+component "pub aethalgard::MockAethalgardClient" as pub_aethalgard__MockAethalgardClient
+Main --> pub_aethalgard__MockAethalgardClient : uses
+component "pub aethalgard::{AethalgardClient, HttpAethalgardClient}" as pub_aethalgard___AethalgardClient__HttpAethalgardClient_
+Main --> pub_aethalgard___AethalgardClient__HttpAethalgardClient_ : uses
+component "pub cursor_store::{CursorStore, InMemoryCursorStore, PostgresCursorStore}" as pub_cursor_store___CursorStore__InMemoryCursorStore__PostgresCursorStore_
+Main --> pub_cursor_store___CursorStore__InMemoryCursorStore__PostgresCursorStore_ : uses
+component "pub git_poller::GitPlatformPoller" as pub_git_poller__GitPlatformPoller
+Main --> pub_git_poller__GitPlatformPoller : uses
+component "pub github::MockGithubClient" as pub_github__MockGithubClient
+Main --> pub_github__MockGithubClient : uses
+component "pub github::{GithubClient, GithubIssue, HttpGithubClient}" as pub_github___GithubClient__GithubIssue__HttpGithubClient_
+Main --> pub_github___GithubClient__GithubIssue__HttpGithubClient_ : uses
+component "pub gitlab::MockGitlabClient" as pub_gitlab__MockGitlabClient
+Main --> pub_gitlab__MockGitlabClient : uses
+component "pub gitlab::{GitlabClient, GitlabIssue, HttpGitlabClient}" as pub_gitlab___GitlabClient__GitlabIssue__HttpGitlabClient_
+Main --> pub_gitlab___GitlabClient__GitlabIssue__HttpGitlabClient_ : uses
+component "pub jira::MockJiraClient" as pub_jira__MockJiraClient
+Main --> pub_jira__MockJiraClient : uses
+component "pub jira::{HttpJiraClient, JiraClient}" as pub_jira___HttpJiraClient__JiraClient_
+Main --> pub_jira___HttpJiraClient__JiraClient_ : uses
+component "pub kafka::{KafkaClient, RdKafkaClient, SimpleMockKafkaClient}" as pub_kafka___KafkaClient__RdKafkaClient__SimpleMockKafkaClient_
+Main --> pub_kafka___KafkaClient__RdKafkaClient__SimpleMockKafkaClient_ : uses
+component "pub kafka::{KafkaClient, RdKafkaClient}" as pub_kafka___KafkaClient__RdKafkaClient_
+Main --> pub_kafka___KafkaClient__RdKafkaClient_ : uses
+component "pub mcp_client::MockMcpClient" as pub_mcp_client__MockMcpClient
+Main --> pub_mcp_client__MockMcpClient : uses
+component "pub mcp_client::{McpClient, McpHttpClient, McpSseClient}" as pub_mcp_client___McpClient__McpHttpClient__McpSseClient_
+Main --> pub_mcp_client___McpClient__McpHttpClient__McpSseClient_ : uses
+component "pub r2r::MockR2rClient" as pub_r2r__MockR2rClient
+Main --> pub_r2r__MockR2rClient : uses
+component "pub r2r::{HttpR2rClient, R2rClient}" as pub_r2r___HttpR2rClient__R2rClient_
+Main --> pub_r2r___HttpR2rClient__R2rClient_ : uses
+component "pub s3::AwsS3Storage" as pub_s3__AwsS3Storage
+Main --> pub_s3__AwsS3Storage : uses
+component "pub semantica::MockSemanticaClient" as pub_semantica__MockSemanticaClient
+Main --> pub_semantica__MockSemanticaClient : uses
+component "pub semantica::{
+    Conflict, DecisionRecord, HttpSemanticaClient, MissionPlan, ProvenanceReport, SemanticaClient,
+}" as pub_semantica________Conflict__DecisionRecord__HttpSemanticaClient__MissionPlan__ProvenanceReport__SemanticaClient___
+Main --> pub_semantica________Conflict__DecisionRecord__HttpSemanticaClient__MissionPlan__ProvenanceReport__SemanticaClient___ : uses
+component "pub sentry::MockSentryClient" as pub_sentry__MockSentryClient
+Main --> pub_sentry__MockSentryClient : uses
+component "pub sentry::{CrashEvent, HttpSentryClient, SentryClient}" as pub_sentry___CrashEvent__HttpSentryClient__SentryClient_
+Main --> pub_sentry___CrashEvent__HttpSentryClient__SentryClient_ : uses
+component "pub ziti::MockZitiIdentity" as pub_ziti__MockZitiIdentity
+Main --> pub_ziti__MockZitiIdentity : uses
+component "pub ziti::{OpenZitiIdentity, ZitiIdentity}" as pub_ziti___OpenZitiIdentity__ZitiIdentity_
+Main --> pub_ziti___OpenZitiIdentity__ZitiIdentity_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[lib]
+[lib] --> [pub aethalgard::MockAethalgardClient]
+[lib] --> [pub aethalgard::{AethalgardClient, HttpAethalgardClient}]
+[lib] --> [pub cursor_store::{CursorStore, InMemoryCursorStore, PostgresCursorStore}]
+[lib] --> [pub git_poller::GitPlatformPoller]
+[lib] --> [pub github::MockGithubClient]
+[lib] --> [pub github::{GithubClient, GithubIssue, HttpGithubClient}]
+[lib] --> [pub gitlab::MockGitlabClient]
+[lib] --> [pub gitlab::{GitlabClient, GitlabIssue, HttpGitlabClient}]
+[lib] --> [pub jira::MockJiraClient]
+[lib] --> [pub jira::{HttpJiraClient, JiraClient}]
+[lib] --> [pub kafka::{KafkaClient, RdKafkaClient, SimpleMockKafkaClient}]
+[lib] --> [pub kafka::{KafkaClient, RdKafkaClient}]
+[lib] --> [pub mcp_client::MockMcpClient]
+[lib] --> [pub mcp_client::{McpClient, McpHttpClient, McpSseClient}]
+[lib] --> [pub r2r::MockR2rClient]
+[lib] --> [pub r2r::{HttpR2rClient, R2rClient}]
+[lib] --> [pub s3::AwsS3Storage]
+[lib] --> [pub semantica::MockSemanticaClient]
+[lib] --> [pub semantica::{
+    Conflict, DecisionRecord, HttpSemanticaClient, MissionPlan, ProvenanceReport, SemanticaClient,
+}]
+[lib] --> [pub sentry::MockSentryClient]
+[lib] --> [pub sentry::{CrashEvent, HttpSentryClient, SentryClient}]
+[lib] --> [pub ziti::MockZitiIdentity]
+[lib] --> [pub ziti::{OpenZitiIdentity, ZitiIdentity}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -89,16 +204,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of lib.rs components
 import { ... } from 'crates/factory-infrastructure/src/lib.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

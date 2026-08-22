@@ -4,7 +4,7 @@ title: "scratch.rs"
 source_path: "crates/factory-mcp-server/src/scratch.rs"
 description: "Detailed documentation for scratch.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: scratch.rs
@@ -52,6 +52,54 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "scratch" as Main
+component "async_openai::{Client, config::OpenAIConfig}" as async_openai___Client__config__OpenAIConfig_
+Main --> async_openai___Client__config__OpenAIConfig_ : uses
+component "reqwest::header::HeaderMap" as reqwest__header__HeaderMap
+Main --> reqwest__header__HeaderMap : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[scratch]
+[scratch] --> [async_openai::{Client, config::OpenAIConfig}]
+[scratch] --> [reqwest::header::HeaderMap]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +114,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of scratch.rs components
 import { ... } from 'crates/factory-mcp-server/src/scratch.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src`

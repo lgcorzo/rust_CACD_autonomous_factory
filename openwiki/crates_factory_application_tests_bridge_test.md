@@ -4,7 +4,7 @@ title: "bridge_test.rs"
 source_path: "crates/factory-application/tests/bridge_test.rs"
 description: "Detailed documentation for bridge_test.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: bridge_test.rs
@@ -52,6 +52,51 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "tests" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "bridge_test" as Main
+component "factory_application::bridge::{BridgeState, StepCheckpoint}" as factory_application__bridge___BridgeState__StepCheckpoint_
+Main --> factory_application__bridge___BridgeState__StepCheckpoint_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[bridge_test]
+[bridge_test] --> [factory_application::bridge::{BridgeState, StepCheckpoint}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +111,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of bridge_test.rs components
 import { ... } from 'crates/factory-application/tests/bridge_test.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/tests`

@@ -4,7 +4,7 @@ title: "main.rs"
 source_path: "crates/factory-cli/src/main.rs"
 description: "Detailed documentation for main.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: main.rs
@@ -100,6 +100,74 @@ enum Commands {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-cli" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "main" as Main
+component "clap::{Parser, Subcommand}" as clap___Parser__Subcommand_
+Main --> clap___Parser__Subcommand_ : uses
+component "factory_application::poller_service::PollerDaemonService" as factory_application__poller_service__PollerDaemonService
+Main --> factory_application__poller_service__PollerDaemonService : uses
+component "factory_application::workflows::comment_control::CommentControlService" as factory_application__workflows__comment_control__CommentControlService
+Main --> factory_application__workflows__comment_control__CommentControlService : uses
+component "factory_infrastructure::r2r::R2rClient" as factory_infrastructure__r2r__R2rClient
+Main --> factory_infrastructure__r2r__R2rClient : uses
+component "factory_infrastructure::{
+                GitPlatformPoller, HttpAethalgardClient, HttpGithubClient, HttpGitlabClient,
+                HttpR2rClient, HttpSemanticaClient, InMemoryCursorStore, KafkaClient,
+                McpHttpClient, PostgresCursorStore,
+            }" as factory_infrastructure____________________GitPlatformPoller__HttpAethalgardClient__HttpGithubClient__HttpGitlabClient__________________HttpR2rClient__HttpSemanticaClient__InMemoryCursorStore__KafkaClient__________________McpHttpClient__PostgresCursorStore_______________
+Main --> factory_infrastructure____________________GitPlatformPoller__HttpAethalgardClient__HttpGithubClient__HttpGitlabClient__________________HttpR2rClient__HttpSemanticaClient__InMemoryCursorStore__KafkaClient__________________McpHttpClient__PostgresCursorStore_______________ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[main]
+[main] --> [clap::{Parser, Subcommand}]
+[main] --> [factory_application::poller_service::PollerDaemonService]
+[main] --> [factory_application::workflows::comment_control::CommentControlService]
+[main] --> [factory_infrastructure::r2r::R2rClient]
+[main] --> [factory_infrastructure::{
+                GitPlatformPoller, HttpAethalgardClient, HttpGithubClient, HttpGitlabClient,
+                HttpR2rClient, HttpSemanticaClient, InMemoryCursorStore, KafkaClient,
+                McpHttpClient, PostgresCursorStore,
+            }]
+[main] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -114,16 +182,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of main.rs components
 import { ... } from 'crates/factory-cli/src/main.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-cli/src`

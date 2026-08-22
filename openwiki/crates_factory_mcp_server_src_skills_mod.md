@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-mcp-server/src/skills/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: mod.rs
@@ -52,6 +52,52 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "skills" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "mod" as Main
+note right of Main: No internal components
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[mod]
+note right of [mod]: No dependencies
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +112,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of mod.rs components
 import { ... } from 'crates/factory-mcp-server/src/skills/mod.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/skills`

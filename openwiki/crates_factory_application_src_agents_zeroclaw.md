@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: zeroclaw.rs
@@ -176,6 +176,68 @@ Agent <|-- ZeroClawAgent : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "agents" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "zeroclaw" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::Agent" as crate__Agent
+Main --> crate__Agent : uses
+component "factory_infrastructure::{AethalgardClient, McpClient}" as factory_infrastructure___AethalgardClient__McpClient_
+Main --> factory_infrastructure___AethalgardClient__McpClient_ : uses
+component "serde_json::{Value, json}" as serde_json___Value__json_
+Main --> serde_json___Value__json_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[zeroclaw]
+[zeroclaw] --> [async_trait::async_trait]
+[zeroclaw] --> [crate::Agent]
+[zeroclaw] --> [factory_infrastructure::{AethalgardClient, McpClient}]
+[zeroclaw] --> [serde_json::{Value, json}]
+[zeroclaw] --> [std::sync::Arc]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> ZeroClawAgent::execute_task
+Caller --> ZeroClawAgent::introspect_k8s
+Caller --> ZeroClawAgent::new
+Caller --> ZeroClawAgent::validate_mission
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -190,16 +252,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of zeroclaw.rs components
 import { ... } from 'crates/factory-application/src/agents/zeroclaw.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

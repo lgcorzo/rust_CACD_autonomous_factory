@@ -4,7 +4,7 @@ title: "auditor.rs"
 source_path: "crates/factory-application/src/agents/auditor.rs"
 description: "Detailed documentation for auditor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: auditor.rs
@@ -180,6 +180,65 @@ Default <|-- AuditorAgent : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "agents" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "auditor" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::Agent" as crate__Agent
+Main --> crate__Agent : uses
+component "serde_json::{Value, json}" as serde_json___Value__json_
+Main --> serde_json___Value__json_ : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[auditor]
+[auditor] --> [async_trait::async_trait]
+[auditor] --> [crate::Agent]
+[auditor] --> [serde_json::{Value, json}]
+[auditor] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> AuditorAgent::analyze_dag_logs
+Caller --> AuditorAgent::audit_mission
+Caller --> AuditorAgent::evaluate_prompts
+Caller --> AuditorAgent::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -194,16 +253,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of auditor.rs components
 import { ... } from 'crates/factory-application/src/agents/auditor.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/agents`

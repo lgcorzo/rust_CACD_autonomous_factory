@@ -4,7 +4,7 @@ title: "plan_mission.rs"
 source_path: "crates/factory-mcp-server/src/tools/plan_mission.rs"
 description: "Detailed documentation for plan_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: plan_mission.rs
@@ -93,6 +93,85 @@ Tool <|-- PlanMissionTool : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-mcp-server" {
+        package "src" {
+            package "tools" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "plan_mission" as Main
+component "async_openai::{
+    types::{
+        ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
+        ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
+        CreateChatCompletionRequestArgs,
+    },
+    Client,
+}" as async_openai________types____________ChatCompletionRequestSystemMessageArgs__ChatCompletionRequestUserMessageArgs__________ChatCompletionResponseFormat__ChatCompletionResponseFormatType__________CreateChatCompletionRequestArgs_____________Client___
+Main --> async_openai________types____________ChatCompletionRequestSystemMessageArgs__ChatCompletionRequestUserMessageArgs__________ChatCompletionResponseFormat__ChatCompletionResponseFormatType__________CreateChatCompletionRequestArgs_____________Client___ : uses
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::protocol::{CallToolResult, McpContent}" as crate__protocol___CallToolResult__McpContent_
+Main --> crate__protocol___CallToolResult__McpContent_ : uses
+component "crate::tools::Tool" as crate__tools__Tool
+Main --> crate__tools__Tool : uses
+component "factory_core::FinOpsTag" as factory_core__FinOpsTag
+Main --> factory_core__FinOpsTag : uses
+component "reqwest::header::{HeaderMap, HeaderValue}" as reqwest__header___HeaderMap__HeaderValue_
+Main --> reqwest__header___HeaderMap__HeaderValue_ : uses
+component "serde_json::{json, Value}" as serde_json___json__Value_
+Main --> serde_json___json__Value_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[plan_mission]
+[plan_mission] --> [async_openai::{
+    types::{
+        ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
+        ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
+        CreateChatCompletionRequestArgs,
+    },
+    Client,
+}]
+[plan_mission] --> [async_trait::async_trait]
+[plan_mission] --> [crate::protocol::{CallToolResult, McpContent}]
+[plan_mission] --> [crate::tools::Tool]
+[plan_mission] --> [factory_core::FinOpsTag]
+[plan_mission] --> [reqwest::header::{HeaderMap, HeaderValue}]
+[plan_mission] --> [serde_json::{json, Value}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> PlanMissionTool::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -107,16 +186,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of plan_mission.rs components
 import { ... } from 'crates/factory-mcp-server/src/tools/plan_mission.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-mcp-server/src/tools`

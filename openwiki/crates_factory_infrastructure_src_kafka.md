@@ -4,7 +4,7 @@ title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: kafka.rs
@@ -131,6 +131,64 @@ KafkaClient <|-- SimpleMockKafkaClient : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "kafka" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "chrono::Utc" as chrono__Utc
+Main --> chrono__Utc : uses
+component "rdkafka::config::ClientConfig" as rdkafka__config__ClientConfig
+Main --> rdkafka__config__ClientConfig : uses
+component "rdkafka::producer::{FutureProducer, FutureRecord}" as rdkafka__producer___FutureProducer__FutureRecord_
+Main --> rdkafka__producer___FutureProducer__FutureRecord_ : uses
+component "std::time::Duration" as std__time__Duration
+Main --> std__time__Duration : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[kafka]
+[kafka] --> [async_trait::async_trait]
+[kafka] --> [chrono::Utc]
+[kafka] --> [rdkafka::config::ClientConfig]
+[kafka] --> [rdkafka::producer::{FutureProducer, FutureRecord}]
+[kafka] --> [std::time::Duration]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> RdKafkaClient::new
+Caller --> SimpleMockKafkaClient::new
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -145,16 +203,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of kafka.rs components
 import { ... } from 'crates/factory-infrastructure/src/kafka.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`

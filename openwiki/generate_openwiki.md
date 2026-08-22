@@ -4,7 +4,7 @@ title: "generate_openwiki.py"
 source_path: "generate_openwiki.py"
 description: "Detailed documentation for generate_openwiki.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: generate_openwiki.py
@@ -32,7 +32,7 @@ Provides implementation for generate_openwiki.py.
 * None
 
 ### Exported functions
-* generate_ai_description, generate_indexes, generate_plantuml_classes, generate_plantuml_sequence, get_git_hash, main, parse_file, setup_okf_structure, validate_links, write_file_doc
+* generate_ai_description, generate_indexes, generate_plantuml_call, generate_plantuml_classes, generate_plantuml_component, generate_plantuml_dependency, generate_plantuml_package, generate_plantuml_sequence, get_git_hash, main, parse_file, setup_okf_structure, validate_links, write_file_doc
 
 ## Public API
 
@@ -46,7 +46,19 @@ No description provided.
 #### `generate_indexes(now (Any)) -> None`
 No description provided.
 
+#### `generate_plantuml_call(classes (Any), free_functions (Any)) -> None`
+No description provided.
+
 #### `generate_plantuml_classes(classes (Any)) -> None`
+No description provided.
+
+#### `generate_plantuml_component(module_name (Any), deps (Any)) -> None`
+No description provided.
+
+#### `generate_plantuml_dependency(module_name (Any), deps (Any)) -> None`
+No description provided.
+
+#### `generate_plantuml_package(dir_name (Any)) -> None`
 No description provided.
 
 #### `generate_plantuml_sequence(module_name (Any), classes (Any), free_functions (Any)) -> None`
@@ -80,6 +92,78 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "generate_openwiki" as Main
+component "datetime" as datetime
+Main --> datetime : uses
+component "json" as json
+Main --> json : uses
+component "os" as os
+Main --> os : uses
+component "re" as re
+Main --> re : uses
+component "shutil" as shutil
+Main --> shutil : uses
+component "subprocess" as subprocess
+Main --> subprocess : uses
+component "sys" as sys
+Main --> sys : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[generate_openwiki]
+[generate_openwiki] --> [datetime]
+[generate_openwiki] --> [json]
+[generate_openwiki] --> [os]
+[generate_openwiki] --> [re]
+[generate_openwiki] --> [shutil]
+[generate_openwiki] --> [subprocess]
+[generate_openwiki] --> [sys]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> generate_ai_description
+Caller --> generate_indexes
+Caller --> generate_plantuml_call
+Caller --> generate_plantuml_classes
+Caller --> generate_plantuml_component
+Caller --> generate_plantuml_dependency
+Caller --> generate_plantuml_package
+Caller --> generate_plantuml_sequence
+Caller --> get_git_hash
+Caller --> main
+Caller --> parse_file
+Caller --> setup_okf_structure
+Caller --> validate_links
+Caller --> write_file_doc
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -94,16 +178,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of generate_openwiki.py components
 import { ... } from 'generate_openwiki.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

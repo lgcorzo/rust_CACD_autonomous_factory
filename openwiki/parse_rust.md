@@ -4,7 +4,7 @@ title: "parse_rust.py"
 source_path: "parse_rust.py"
 description: "Detailed documentation for parse_rust.py"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: parse_rust.py
@@ -56,6 +56,57 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "root" {
+    class Module
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "parse_rust" as Main
+component "json" as json
+Main --> json : uses
+component "sys" as sys
+Main --> sys : uses
+component "tree_sitter" as tree_sitter
+Main --> tree_sitter : uses
+component "tree_sitter_rust" as tree_sitter_rust
+Main --> tree_sitter_rust : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[parse_rust]
+[parse_rust] --> [json]
+[parse_rust] --> [sys]
+[parse_rust] --> [tree_sitter]
+[parse_rust] --> [tree_sitter_rust]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> get_node_text
+Caller --> parse_rust
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -70,16 +121,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of parse_rust.py components
 import { ... } from 'parse_rust.py';
 ```
-
-
 
 ## Cross References
 * **Parent module:** ``

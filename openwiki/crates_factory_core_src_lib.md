@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: lib.rs
@@ -20,7 +20,7 @@ Provides implementation for lib.rs.
 * Handles logic related to lib.
 
 ### Dependencies
-* chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap, uuid::Uuid
+* chrono::{DateTime, Utc}, pub config::AgentModelConfig, serde::{Deserialize, Serialize}, std::collections::HashMap, uuid::Uuid
 
 ### Imported modules
 * None
@@ -706,6 +706,64 @@ class UserFeedbackPayload {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-core" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "lib" as Main
+component "chrono::{DateTime, Utc}" as chrono___DateTime__Utc_
+Main --> chrono___DateTime__Utc_ : uses
+component "pub config::AgentModelConfig" as pub_config__AgentModelConfig
+Main --> pub_config__AgentModelConfig : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "std::collections::HashMap" as std__collections__HashMap
+Main --> std__collections__HashMap : uses
+component "uuid::Uuid" as uuid__Uuid
+Main --> uuid__Uuid : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[lib]
+[lib] --> [chrono::{DateTime, Utc}]
+[lib] --> [pub config::AgentModelConfig]
+[lib] --> [serde::{Deserialize, Serialize}]
+[lib] --> [std::collections::HashMap]
+[lib] --> [uuid::Uuid]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> PRDirective::parse
+Caller --> PolledIssueEvent::extract_resource_limits
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -720,8 +778,6 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
@@ -729,8 +785,6 @@ Svc --> Caller: result
 import { ... } from 'crates/factory-core/src/lib.rs';
 ```
 
-
-
 ## Cross References
 * **Parent module:** `crates/factory-core/src`
-* **Dependencies:** chrono::{DateTime, Utc}, serde::{Deserialize, Serialize}, std::collections::HashMap, uuid::Uuid
+* **Dependencies:** chrono::{DateTime, Utc}, pub config::AgentModelConfig, serde::{Deserialize, Serialize}, std::collections::HashMap, uuid::Uuid

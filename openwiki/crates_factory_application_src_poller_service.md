@@ -4,7 +4,7 @@ title: "poller_service.rs"
 source_path: "crates/factory-application/src/poller_service.rs"
 description: "Detailed documentation for poller_service.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: poller_service.rs
@@ -174,6 +174,108 @@ class PollerDaemonService {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "poller_service" as Main
+component "chrono::Utc" as chrono__Utc
+Main --> chrono__Utc : uses
+component "crate::workflows::comment_control::{CommentControlInput, CommentControlService}" as crate__workflows__comment_control___CommentControlInput__CommentControlService_
+Main --> crate__workflows__comment_control___CommentControlInput__CommentControlService_ : uses
+component "ed25519_dalek::SigningKey" as ed25519_dalek__SigningKey
+Main --> ed25519_dalek__SigningKey : uses
+component "factory_core::security::nhi::{AgentSubject, VerifiableCredential}" as factory_core__security__nhi___AgentSubject__VerifiableCredential_
+Main --> factory_core__security__nhi___AgentSubject__VerifiableCredential_ : uses
+component "factory_core::{PRCommentEvent, PolledIssueEvent}" as factory_core___PRCommentEvent__PolledIssueEvent_
+Main --> factory_core___PRCommentEvent__PolledIssueEvent_ : uses
+component "factory_infrastructure::aethalgard::MockAethalgardClient" as factory_infrastructure__aethalgard__MockAethalgardClient
+Main --> factory_infrastructure__aethalgard__MockAethalgardClient : uses
+component "factory_infrastructure::cursor_store::InMemoryCursorStore" as factory_infrastructure__cursor_store__InMemoryCursorStore
+Main --> factory_infrastructure__cursor_store__InMemoryCursorStore : uses
+component "factory_infrastructure::git_poller::GitPlatformPoller" as factory_infrastructure__git_poller__GitPlatformPoller
+Main --> factory_infrastructure__git_poller__GitPlatformPoller : uses
+component "factory_infrastructure::github::{
+        GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient,
+    }" as factory_infrastructure__github____________GithubComment__GithubIssue__GithubPullRequest__GithubUser__MockGithubClient_______
+Main --> factory_infrastructure__github____________GithubComment__GithubIssue__GithubPullRequest__GithubUser__MockGithubClient_______ : uses
+component "factory_infrastructure::kafka::KafkaClient" as factory_infrastructure__kafka__KafkaClient
+Main --> factory_infrastructure__kafka__KafkaClient : uses
+component "factory_infrastructure::kafka::SimpleMockKafkaClient" as factory_infrastructure__kafka__SimpleMockKafkaClient
+Main --> factory_infrastructure__kafka__SimpleMockKafkaClient : uses
+component "factory_infrastructure::mcp_client::MockMcpClient" as factory_infrastructure__mcp_client__MockMcpClient
+Main --> factory_infrastructure__mcp_client__MockMcpClient : uses
+component "factory_infrastructure::r2r::MockR2rClient" as factory_infrastructure__r2r__MockR2rClient
+Main --> factory_infrastructure__r2r__MockR2rClient : uses
+component "factory_infrastructure::semantica::SemanticaClient" as factory_infrastructure__semantica__SemanticaClient
+Main --> factory_infrastructure__semantica__SemanticaClient : uses
+component "rand::rngs::OsRng" as rand__rngs__OsRng
+Main --> rand__rngs__OsRng : uses
+component "serde::{Deserialize, Serialize}" as serde___Deserialize__Serialize_
+Main --> serde___Deserialize__Serialize_ : uses
+component "std::sync::Arc" as std__sync__Arc
+Main --> std__sync__Arc : uses
+component "super::*" as super___
+Main --> super___ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[poller_service]
+[poller_service] --> [chrono::Utc]
+[poller_service] --> [crate::workflows::comment_control::{CommentControlInput, CommentControlService}]
+[poller_service] --> [ed25519_dalek::SigningKey]
+[poller_service] --> [factory_core::security::nhi::{AgentSubject, VerifiableCredential}]
+[poller_service] --> [factory_core::{PRCommentEvent, PolledIssueEvent}]
+[poller_service] --> [factory_infrastructure::aethalgard::MockAethalgardClient]
+[poller_service] --> [factory_infrastructure::cursor_store::InMemoryCursorStore]
+[poller_service] --> [factory_infrastructure::git_poller::GitPlatformPoller]
+[poller_service] --> [factory_infrastructure::github::{
+        GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient,
+    }]
+[poller_service] --> [factory_infrastructure::kafka::KafkaClient]
+[poller_service] --> [factory_infrastructure::kafka::SimpleMockKafkaClient]
+[poller_service] --> [factory_infrastructure::mcp_client::MockMcpClient]
+[poller_service] --> [factory_infrastructure::r2r::MockR2rClient]
+[poller_service] --> [factory_infrastructure::semantica::SemanticaClient]
+[poller_service] --> [rand::rngs::OsRng]
+[poller_service] --> [serde::{Deserialize, Serialize}]
+[poller_service] --> [std::sync::Arc]
+[poller_service] --> [super::*]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> PollerDaemonService::new
+Caller --> PollerDaemonService::poll_once
+Caller --> PollerDaemonService::with_signing_key
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -188,16 +290,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of poller_service.rs components
 import { ... } from 'crates/factory-application/src/poller_service.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src`

@@ -103,6 +103,72 @@ def generate_plantuml_sequence(module_name, classes, free_functions):
     return seq
 
 
+def generate_plantuml_package(dir_name):
+    puml = "@startuml\n"
+    parts = dir_name.split(os.sep)
+    indent = ""
+    has_package = False
+    for p in parts:
+        if p and p != '.':
+            puml += f"{indent}package \"{p}\" {{\n"
+            indent += "    "
+            has_package = True
+    if has_package:
+        puml += f"{indent}class Module\n"
+        for p in reversed(parts):
+            if p and p != '.':
+                indent = indent[:-4]
+                puml += f"{indent}}}\n"
+    if not has_package:
+        puml += "package \"root\" {\n    class Module\n}\n"
+    puml += "@enduml\n"
+    return puml
+
+
+def generate_plantuml_component(module_name, deps):
+    puml = "@startuml\n"
+    puml += f"component \"{module_name}\" as Main\n"
+    if deps:
+        for d in deps:
+            safe_d = "".join(c if c.isalnum() else "_" for c in d)
+            puml += f"component \"{d}\" as {safe_d}\n"
+            puml += f"Main --> {safe_d} : uses\n"
+    else:
+        puml += "note right of Main: No internal components\n"
+    puml += "@enduml\n"
+    return puml
+
+
+def generate_plantuml_dependency(module_name, deps):
+    puml = "@startuml\n"
+    puml += f"[{module_name}]\n"
+    if deps:
+        for d in deps:
+            puml += f"[{module_name}] --> [{d}]\n"
+    else:
+        puml += f"note right of [{module_name}]: No dependencies\n"
+    puml += "@enduml\n"
+    return puml
+
+
+def generate_plantuml_call(classes, free_functions):
+    puml = "@startuml\n"
+    has_calls = False
+    for c in classes:
+        for m in c.get('methods', []):
+            if m.get('is_pub', True):
+                puml += f"Caller --> {c['name']}::{m['name']}\n"
+                has_calls = True
+    for f in free_functions:
+        if f.get('is_pub', True):
+            puml += f"Caller --> {f['name']}\n"
+            has_calls = True
+    if not has_calls:
+        puml += "Caller --> Module : no public API\n"
+    puml += "@enduml\n"
+    return puml
+
+
 def write_file_doc(file_path, parsed, now):
     file_name = os.path.basename(file_path)
     base_name = os.path.splitext(file_name)[0]
@@ -121,6 +187,11 @@ def write_file_doc(file_path, parsed, now):
     parsed['free_functions'].sort(key=lambda x: x['name'])
     plantuml_classes = generate_plantuml_classes(parsed['classes'])
     seq_diagram = generate_plantuml_sequence(base_name, parsed['classes'], parsed['free_functions'])
+
+    pkg_diagram = generate_plantuml_package(dir_name)
+    comp_diagram = generate_plantuml_component(base_name, parsed.get('dependencies', []))
+    dep_diagram = generate_plantuml_dependency(base_name, parsed.get('dependencies', []))
+    call_diagram = generate_plantuml_call(parsed['classes'], parsed['free_functions'])
 
     deps_str = ", ".join(sorted(parsed['dependencies'])) if parsed['dependencies'] else "None"
 
@@ -272,6 +343,30 @@ Provides implementation for {file_name}.
 
 ```plantuml
 {plantuml_classes}
+```
+
+## Package Diagram
+
+```plantuml
+{pkg_diagram}
+```
+
+## Component Diagram
+
+```plantuml
+{comp_diagram}
+```
+
+## Dependency Graph
+
+```plantuml
+{dep_diagram}
+```
+
+## Call Graph
+
+```plantuml
+{call_diagram}
 ```
 
 ## Execution flow & Sequence explanation

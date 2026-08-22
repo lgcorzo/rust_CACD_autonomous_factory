@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-application/src/bridge/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: mod.rs
@@ -52,6 +52,59 @@ class EmptyModule {
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-application" {
+        package "src" {
+            package "bridge" {
+                class Module
+            }
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "mod" as Main
+component "pub adk_driver::*" as pub_adk_driver___
+Main --> pub_adk_driver___ : uses
+component "pub semantica_bridge::SemanticaBridge" as pub_semantica_bridge__SemanticaBridge
+Main --> pub_semantica_bridge__SemanticaBridge : uses
+component "pub state::{BridgeState, BridgeStatus, StepCheckpoint}" as pub_state___BridgeState__BridgeStatus__StepCheckpoint_
+Main --> pub_state___BridgeState__BridgeStatus__StepCheckpoint_ : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[mod]
+[mod] --> [pub adk_driver::*]
+[mod] --> [pub semantica_bridge::SemanticaBridge]
+[mod] --> [pub state::{BridgeState, BridgeStatus, StepCheckpoint}]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> Module : no public API
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -66,16 +119,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of mod.rs components
 import { ... } from 'crates/factory-application/src/bridge/mod.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-application/src/bridge`

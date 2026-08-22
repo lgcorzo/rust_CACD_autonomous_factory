@@ -4,7 +4,7 @@ title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Detailed documentation for aethalgard.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "198b215"
+last_verified_commit: "ec7bd0f"
 ---
 
 # File: aethalgard.rs
@@ -135,6 +135,58 @@ AethalgardClient <|-- HttpAethalgardClient : extends/implements
 
 ```
 
+## Package Diagram
+
+```plantuml
+@startuml
+package "crates" {
+    package "factory-infrastructure" {
+        package "src" {
+            class Module
+        }
+    }
+}
+@enduml
+
+```
+
+## Component Diagram
+
+```plantuml
+@startuml
+component "aethalgard" as Main
+component "async_trait::async_trait" as async_trait__async_trait
+Main --> async_trait__async_trait : uses
+component "crate::semantica::SemanticaClient" as crate__semantica__SemanticaClient
+Main --> crate__semantica__SemanticaClient : uses
+component "serde_json::json" as serde_json__json
+Main --> serde_json__json : uses
+@enduml
+
+```
+
+## Dependency Graph
+
+```plantuml
+@startuml
+[aethalgard]
+[aethalgard] --> [async_trait::async_trait]
+[aethalgard] --> [crate::semantica::SemanticaClient]
+[aethalgard] --> [serde_json::json]
+@enduml
+
+```
+
+## Call Graph
+
+```plantuml
+@startuml
+Caller --> HttpAethalgardClient::new
+Caller --> HttpAethalgardClient::with_semantica_endpoint
+@enduml
+
+```
+
 ## Execution flow & Sequence explanation
 
 ```plantuml
@@ -149,16 +201,12 @@ Svc --> Caller: result
 
 ```
 
-
-
 ## Examples
 
 ```
 // Example usage of aethalgard.rs components
 import { ... } from 'crates/factory-infrastructure/src/aethalgard.rs';
 ```
-
-
 
 ## Cross References
 * **Parent module:** `crates/factory-infrastructure/src`
