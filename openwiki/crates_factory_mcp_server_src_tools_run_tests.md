@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "run_tests.rs"
 source_path: "crates/factory-mcp-server/src/tools/run_tests.rs"
 description: "Detailed documentation for run_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: run_tests.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(driver: Arc<dyn SandboxDriver> (Any))`
-Parameters: driver: Arc<dyn SandboxDriver> (Any)
+##### `new(driver (Arc<dyn SandboxDriver>))`
+Parameters: driver (Arc<dyn SandboxDriver>)
 Dependencies: Inherited from context
 Initialization: Sets up RunTestsTool
 
@@ -60,7 +65,7 @@ None.
 
 **Private Methods:**
 
-* `call(_params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(_params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
@@ -74,11 +79,11 @@ None.
 ```plantuml
 @startuml
 class RunTestsTool {
-    -call(_params: Value:Any) : anyhow::Result<CallToolResult>
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new(driver: Arc<dyn SandboxDriver>:Any) : Self
+    -call(_params: Value) anyhow::Result<CallToolResult>
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new(driver: Arc<dyn SandboxDriver>) Self
 }
 Tool <|-- RunTestsTool : extends/implements
 @enduml

@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "search_jira.rs"
 source_path: "crates/factory-mcp-server/src/tools/search_jira.rs"
 description: "Detailed documentation for search_jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: search_jira.rs
@@ -57,7 +62,7 @@ None.
 
 **Private Methods:**
 
-* `search_issues(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
+* `search_issues(_query (&str)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### SearchJiraTool
 
@@ -66,8 +71,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(jira_client: Arc<dyn JiraClient> (Any))`
-Parameters: jira_client: Arc<dyn JiraClient> (Any)
+##### `new(jira_client (Arc<dyn JiraClient>))`
+Parameters: jira_client (Arc<dyn JiraClient>)
 Dependencies: Inherited from context
 Initialization: Sets up SearchJiraTool
 
@@ -81,7 +86,7 @@ None.
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
@@ -95,15 +100,15 @@ None.
 ```plantuml
 @startuml
 class ManualMockJiraClient {
-    -search_issues(_query: &str:Any) : anyhow::Result<String>
+    -search_issues(_query: &str) anyhow::Result<String>
 }
 JiraClient <|-- ManualMockJiraClient : extends/implements
 class SearchJiraTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new(jira_client: Arc<dyn JiraClient>:Any) : Self
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new(jira_client: Arc<dyn JiraClient>) Self
 }
 Tool <|-- SearchJiraTool : extends/implements
 @enduml

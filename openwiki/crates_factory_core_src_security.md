@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: security.rs
@@ -79,8 +84,8 @@ None.
 
 **Private Methods:**
 
-* `audit_content(_content: &str (Any)) -> Result<AuditResult>`: Internal helper logic.
-* `validate_signature(data: &[u8] (Any), signature: &str (Any)) -> Result<bool>`: Internal helper logic.
+* `audit_content(_content (&str)) -> Result<AuditResult>`: Internal helper logic.
+* `validate_signature(data (&[u8]), signature (&str)) -> Result<bool>`: Internal helper logic.
 
 #### JitToken
 
@@ -144,13 +149,13 @@ Default constructor.
 
 **Public Methods:**
 
-##### `inspect_diff(diff: &str (Any)) -> Self`
+##### `inspect_diff(diff (&str)) -> Self`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `diff: &str`: type=Any, meaning=Input for diff: &str, valid values=Any valid Any, optional=No, default value=None
+* `diff`: type=&str, meaning=Input for diff, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: Self
@@ -261,8 +266,8 @@ None.
 class AuditResult {
 }
 class Ed25519SecurityValidator {
-    -audit_content(_content: &str:Any) : Result<AuditResult>
-    -validate_signature(data: &[u8]:Any, signature: &str:Any) : Result<bool>
+    -audit_content(_content: &str) Result<AuditResult>
+    -validate_signature(data: &[u8], signature: &str) Result<bool>
 }
 SecurityValidator <|-- Ed25519SecurityValidator : extends/implements
 class JitToken {
@@ -270,8 +275,8 @@ class JitToken {
 class SandboxConstraint {
 }
 class SastScanResult {
-    +inspect_diff(diff: &str:Any) : Self
-    +passes_gate() : bool
+    +inspect_diff(diff: &str) Self
+    +passes_gate() bool
 }
 interface SecurityBounds {
 }

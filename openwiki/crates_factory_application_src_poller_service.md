@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "poller_service.rs"
 source_path: "crates/factory-application/src/poller_service.rs"
 description: "Detailed documentation for poller_service.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: poller_service.rs
@@ -70,8 +75,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(poller: Arc<GitPlatformPoller> (Any), kafka_client: Arc<dyn KafkaClient> (Any), semantica_client: Option<Arc<dyn SemanticaClient>> (Any), comment_service: Arc<CommentControlService> (Any))`
-Parameters: poller: Arc<GitPlatformPoller> (Any), kafka_client: Arc<dyn KafkaClient> (Any), semantica_client: Option<Arc<dyn SemanticaClient>> (Any), comment_service: Arc<CommentControlService> (Any)
+##### `new(poller (Arc<GitPlatformPoller>), kafka_client (Arc<dyn KafkaClient>), semantica_client (Option<Arc<dyn SemanticaClient>>), comment_service (Arc<CommentControlService>))`
+Parameters: poller (Arc<GitPlatformPoller>), kafka_client (Arc<dyn KafkaClient>), semantica_client (Option<Arc<dyn SemanticaClient>>), comment_service (Arc<CommentControlService>)
 Dependencies: Inherited from context
 Initialization: Sets up PollerDaemonService
 
@@ -86,14 +91,14 @@ Initialization: Sets up PollerDaemonService
 
 **Public Methods:**
 
-##### `poll_once(github_repos: &[String] (Any), gitlab_projects: &[String] (Any)) -> PollerCycleStats`
+##### `poll_once(github_repos (&[String]), gitlab_projects (&[String])) -> PollerCycleStats`
 
 ###### Description
 /// Executes a single polling cycle across configured repositories.
 
 ###### Inputs
-* `github_repos: &[String]`: type=Any, meaning=Input for github_repos: &[String], valid values=Any valid Any, optional=No, default value=None
-* `gitlab_projects: &[String]`: type=Any, meaning=Input for gitlab_projects: &[String], valid values=Any valid Any, optional=No, default value=None
+* `github_repos`: type=&[String], meaning=Input for github_repos, valid values=Any valid &[String], optional=No, default value=None
+* `gitlab_projects`: type=&[String], meaning=Input for gitlab_projects, valid values=Any valid &[String], optional=No, default value=None
 
 ###### Output
 Return type: PollerCycleStats
@@ -117,14 +122,14 @@ Space Complexity: O(1) mostly
 let result = instance.poll_once();
 ```
 
-##### `with_signing_key(signing_key: SigningKey (Any), key_id: String (Any)) -> Self`
+##### `with_signing_key(signing_key (SigningKey), key_id (String)) -> Self`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `signing_key: SigningKey`: type=Any, meaning=Input for signing_key: SigningKey, valid values=Any valid Any, optional=No, default value=None
-* `key_id: String`: type=Any, meaning=Input for key_id: String, valid values=Any valid Any, optional=No, default value=None
+* `signing_key`: type=SigningKey, meaning=Input for signing_key, valid values=Any valid SigningKey, optional=No, default value=None
+* `key_id`: type=String, meaning=Input for key_id, valid values=Any valid String, optional=No, default value=None
 
 ###### Output
 Return type: Self
@@ -150,8 +155,8 @@ let result = instance.with_signing_key();
 
 **Private Methods:**
 
-* `ingest_issue(issue: &PolledIssueEvent (Any)) -> anyhow::Result<()>`: Internal helper logic.
-* `process_comment_directive(comment: &PRCommentEvent (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `ingest_issue(issue (&PolledIssueEvent)) -> anyhow::Result<()>`: Internal helper logic.
+* `process_comment_directive(comment (&PRCommentEvent)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -164,11 +169,11 @@ None.
 class PollerCycleStats {
 }
 class PollerDaemonService {
-    -ingest_issue(issue: &PolledIssueEvent:Any) : anyhow::Result<()>
-    +new(poller: Arc<GitPlatformPoller>:Any, kafka_client: Arc<dyn KafkaClient>:Any, semantica_client: Option<Arc<dyn SemanticaClient>>:Any, comment_service: Arc<CommentControlService>:Any) : Self
-    +poll_once(github_repos: &[String]:Any, gitlab_projects: &[String]:Any) : PollerCycleStats
-    -process_comment_directive(comment: &PRCommentEvent:Any) : anyhow::Result<()>
-    +with_signing_key(signing_key: SigningKey:Any, key_id: String:Any) : Self
+    -ingest_issue(issue: &PolledIssueEvent) anyhow::Result<()>
+    +new(poller: Arc<GitPlatformPoller>, kafka_client: Arc<dyn KafkaClient>, semantica_client: Option<Arc<dyn SemanticaClient>>, comment_service: Arc<CommentControlService>) Self
+    +poll_once(github_repos: &[String], gitlab_projects: &[String]) PollerCycleStats
+    -process_comment_directive(comment: &PRCommentEvent) anyhow::Result<()>
+    +with_signing_key(signing_key: SigningKey, key_id: String) Self
 }
 @enduml
 

@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "adk_driver.rs"
 source_path: "crates/factory-application/src/bridge/adk_driver.rs"
 description: "Detailed documentation for adk_driver.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: adk_driver.rs
@@ -57,8 +62,8 @@ None.
 
 **Private Methods:**
 
-* `apply_patch(_mission_id: &str (Any), patch: &SurgicalPatch (Any)) -> Result<ExecutionResult, FactoryError>`: Internal helper logic.
-* `verify_syntax(_file_path: &std::path::Path (Any)) -> Result<bool, FactoryError>`: Internal helper logic.
+* `apply_patch(_mission_id (&str), patch (&SurgicalPatch)) -> Result<ExecutionResult, FactoryError>`: Internal helper logic.
+* `verify_syntax(_file_path (&std::path::Path)) -> Result<bool, FactoryError>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -69,8 +74,8 @@ None.
 ```plantuml
 @startuml
 class NativeADKDriver {
-    -apply_patch(_mission_id: &str:Any, patch: &SurgicalPatch:Any) : Result<ExecutionResult, FactoryError>
-    -verify_syntax(_file_path: &std::path::Path:Any) : Result<bool, FactoryError>
+    -apply_patch(_mission_id: &str, patch: &SurgicalPatch) Result<ExecutionResult, FactoryError>
+    -verify_syntax(_file_path: &std::path::Path) Result<bool, FactoryError>
 }
 CodeSurgeryExecutor <|-- NativeADKDriver : extends/implements
 @enduml

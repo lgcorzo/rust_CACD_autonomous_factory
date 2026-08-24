@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Detailed documentation for r2r.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: r2r.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(url: String (Any), user: String (Any), pwd: String (Any))`
-Parameters: url: String (Any), user: String (Any), pwd: String (Any)
+##### `new(url (String), user (String), pwd (String))`
+Parameters: url (String), user (String), pwd (String)
 Dependencies: Inherited from context
 Initialization: Sets up HttpR2rClient
 
@@ -64,9 +69,9 @@ None.
 **Private Methods:**
 
 * `get_token() -> anyhow::Result<String>`: Internal helper logic.
-* `map_stacktrace_to_ast(stacktrace: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
-* `push_osr_metric(metric: &factory_core::OsrMetric (Any)) -> anyhow::Result<()>`: Internal helper logic.
-* `search(query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
+* `map_stacktrace_to_ast(stacktrace (&str)) -> anyhow::Result<String>`: Internal helper logic.
+* `push_osr_metric(metric (&factory_core::OsrMetric)) -> anyhow::Result<()>`: Internal helper logic.
+* `search(query (&str)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### R2rClient
 
@@ -98,11 +103,11 @@ None.
 ```plantuml
 @startuml
 class HttpR2rClient {
-    -get_token() : anyhow::Result<String>
-    -map_stacktrace_to_ast(stacktrace: &str:Any) : anyhow::Result<String>
-    +new(url: String:Any, user: String:Any, pwd: String:Any) : Self
-    -push_osr_metric(metric: &factory_core::OsrMetric:Any) : anyhow::Result<()>
-    -search(query: &str:Any) : anyhow::Result<String>
+    -get_token() anyhow::Result<String>
+    -map_stacktrace_to_ast(stacktrace: &str) anyhow::Result<String>
+    +new(url: String, user: String, pwd: String) Self
+    -push_osr_metric(metric: &factory_core::OsrMetric) anyhow::Result<()>
+    -search(query: &str) anyhow::Result<String>
 }
 R2rClient <|-- HttpR2rClient : extends/implements
 interface R2rClient {

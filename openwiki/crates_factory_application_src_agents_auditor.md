@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "auditor.rs"
 source_path: "crates/factory-application/src/agents/auditor.rs"
 description: "Detailed documentation for auditor.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: auditor.rs
@@ -56,13 +61,13 @@ None.
 
 **Public Methods:**
 
-##### `analyze_dag_logs(mission_id: &str (Any)) -> anyhow::Result<Vec<Value>>`
+##### `analyze_dag_logs(mission_id (&str)) -> anyhow::Result<Vec<Value>>`
 
 ###### Description
 /// Queries Hatchet API for recent failed mission DAGs.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Vec<Value>>
@@ -86,14 +91,14 @@ Space Complexity: O(1) mostly
 let result = instance.analyze_dag_logs();
 ```
 
-##### `audit_mission(mission_id: &str (Any), failures: &[Value] (Any)) -> anyhow::Result<Value>`
+##### `audit_mission(mission_id (&str), failures (&[Value])) -> anyhow::Result<Value>`
 
 ###### Description
 /// Uses LiteLLM to process failures and output recommendations.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-* `failures: &[Value]`: type=Any, meaning=Input for failures: &[Value], valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `failures`: type=&[Value], meaning=Input for failures, valid values=Any valid &[Value], optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -117,7 +122,7 @@ Space Complexity: O(1) mostly
 let result = instance.audit_mission();
 ```
 
-##### `evaluate_prompts(mission_id: &str (Any), targets: &[factory_core::Targets] (Any), recommendations: &[Value] (Any)) -> anyhow::Result<String>`
+##### `evaluate_prompts(mission_id (&str), targets (&[factory_core::Targets]), recommendations (&[Value])) -> anyhow::Result<String>`
 
 ###### Description
 /// Self-Improving Prompt Engineering evaluation loop.
@@ -125,9 +130,9 @@ let result = instance.audit_mission();
 /// Analyzes Hatchet failure recommendations against Target ground truths to propose a new system prompt.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-* `targets: &[factory_core::Targets]`: type=Any, meaning=Input for targets: &[factory_core::Targets], valid values=Any valid Any, optional=No, default value=None
-* `recommendations: &[Value]`: type=Any, meaning=Input for recommendations: &[Value], valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `targets`: type=&[factory_core::Targets], meaning=Input for targets, valid values=Any valid &[factory_core::Targets], optional=No, default value=None
+* `recommendations`: type=&[Value], meaning=Input for recommendations, valid values=Any valid &[Value], optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<String>
@@ -154,7 +159,7 @@ let result = instance.evaluate_prompts();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `execute(task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `execute(task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 
 ### Exported Functions
@@ -166,13 +171,13 @@ None.
 ```plantuml
 @startuml
 class AuditorAgent {
-    +analyze_dag_logs(mission_id: &str:Any) : anyhow::Result<Vec<Value>>
-    +audit_mission(mission_id: &str:Any, failures: &[Value]:Any) : anyhow::Result<Value>
-    -default() : Self
-    +evaluate_prompts(mission_id: &str:Any, targets: &[factory_core::Targets]:Any, recommendations: &[Value]:Any) : anyhow::Result<String>
-    -execute(task_description: &str:Any) : anyhow::Result<Value>
-    -name() : String
-    +new() : Self
+    +analyze_dag_logs(mission_id: &str) anyhow::Result<Vec<Value>>
+    +audit_mission(mission_id: &str, failures: &[Value]) anyhow::Result<Value>
+    -default() Self
+    +evaluate_prompts(mission_id: &str, targets: &[factory_core::Targets], recommendations: &[Value]) anyhow::Result<String>
+    -execute(task_description: &str) anyhow::Result<Value>
+    -name() String
+    +new() Self
 }
 Agent <|-- AuditorAgent : extends/implements
 Default <|-- AuditorAgent : extends/implements

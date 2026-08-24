@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "vault.rs"
 source_path: "crates/factory-infrastructure/src/vault.rs"
 description: "Detailed documentation for vault.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: vault.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(vault_addr: String (Any), role_token: String (Any))`
-Parameters: vault_addr: String (Any), role_token: String (Any)
+##### `new(vault_addr (String), role_token (String))`
+Parameters: vault_addr (String), role_token (String)
 Dependencies: Inherited from context
 Initialization: Sets up VaultSecurityBounds
 
@@ -62,8 +67,8 @@ None.
 
 **Private Methods:**
 
-* `issue_jit_token(audience: &str (Any)) -> factory_core::error::Result<JitToken>`: Internal helper logic.
-* `validate_token(token: &JitToken (Any)) -> factory_core::error::Result<bool>`: Internal helper logic.
+* `issue_jit_token(audience (&str)) -> factory_core::error::Result<JitToken>`: Internal helper logic.
+* `validate_token(token (&JitToken)) -> factory_core::error::Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -74,9 +79,9 @@ None.
 ```plantuml
 @startuml
 class VaultSecurityBounds {
-    -issue_jit_token(audience: &str:Any) : factory_core::error::Result<JitToken>
-    +new(vault_addr: String:Any, role_token: String:Any) : Self
-    -validate_token(token: &JitToken:Any) : factory_core::error::Result<bool>
+    -issue_jit_token(audience: &str) factory_core::error::Result<JitToken>
+    +new(vault_addr: String, role_token: String) Self
+    -validate_token(token: &JitToken) factory_core::error::Result<bool>
 }
 SecurityBounds <|-- VaultSecurityBounds : extends/implements
 @enduml

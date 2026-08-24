@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "deep_research_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/deep_research_tool.rs"
 description: "Detailed documentation for deep_research_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: deep_research_tool.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(kafka_client: Arc<dyn KafkaClient> (Any))`
-Parameters: kafka_client: Arc<dyn KafkaClient> (Any)
+##### `new(kafka_client (Arc<dyn KafkaClient>))`
+Parameters: kafka_client (Arc<dyn KafkaClient>)
 Dependencies: Inherited from context
 Initialization: Sets up DeepResearchTool
 
@@ -60,7 +65,7 @@ None.
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
@@ -74,11 +79,11 @@ None.
 ```plantuml
 @startuml
 class DeepResearchTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new(kafka_client: Arc<dyn KafkaClient>:Any) : Self
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new(kafka_client: Arc<dyn KafkaClient>) Self
 }
 Tool <|-- DeepResearchTool : extends/implements
 @enduml

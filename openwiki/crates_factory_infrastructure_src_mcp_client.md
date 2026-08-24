@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: mcp_client.rs
@@ -66,8 +71,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(base_url: String (Any))`
-Parameters: base_url: String (Any)
+##### `new(base_url (String))`
+Parameters: base_url (String)
 Dependencies: Inherited from context
 Initialization: Sets up McpHttpClient
 
@@ -82,7 +87,7 @@ None.
 
 **Private Methods:**
 
-* `call_tool_json(name: &str (Any), arguments: Value (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `call_tool_json(name (&str), arguments (Value)) -> anyhow::Result<Value>`: Internal helper logic.
 
 #### McpSseClient
 
@@ -91,8 +96,8 @@ None.
 
 **Constructor:**
 
-##### `new(base_url: String (Any))`
-Parameters: base_url: String (Any)
+##### `new(base_url (String))`
+Parameters: base_url (String)
 Dependencies: Inherited from context
 Initialization: Sets up McpSseClient
 
@@ -108,7 +113,7 @@ None.
 
 **Private Methods:**
 
-* `call_tool_json(name: &str (Any), arguments: Value (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `call_tool_json(name (&str), arguments (Value)) -> anyhow::Result<Value>`: Internal helper logic.
 * `get_session_url() -> anyhow::Result<String>`: Internal helper logic.
 
 ### Exported Functions
@@ -122,14 +127,14 @@ None.
 interface McpClient {
 }
 class McpHttpClient {
-    -call_tool_json(name: &str:Any, arguments: Value:Any) : anyhow::Result<Value>
-    +new(base_url: String:Any) : Self
+    -call_tool_json(name: &str, arguments: Value) anyhow::Result<Value>
+    +new(base_url: String) Self
 }
 McpClient <|-- McpHttpClient : extends/implements
 class McpSseClient {
-    -call_tool_json(name: &str:Any, arguments: Value:Any) : anyhow::Result<Value>
-    -get_session_url() : anyhow::Result<String>
-    +new(base_url: String:Any) : Self
+    -call_tool_json(name: &str, arguments: Value) anyhow::Result<Value>
+    -get_session_url() anyhow::Result<String>
+    +new(base_url: String) Self
 }
 McpClient <|-- McpSseClient : extends/implements
 @enduml

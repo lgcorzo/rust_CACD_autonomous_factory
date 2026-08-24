@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "circuit_breaker.rs"
 source_path: "crates/factory-application/src/workflows/circuit_breaker.rs"
 description: "Detailed documentation for circuit_breaker.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: circuit_breaker.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(max_attempts: u32 (Any), min_safety_score: f32 (Any))`
-Parameters: max_attempts: u32 (Any), min_safety_score: f32 (Any)
+##### `new(max_attempts (u32), min_safety_score (f32))`
+Parameters: max_attempts (u32), min_safety_score (f32)
 Dependencies: Inherited from context
 Initialization: Sets up CircuitBreakerGuard
 
@@ -58,13 +63,13 @@ Initialization: Sets up CircuitBreakerGuard
 
 **Public Methods:**
 
-##### `evaluate_diff(diff: &str (Any)) -> (CircuitBreakerStatus, SastScanResult)`
+##### `evaluate_diff(diff (&str)) -> (CircuitBreakerStatus, SastScanResult)`
 
 ###### Description
 /// Evaluates the code diff against the security threshold and tracks attempts.
 
 ###### Inputs
-* `diff: &str`: type=Any, meaning=Input for diff: &str, valid values=Any valid Any, optional=No, default value=None
+* `diff`: type=&str, meaning=Input for diff, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: (CircuitBreakerStatus, SastScanResult)
@@ -88,15 +93,15 @@ Space Complexity: O(1) mostly
 let result = instance.evaluate_diff();
 ```
 
-##### `format_stuck_alert(repo: &str (Any), pr_number: u64 (Any), reason: &str (Any)) -> String`
+##### `format_stuck_alert(repo (&str), pr_number (u64), reason (&str)) -> String`
 
 ###### Description
 /// Generates human architect escalation message when stuck.
 
 ###### Inputs
-* `repo: &str`: type=Any, meaning=Input for repo: &str, valid values=Any valid Any, optional=No, default value=None
-* `pr_number: u64`: type=Any, meaning=Input for pr_number: u64, valid values=Any valid Any, optional=No, default value=None
-* `reason: &str`: type=Any, meaning=Input for reason: &str, valid values=Any valid Any, optional=No, default value=None
+* `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
+* `pr_number`: type=u64, meaning=Input for pr_number, valid values=Any valid u64, optional=No, default value=None
+* `reason`: type=&str, meaning=Input for reason, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: String
@@ -154,10 +159,10 @@ None.
 ```plantuml
 @startuml
 class CircuitBreakerGuard {
-    -default() : Self
-    +evaluate_diff(diff: &str:Any) : (CircuitBreakerStatus, SastScanResult)
-    +format_stuck_alert(repo: &str:Any, pr_number: u64:Any, reason: &str:Any) : String
-    +new(max_attempts: u32:Any, min_safety_score: f32:Any) : Self
+    -default() Self
+    +evaluate_diff(diff: &str) (CircuitBreakerStatus, SastScanResult)
+    +format_stuck_alert(repo: &str, pr_number: u64, reason: &str) String
+    +new(max_attempts: u32, min_safety_score: f32) Self
 }
 Default <|-- CircuitBreakerGuard : extends/implements
 enum CircuitBreakerStatus {

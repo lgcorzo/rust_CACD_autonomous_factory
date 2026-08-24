@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "deep_research.rs"
 source_path: "crates/factory-application/src/workflows/deep_research.rs"
 description: "Detailed documentation for deep_research.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: deep_research.rs
@@ -136,7 +141,7 @@ None.
 
 ### Exported Functions
 
-#### `create_deep_research_workflow(hatchet: &Hatchet (Any), r2r_url: String (Any)) -> Workflow<DeepSearchInput, DeepSearchOutput>`
+#### `create_deep_research_workflow(hatchet (&Hatchet), r2r_url (String)) -> Workflow<DeepSearchInput, DeepSearchOutput>`
 No description provided.
 
 ## Internal architecture
