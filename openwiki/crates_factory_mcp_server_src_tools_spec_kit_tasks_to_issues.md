@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "spec_kit_tasks_to_issues.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs"
 description: "Detailed documentation for spec_kit_tasks_to_issues.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: spec_kit_tasks_to_issues.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(gitlab_client: Arc<dyn GitlabClient> (Any))`
-Parameters: gitlab_client: Arc<dyn GitlabClient> (Any)
+##### `new(gitlab_client (Arc<dyn GitlabClient>))`
+Parameters: gitlab_client (Arc<dyn GitlabClient>)
 Dependencies: Inherited from context
 Initialization: Sets up SpecKitTasksToIssuesTool
 
@@ -60,7 +65,7 @@ None.
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
@@ -74,11 +79,11 @@ None.
 ```plantuml
 @startuml
 class SpecKitTasksToIssuesTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new(gitlab_client: Arc<dyn GitlabClient>:Any) : Self
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new(gitlab_client: Arc<dyn GitlabClient>) Self
 }
 Tool <|-- SpecKitTasksToIssuesTool : extends/implements
 @enduml

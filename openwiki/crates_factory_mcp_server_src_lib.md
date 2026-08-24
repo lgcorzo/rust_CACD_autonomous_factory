@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "lib.rs"
 source_path: "crates/factory-mcp-server/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: lib.rs
@@ -71,13 +76,13 @@ Initialization: Sets up McpServer
 
 **Public Methods:**
 
-##### `add_tool(tool: Box<dyn Tool> (Any)) -> None`
+##### `add_tool(tool (Box<dyn Tool>)) -> None`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `tool: Box<dyn Tool>`: type=Any, meaning=Input for tool: Box<dyn Tool>, valid values=Any valid Any, optional=No, default value=None
+* `tool`: type=Box<dyn Tool>, meaning=Input for tool, valid values=Any valid Box<dyn Tool>, optional=No, default value=None
 
 ###### Output
 Return type: None
@@ -101,13 +106,13 @@ Space Complexity: O(1) mostly
 let result = instance.add_tool();
 ```
 
-##### `handle_request(request: JsonRpcRequest (Any)) -> JsonRpcResponse`
+##### `handle_request(request (JsonRpcRequest)) -> JsonRpcResponse`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `request: JsonRpcRequest`: type=Any, meaning=Input for request: JsonRpcRequest, valid values=Any valid Any, optional=No, default value=None
+* `request`: type=JsonRpcRequest, meaning=Input for request, valid values=Any valid JsonRpcRequest, optional=No, default value=None
 
 ###### Output
 Return type: JsonRpcResponse
@@ -131,15 +136,15 @@ Space Complexity: O(1) mostly
 let result = instance.handle_request();
 ```
 
-##### `post_handler(State(server): State<Arc<McpServer>> (Any), Query(params): Query<HashMap<String, String>> (Any), Json(request): Json<JsonRpcRequest> (Any)) -> Json<JsonRpcResponse>`
+##### `post_handler(State(server) (State<Arc<McpServer>>), Query(params) (Query<HashMap<String, String>>), Json(request) (Json<JsonRpcRequest>)) -> Json<JsonRpcResponse>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `State(server): State<Arc<McpServer>>`: type=Any, meaning=Input for State(server): State<Arc<McpServer>>, valid values=Any valid Any, optional=No, default value=None
-* `Query(params): Query<HashMap<String, String>>`: type=Any, meaning=Input for Query(params): Query<HashMap<String, String>>, valid values=Any valid Any, optional=No, default value=None
-* `Json(request): Json<JsonRpcRequest>`: type=Any, meaning=Input for Json(request): Json<JsonRpcRequest>, valid values=Any valid Any, optional=No, default value=None
+* `State(server)`: type=State<Arc<McpServer>>, meaning=Input for State(server), valid values=Any valid State<Arc<McpServer>>, optional=No, default value=None
+* `Query(params)`: type=Query<HashMap<String, String>>, meaning=Input for Query(params), valid values=Any valid Query<HashMap<String, String>>, optional=No, default value=None
+* `Json(request)`: type=Json<JsonRpcRequest>, meaning=Input for Json(request), valid values=Any valid Json<JsonRpcRequest>, optional=No, default value=None
 
 ###### Output
 Return type: Json<JsonRpcResponse>
@@ -193,13 +198,13 @@ Space Complexity: O(1) mostly
 let result = instance.register_default_tools();
 ```
 
-##### `sse_handler(State(server): State<Arc<McpServer>> (Any)) -> Sse<impl Stream<Item = Result<Event, Infallible>>>`
+##### `sse_handler(State(server) (State<Arc<McpServer>>)) -> Sse<impl Stream<Item = Result<Event, Infallible>>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `State(server): State<Arc<McpServer>>`: type=Any, meaning=Input for State(server): State<Arc<McpServer>>, valid values=Any valid Any, optional=No, default value=None
+* `State(server)`: type=State<Arc<McpServer>>, meaning=Input for State(server), valid values=Any valid State<Arc<McpServer>>, optional=No, default value=None
 
 ###### Output
 Return type: Sse<impl Stream<Item = Result<Event, Infallible>>>
@@ -226,9 +231,9 @@ let result = instance.sse_handler();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `error_response(id: Option<Value> (Any), code: i32 (Any), message: &str (Any)) -> JsonRpcResponse`: Internal helper logic.
-* `handle_call_tool(request: JsonRpcRequest (Any)) -> JsonRpcResponse`: Internal helper logic.
-* `handle_list_tools(id: Option<Value> (Any)) -> JsonRpcResponse`: Internal helper logic.
+* `error_response(id (Option<Value>), code (i32), message (&str)) -> JsonRpcResponse`: Internal helper logic.
+* `handle_call_tool(request (JsonRpcRequest)) -> JsonRpcResponse`: Internal helper logic.
+* `handle_list_tools(id (Option<Value>)) -> JsonRpcResponse`: Internal helper logic.
 
 ### Exported Functions
 
@@ -239,16 +244,16 @@ None.
 ```plantuml
 @startuml
 class McpServer {
-    +add_tool(tool: Box<dyn Tool>:Any) : None
-    -default() : Self
-    -error_response(id: Option<Value>:Any, code: i32:Any, message: &str:Any) : JsonRpcResponse
-    -handle_call_tool(request: JsonRpcRequest:Any) : JsonRpcResponse
-    -handle_list_tools(id: Option<Value>:Any) : JsonRpcResponse
-    +handle_request(request: JsonRpcRequest:Any) : JsonRpcResponse
-    +new() : Self
-    +post_handler(State(server): State<Arc<McpServer>>:Any, Query(params): Query<HashMap<String, String>>:Any, Json(request): Json<JsonRpcRequest>:Any) : Json<JsonRpcResponse>
-    +register_default_tools() : anyhow::Result<()>
-    +sse_handler(State(server): State<Arc<McpServer>>:Any) : Sse<impl Stream<Item = Result<Event, Infallible>>>
+    +add_tool(tool: Box<dyn Tool>) None
+    -default() Self
+    -error_response(id: Option<Value>, code: i32, message: &str) JsonRpcResponse
+    -handle_call_tool(request: JsonRpcRequest) JsonRpcResponse
+    -handle_list_tools(id: Option<Value>) JsonRpcResponse
+    +handle_request(request: JsonRpcRequest) JsonRpcResponse
+    +new() Self
+    +post_handler(State(server): State<Arc<McpServer>>, Query(params): Query<HashMap<String, String>>, Json(request): Json<JsonRpcRequest>) Json<JsonRpcResponse>
+    +register_default_tools() anyhow::Result<()>
+    +sse_handler(State(server): State<Arc<McpServer>>) Sse<impl Stream<Item = Result<Event, Infallible>>>
 }
 Default <|-- McpServer : extends/implements
 @enduml

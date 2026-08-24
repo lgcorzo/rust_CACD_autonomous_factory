@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "cursor_store.rs"
 source_path: "crates/factory-infrastructure/src/cursor_store.rs"
 description: "Detailed documentation for cursor_store.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: cursor_store.rs
@@ -82,10 +87,10 @@ None.
 
 **Private Methods:**
 
-* `get_cursor(source_key: &str (Any)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
-* `is_event_processed(source_key: &str (Any), event_hash: &str (Any)) -> anyhow::Result<bool>`: Internal helper logic.
-* `mark_event_processed(source_key: &str (Any), event_hash: &str (Any)) -> anyhow::Result<()>`: Internal helper logic.
-* `save_cursor(cursor: &PollerSyncCursor (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `get_cursor(source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
+* `is_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`: Internal helper logic.
+* `mark_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<()>`: Internal helper logic.
+* `save_cursor(cursor (&PollerSyncCursor)) -> anyhow::Result<()>`: Internal helper logic.
 
 #### PostgresCursorStore
 
@@ -94,8 +99,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(database_url: String (Any))`
-Parameters: database_url: String (Any)
+##### `new(database_url (String))`
+Parameters: database_url (String)
 Dependencies: Inherited from context
 Initialization: Sets up PostgresCursorStore
 
@@ -110,10 +115,10 @@ None.
 
 **Private Methods:**
 
-* `get_cursor(source_key: &str (Any)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
-* `is_event_processed(source_key: &str (Any), event_hash: &str (Any)) -> anyhow::Result<bool>`: Internal helper logic.
-* `mark_event_processed(source_key: &str (Any), event_hash: &str (Any)) -> anyhow::Result<()>`: Internal helper logic.
-* `save_cursor(cursor: &PollerSyncCursor (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `get_cursor(source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
+* `is_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`: Internal helper logic.
+* `mark_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<()>`: Internal helper logic.
+* `save_cursor(cursor (&PollerSyncCursor)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -126,19 +131,19 @@ None.
 interface CursorStore {
 }
 class InMemoryCursorStore {
-    -get_cursor(source_key: &str:Any) : anyhow::Result<Option<PollerSyncCursor>>
-    -is_event_processed(source_key: &str:Any, event_hash: &str:Any) : anyhow::Result<bool>
-    -mark_event_processed(source_key: &str:Any, event_hash: &str:Any) : anyhow::Result<()>
-    +new() : Self
-    -save_cursor(cursor: &PollerSyncCursor:Any) : anyhow::Result<()>
+    -get_cursor(source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
+    -is_event_processed(source_key: &str, event_hash: &str) anyhow::Result<bool>
+    -mark_event_processed(source_key: &str, event_hash: &str) anyhow::Result<()>
+    +new() Self
+    -save_cursor(cursor: &PollerSyncCursor) anyhow::Result<()>
 }
 CursorStore <|-- InMemoryCursorStore : extends/implements
 class PostgresCursorStore {
-    -get_cursor(source_key: &str:Any) : anyhow::Result<Option<PollerSyncCursor>>
-    -is_event_processed(source_key: &str:Any, event_hash: &str:Any) : anyhow::Result<bool>
-    -mark_event_processed(source_key: &str:Any, event_hash: &str:Any) : anyhow::Result<()>
-    +new(database_url: String:Any) : Self
-    -save_cursor(cursor: &PollerSyncCursor:Any) : anyhow::Result<()>
+    -get_cursor(source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
+    -is_event_processed(source_key: &str, event_hash: &str) anyhow::Result<bool>
+    -mark_event_processed(source_key: &str, event_hash: &str) anyhow::Result<()>
+    +new(database_url: String) Self
+    -save_cursor(cursor: &PollerSyncCursor) anyhow::Result<()>
 }
 CursorStore <|-- PostgresCursorStore : extends/implements
 @enduml

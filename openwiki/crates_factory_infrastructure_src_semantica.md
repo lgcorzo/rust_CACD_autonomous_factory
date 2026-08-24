@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "semantica.rs"
 source_path: "crates/factory-infrastructure/src/semantica.rs"
 description: "Detailed documentation for semantica.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: semantica.rs
@@ -95,8 +100,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(endpoint: String (Any), nhi_identity: Option<String> (Any))`
-Parameters: endpoint: String (Any), nhi_identity: Option<String> (Any)
+##### `new(endpoint (String), nhi_identity (Option<String>))`
+Parameters: endpoint (String), nhi_identity (Option<String>)
 Dependencies: Inherited from context
 Initialization: Sets up HttpSemanticaClient
 
@@ -112,9 +117,9 @@ None.
 
 **Private Methods:**
 
-* `detect_conflicts(plan: &MissionPlan (Any)) -> anyhow::Result<Vec<Conflict>>`: Internal helper logic.
-* `record_decision(record: &DecisionRecord (Any)) -> anyhow::Result<()>`: Internal helper logic.
-* `verify_provenance(patch_id: &str (Any)) -> anyhow::Result<ProvenanceReport>`: Internal helper logic.
+* `detect_conflicts(plan (&MissionPlan)) -> anyhow::Result<Vec<Conflict>>`: Internal helper logic.
+* `record_decision(record (&DecisionRecord)) -> anyhow::Result<()>`: Internal helper logic.
+* `verify_provenance(patch_id (&str)) -> anyhow::Result<ProvenanceReport>`: Internal helper logic.
 
 #### MissionPlan
 
@@ -199,10 +204,10 @@ class Conflict {
 class DecisionRecord {
 }
 class HttpSemanticaClient {
-    -detect_conflicts(plan: &MissionPlan:Any) : anyhow::Result<Vec<Conflict>>
-    +new(endpoint: String:Any, nhi_identity: Option<String>:Any) : Self
-    -record_decision(record: &DecisionRecord:Any) : anyhow::Result<()>
-    -verify_provenance(patch_id: &str:Any) : anyhow::Result<ProvenanceReport>
+    -detect_conflicts(plan: &MissionPlan) anyhow::Result<Vec<Conflict>>
+    +new(endpoint: String, nhi_identity: Option<String>) Self
+    -record_decision(record: &DecisionRecord) anyhow::Result<()>
+    -verify_provenance(patch_id: &str) anyhow::Result<ProvenanceReport>
 }
 SemanticaClient <|-- HttpSemanticaClient : extends/implements
 class MissionPlan {

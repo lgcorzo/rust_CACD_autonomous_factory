@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "retrieve_context.rs"
 source_path: "crates/factory-mcp-server/src/tools/retrieve_context.rs"
 description: "Detailed documentation for retrieve_context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: retrieve_context.rs
@@ -57,9 +62,9 @@ None.
 
 **Private Methods:**
 
-* `map_stacktrace_to_ast(query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
-* `push_osr_metric(_metric: &factory_core::OsrMetric (Any)) -> anyhow::Result<()>`: Internal helper logic.
-* `search(_query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
+* `map_stacktrace_to_ast(query (&str)) -> anyhow::Result<String>`: Internal helper logic.
+* `push_osr_metric(_metric (&factory_core::OsrMetric)) -> anyhow::Result<()>`: Internal helper logic.
+* `search(_query (&str)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### RetrieveContextTool
 
@@ -68,8 +73,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(r2r_client: Arc<dyn R2rClient> (Any))`
-Parameters: r2r_client: Arc<dyn R2rClient> (Any)
+##### `new(r2r_client (Arc<dyn R2rClient>))`
+Parameters: r2r_client (Arc<dyn R2rClient>)
 Dependencies: Inherited from context
 Initialization: Sets up RetrieveContextTool
 
@@ -83,7 +88,7 @@ None.
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
@@ -97,17 +102,17 @@ None.
 ```plantuml
 @startuml
 class ManualMockR2rClient {
-    -map_stacktrace_to_ast(query: &str:Any) : anyhow::Result<String>
-    -push_osr_metric(_metric: &factory_core::OsrMetric:Any) : anyhow::Result<()>
-    -search(_query: &str:Any) : anyhow::Result<String>
+    -map_stacktrace_to_ast(query: &str) anyhow::Result<String>
+    -push_osr_metric(_metric: &factory_core::OsrMetric) anyhow::Result<()>
+    -search(_query: &str) anyhow::Result<String>
 }
 R2rClient <|-- ManualMockR2rClient : extends/implements
 class RetrieveContextTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new(r2r_client: Arc<dyn R2rClient>:Any) : Self
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new(r2r_client: Arc<dyn R2rClient>) Self
 }
 Tool <|-- RetrieveContextTool : extends/implements
 @enduml

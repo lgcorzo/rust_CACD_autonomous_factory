@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: rustant.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(mcp_client: Arc<dyn McpClient> (Any), r2r_client: Arc<dyn R2rClient> (Any))`
-Parameters: mcp_client: Arc<dyn McpClient> (Any), r2r_client: Arc<dyn R2rClient> (Any)
+##### `new(mcp_client (Arc<dyn McpClient>), r2r_client (Arc<dyn R2rClient>))`
+Parameters: mcp_client (Arc<dyn McpClient>), r2r_client (Arc<dyn R2rClient>)
 Dependencies: Inherited from context
 Initialization: Sets up RustantAgent
 
@@ -57,14 +62,14 @@ Initialization: Sets up RustantAgent
 
 **Public Methods:**
 
-##### `plan_mission(mission_id: &str (Any), goal: &str (Any)) -> anyhow::Result<Value>`
+##### `plan_mission(mission_id (&str), goal (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-* `goal: &str`: type=Any, meaning=Input for goal: &str, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `goal`: type=&str, meaning=Input for goal, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -88,14 +93,14 @@ Space Complexity: O(1) mostly
 let result = instance.plan_mission();
 ```
 
-##### `review_mission(mission_id: &str (Any), mission_results: &str (Any)) -> anyhow::Result<Value>`
+##### `review_mission(mission_id (&str), mission_results (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-* `mission_results: &str`: type=Any, meaning=Input for mission_results: &str, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `mission_results`: type=&str, meaning=Input for mission_results, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -121,7 +126,7 @@ let result = instance.review_mission();
 
 **Private Methods:**
 
-* `execute(task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `execute(task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 
 ### Exported Functions
@@ -133,11 +138,11 @@ None.
 ```plantuml
 @startuml
 class RustantAgent {
-    -execute(task_description: &str:Any) : anyhow::Result<Value>
-    -name() : String
-    +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any) : Self
-    +plan_mission(mission_id: &str:Any, goal: &str:Any) : anyhow::Result<Value>
-    +review_mission(mission_id: &str:Any, mission_results: &str:Any) : anyhow::Result<Value>
+    -execute(task_description: &str) anyhow::Result<Value>
+    -name() String
+    +new(mcp_client: Arc<dyn McpClient>, r2r_client: Arc<dyn R2rClient>) Self
+    +plan_mission(mission_id: &str, goal: &str) anyhow::Result<Value>
+    +review_mission(mission_id: &str, mission_results: &str) anyhow::Result<Value>
 }
 Agent <|-- RustantAgent : extends/implements
 @enduml

@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: sentry.rs
@@ -71,8 +76,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(url: String (Any), api_token: String (Any))`
-Parameters: url: String (Any), api_token: String (Any)
+##### `new(url (String), api_token (String))`
+Parameters: url (String), api_token (String)
 Dependencies: Inherited from context
 Initialization: Sets up HttpSentryClient
 
@@ -88,7 +93,7 @@ None.
 
 **Private Methods:**
 
-* `fetch_recent_crashes(project: &str (Any), since_minutes: u64 (Any)) -> anyhow::Result<Vec<CrashEvent>>`: Internal helper logic.
+* `fetch_recent_crashes(project (&str), since_minutes (u64)) -> anyhow::Result<Vec<CrashEvent>>`: Internal helper logic.
 
 #### SentryClient
 
@@ -122,8 +127,8 @@ None.
 class CrashEvent {
 }
 class HttpSentryClient {
-    -fetch_recent_crashes(project: &str:Any, since_minutes: u64:Any) : anyhow::Result<Vec<CrashEvent>>
-    +new(url: String:Any, api_token: String:Any) : Self
+    -fetch_recent_crashes(project: &str, since_minutes: u64) anyhow::Result<Vec<CrashEvent>>
+    +new(url: String, api_token: String) Self
 }
 SentryClient <|-- HttpSentryClient : extends/implements
 interface SentryClient {

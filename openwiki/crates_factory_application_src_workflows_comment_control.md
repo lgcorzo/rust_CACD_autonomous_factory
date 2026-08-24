@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "comment_control.rs"
 source_path: "crates/factory-application/src/workflows/comment_control.rs"
 description: "Detailed documentation for comment_control.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: comment_control.rs
@@ -90,8 +95,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(github_client: Option<Arc<dyn GithubClient>> (Any), gitlab_client: Option<Arc<dyn GitlabClient>> (Any), mcp_client: Arc<dyn McpClient> (Any), r2r_client: Arc<dyn R2rClient> (Any), aethalgard_client: Arc<dyn AethalgardClient> (Any))`
-Parameters: github_client: Option<Arc<dyn GithubClient>> (Any), gitlab_client: Option<Arc<dyn GitlabClient>> (Any), mcp_client: Arc<dyn McpClient> (Any), r2r_client: Arc<dyn R2rClient> (Any), aethalgard_client: Arc<dyn AethalgardClient> (Any)
+##### `new(github_client (Option<Arc<dyn GithubClient>>), gitlab_client (Option<Arc<dyn GitlabClient>>), mcp_client (Arc<dyn McpClient>), r2r_client (Arc<dyn R2rClient>), aethalgard_client (Arc<dyn AethalgardClient>))`
+Parameters: github_client (Option<Arc<dyn GithubClient>>), gitlab_client (Option<Arc<dyn GitlabClient>>), mcp_client (Arc<dyn McpClient>), r2r_client (Arc<dyn R2rClient>), aethalgard_client (Arc<dyn AethalgardClient>)
 Dependencies: Inherited from context
 Initialization: Sets up CommentControlService
 
@@ -105,13 +110,13 @@ Initialization: Sets up CommentControlService
 
 **Public Methods:**
 
-##### `handle_directive(input: &CommentControlInput (Any)) -> anyhow::Result<CommentControlOutput>`
+##### `handle_directive(input (&CommentControlInput)) -> anyhow::Result<CommentControlOutput>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `input: &CommentControlInput`: type=Any, meaning=Input for input: &CommentControlInput, valid values=Any valid Any, optional=No, default value=None
+* `input`: type=&CommentControlInput, meaning=Input for input, valid values=Any valid &CommentControlInput, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<CommentControlOutput>
@@ -152,8 +157,8 @@ class CommentControlInput {
 class CommentControlOutput {
 }
 class CommentControlService {
-    +handle_directive(input: &CommentControlInput:Any) : anyhow::Result<CommentControlOutput>
-    +new(github_client: Option<Arc<dyn GithubClient>>:Any, gitlab_client: Option<Arc<dyn GitlabClient>>:Any, mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) : Self
+    +handle_directive(input: &CommentControlInput) anyhow::Result<CommentControlOutput>
+    +new(github_client: Option<Arc<dyn GithubClient>>, gitlab_client: Option<Arc<dyn GitlabClient>>, mcp_client: Arc<dyn McpClient>, r2r_client: Arc<dyn R2rClient>, aethalgard_client: Arc<dyn AethalgardClient>) Self
 }
 @enduml
 

@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "bridge.rs"
 source_path: "crates/factory-mcp-server/src/tools/bridge.rs"
 description: "Detailed documentation for bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: bridge.rs
@@ -53,13 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `load_state(mission_id: &str (Any)) -> anyhow::Result<Value>`
+##### `load_state(mission_id (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -83,14 +88,14 @@ Space Complexity: O(1) mostly
 let result = instance.load_state();
 ```
 
-##### `save_state(mission_id: &str (Any), state: Value (Any)) -> anyhow::Result<Value>`
+##### `save_state(mission_id (&str), state (Value)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-* `state: Value`: type=Any, meaning=Input for state: Value, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `state`: type=Value, meaning=Input for state, valid values=Any valid Value, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -116,9 +121,9 @@ let result = instance.save_state();
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
-* `get_checkpoint_path(mission_id: &str (Any)) -> PathBuf`: Internal helper logic.
+* `get_checkpoint_path(mission_id (&str)) -> PathBuf`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 
@@ -131,13 +136,13 @@ None.
 ```plantuml
 @startuml
 class BridgeTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -description() : String
-    -get_checkpoint_path(mission_id: &str:Any) : PathBuf
-    -input_schema() : Value
-    +load_state(mission_id: &str:Any) : anyhow::Result<Value>
-    -name() : String
-    +save_state(mission_id: &str:Any, state: Value:Any) : anyhow::Result<Value>
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -description() String
+    -get_checkpoint_path(mission_id: &str) PathBuf
+    -input_schema() Value
+    +load_state(mission_id: &str) anyhow::Result<Value>
+    -name() String
+    +save_state(mission_id: &str, state: Value) anyhow::Result<Value>
 }
 Tool <|-- BridgeTool : extends/implements
 @enduml

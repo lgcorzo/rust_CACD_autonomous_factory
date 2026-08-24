@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "github.rs"
 source_path: "crates/factory-infrastructure/src/github.rs"
 description: "Detailed documentation for github.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: github.rs
@@ -165,8 +170,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(api_token: String (Any))`
-Parameters: api_token: String (Any)
+##### `new(api_token (String))`
+Parameters: api_token (String)
 Dependencies: Inherited from context
 Initialization: Sets up HttpGithubClient
 
@@ -178,14 +183,14 @@ Initialization: Sets up HttpGithubClient
 
 **Public Methods:**
 
-##### `with_url(api_url: String (Any), api_token: String (Any)) -> Self`
+##### `with_url(api_url (String), api_token (String)) -> Self`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `api_url: String`: type=Any, meaning=Input for api_url: String, valid values=Any valid Any, optional=No, default value=None
-* `api_token: String`: type=Any, meaning=Input for api_token: String, valid values=Any valid Any, optional=No, default value=None
+* `api_url`: type=String, meaning=Input for api_url, valid values=Any valid String, optional=No, default value=None
+* `api_token`: type=String, meaning=Input for api_token, valid values=Any valid String, optional=No, default value=None
 
 ###### Output
 Return type: Self
@@ -211,13 +216,13 @@ let result = instance.with_url();
 
 **Private Methods:**
 
-* `create_issue(repo: &str (Any), title: &str (Any), body: &str (Any)) -> anyhow::Result<GithubIssue>`: Internal helper logic.
-* `create_pull_request(repo: &str (Any), title: &str (Any), head: &str (Any), base: &str (Any), body: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
-* `list_active_pull_requests(repo: &str (Any)) -> anyhow::Result<Vec<GithubPullRequest>>`: Internal helper logic.
-* `list_issues_updated_since(repo: &str (Any), labels: Option<String> (Any), since: Option<DateTime<Utc>> (Any)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
-* `list_open_issues(repo: &str (Any), labels: Option<String> (Any)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
-* `list_pull_request_comments(repo: &str (Any), pr_number: u64 (Any), since: Option<DateTime<Utc>> (Any)) -> anyhow::Result<Vec<GithubComment>>`: Internal helper logic.
-* `post_pull_request_comment(repo: &str (Any), pr_number: u64 (Any), body: &str (Any)) -> anyhow::Result<GithubComment>`: Internal helper logic.
+* `create_issue(repo (&str), title (&str), body (&str)) -> anyhow::Result<GithubIssue>`: Internal helper logic.
+* `create_pull_request(repo (&str), title (&str), head (&str), base (&str), body (&str)) -> anyhow::Result<String>`: Internal helper logic.
+* `list_active_pull_requests(repo (&str)) -> anyhow::Result<Vec<GithubPullRequest>>`: Internal helper logic.
+* `list_issues_updated_since(repo (&str), labels (Option<String>), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
+* `list_open_issues(repo (&str), labels (Option<String>)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
+* `list_pull_request_comments(repo (&str), pr_number (u64), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubComment>>`: Internal helper logic.
+* `post_pull_request_comment(repo (&str), pr_number (u64), body (&str)) -> anyhow::Result<GithubComment>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -238,15 +243,15 @@ class GithubPullRequest {
 class GithubUser {
 }
 class HttpGithubClient {
-    -create_issue(repo: &str:Any, title: &str:Any, body: &str:Any) : anyhow::Result<GithubIssue>
-    -create_pull_request(repo: &str:Any, title: &str:Any, head: &str:Any, base: &str:Any, body: &str:Any) : anyhow::Result<String>
-    -list_active_pull_requests(repo: &str:Any) : anyhow::Result<Vec<GithubPullRequest>>
-    -list_issues_updated_since(repo: &str:Any, labels: Option<String>:Any, since: Option<DateTime<Utc>>:Any) : anyhow::Result<Vec<GithubIssue>>
-    -list_open_issues(repo: &str:Any, labels: Option<String>:Any) : anyhow::Result<Vec<GithubIssue>>
-    -list_pull_request_comments(repo: &str:Any, pr_number: u64:Any, since: Option<DateTime<Utc>>:Any) : anyhow::Result<Vec<GithubComment>>
-    +new(api_token: String:Any) : Self
-    -post_pull_request_comment(repo: &str:Any, pr_number: u64:Any, body: &str:Any) : anyhow::Result<GithubComment>
-    +with_url(api_url: String:Any, api_token: String:Any) : Self
+    -create_issue(repo: &str, title: &str, body: &str) anyhow::Result<GithubIssue>
+    -create_pull_request(repo: &str, title: &str, head: &str, base: &str, body: &str) anyhow::Result<String>
+    -list_active_pull_requests(repo: &str) anyhow::Result<Vec<GithubPullRequest>>
+    -list_issues_updated_since(repo: &str, labels: Option<String>, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubIssue>>
+    -list_open_issues(repo: &str, labels: Option<String>) anyhow::Result<Vec<GithubIssue>>
+    -list_pull_request_comments(repo: &str, pr_number: u64, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubComment>>
+    +new(api_token: String) Self
+    -post_pull_request_comment(repo: &str, pr_number: u64, body: &str) anyhow::Result<GithubComment>
+    +with_url(api_url: String, api_token: String) Self
 }
 GithubClient <|-- HttpGithubClient : extends/implements
 @enduml

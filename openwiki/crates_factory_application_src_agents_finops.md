@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Detailed documentation for finops.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: finops.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(litellm_base_url: String (Any), api_key: String (Any), tag: FinOpsTag (Any))`
-Parameters: litellm_base_url: String (Any), api_key: String (Any), tag: FinOpsTag (Any)
+##### `new(litellm_base_url (String), api_key (String), tag (FinOpsTag))`
+Parameters: litellm_base_url (String), api_key (String), tag (FinOpsTag)
 Dependencies: Inherited from context
 Initialization: Sets up FinOpsAgent
 
@@ -92,7 +97,7 @@ let result = instance.monitor_budget();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `execute(_task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `execute(_task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 
 ### Exported Functions
@@ -104,11 +109,11 @@ None.
 ```plantuml
 @startuml
 class FinOpsAgent {
-    -default() : Self
-    -execute(_task_description: &str:Any) : anyhow::Result<Value>
-    +monitor_budget() : anyhow::Result<()>
-    -name() : String
-    +new(litellm_base_url: String:Any, api_key: String:Any, tag: FinOpsTag:Any) : Self
+    -default() Self
+    -execute(_task_description: &str) anyhow::Result<Value>
+    +monitor_budget() anyhow::Result<()>
+    -name() String
+    +new(litellm_base_url: String, api_key: String, tag: FinOpsTag) Self
 }
 Agent <|-- FinOpsAgent : extends/implements
 Default <|-- FinOpsAgent : extends/implements

@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: lib.rs
@@ -340,13 +345,13 @@ None.
 
 **Public Methods:**
 
-##### `parse(text: &str (Any)) -> Option<Self>`
+##### `parse(text (&str)) -> Option<Self>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `text: &str`: type=Any, meaning=Input for text: &str, valid values=Any valid Any, optional=No, default value=None
+* `text`: type=&str, meaning=Input for text, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: Option<Self>
@@ -398,13 +403,13 @@ Default constructor.
 
 **Public Methods:**
 
-##### `extract_resource_limits(body: &str (Any)) -> Option<String>`
+##### `extract_resource_limits(body (&str)) -> Option<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `body: &str`: type=Any, meaning=Input for body: &str, valid values=Any valid Any, optional=No, default value=None
+* `body`: type=&str, meaning=Input for body, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: Option<String>
@@ -657,7 +662,7 @@ class CausalProvenanceNode {
 class ComplianceReport {
 }
 class DailyBudgetConfig {
-    -default() : Self
+    -default() Self
 }
 Default <|-- DailyBudgetConfig : extends/implements
 class FeatureImportances {
@@ -679,10 +684,10 @@ class Outputs {
 class PRCommentEvent {
 }
 enum PRDirective {
-    +parse(text: &str:Any) : Option<Self>
+    +parse(text: &str) Option<Self>
 }
 class PolledIssueEvent {
-    +extract_resource_limits(body: &str:Any) : Option<String>
+    +extract_resource_limits(body: &str) Option<String>
 }
 class PollerSyncCursor {
 }
