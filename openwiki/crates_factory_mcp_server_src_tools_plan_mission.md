@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "plan_mission.rs"
 source_path: "crates/factory-mcp-server/src/tools/plan_mission.rs"
 description: "Detailed documentation for plan_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: plan_mission.rs
@@ -52,8 +57,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(api_key: String (Any), base_url: String (Any), model: String (Any), finops_tag: FinOpsTag (Any))`
-Parameters: api_key: String (Any), base_url: String (Any), model: String (Any), finops_tag: FinOpsTag (Any)
+##### `new(api_key (String), base_url (String), model (String), finops_tag (FinOpsTag))`
+Parameters: api_key (String), base_url (String), model (String), finops_tag (FinOpsTag)
 Dependencies: Inherited from context
 Initialization: Sets up PlanMissionTool
 
@@ -68,7 +73,7 @@ None.
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
@@ -82,11 +87,11 @@ None.
 ```plantuml
 @startuml
 class PlanMissionTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new(api_key: String:Any, base_url: String:Any, model: String:Any, finops_tag: FinOpsTag:Any) : Self
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new(api_key: String, base_url: String, model: String, finops_tag: FinOpsTag) Self
 }
 Tool <|-- PlanMissionTool : extends/implements
 @enduml

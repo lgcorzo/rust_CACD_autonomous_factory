@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "security_review.rs"
 source_path: "crates/factory-mcp-server/src/tools/security_review.rs"
 description: "Detailed documentation for security_review.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: security_review.rs
@@ -61,13 +66,13 @@ Initialization: Sets up SecurityReviewTool
 
 **Public Methods:**
 
-##### `with_model(model: String (Any)) -> Self`
+##### `with_model(model (String)) -> Self`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `model: String`: type=Any, meaning=Input for model: String, valid values=Any valid Any, optional=No, default value=None
+* `model`: type=String, meaning=Input for model, valid values=Any valid String, optional=No, default value=None
 
 ###### Output
 Return type: Self
@@ -93,10 +98,10 @@ let result = instance.with_model();
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `default() -> Self`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
-* `heuristic_scan(diff: &str (Any)) -> (f64, Vec<String>)`: Internal helper logic.
+* `heuristic_scan(diff (&str)) -> (f64, Vec<String>)`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 
@@ -109,14 +114,14 @@ None.
 ```plantuml
 @startuml
 class SecurityReviewTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -default() : Self
-    -description() : String
-    -heuristic_scan(diff: &str:Any) : (f64, Vec<String>)
-    -input_schema() : Value
-    -name() : String
-    +new() : Self
-    +with_model(model: String:Any) : Self
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -default() Self
+    -description() String
+    -heuristic_scan(diff: &str) (f64, Vec<String>)
+    -input_schema() Value
+    -name() String
+    +new() Self
+    +with_model(model: String) Self
 }
 Default <|-- SecurityReviewTool : extends/implements
 Tool <|-- SecurityReviewTool : extends/implements

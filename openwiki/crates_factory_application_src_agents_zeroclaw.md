@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: zeroclaw.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(mcp_client: Arc<dyn McpClient> (Any), aethalgard_client: Arc<dyn AethalgardClient> (Any))`
-Parameters: mcp_client: Arc<dyn McpClient> (Any), aethalgard_client: Arc<dyn AethalgardClient> (Any)
+##### `new(mcp_client (Arc<dyn McpClient>), aethalgard_client (Arc<dyn AethalgardClient>))`
+Parameters: mcp_client (Arc<dyn McpClient>), aethalgard_client (Arc<dyn AethalgardClient>)
 Dependencies: Inherited from context
 Initialization: Sets up ZeroClawAgent
 
@@ -57,15 +62,15 @@ Initialization: Sets up ZeroClawAgent
 
 **Public Methods:**
 
-##### `execute_task(mission_id: &str (Any), task_description: &str (Any), _files: &[String] (Any)) -> anyhow::Result<Value>`
+##### `execute_task(mission_id (&str), task_description (&str), _files (&[String])) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-* `task_description: &str`: type=Any, meaning=Input for task_description: &str, valid values=Any valid Any, optional=No, default value=None
-* `_files: &[String]`: type=Any, meaning=Input for _files: &[String], valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `task_description`: type=&str, meaning=Input for task_description, valid values=Any valid &str, optional=No, default value=None
+* `_files`: type=&[String], meaning=Input for _files, valid values=Any valid &[String], optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -89,13 +94,13 @@ Space Complexity: O(1) mostly
 let result = instance.execute_task();
 ```
 
-##### `introspect_k8s(mission_id: &str (Any)) -> anyhow::Result<Value>`
+##### `introspect_k8s(mission_id (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -119,14 +124,14 @@ Space Complexity: O(1) mostly
 let result = instance.introspect_k8s();
 ```
 
-##### `validate_mission(mission_id: &str (Any), test_command: &str (Any)) -> anyhow::Result<Value>`
+##### `validate_mission(mission_id (&str), test_command (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
-* `test_command: &str`: type=Any, meaning=Input for test_command: &str, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `test_command`: type=&str, meaning=Input for test_command, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -152,7 +157,7 @@ let result = instance.validate_mission();
 
 **Private Methods:**
 
-* `execute(task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `execute(task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 
 ### Exported Functions
@@ -164,12 +169,12 @@ None.
 ```plantuml
 @startuml
 class ZeroClawAgent {
-    -execute(task_description: &str:Any) : anyhow::Result<Value>
-    +execute_task(mission_id: &str:Any, task_description: &str:Any, _files: &[String]:Any) : anyhow::Result<Value>
-    +introspect_k8s(mission_id: &str:Any) : anyhow::Result<Value>
-    -name() : String
-    +new(mcp_client: Arc<dyn McpClient>:Any, aethalgard_client: Arc<dyn AethalgardClient>:Any) : Self
-    +validate_mission(mission_id: &str:Any, test_command: &str:Any) : anyhow::Result<Value>
+    -execute(task_description: &str) anyhow::Result<Value>
+    +execute_task(mission_id: &str, task_description: &str, _files: &[String]) anyhow::Result<Value>
+    +introspect_k8s(mission_id: &str) anyhow::Result<Value>
+    -name() String
+    +new(mcp_client: Arc<dyn McpClient>, aethalgard_client: Arc<dyn AethalgardClient>) Self
+    +validate_mission(mission_id: &str, test_command: &str) anyhow::Result<Value>
 }
 Agent <|-- ZeroClawAgent : extends/implements
 @enduml

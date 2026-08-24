@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "develop_task.rs"
 source_path: "crates/factory-application/src/workflows/develop_task.rs"
 description: "Detailed documentation for develop_task.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: develop_task.rs
@@ -84,7 +89,7 @@ None.
 
 ### Exported Functions
 
-#### `create_develop_task_workflow(hatchet: &Hatchet (Any), mcp_url: String (Any)) -> Task<TaskInput, TaskOutput>`
+#### `create_develop_task_workflow(hatchet (&Hatchet), mcp_url (String)) -> Task<TaskInput, TaskOutput>`
 No description provided.
 
 ## Internal architecture

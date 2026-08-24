@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: ziti.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(service: &str (Any), identity_file: &str (Any))`
-Parameters: service: &str (Any), identity_file: &str (Any)
+##### `new(service (&str), identity_file (&str))`
+Parameters: service (&str), identity_file (&str)
 Dependencies: Inherited from context
 Initialization: Sets up OpenZitiIdentity
 
@@ -94,9 +99,9 @@ None.
 ```plantuml
 @startuml
 class OpenZitiIdentity {
-    -get_token() : anyhow::Result<String>
-    +new(service: &str:Any, identity_file: &str:Any) : Self
-    -service_name() : String
+    -get_token() anyhow::Result<String>
+    +new(service: &str, identity_file: &str) Self
+    -service_name() String
 }
 ZitiIdentity <|-- OpenZitiIdentity : extends/implements
 interface ZitiIdentity {

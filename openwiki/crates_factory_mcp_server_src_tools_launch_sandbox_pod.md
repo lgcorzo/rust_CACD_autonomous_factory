@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "launch_sandbox_pod.rs"
 source_path: "crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
 description: "Detailed documentation for launch_sandbox_pod.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: launch_sandbox_pod.rs
@@ -60,7 +65,7 @@ None.
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `default() -> Self`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
@@ -97,12 +102,12 @@ None.
 ```plantuml
 @startuml
 class LaunchSandboxPodTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -default() : Self
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new() : Self
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -default() Self
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new() Self
 }
 Default <|-- LaunchSandboxPodTool : extends/implements
 Tool <|-- LaunchSandboxPodTool : extends/implements

@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "context.rs"
 source_path: "crates/factory-mcp-server/src/skills/context.rs"
 description: "Detailed documentation for context.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: context.rs
@@ -53,13 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `format_for_llm(pruned_context: &str (Any)) -> Value`
+##### `format_for_llm(pruned_context (&str)) -> Value`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `pruned_context: &str`: type=Any, meaning=Input for pruned_context: &str, valid values=Any valid Any, optional=No, default value=None
+* `pruned_context`: type=&str, meaning=Input for pruned_context, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: Value
@@ -83,14 +88,14 @@ Space Complexity: O(1) mostly
 let result = instance.format_for_llm();
 ```
 
-##### `prune_context(raw_context: &str (Any), max_chars: usize (Any)) -> String`
+##### `prune_context(raw_context (&str), max_chars (usize)) -> String`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `raw_context: &str`: type=Any, meaning=Input for raw_context: &str, valid values=Any valid Any, optional=No, default value=None
-* `max_chars: usize`: type=Any, meaning=Input for max_chars: usize, valid values=Any valid Any, optional=No, default value=None
+* `raw_context`: type=&str, meaning=Input for raw_context, valid values=Any valid &str, optional=No, default value=None
+* `max_chars`: type=usize, meaning=Input for max_chars, valid values=Any valid usize, optional=No, default value=None
 
 ###### Output
 Return type: String
@@ -127,8 +132,8 @@ None.
 ```plantuml
 @startuml
 class ContextSkill {
-    +format_for_llm(pruned_context: &str:Any) : Value
-    +prune_context(raw_context: &str:Any, max_chars: usize:Any) : String
+    +format_for_llm(pruned_context: &str) Value
+    +prune_context(raw_context: &str, max_chars: usize) String
 }
 @enduml
 

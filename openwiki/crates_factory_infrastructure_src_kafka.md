@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: kafka.rs
@@ -66,8 +71,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(brokers: &str (Any))`
-Parameters: brokers: &str (Any)
+##### `new(brokers (&str))`
+Parameters: brokers (&str)
 Dependencies: Inherited from context
 Initialization: Sets up RdKafkaClient
 
@@ -81,7 +86,7 @@ None.
 
 **Private Methods:**
 
-* `publish(topic: &str (Any), key: &str (Any), payload: &[u8] (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `publish(topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`: Internal helper logic.
 
 #### SimpleMockKafkaClient
 
@@ -90,8 +95,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(_brokers: &str (Any))`
-Parameters: _brokers: &str (Any)
+##### `new(_brokers (&str))`
+Parameters: _brokers (&str)
 Dependencies: Inherited from context
 Initialization: Sets up SimpleMockKafkaClient
 
@@ -105,7 +110,7 @@ None.
 
 **Private Methods:**
 
-* `publish(topic: &str (Any), key: &str (Any), payload: &[u8] (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `publish(topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -118,13 +123,13 @@ None.
 interface KafkaClient {
 }
 class RdKafkaClient {
-    +new(brokers: &str:Any) : anyhow::Result<Self>
-    -publish(topic: &str:Any, key: &str:Any, payload: &[u8]:Any) : anyhow::Result<()>
+    +new(brokers: &str) anyhow::Result<Self>
+    -publish(topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
 }
 KafkaClient <|-- RdKafkaClient : extends/implements
 class SimpleMockKafkaClient {
-    +new(_brokers: &str:Any) : anyhow::Result<Self>
-    -publish(topic: &str:Any, key: &str:Any, payload: &[u8]:Any) : anyhow::Result<()>
+    +new(_brokers: &str) anyhow::Result<Self>
+    -publish(topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
 }
 KafkaClient <|-- SimpleMockKafkaClient : extends/implements
 @enduml

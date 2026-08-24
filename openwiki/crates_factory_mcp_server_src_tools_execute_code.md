@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "execute_code.rs"
 source_path: "crates/factory-mcp-server/src/tools/execute_code.rs"
 description: "Detailed documentation for execute_code.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: execute_code.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(driver: Arc<dyn SandboxDriver> (Any))`
-Parameters: driver: Arc<dyn SandboxDriver> (Any)
+##### `new(driver (Arc<dyn SandboxDriver>))`
+Parameters: driver (Arc<dyn SandboxDriver>)
 Dependencies: Inherited from context
 Initialization: Sets up ExecuteCodeTool
 
@@ -60,7 +65,7 @@ None.
 
 **Private Methods:**
 
-* `call(params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
@@ -74,11 +79,11 @@ None.
 ```plantuml
 @startuml
 class ExecuteCodeTool {
-    -call(params: Value:Any) : anyhow::Result<CallToolResult>
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new(driver: Arc<dyn SandboxDriver>:Any) : Self
+    -call(params: Value) anyhow::Result<CallToolResult>
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new(driver: Arc<dyn SandboxDriver>) Self
 }
 Tool <|-- ExecuteCodeTool : extends/implements
 @enduml

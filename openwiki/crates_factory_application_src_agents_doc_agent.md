@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Detailed documentation for doc_agent.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: doc_agent.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(mcp_client: Arc<dyn McpClient> (Any), r2r_client: Arc<dyn R2rClient> (Any), superpowers_skills_root: std::path::PathBuf (Any))`
-Parameters: mcp_client: Arc<dyn McpClient> (Any), r2r_client: Arc<dyn R2rClient> (Any), superpowers_skills_root: std::path::PathBuf (Any)
+##### `new(mcp_client (Arc<dyn McpClient>), r2r_client (Arc<dyn R2rClient>), superpowers_skills_root (std::path::PathBuf))`
+Parameters: mcp_client (Arc<dyn McpClient>), r2r_client (Arc<dyn R2rClient>), superpowers_skills_root (std::path::PathBuf)
 Dependencies: Inherited from context
 Initialization: Sets up DocumentationAgent
 
@@ -58,13 +63,13 @@ Initialization: Sets up DocumentationAgent
 
 **Public Methods:**
 
-##### `extract_code_deltas(commit_sha: &str (Any)) -> anyhow::Result<String>`
+##### `extract_code_deltas(commit_sha (&str)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `commit_sha: &str`: type=Any, meaning=Input for commit_sha: &str, valid values=Any valid Any, optional=No, default value=None
+* `commit_sha`: type=&str, meaning=Input for commit_sha, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<String>
@@ -88,13 +93,13 @@ Space Complexity: O(1) mostly
 let result = instance.extract_code_deltas();
 ```
 
-##### `generate_hazitek_report(mission_id: &str (Any)) -> anyhow::Result<factory_core::ComplianceReport>`
+##### `generate_hazitek_report(mission_id (&str)) -> anyhow::Result<factory_core::ComplianceReport>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<factory_core::ComplianceReport>
@@ -118,13 +123,13 @@ Space Complexity: O(1) mostly
 let result = instance.generate_hazitek_report();
 ```
 
-##### `run_post_merge_pipeline(mission_id: &str (Any)) -> anyhow::Result<Value>`
+##### `run_post_merge_pipeline(mission_id (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `mission_id: &str`: type=Any, meaning=Input for mission_id: &str, valid values=Any valid Any, optional=No, default value=None
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Value>
@@ -150,7 +155,7 @@ let result = instance.run_post_merge_pipeline();
 
 **Private Methods:**
 
-* `execute(task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `execute(task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 * `verify_osr() -> anyhow::Result<f32>`: Internal helper logic.
 
@@ -163,13 +168,13 @@ None.
 ```plantuml
 @startuml
 class DocumentationAgent {
-    -execute(task_description: &str:Any) : anyhow::Result<Value>
-    +extract_code_deltas(commit_sha: &str:Any) : anyhow::Result<String>
-    +generate_hazitek_report(mission_id: &str:Any) : anyhow::Result<factory_core::ComplianceReport>
-    -name() : String
-    +new(mcp_client: Arc<dyn McpClient>:Any, r2r_client: Arc<dyn R2rClient>:Any, superpowers_skills_root: std::path::PathBuf:Any) : Self
-    +run_post_merge_pipeline(mission_id: &str:Any) : anyhow::Result<Value>
-    -verify_osr() : anyhow::Result<f32>
+    -execute(task_description: &str) anyhow::Result<Value>
+    +extract_code_deltas(commit_sha: &str) anyhow::Result<String>
+    +generate_hazitek_report(mission_id: &str) anyhow::Result<factory_core::ComplianceReport>
+    -name() String
+    +new(mcp_client: Arc<dyn McpClient>, r2r_client: Arc<dyn R2rClient>, superpowers_skills_root: std::path::PathBuf) Self
+    +run_post_merge_pipeline(mission_id: &str) anyhow::Result<Value>
+    -verify_osr() anyhow::Result<f32>
 }
 Agent <|-- DocumentationAgent : extends/implements
 @enduml
