@@ -74,9 +74,9 @@ def generate_plantuml_classes(classes):
 
         for m in c.get('methods', []):
             visibility = "+" if m.get('is_pub', True) else "-"
-            args_str = ", ".join([f"{a['name']}:{a['type']}" for a in m.get('args', [])])
+            args_str = ", ".join([f"{a['name']}: {a['type']}" for a in m.get('args', [])])
             ret_type = m.get('ret_type', 'None').strip()
-            puml += f"    {visibility}{m['name']}({args_str}) : {ret_type}\n"
+            puml += f"    {visibility}{m['name']}({args_str}) {ret_type}\n"
 
         puml += "}\n"
 
@@ -210,11 +210,16 @@ def write_file_doc(file_path, parsed, now):
     git_hash = get_git_hash()
 
     content = f"""---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "{file_name}"
 source_path: "{file_path}"
 description: "Detailed documentation for {file_name}"
 tags: ["documentation", "ast", "openwiki"]
+timestamp: "{now}"
+generated: "agent:okf-professional-documenter"
+verified: "true"
 last_verified_commit: "{git_hash}"
 ---
 

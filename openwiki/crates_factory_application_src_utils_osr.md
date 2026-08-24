@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "osr.rs"
 source_path: "crates/factory-application/src/utils/osr.rs"
 description: "Detailed documentation for osr.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: osr.rs
@@ -40,10 +45,10 @@ Provides implementation for osr.rs.
 
 ### Exported Functions
 
-#### `calculate_osr(wiki_content: &str (Any), r2r_text: &str (Any)) -> f32`
+#### `calculate_osr(wiki_content (&str), r2r_text (&str)) -> f32`
 No description provided.
 
-#### `levenshtein_distance(a: &str (Any), b: &str (Any)) -> usize`
+#### `levenshtein_distance(a (&str), b (&str)) -> usize`
 No description provided.
 
 ## Internal architecture

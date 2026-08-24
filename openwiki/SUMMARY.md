@@ -93,6 +93,7 @@
 * [parse_rust](parse_rust)
 * [parse_ts](parse_ts)
 * [test_hatchet](test_hatchet)
+* [test_parse](test_parse)
 * [test_ziti](test_ziti)
 
 ## api

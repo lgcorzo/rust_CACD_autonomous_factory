@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "semantica_bridge.rs"
 source_path: "crates/factory-application/src/bridge/semantica_bridge.rs"
 description: "Detailed documentation for semantica_bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: semantica_bridge.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(semantica_client: Arc<dyn SemanticaClient> (Any))`
-Parameters: semantica_client: Arc<dyn SemanticaClient> (Any)
+##### `new(semantica_client (Arc<dyn SemanticaClient>))`
+Parameters: semantica_client (Arc<dyn SemanticaClient>)
 Dependencies: Inherited from context
 Initialization: Sets up SemanticaBridge
 
@@ -56,13 +61,13 @@ Initialization: Sets up SemanticaBridge
 
 **Public Methods:**
 
-##### `process_agent_thought_event(event_payload: &str (Any)) -> anyhow::Result<()>`
+##### `process_agent_thought_event(event_payload (&str)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `event_payload: &str`: type=Any, meaning=Input for event_payload: &str, valid values=Any valid Any, optional=No, default value=None
+* `event_payload`: type=&str, meaning=Input for event_payload, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<()>
@@ -99,8 +104,8 @@ None.
 ```plantuml
 @startuml
 class SemanticaBridge {
-    +new(semantica_client: Arc<dyn SemanticaClient>:Any) : Self
-    +process_agent_thought_event(event_payload: &str:Any) : anyhow::Result<()>
+    +new(semantica_client: Arc<dyn SemanticaClient>) Self
+    +process_agent_thought_event(event_payload: &str) anyhow::Result<()>
 }
 @enduml
 

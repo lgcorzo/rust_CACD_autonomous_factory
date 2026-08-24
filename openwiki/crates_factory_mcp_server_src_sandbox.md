@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: sandbox.rs
@@ -81,7 +86,7 @@ None.
 
 **Private Methods:**
 
-* `execute(code: &str (Any), language: &str (Any)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
+* `execute(code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
 
 #### NativeSurgerySandboxDriver
 
@@ -102,8 +107,8 @@ None.
 
 **Private Methods:**
 
-* `execute(_code: &str (Any), _language: &str (Any)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
-* `execute_surgery(id: &str (Any), patch: &factory_core::executor::SurgicalPatch (Any)) -> factory_core::error::Result<factory_core::executor::ExecutionResult>`: Internal helper logic.
+* `execute(_code (&str), _language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
+* `execute_surgery(id (&str), patch (&factory_core::executor::SurgicalPatch)) -> factory_core::error::Result<factory_core::executor::ExecutionResult>`: Internal helper logic.
 
 #### SandboxDriver
 
@@ -166,7 +171,7 @@ None.
 
 **Private Methods:**
 
-* `execute(code: &str (Any), language: &str (Any)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
+* `execute(code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -179,12 +184,12 @@ None.
 class ExecutionResult {
 }
 class GvisorK8sDriver {
-    -execute(code: &str:Any, language: &str:Any) : anyhow::Result<ExecutionResult>
+    -execute(code: &str, language: &str) anyhow::Result<ExecutionResult>
 }
 SandboxDriver <|-- GvisorK8sDriver : extends/implements
 class NativeSurgerySandboxDriver {
-    -execute(_code: &str:Any, _language: &str:Any) : anyhow::Result<ExecutionResult>
-    -execute_surgery(id: &str:Any, patch: &factory_core::executor::SurgicalPatch:Any) : factory_core::error::Result<factory_core::executor::ExecutionResult>
+    -execute(_code: &str, _language: &str) anyhow::Result<ExecutionResult>
+    -execute_surgery(id: &str, patch: &factory_core::executor::SurgicalPatch) factory_core::error::Result<factory_core::executor::ExecutionResult>
 }
 SandboxDriver <|-- NativeSurgerySandboxDriver : extends/implements
 interface SandboxDriver {
@@ -192,7 +197,7 @@ interface SandboxDriver {
 enum SandboxMode {
 }
 class SubprocessDriver {
-    -execute(code: &str:Any, language: &str:Any) : anyhow::Result<ExecutionResult>
+    -execute(code: &str, language: &str) anyhow::Result<ExecutionResult>
 }
 SandboxDriver <|-- SubprocessDriver : extends/implements
 @enduml

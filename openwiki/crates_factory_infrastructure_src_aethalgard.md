@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Detailed documentation for aethalgard.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: aethalgard.rs
@@ -66,8 +71,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(webhook_url: String (Any))`
-Parameters: webhook_url: String (Any)
+##### `new(webhook_url (String))`
+Parameters: webhook_url (String)
 Dependencies: Inherited from context
 Initialization: Sets up HttpAethalgardClient
 
@@ -79,13 +84,13 @@ Initialization: Sets up HttpAethalgardClient
 
 **Public Methods:**
 
-##### `with_semantica_endpoint(endpoint: String (Any)) -> Self`
+##### `with_semantica_endpoint(endpoint (String)) -> Self`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `endpoint: String`: type=Any, meaning=Input for endpoint: String, valid values=Any valid Any, optional=No, default value=None
+* `endpoint`: type=String, meaning=Input for endpoint, valid values=Any valid String, optional=No, default value=None
 
 ###### Output
 Return type: Self
@@ -111,8 +116,8 @@ let result = instance.with_semantica_endpoint();
 
 **Private Methods:**
 
-* `notify_remediation(mission_id: &str (Any), error_details: &str (Any)) -> anyhow::Result<()>`: Internal helper logic.
-* `verify_causal_provenance(patch_id: &str (Any)) -> anyhow::Result<bool>`: Internal helper logic.
+* `notify_remediation(mission_id (&str), error_details (&str)) -> anyhow::Result<()>`: Internal helper logic.
+* `verify_causal_provenance(patch_id (&str)) -> anyhow::Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -125,10 +130,10 @@ None.
 interface AethalgardClient {
 }
 class HttpAethalgardClient {
-    +new(webhook_url: String:Any) : Self
-    -notify_remediation(mission_id: &str:Any, error_details: &str:Any) : anyhow::Result<()>
-    -verify_causal_provenance(patch_id: &str:Any) : anyhow::Result<bool>
-    +with_semantica_endpoint(endpoint: String:Any) : Self
+    +new(webhook_url: String) Self
+    -notify_remediation(mission_id: &str, error_details: &str) anyhow::Result<()>
+    -verify_causal_provenance(patch_id: &str) anyhow::Result<bool>
+    +with_semantica_endpoint(endpoint: String) Self
 }
 AethalgardClient <|-- HttpAethalgardClient : extends/implements
 @enduml

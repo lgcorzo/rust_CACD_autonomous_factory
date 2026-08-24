@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "autonomous_mission.rs"
 source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
 description: "Detailed documentation for autonomous_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: autonomous_mission.rs
@@ -58,13 +63,13 @@ Default constructor.
 
 **Public Methods:**
 
-##### `from_protobuf(bytes: &[u8] (Any)) -> Result<Self, prost::DecodeError>`
+##### `from_protobuf(bytes (&[u8])) -> Result<Self, prost::DecodeError>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `bytes: &[u8]`: type=Any, meaning=Input for bytes: &[u8], valid values=Any valid Any, optional=No, default value=None
+* `bytes`: type=&[u8], meaning=Input for bytes, valid values=Any valid &[u8], optional=No, default value=None
 
 ###### Output
 Return type: Result<Self, prost::DecodeError>
@@ -118,7 +123,7 @@ None.
 
 ### Exported Functions
 
-#### `create_mission_workflow(hatchet: &Hatchet (Any), mcp_url: String (Any), r2r_url: String (Any), kafka_brokers: String (Any), aethalgard_webhook_url: String (Any)) -> Workflow<MissionInput, MissionOutput>`
+#### `create_mission_workflow(hatchet (&Hatchet), mcp_url (String), r2r_url (String), kafka_brokers (String), aethalgard_webhook_url (String)) -> Workflow<MissionInput, MissionOutput>`
 No description provided.
 
 ## Internal architecture
@@ -126,7 +131,7 @@ No description provided.
 ```plantuml
 @startuml
 class MissionInput {
-    +from_protobuf(bytes: &[u8]:Any) : Result<Self, prost::DecodeError>
+    +from_protobuf(bytes: &[u8]) Result<Self, prost::DecodeError>
 }
 class MissionOutput {
 }

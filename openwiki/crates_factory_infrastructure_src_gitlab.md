@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: gitlab.rs
@@ -164,8 +169,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(url: String (Any), api_token: String (Any))`
-Parameters: url: String (Any), api_token: String (Any)
+##### `new(url (String), api_token (String))`
+Parameters: url (String), api_token (String)
 Dependencies: Inherited from context
 Initialization: Sets up HttpGitlabClient
 
@@ -181,13 +186,13 @@ None.
 
 **Private Methods:**
 
-* `create_issue(project_id: &str (Any), title: &str (Any), description: &str (Any)) -> anyhow::Result<GitlabIssue>`: Internal helper logic.
-* `create_issue_with_labels(project_id: &str (Any), title: &str (Any), description: &str (Any), labels: &[String] (Any)) -> anyhow::Result<GitlabIssue>`: Internal helper logic.
-* `list_active_merge_requests(project_id: &str (Any)) -> anyhow::Result<Vec<GitlabMergeRequest>>`: Internal helper logic.
-* `list_issues_updated_since(project_id: &str (Any), labels: Option<String> (Any), since: Option<DateTime<Utc>> (Any)) -> anyhow::Result<Vec<GitlabIssue>>`: Internal helper logic.
-* `list_merge_request_notes(project_id: &str (Any), mr_iid: u64 (Any), since: Option<DateTime<Utc>> (Any)) -> anyhow::Result<Vec<GitlabNote>>`: Internal helper logic.
-* `list_open_issues(project_id: &str (Any), labels: Option<String> (Any)) -> anyhow::Result<Vec<GitlabIssue>>`: Internal helper logic.
-* `post_merge_request_note(project_id: &str (Any), mr_iid: u64 (Any), body: &str (Any)) -> anyhow::Result<GitlabNote>`: Internal helper logic.
+* `create_issue(project_id (&str), title (&str), description (&str)) -> anyhow::Result<GitlabIssue>`: Internal helper logic.
+* `create_issue_with_labels(project_id (&str), title (&str), description (&str), labels (&[String])) -> anyhow::Result<GitlabIssue>`: Internal helper logic.
+* `list_active_merge_requests(project_id (&str)) -> anyhow::Result<Vec<GitlabMergeRequest>>`: Internal helper logic.
+* `list_issues_updated_since(project_id (&str), labels (Option<String>), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GitlabIssue>>`: Internal helper logic.
+* `list_merge_request_notes(project_id (&str), mr_iid (u64), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GitlabNote>>`: Internal helper logic.
+* `list_open_issues(project_id (&str), labels (Option<String>)) -> anyhow::Result<Vec<GitlabIssue>>`: Internal helper logic.
+* `post_merge_request_note(project_id (&str), mr_iid (u64), body (&str)) -> anyhow::Result<GitlabNote>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -208,14 +213,14 @@ class GitlabMergeRequest {
 class GitlabNote {
 }
 class HttpGitlabClient {
-    -create_issue(project_id: &str:Any, title: &str:Any, description: &str:Any) : anyhow::Result<GitlabIssue>
-    -create_issue_with_labels(project_id: &str:Any, title: &str:Any, description: &str:Any, labels: &[String]:Any) : anyhow::Result<GitlabIssue>
-    -list_active_merge_requests(project_id: &str:Any) : anyhow::Result<Vec<GitlabMergeRequest>>
-    -list_issues_updated_since(project_id: &str:Any, labels: Option<String>:Any, since: Option<DateTime<Utc>>:Any) : anyhow::Result<Vec<GitlabIssue>>
-    -list_merge_request_notes(project_id: &str:Any, mr_iid: u64:Any, since: Option<DateTime<Utc>>:Any) : anyhow::Result<Vec<GitlabNote>>
-    -list_open_issues(project_id: &str:Any, labels: Option<String>:Any) : anyhow::Result<Vec<GitlabIssue>>
-    +new(url: String:Any, api_token: String:Any) : Self
-    -post_merge_request_note(project_id: &str:Any, mr_iid: u64:Any, body: &str:Any) : anyhow::Result<GitlabNote>
+    -create_issue(project_id: &str, title: &str, description: &str) anyhow::Result<GitlabIssue>
+    -create_issue_with_labels(project_id: &str, title: &str, description: &str, labels: &[String]) anyhow::Result<GitlabIssue>
+    -list_active_merge_requests(project_id: &str) anyhow::Result<Vec<GitlabMergeRequest>>
+    -list_issues_updated_since(project_id: &str, labels: Option<String>, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GitlabIssue>>
+    -list_merge_request_notes(project_id: &str, mr_iid: u64, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GitlabNote>>
+    -list_open_issues(project_id: &str, labels: Option<String>) anyhow::Result<Vec<GitlabIssue>>
+    +new(url: String, api_token: String) Self
+    -post_merge_request_note(project_id: &str, mr_iid: u64, body: &str) anyhow::Result<GitlabNote>
 }
 GitlabClient <|-- HttpGitlabClient : extends/implements
 @enduml

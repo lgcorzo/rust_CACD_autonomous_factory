@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "config.rs"
 source_path: "crates/factory-core/src/config.rs"
 description: "Detailed documentation for config.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: config.rs
@@ -55,13 +60,13 @@ Default constructor.
 
 **Public Methods:**
 
-##### `from_file(path: P (Any)) -> anyhow::Result<Self>`
+##### `from_file(path (P)) -> anyhow::Result<Self>`
 
 ###### Description
 /// Parse configuration from a specific YAML or JSON file.
 
 ###### Inputs
-* `path: P`: type=Any, meaning=Input for path: P, valid values=Any valid Any, optional=No, default value=None
+* `path`: type=P, meaning=Input for path, valid values=Any valid P, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Self>
@@ -115,7 +120,7 @@ Space Complexity: O(1) mostly
 let result = instance.get_default_model();
 ```
 
-##### `get_model(agent_name: &str (Any)) -> &str`
+##### `get_model(agent_name (&str)) -> &str`
 
 ###### Description
 /// Retrieve model for a given agent or tool name.
@@ -123,7 +128,7 @@ let result = instance.get_default_model();
 /// If key is "planner" or "plan_mission", returns planner_model unless specifically overridden.
 
 ###### Inputs
-* `agent_name: &str`: type=Any, meaning=Input for agent_name: &str, valid values=Any valid Any, optional=No, default value=None
+* `agent_name`: type=&str, meaning=Input for agent_name, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: &str
@@ -220,12 +225,12 @@ None.
 ```plantuml
 @startuml
 class AgentModelConfig {
-    -default() : Self
-    +from_file(path: P:Any) : anyhow::Result<Self>
-    +get_default_model() : &str
-    +get_model(agent_name: &str:Any) : &str
-    +get_planner_model() : &str
-    +load() : Self
+    -default() Self
+    +from_file(path: P) anyhow::Result<Self>
+    +get_default_model() &str
+    +get_model(agent_name: &str) &str
+    +get_planner_model() &str
+    +load() Self
 }
 Default <|-- AgentModelConfig : extends/implements
 @enduml

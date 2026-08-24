@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "github_webhook.rs"
 source_path: "crates/factory-mcp-server/src/github_webhook.rs"
 description: "Detailed documentation for github_webhook.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: github_webhook.rs
@@ -135,10 +140,10 @@ None.
 
 ### Exported Functions
 
-#### `handle_github_webhook(State(_server): State<Arc<McpServer>> (Any), headers: HeaderMap (Any), body_bytes: axum::body::Bytes (Any)) -> impl IntoResponse`
+#### `handle_github_webhook(State(_server) (State<Arc<McpServer>>), headers (HeaderMap), body_bytes (axum::body::Bytes)) -> impl IntoResponse`
 No description provided.
 
-#### `verify_github_signature(secret: &str (Any), signature_header: &str (Any), body_bytes: &[u8] (Any)) -> bool`
+#### `verify_github_signature(secret (&str), signature_header (&str), body_bytes (&[u8])) -> bool`
 No description provided.
 
 ## Internal architecture

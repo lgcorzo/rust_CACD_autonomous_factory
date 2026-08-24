@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Detailed documentation for qa_observer.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: qa_observer.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(sentry_url: String (Any), sentry_token: String (Any), sentry_project: String (Any), gitlab_url: String (Any), gitlab_token: String (Any), gitlab_project: String (Any), hatchet: Hatchet (Any))`
-Parameters: sentry_url: String (Any), sentry_token: String (Any), sentry_project: String (Any), gitlab_url: String (Any), gitlab_token: String (Any), gitlab_project: String (Any), hatchet: Hatchet (Any)
+##### `new(sentry_url (String), sentry_token (String), sentry_project (String), gitlab_url (String), gitlab_token (String), gitlab_project (String), hatchet (Hatchet))`
+Parameters: sentry_url (String), sentry_token (String), sentry_project (String), gitlab_url (String), gitlab_token (String), gitlab_project (String), hatchet (Hatchet)
 Dependencies: Inherited from context
 Initialization: Sets up QAObserverAgent
 
@@ -95,7 +100,7 @@ let result = instance.monitor_crashes();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `execute(_task_description: &str (Any)) -> anyhow::Result<Value>`: Internal helper logic.
+* `execute(_task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
 * `name() -> String`: Internal helper logic.
 
 ### Exported Functions
@@ -107,11 +112,11 @@ None.
 ```plantuml
 @startuml
 class QAObserverAgent {
-    -default() : Self
-    -execute(_task_description: &str:Any) : anyhow::Result<Value>
-    +monitor_crashes() : anyhow::Result<()>
-    -name() : String
-    +new(sentry_url: String:Any, sentry_token: String:Any, sentry_project: String:Any, gitlab_url: String:Any, gitlab_token: String:Any, gitlab_project: String:Any, hatchet: Hatchet:Any) : Self
+    -default() Self
+    -execute(_task_description: &str) anyhow::Result<Value>
+    +monitor_crashes() anyhow::Result<()>
+    -name() String
+    +new(sentry_url: String, sentry_token: String, sentry_project: String, gitlab_url: String, gitlab_token: String, gitlab_project: String, hatchet: Hatchet) Self
 }
 Agent <|-- QAObserverAgent : extends/implements
 Default <|-- QAObserverAgent : extends/implements

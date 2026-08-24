@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "list_minio_buckets.rs"
 source_path: "crates/factory-mcp-server/src/tools/list_minio_buckets.rs"
 description: "Detailed documentation for list_minio_buckets.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: list_minio_buckets.rs
@@ -60,7 +65,7 @@ None.
 
 **Private Methods:**
 
-* `call(_params: Value (Any)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(_params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `default() -> Self`: Internal helper logic.
 * `description() -> String`: Internal helper logic.
 * `input_schema() -> Value`: Internal helper logic.
@@ -75,12 +80,12 @@ None.
 ```plantuml
 @startuml
 class ListMinioBucketsTool {
-    -call(_params: Value:Any) : anyhow::Result<CallToolResult>
-    -default() : Self
-    -description() : String
-    -input_schema() : Value
-    -name() : String
-    +new() : Self
+    -call(_params: Value) anyhow::Result<CallToolResult>
+    -default() Self
+    -description() String
+    -input_schema() Value
+    -name() String
+    +new() Self
 }
 Default <|-- ListMinioBucketsTool : extends/implements
 Tool <|-- ListMinioBucketsTool : extends/implements

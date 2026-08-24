@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "feedback_route.rs"
 source_path: "crates/factory-mcp-server/src/feedback_route.rs"
 description: "Detailed documentation for feedback_route.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: feedback_route.rs
@@ -44,7 +49,7 @@ Provides implementation for feedback_route.rs.
 
 ### Exported Functions
 
-#### `handle_feedback(State(_server): State<Arc<McpServer>> (Any), Json(payload): Json<UserFeedbackPayload> (Any)) -> impl IntoResponse`
+#### `handle_feedback(State(_server) (State<Arc<McpServer>>), Json(payload) (Json<UserFeedbackPayload>)) -> impl IntoResponse`
 No description provided.
 
 ## Internal architecture

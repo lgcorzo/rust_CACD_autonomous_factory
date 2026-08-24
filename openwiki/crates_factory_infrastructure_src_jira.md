@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Detailed documentation for jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: jira.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(url: String (Any), username: String (Any), api_token: String (Any))`
-Parameters: url: String (Any), username: String (Any), api_token: String (Any)
+##### `new(url (String), username (String), api_token (String))`
+Parameters: url (String), username (String), api_token (String)
 Dependencies: Inherited from context
 Initialization: Sets up HttpJiraClient
 
@@ -63,7 +68,7 @@ None.
 
 **Private Methods:**
 
-* `search_issues(query: &str (Any)) -> anyhow::Result<String>`: Internal helper logic.
+* `search_issues(query (&str)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### JiraClient
 
@@ -95,8 +100,8 @@ None.
 ```plantuml
 @startuml
 class HttpJiraClient {
-    +new(url: String:Any, username: String:Any, api_token: String:Any) : Self
-    -search_issues(query: &str:Any) : anyhow::Result<String>
+    +new(url: String, username: String, api_token: String) Self
+    -search_issues(query: &str) anyhow::Result<String>
 }
 JiraClient <|-- HttpJiraClient : extends/implements
 interface JiraClient {

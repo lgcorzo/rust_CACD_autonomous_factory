@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Detailed documentation for state.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: state.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(session_id: String (Any))`
-Parameters: session_id: String (Any)
+##### `new(session_id (String))`
+Parameters: session_id (String)
 Dependencies: Inherited from context
 Initialization: Sets up BridgeState
 
@@ -61,15 +66,15 @@ Initialization: Sets up BridgeState
 
 **Public Methods:**
 
-##### `load_checkpoint(session_id: &str (Any), s3: &dyn factory_infrastructure::S3Storage (Any), bucket: &str (Any)) -> anyhow::Result<Option<Self>>`
+##### `load_checkpoint(session_id (&str), s3 (&dyn factory_infrastructure::S3Storage), bucket (&str)) -> anyhow::Result<Option<Self>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `session_id: &str`: type=Any, meaning=Input for session_id: &str, valid values=Any valid Any, optional=No, default value=None
-* `s3: &dyn factory_infrastructure::S3Storage`: type=Any, meaning=Input for s3: &dyn factory_infrastructure::S3Storage, valid values=Any valid Any, optional=No, default value=None
-* `bucket: &str`: type=Any, meaning=Input for bucket: &str, valid values=Any valid Any, optional=No, default value=None
+* `session_id`: type=&str, meaning=Input for session_id, valid values=Any valid &str, optional=No, default value=None
+* `s3`: type=&dyn factory_infrastructure::S3Storage, meaning=Input for s3, valid values=Any valid &dyn factory_infrastructure::S3Storage, optional=No, default value=None
+* `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Option<Self>>
@@ -93,14 +98,14 @@ Space Complexity: O(1) mostly
 let result = instance.load_checkpoint();
 ```
 
-##### `save_checkpoint(s3: &dyn factory_infrastructure::S3Storage (Any), bucket: &str (Any)) -> anyhow::Result<()>`
+##### `save_checkpoint(s3 (&dyn factory_infrastructure::S3Storage), bucket (&str)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-* `s3: &dyn factory_infrastructure::S3Storage`: type=Any, meaning=Input for s3: &dyn factory_infrastructure::S3Storage, valid values=Any valid Any, optional=No, default value=None
-* `bucket: &str`: type=Any, meaning=Input for bucket: &str, valid values=Any valid Any, optional=No, default value=None
+* `s3`: type=&dyn factory_infrastructure::S3Storage, meaning=Input for s3, valid values=Any valid &dyn factory_infrastructure::S3Storage, optional=No, default value=None
+* `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<()>
@@ -126,7 +131,7 @@ let result = instance.save_checkpoint();
 
 **Private Methods:**
 
-* `get_checkpoint_key(session_id: &str (Any)) -> String`: Internal helper logic.
+* `get_checkpoint_key(session_id (&str)) -> String`: Internal helper logic.
 
 #### BridgeStatus
 
@@ -182,10 +187,10 @@ None.
 ```plantuml
 @startuml
 class BridgeState {
-    -get_checkpoint_key(session_id: &str:Any) : String
-    +load_checkpoint(session_id: &str:Any, s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) : anyhow::Result<Option<Self>>
-    +new(session_id: String:Any) : Self
-    +save_checkpoint(s3: &dyn factory_infrastructure::S3Storage:Any, bucket: &str:Any) : anyhow::Result<()>
+    -get_checkpoint_key(session_id: &str) String
+    +load_checkpoint(session_id: &str, s3: &dyn factory_infrastructure::S3Storage, bucket: &str) anyhow::Result<Option<Self>>
+    +new(session_id: String) Self
+    +save_checkpoint(s3: &dyn factory_infrastructure::S3Storage, bucket: &str) anyhow::Result<()>
 }
 enum BridgeStatus {
 }

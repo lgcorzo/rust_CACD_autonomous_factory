@@ -1,10 +1,15 @@
 ---
-type: "module-documentation"
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
 title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-last_verified_commit: "ec7bd0f"
+timestamp: "2026-08-24T05:31:17Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "d073f5f"
 ---
 
 # File: telemetry_export.rs
@@ -45,8 +50,8 @@ No description provided.
 
 **Constructor:**
 
-##### `new(kafka_brokers: String (Any), openwebui_db_url: String (Any))`
-Parameters: kafka_brokers: String (Any), openwebui_db_url: String (Any)
+##### `new(kafka_brokers (String), openwebui_db_url (String))`
+Parameters: kafka_brokers (String), openwebui_db_url (String)
 Dependencies: Inherited from context
 Initialization: Sets up TelemetryExporter
 
@@ -58,13 +63,13 @@ Initialization: Sets up TelemetryExporter
 
 **Public Methods:**
 
-##### `start_export_loop(self: Arc<Self> (Any)) -> anyhow::Result<()>`
+##### `start_export_loop(self (Arc<Self>)) -> anyhow::Result<()>`
 
 ###### Description
 /// Starts a background task consuming `agent-thought` from Kafka and exporting to OpenWebUI.
 
 ###### Inputs
-* `self: Arc<Self>`: type=Any, meaning=Input for self: Arc<Self>, valid values=Any valid Any, optional=No, default value=None
+* `self`: type=Arc<Self>, meaning=Input for self, valid values=Any valid Arc<Self>, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<()>
@@ -90,7 +95,7 @@ let result = instance.start_export_loop();
 
 **Private Methods:**
 
-* `push_to_openwebui(thought: &Value (Any)) -> anyhow::Result<()>`: Internal helper logic.
+* `push_to_openwebui(thought (&Value)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -101,9 +106,9 @@ None.
 ```plantuml
 @startuml
 class TelemetryExporter {
-    +new(kafka_brokers: String:Any, openwebui_db_url: String:Any) : Self
-    -push_to_openwebui(thought: &Value:Any) : anyhow::Result<()>
-    +start_export_loop(self: Arc<Self>:Any) : anyhow::Result<()>
+    +new(kafka_brokers: String, openwebui_db_url: String) Self
+    -push_to_openwebui(thought: &Value) anyhow::Result<()>
+    +start_export_loop(self: Arc<Self>) anyhow::Result<()>
 }
 @enduml
 
