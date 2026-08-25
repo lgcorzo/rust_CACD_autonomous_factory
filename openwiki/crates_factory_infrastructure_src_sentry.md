@@ -6,10 +6,10 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-25T05:53:44Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: sentry.rs
@@ -110,7 +110,36 @@ None.
 
 **Public Methods:**
 
-None.
+##### `fetch_recent_crashes(project (&str), since_minutes (u64)) -> anyhow::Result<Vec<CrashEvent>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `project`: type=&str, meaning=Input for project, valid values=Any valid &str, optional=No, default value=None
+* `since_minutes`: type=u64, meaning=Input for since_minutes, valid values=Any valid u64, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<CrashEvent>>
+Semantic meaning: Result of fetch_recent_crashes
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.fetch_recent_crashes();
+```
 
 **Private Methods:**
 
@@ -132,6 +161,7 @@ class HttpSentryClient {
 }
 SentryClient <|-- HttpSentryClient : extends/implements
 interface SentryClient {
+    +fetch_recent_crashes(project: &str, since_minutes: u64) anyhow::Result<Vec<CrashEvent>>
 }
 @enduml
 
@@ -193,6 +223,7 @@ Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
 ```plantuml
 @startuml
 Caller --> HttpSentryClient::new
+Caller --> SentryClient::fetch_recent_crashes
 @enduml
 
 ```

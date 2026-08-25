@@ -6,10 +6,10 @@ title: "parse_c.py"
 source_path: "parse_c.py"
 description: "Detailed documentation for parse_c.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-25T05:53:44Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: parse_c.py
