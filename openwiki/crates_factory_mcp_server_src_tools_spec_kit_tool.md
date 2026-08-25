@@ -6,10 +6,10 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-25T05:53:44Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: spec_kit_tool.rs
@@ -215,7 +215,36 @@ None.
 
 **Public Methods:**
 
-None.
+##### `invoke(command (SpecKitCommand), args (Vec<String>)) -> anyhow::Result<String>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `command`: type=SpecKitCommand, meaning=Input for command, valid values=Any valid SpecKitCommand, optional=No, default value=None
+* `args`: type=Vec<String>, meaning=Input for args, valid values=Any valid Vec<String>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<String>
+Semantic meaning: Result of invoke
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.invoke();
+```
 
 **Private Methods:**
 
@@ -254,6 +283,7 @@ class SpecKitTool {
 }
 Tool <|-- SpecKitTool : extends/implements
 interface SpecProvider {
+    +invoke(command: SpecKitCommand, args: Vec<String>) anyhow::Result<String>
 }
 @enduml
 
@@ -324,6 +354,7 @@ Caller --> MockSpecProvider::new
 Caller --> SpecKitTool::invoke_spec_kit
 Caller --> SpecKitTool::new
 Caller --> SpecKitTool::with_provider
+Caller --> SpecProvider::invoke
 @enduml
 
 ```

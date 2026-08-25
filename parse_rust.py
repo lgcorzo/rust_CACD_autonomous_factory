@@ -51,11 +51,52 @@ def parse_rust(filepath):
                                             'type': get_node_text(ftype_node, source_bytes)
                                         })
 
+                    methods = []
+                    if kind == 'trait':
+                        body_node = node.child_by_field_name('body')
+                        if body_node and body_node.type == 'declaration_list':
+                            for b_child in body_node.children:
+                                if b_child.type in ['function_item', 'function_signature_item']:
+                                    func_name_node = b_child.child_by_field_name('name')
+                                    if func_name_node:
+                                        func_name = get_node_text(func_name_node, source_bytes)
+                                        is_pub = True
+
+                                        func_doc = []
+                                        ps = b_child.prev_sibling
+                                        while ps and ps.type in ['line_comment', 'attribute_item']:
+                                            if ps.type == 'line_comment':
+                                                func_doc.append(get_node_text(ps, source_bytes))
+                                            ps = ps.prev_sibling
+
+                                        is_constructor = func_name == 'new'
+                                        args = []
+                                        ret_type = 'None'
+                                        params_node = b_child.child_by_field_name('parameters')
+                                        if params_node:
+                                            for p in params_node.children:
+                                                if p.type == 'parameter':
+                                                    pat = p.child_by_field_name('pattern')
+                                                    typ = p.child_by_field_name('type')
+                                                    pat_text = get_node_text(pat, source_bytes) if pat else 'unknown'
+                                                    typ_text = get_node_text(typ, source_bytes) if typ else 'Any'
+                                                    args.append({'name': pat_text, 'type': typ_text})
+                                        return_type_node = b_child.child_by_field_name('return_type')
+                                        if return_type_node:
+                                            ret_type = get_node_text(return_type_node, source_bytes)
+                                        methods.append({
+                                            'name': func_name,
+                                            'is_pub': is_pub,
+                                            'is_constructor': is_constructor,
+                                            'doc': '\n'.join(reversed(func_doc)),
+                                            'args': args,
+                                            'ret_type': ret_type
+                                        })
                     classes.append({
                         'name': name,
                         'kind': kind,
                         'doc': '\n'.join(reversed(doc_comments)),
-                        'methods': [],
+                        'methods': methods,
                         'fields': fields,
                         'implements': []
                     })
