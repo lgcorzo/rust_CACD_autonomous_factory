@@ -6,10 +6,10 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: security.rs
@@ -228,7 +228,95 @@ None.
 
 **Public Methods:**
 
-None.
+##### `issue_jit_token(audience (&str)) -> Result<JitToken>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `audience`: type=&str, meaning=Input for audience, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: Result<JitToken>
+Semantic meaning: Result of issue_jit_token
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.issue_jit_token();
+```
+
+##### `validate_token(token (&JitToken)) -> Result<bool>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `token`: type=&JitToken, meaning=Input for token, valid values=Any valid &JitToken, optional=No, default value=None
+
+###### Output
+Return type: Result<bool>
+Semantic meaning: Result of validate_token
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.validate_token();
+```
+
+##### `wipe_token_from_memory(token (&mut JitToken)) -> None`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `token`: type=&mut JitToken, meaning=Input for token, valid values=Any valid &mut JitToken, optional=No, default value=None
+
+###### Output
+Return type: None
+Semantic meaning: Result of wipe_token_from_memory
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.wipe_token_from_memory();
+```
 
 **Private Methods:**
 
@@ -249,7 +337,66 @@ None.
 
 **Public Methods:**
 
-None.
+##### `audit_content(content (&str)) -> Result<AuditResult>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `content`: type=&str, meaning=Input for content, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: Result<AuditResult>
+Semantic meaning: Result of audit_content
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.audit_content();
+```
+
+##### `validate_signature(data (&[u8]), signature (&str)) -> Result<bool>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `data`: type=&[u8], meaning=Input for data, valid values=Any valid &[u8], optional=No, default value=None
+* `signature`: type=&str, meaning=Input for signature, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: Result<bool>
+Semantic meaning: Result of validate_signature
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.validate_signature();
+```
 
 **Private Methods:**
 
@@ -279,8 +426,13 @@ class SastScanResult {
     +passes_gate() bool
 }
 interface SecurityBounds {
+    +issue_jit_token(audience: &str) Result<JitToken>
+    +validate_token(token: &JitToken) Result<bool>
+    +wipe_token_from_memory(token: &mut JitToken) None
 }
 interface SecurityValidator {
+    +audit_content(content: &str) Result<AuditResult>
+    +validate_signature(data: &[u8], signature: &str) Result<bool>
 }
 @enduml
 
@@ -340,6 +492,11 @@ Main --> zeroize__Zeroize : uses
 @startuml
 Caller --> SastScanResult::inspect_diff
 Caller --> SastScanResult::passes_gate
+Caller --> SecurityBounds::issue_jit_token
+Caller --> SecurityBounds::validate_token
+Caller --> SecurityBounds::wipe_token_from_memory
+Caller --> SecurityValidator::audit_content
+Caller --> SecurityValidator::validate_signature
 @enduml
 
 ```

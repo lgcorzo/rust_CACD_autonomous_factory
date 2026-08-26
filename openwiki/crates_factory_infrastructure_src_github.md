@@ -6,10 +6,10 @@ title: "github.rs"
 source_path: "crates/factory-infrastructure/src/github.rs"
 description: "Detailed documentation for github.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: github.rs
@@ -58,7 +58,228 @@ None.
 
 **Public Methods:**
 
-None.
+##### `create_issue(repo (&str), title (&str), body (&str)) -> anyhow::Result<GithubIssue>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
+* `title`: type=&str, meaning=Input for title, valid values=Any valid &str, optional=No, default value=None
+* `body`: type=&str, meaning=Input for body, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<GithubIssue>
+Semantic meaning: Result of create_issue
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.create_issue();
+```
+
+##### `create_pull_request(repo (&str), title (&str), head (&str), base (&str), body (&str)) -> anyhow::Result<String>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
+* `title`: type=&str, meaning=Input for title, valid values=Any valid &str, optional=No, default value=None
+* `head`: type=&str, meaning=Input for head, valid values=Any valid &str, optional=No, default value=None
+* `base`: type=&str, meaning=Input for base, valid values=Any valid &str, optional=No, default value=None
+* `body`: type=&str, meaning=Input for body, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<String>
+Semantic meaning: Result of create_pull_request
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.create_pull_request();
+```
+
+##### `list_active_pull_requests(repo (&str)) -> anyhow::Result<Vec<GithubPullRequest>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<GithubPullRequest>>
+Semantic meaning: Result of list_active_pull_requests
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_active_pull_requests();
+```
+
+##### `list_issues_updated_since(repo (&str), labels (Option<String>), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubIssue>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
+* `labels`: type=Option<String>, meaning=Input for labels, valid values=Any valid Option<String>, optional=No, default value=None
+* `since`: type=Option<DateTime<Utc>>, meaning=Input for since, valid values=Any valid Option<DateTime<Utc>>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<GithubIssue>>
+Semantic meaning: Result of list_issues_updated_since
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_issues_updated_since();
+```
+
+##### `list_open_issues(repo (&str), labels (Option<String>)) -> anyhow::Result<Vec<GithubIssue>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
+* `labels`: type=Option<String>, meaning=Input for labels, valid values=Any valid Option<String>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<GithubIssue>>
+Semantic meaning: Result of list_open_issues
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_open_issues();
+```
+
+##### `list_pull_request_comments(repo (&str), pr_number (u64), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubComment>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
+* `pr_number`: type=u64, meaning=Input for pr_number, valid values=Any valid u64, optional=No, default value=None
+* `since`: type=Option<DateTime<Utc>>, meaning=Input for since, valid values=Any valid Option<DateTime<Utc>>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<GithubComment>>
+Semantic meaning: Result of list_pull_request_comments
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_pull_request_comments();
+```
+
+##### `post_pull_request_comment(repo (&str), pr_number (u64), body (&str)) -> anyhow::Result<GithubComment>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
+* `pr_number`: type=u64, meaning=Input for pr_number, valid values=Any valid u64, optional=No, default value=None
+* `body`: type=&str, meaning=Input for body, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<GithubComment>
+Semantic meaning: Result of post_pull_request_comment
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.post_pull_request_comment();
+```
 
 **Private Methods:**
 
@@ -233,6 +454,13 @@ None.
 ```plantuml
 @startuml
 interface GithubClient {
+    +create_issue(repo: &str, title: &str, body: &str) anyhow::Result<GithubIssue>
+    +create_pull_request(repo: &str, title: &str, head: &str, base: &str, body: &str) anyhow::Result<String>
+    +list_active_pull_requests(repo: &str) anyhow::Result<Vec<GithubPullRequest>>
+    +list_issues_updated_since(repo: &str, labels: Option<String>, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubIssue>>
+    +list_open_issues(repo: &str, labels: Option<String>) anyhow::Result<Vec<GithubIssue>>
+    +list_pull_request_comments(repo: &str, pr_number: u64, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubComment>>
+    +post_pull_request_comment(repo: &str, pr_number: u64, body: &str) anyhow::Result<GithubComment>
 }
 class GithubComment {
 }
@@ -313,6 +541,13 @@ Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
 
 ```plantuml
 @startuml
+Caller --> GithubClient::create_issue
+Caller --> GithubClient::create_pull_request
+Caller --> GithubClient::list_active_pull_requests
+Caller --> GithubClient::list_issues_updated_since
+Caller --> GithubClient::list_open_issues
+Caller --> GithubClient::list_pull_request_comments
+Caller --> GithubClient::post_pull_request_comment
 Caller --> HttpGithubClient::new
 Caller --> HttpGithubClient::with_url
 @enduml
@@ -326,7 +561,7 @@ Caller --> HttpGithubClient::with_url
 autonumber
 participant "Client Interface" as Caller
 participant "GithubService" as Svc
-Caller -> Svc: execute()
+Caller -> Svc: create_issue()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml

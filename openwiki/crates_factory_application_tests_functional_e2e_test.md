@@ -6,10 +6,10 @@ title: "functional_e2e_test.rs"
 source_path: "crates/factory-application/tests/functional_e2e_test.rs"
 description: "Detailed documentation for functional_e2e_test.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: functional_e2e_test.rs

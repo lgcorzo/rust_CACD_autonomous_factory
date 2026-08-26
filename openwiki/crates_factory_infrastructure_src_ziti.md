@@ -6,10 +6,10 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: ziti.rs
@@ -84,7 +84,65 @@ None.
 
 **Public Methods:**
 
+##### `get_token() -> anyhow::Result<String>`
+
+###### Description
+No description provided.
+
+###### Inputs
 None.
+
+###### Output
+Return type: anyhow::Result<String>
+Semantic meaning: Result of get_token
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.get_token();
+```
+
+##### `service_name() -> String`
+
+###### Description
+No description provided.
+
+###### Inputs
+None.
+
+###### Output
+Return type: String
+Semantic meaning: Result of service_name
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.service_name();
+```
 
 **Private Methods:**
 
@@ -105,6 +163,8 @@ class OpenZitiIdentity {
 }
 ZitiIdentity <|-- OpenZitiIdentity : extends/implements
 interface ZitiIdentity {
+    +get_token() anyhow::Result<String>
+    +service_name() String
 }
 @enduml
 
@@ -154,6 +214,8 @@ Main --> super___ : uses
 ```plantuml
 @startuml
 Caller --> OpenZitiIdentity::new
+Caller --> ZitiIdentity::get_token
+Caller --> ZitiIdentity::service_name
 @enduml
 
 ```

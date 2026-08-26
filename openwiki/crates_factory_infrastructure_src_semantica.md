@@ -6,10 +6,10 @@ title: "semantica.rs"
 source_path: "crates/factory-infrastructure/src/semantica.rs"
 description: "Detailed documentation for semantica.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: semantica.rs
@@ -185,7 +185,95 @@ None.
 
 **Public Methods:**
 
-None.
+##### `detect_conflicts(plan (&MissionPlan)) -> anyhow::Result<Vec<Conflict>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `plan`: type=&MissionPlan, meaning=Input for plan, valid values=Any valid &MissionPlan, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<Conflict>>
+Semantic meaning: Result of detect_conflicts
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.detect_conflicts();
+```
+
+##### `record_decision(record (&DecisionRecord)) -> anyhow::Result<()>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `record`: type=&DecisionRecord, meaning=Input for record, valid values=Any valid &DecisionRecord, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<()>
+Semantic meaning: Result of record_decision
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.record_decision();
+```
+
+##### `verify_provenance(patch_id (&str)) -> anyhow::Result<ProvenanceReport>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `patch_id`: type=&str, meaning=Input for patch_id, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<ProvenanceReport>
+Semantic meaning: Result of verify_provenance
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.verify_provenance();
+```
 
 **Private Methods:**
 
@@ -215,6 +303,9 @@ class MissionPlan {
 class ProvenanceReport {
 }
 interface SemanticaClient {
+    +detect_conflicts(plan: &MissionPlan) anyhow::Result<Vec<Conflict>>
+    +record_decision(record: &DecisionRecord) anyhow::Result<()>
+    +verify_provenance(patch_id: &str) anyhow::Result<ProvenanceReport>
 }
 @enduml
 
@@ -267,6 +358,9 @@ Main --> super___ : uses
 ```plantuml
 @startuml
 Caller --> HttpSemanticaClient::new
+Caller --> SemanticaClient::detect_conflicts
+Caller --> SemanticaClient::record_decision
+Caller --> SemanticaClient::verify_provenance
 @enduml
 
 ```

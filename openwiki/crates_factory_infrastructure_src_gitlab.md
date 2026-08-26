@@ -6,10 +6,10 @@ title: "gitlab.rs"
 source_path: "crates/factory-infrastructure/src/gitlab.rs"
 description: "Detailed documentation for gitlab.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: gitlab.rs
@@ -79,7 +79,227 @@ None.
 
 **Public Methods:**
 
-None.
+##### `create_issue(project_id (&str), title (&str), description (&str)) -> anyhow::Result<GitlabIssue>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
+* `title`: type=&str, meaning=Input for title, valid values=Any valid &str, optional=No, default value=None
+* `description`: type=&str, meaning=Input for description, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<GitlabIssue>
+Semantic meaning: Result of create_issue
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.create_issue();
+```
+
+##### `create_issue_with_labels(project_id (&str), title (&str), description (&str), labels (&[String])) -> anyhow::Result<GitlabIssue>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
+* `title`: type=&str, meaning=Input for title, valid values=Any valid &str, optional=No, default value=None
+* `description`: type=&str, meaning=Input for description, valid values=Any valid &str, optional=No, default value=None
+* `labels`: type=&[String], meaning=Input for labels, valid values=Any valid &[String], optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<GitlabIssue>
+Semantic meaning: Result of create_issue_with_labels
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.create_issue_with_labels();
+```
+
+##### `list_active_merge_requests(project_id (&str)) -> anyhow::Result<Vec<GitlabMergeRequest>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<GitlabMergeRequest>>
+Semantic meaning: Result of list_active_merge_requests
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_active_merge_requests();
+```
+
+##### `list_issues_updated_since(project_id (&str), labels (Option<String>), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GitlabIssue>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
+* `labels`: type=Option<String>, meaning=Input for labels, valid values=Any valid Option<String>, optional=No, default value=None
+* `since`: type=Option<DateTime<Utc>>, meaning=Input for since, valid values=Any valid Option<DateTime<Utc>>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<GitlabIssue>>
+Semantic meaning: Result of list_issues_updated_since
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_issues_updated_since();
+```
+
+##### `list_merge_request_notes(project_id (&str), mr_iid (u64), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GitlabNote>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
+* `mr_iid`: type=u64, meaning=Input for mr_iid, valid values=Any valid u64, optional=No, default value=None
+* `since`: type=Option<DateTime<Utc>>, meaning=Input for since, valid values=Any valid Option<DateTime<Utc>>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<GitlabNote>>
+Semantic meaning: Result of list_merge_request_notes
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_merge_request_notes();
+```
+
+##### `list_open_issues(project_id (&str), labels (Option<String>)) -> anyhow::Result<Vec<GitlabIssue>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
+* `labels`: type=Option<String>, meaning=Input for labels, valid values=Any valid Option<String>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<GitlabIssue>>
+Semantic meaning: Result of list_open_issues
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_open_issues();
+```
+
+##### `post_merge_request_note(project_id (&str), mr_iid (u64), body (&str)) -> anyhow::Result<GitlabNote>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
+* `mr_iid`: type=u64, meaning=Input for mr_iid, valid values=Any valid u64, optional=No, default value=None
+* `body`: type=&str, meaning=Input for body, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<GitlabNote>
+Semantic meaning: Result of post_merge_request_note
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.post_merge_request_note();
+```
 
 **Private Methods:**
 
@@ -205,6 +425,13 @@ None.
 class GitlabAuthor {
 }
 interface GitlabClient {
+    +create_issue(project_id: &str, title: &str, description: &str) anyhow::Result<GitlabIssue>
+    +create_issue_with_labels(project_id: &str, title: &str, description: &str, labels: &[String]) anyhow::Result<GitlabIssue>
+    +list_active_merge_requests(project_id: &str) anyhow::Result<Vec<GitlabMergeRequest>>
+    +list_issues_updated_since(project_id: &str, labels: Option<String>, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GitlabIssue>>
+    +list_merge_request_notes(project_id: &str, mr_iid: u64, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GitlabNote>>
+    +list_open_issues(project_id: &str, labels: Option<String>) anyhow::Result<Vec<GitlabIssue>>
+    +post_merge_request_note(project_id: &str, mr_iid: u64, body: &str) anyhow::Result<GitlabNote>
 }
 class GitlabIssue {
 }
@@ -285,6 +512,13 @@ Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
 
 ```plantuml
 @startuml
+Caller --> GitlabClient::create_issue
+Caller --> GitlabClient::create_issue_with_labels
+Caller --> GitlabClient::list_active_merge_requests
+Caller --> GitlabClient::list_issues_updated_since
+Caller --> GitlabClient::list_merge_request_notes
+Caller --> GitlabClient::list_open_issues
+Caller --> GitlabClient::post_merge_request_note
 Caller --> HttpGitlabClient::new
 @enduml
 

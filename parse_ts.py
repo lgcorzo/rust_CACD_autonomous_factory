@@ -47,7 +47,7 @@ def parse_ts(filepath):
                     body_node = node.child_by_field_name('body')
                     if body_node:
                         for b_child in body_node.children:
-                            if b_child.type == 'method_definition':
+                            if b_child.type == 'method_definition' or b_child.type == 'method_signature':
                                 m_name_node = b_child.child_by_field_name('name')
                                 if m_name_node:
                                     m_name = get_node_text(m_name_node, source_bytes)
@@ -74,6 +74,8 @@ def parse_ts(filepath):
                                     ret_node = b_child.child_by_field_name('return_type')
                                     if ret_node:
                                         ret_type = get_node_text(ret_node, source_bytes)
+                                        if ret_type.startswith(':'):
+                                            ret_type = ret_type[1:].strip()
 
                                     methods.append({
                                         'name': m_name,
@@ -91,6 +93,8 @@ def parse_ts(filepath):
                                     f_type = "any"
                                     if f_type_node:
                                         f_type = get_node_text(f_type_node, source_bytes)
+                                        if f_type.startswith(':'):
+                                            f_type = f_type[1:].strip()
                                     fields.append({
                                         'name': f_name,
                                         'type': f_type
@@ -105,17 +109,23 @@ def parse_ts(filepath):
                         'implements': []
                     })
 
-            elif node.type == 'function_declaration':
+            elif node.type == 'function_declaration' or node.type == 'function_signature':
                 if node.parent and node.parent.type == 'program':
                     name_node = node.child_by_field_name('name')
                     if name_node:
                         name = get_node_text(name_node, source_bytes)
+                        ret_type = "any"
+                        ret_node = node.child_by_field_name('return_type')
+                        if ret_node:
+                            ret_type = get_node_text(ret_node, source_bytes)
+                            if ret_type.startswith(':'):
+                                ret_type = ret_type[1:].strip()
                         free_functions.append({
                             'name': name,
                             'is_pub': True,
                             'doc': '',
                             'args': [],
-                            'ret_type': 'any'
+                            'ret_type': ret_type
                         })
 
             for child in node.children:

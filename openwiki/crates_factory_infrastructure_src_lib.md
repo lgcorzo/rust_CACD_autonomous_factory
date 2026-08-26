@@ -6,10 +6,10 @@ title: "lib.rs"
 source_path: "crates/factory-infrastructure/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: lib.rs
@@ -60,7 +60,129 @@ None.
 
 **Public Methods:**
 
+##### `get_object(bucket (&str), key (&str)) -> anyhow::Result<Vec<u8>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
+* `key`: type=&str, meaning=Input for key, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<u8>>
+Semantic meaning: Result of get_object
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.get_object();
+```
+
+##### `list_buckets() -> anyhow::Result<Vec<String>>`
+
+###### Description
+No description provided.
+
+###### Inputs
 None.
+
+###### Output
+Return type: anyhow::Result<Vec<String>>
+Semantic meaning: Result of list_buckets
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_buckets();
+```
+
+##### `list_objects(bucket (&str), prefix (Option<String>)) -> anyhow::Result<Vec<String>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
+* `prefix`: type=Option<String>, meaning=Input for prefix, valid values=Any valid Option<String>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Vec<String>>
+Semantic meaning: Result of list_objects
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.list_objects();
+```
+
+##### `put_object(bucket (&str), key (&str), data (Vec<u8>)) -> anyhow::Result<()>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
+* `key`: type=&str, meaning=Input for key, valid values=Any valid &str, optional=No, default value=None
+* `data`: type=Vec<u8>, meaning=Input for data, valid values=Any valid Vec<u8>, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<()>
+Semantic meaning: Result of put_object
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.put_object();
+```
 
 **Private Methods:**
 
@@ -75,6 +197,10 @@ None.
 ```plantuml
 @startuml
 interface S3Storage {
+    +get_object(bucket: &str, key: &str) anyhow::Result<Vec<u8>>
+    +list_buckets() anyhow::Result<Vec<String>>
+    +list_objects(bucket: &str, prefix: Option<String>) anyhow::Result<Vec<String>>
+    +put_object(bucket: &str, key: &str, data: Vec<u8>) anyhow::Result<()>
 }
 @enduml
 
@@ -190,7 +316,10 @@ Main --> pub_ziti___OpenZitiIdentity__ZitiIdentity_ : uses
 
 ```plantuml
 @startuml
-Caller --> Module : no public API
+Caller --> S3Storage::get_object
+Caller --> S3Storage::list_buckets
+Caller --> S3Storage::list_objects
+Caller --> S3Storage::put_object
 @enduml
 
 ```
@@ -202,7 +331,7 @@ Caller --> Module : no public API
 autonumber
 participant "Client Interface" as Caller
 participant "LibService" as Svc
-Caller -> Svc: execute()
+Caller -> Svc: get_object()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml

@@ -6,10 +6,10 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: lib.rs
@@ -58,7 +58,65 @@ None.
 
 **Public Methods:**
 
+##### `execute(task_description (&str)) -> anyhow::Result<Value>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `task_description`: type=&str, meaning=Input for task_description, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Value>
+Semantic meaning: Result of execute
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.execute();
+```
+
+##### `name() -> String`
+
+###### Description
+No description provided.
+
+###### Inputs
 None.
+
+###### Output
+Return type: String
+Semantic meaning: Result of name
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.name();
+```
 
 **Private Methods:**
 
@@ -73,6 +131,8 @@ None.
 ```plantuml
 @startuml
 interface Agent {
+    +execute(task_description: &str) anyhow::Result<Value>
+    +name() String
 }
 @enduml
 
@@ -124,7 +184,8 @@ Main --> serde_json__Value : uses
 
 ```plantuml
 @startuml
-Caller --> Module : no public API
+Caller --> Agent::execute
+Caller --> Agent::name
 @enduml
 
 ```

@@ -6,10 +6,10 @@ title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Detailed documentation for jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: jira.rs
@@ -85,7 +85,35 @@ None.
 
 **Public Methods:**
 
-None.
+##### `search_issues(query (&str)) -> anyhow::Result<String>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `query`: type=&str, meaning=Input for query, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<String>
+Semantic meaning: Result of search_issues
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.search_issues();
+```
 
 **Private Methods:**
 
@@ -105,6 +133,7 @@ class HttpJiraClient {
 }
 JiraClient <|-- HttpJiraClient : extends/implements
 interface JiraClient {
+    +search_issues(query: &str) anyhow::Result<String>
 }
 @enduml
 
@@ -163,6 +192,7 @@ Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
 ```plantuml
 @startuml
 Caller --> HttpJiraClient::new
+Caller --> JiraClient::search_issues
 @enduml
 
 ```

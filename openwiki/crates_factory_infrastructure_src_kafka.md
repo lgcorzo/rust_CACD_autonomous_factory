@@ -6,10 +6,10 @@ title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: kafka.rs
@@ -58,7 +58,69 @@ None.
 
 **Public Methods:**
 
-None.
+##### `publish(topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `topic`: type=&str, meaning=Input for topic, valid values=Any valid &str, optional=No, default value=None
+* `key`: type=&str, meaning=Input for key, valid values=Any valid &str, optional=No, default value=None
+* `payload`: type=&[u8], meaning=Input for payload, valid values=Any valid &[u8], optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<()>
+Semantic meaning: Result of publish
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.publish();
+```
+
+##### `publish_thought(mission_id (&str), thought (&str), agent (&str)) -> anyhow::Result<()>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `thought`: type=&str, meaning=Input for thought, valid values=Any valid &str, optional=No, default value=None
+* `agent`: type=&str, meaning=Input for agent, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<()>
+Semantic meaning: Result of publish_thought
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.publish_thought();
+```
 
 **Private Methods:**
 
@@ -121,6 +183,8 @@ None.
 ```plantuml
 @startuml
 interface KafkaClient {
+    +publish(topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
+    +publish_thought(mission_id: &str, thought: &str, agent: &str) anyhow::Result<()>
 }
 class RdKafkaClient {
     +new(brokers: &str) anyhow::Result<Self>
@@ -188,6 +252,8 @@ Main --> std__time__Duration : uses
 
 ```plantuml
 @startuml
+Caller --> KafkaClient::publish
+Caller --> KafkaClient::publish_thought
 Caller --> RdKafkaClient::new
 Caller --> SimpleMockKafkaClient::new
 @enduml
@@ -201,7 +267,7 @@ Caller --> SimpleMockKafkaClient::new
 autonumber
 participant "Client Interface" as Caller
 participant "KafkaService" as Svc
-Caller -> Svc: execute()
+Caller -> Svc: publish()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml

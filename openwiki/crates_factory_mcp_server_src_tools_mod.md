@@ -6,10 +6,10 @@ title: "mod.rs"
 source_path: "crates/factory-mcp-server/src/tools/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: mod.rs
@@ -58,7 +58,125 @@ None.
 
 **Public Methods:**
 
+##### `call(params (Value)) -> anyhow::Result<CallToolResult>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `params`: type=Value, meaning=Input for params, valid values=Any valid Value, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<CallToolResult>
+Semantic meaning: Result of call
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.call();
+```
+
+##### `description() -> String`
+
+###### Description
+No description provided.
+
+###### Inputs
 None.
+
+###### Output
+Return type: String
+Semantic meaning: Result of description
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.description();
+```
+
+##### `input_schema() -> Value`
+
+###### Description
+No description provided.
+
+###### Inputs
+None.
+
+###### Output
+Return type: Value
+Semantic meaning: Result of input_schema
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.input_schema();
+```
+
+##### `name() -> String`
+
+###### Description
+No description provided.
+
+###### Inputs
+None.
+
+###### Output
+Return type: String
+Semantic meaning: Result of name
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.name();
+```
 
 **Private Methods:**
 
@@ -73,6 +191,10 @@ None.
 ```plantuml
 @startuml
 interface Tool {
+    +call(params: Value) anyhow::Result<CallToolResult>
+    +description() String
+    +input_schema() Value
+    +name() String
 }
 @enduml
 
@@ -177,7 +299,10 @@ Main --> serde_json__Value : uses
 
 ```plantuml
 @startuml
-Caller --> Module : no public API
+Caller --> Tool::call
+Caller --> Tool::description
+Caller --> Tool::input_schema
+Caller --> Tool::name
 @enduml
 
 ```
@@ -189,7 +314,7 @@ Caller --> Module : no public API
 autonumber
 participant "Client Interface" as Caller
 participant "ModService" as Svc
-Caller -> Svc: execute()
+Caller -> Svc: call()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml

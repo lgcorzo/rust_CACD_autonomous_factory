@@ -6,10 +6,10 @@ title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Detailed documentation for aethalgard.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: aethalgard.rs
@@ -58,7 +58,66 @@ None.
 
 **Public Methods:**
 
-None.
+##### `notify_remediation(mission_id (&str), error_details (&str)) -> anyhow::Result<()>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `error_details`: type=&str, meaning=Input for error_details, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<()>
+Semantic meaning: Result of notify_remediation
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.notify_remediation();
+```
+
+##### `verify_causal_provenance(patch_id (&str)) -> anyhow::Result<bool>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `patch_id`: type=&str, meaning=Input for patch_id, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<bool>
+Semantic meaning: Result of verify_causal_provenance
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.verify_causal_provenance();
+```
 
 **Private Methods:**
 
@@ -128,6 +187,8 @@ None.
 ```plantuml
 @startuml
 interface AethalgardClient {
+    +notify_remediation(mission_id: &str, error_details: &str) anyhow::Result<()>
+    +verify_causal_provenance(patch_id: &str) anyhow::Result<bool>
 }
 class HttpAethalgardClient {
     +new(webhook_url: String) Self
@@ -186,6 +247,8 @@ Main --> serde_json__json : uses
 
 ```plantuml
 @startuml
+Caller --> AethalgardClient::notify_remediation
+Caller --> AethalgardClient::verify_causal_provenance
 Caller --> HttpAethalgardClient::new
 Caller --> HttpAethalgardClient::with_semantica_endpoint
 @enduml
@@ -199,7 +262,7 @@ Caller --> HttpAethalgardClient::with_semantica_endpoint
 autonumber
 participant "Client Interface" as Caller
 participant "AethalgardService" as Svc
-Caller -> Svc: execute()
+Caller -> Svc: notify_remediation()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml

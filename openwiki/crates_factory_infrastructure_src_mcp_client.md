@@ -6,10 +6,10 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: mcp_client.rs
@@ -58,7 +58,36 @@ None.
 
 **Public Methods:**
 
-None.
+##### `call_tool_json(name (&str), arguments (Value)) -> anyhow::Result<Value>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `name`: type=&str, meaning=Input for name, valid values=Any valid &str, optional=No, default value=None
+* `arguments`: type=Value, meaning=Input for arguments, valid values=Any valid Value, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Value>
+Semantic meaning: Result of call_tool_json
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.call_tool_json();
+```
 
 **Private Methods:**
 
@@ -125,6 +154,7 @@ None.
 ```plantuml
 @startuml
 interface McpClient {
+    +call_tool_json(name: &str, arguments: Value) anyhow::Result<Value>
 }
 class McpHttpClient {
     -call_tool_json(name: &str, arguments: Value) anyhow::Result<Value>
@@ -202,6 +232,7 @@ Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
 
 ```plantuml
 @startuml
+Caller --> McpClient::call_tool_json
 Caller --> McpHttpClient::new
 Caller --> McpSseClient::new
 @enduml
@@ -215,7 +246,7 @@ Caller --> McpSseClient::new
 autonumber
 participant "Client Interface" as Caller
 participant "Mcp_clientService" as Svc
-Caller -> Svc: execute()
+Caller -> Svc: call_tool_json()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml

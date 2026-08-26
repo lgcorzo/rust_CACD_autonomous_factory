@@ -6,10 +6,10 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-26T06:00:08Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: sandbox.rs
@@ -125,7 +125,67 @@ None.
 
 **Public Methods:**
 
-None.
+##### `execute(code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `code`: type=&str, meaning=Input for code, valid values=Any valid &str, optional=No, default value=None
+* `language`: type=&str, meaning=Input for language, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<ExecutionResult>
+Semantic meaning: Result of execute
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.execute();
+```
+
+##### `execute_surgery(_id (&str), _patch (&factory_core::executor::SurgicalPatch)) -> factory_core::error::Result<factory_core::executor::ExecutionResult>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `_id`: type=&str, meaning=Input for _id, valid values=Any valid &str, optional=No, default value=None
+* `_patch`: type=&factory_core::executor::SurgicalPatch, meaning=Input for _patch, valid values=Any valid &factory_core::executor::SurgicalPatch, optional=No, default value=None
+
+###### Output
+Return type: factory_core::error::Result<factory_core::executor::ExecutionResult>
+Semantic meaning: Result of execute_surgery
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.execute_surgery();
+```
 
 **Private Methods:**
 
@@ -193,6 +253,8 @@ class NativeSurgerySandboxDriver {
 }
 SandboxDriver <|-- NativeSurgerySandboxDriver : extends/implements
 interface SandboxDriver {
+    +execute(code: &str, language: &str) anyhow::Result<ExecutionResult>
+    +execute_surgery(_id: &str, _patch: &factory_core::executor::SurgicalPatch) factory_core::error::Result<factory_core::executor::ExecutionResult>
 }
 enum SandboxMode {
 }
@@ -268,7 +330,8 @@ Main --> tokio__time__timeout : uses
 
 ```plantuml
 @startuml
-Caller --> Module : no public API
+Caller --> SandboxDriver::execute
+Caller --> SandboxDriver::execute_surgery
 @enduml
 
 ```
