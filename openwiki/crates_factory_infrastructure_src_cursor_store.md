@@ -6,10 +6,10 @@ title: "cursor_store.rs"
 source_path: "crates/factory-infrastructure/src/cursor_store.rs"
 description: "Detailed documentation for cursor_store.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-25T05:53:44Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: cursor_store.rs
@@ -58,7 +58,127 @@ None.
 
 **Public Methods:**
 
-None.
+##### `get_cursor(source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `source_key`: type=&str, meaning=Input for source_key, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<Option<PollerSyncCursor>>
+Semantic meaning: Result of get_cursor
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.get_cursor();
+```
+
+##### `is_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `source_key`: type=&str, meaning=Input for source_key, valid values=Any valid &str, optional=No, default value=None
+* `event_hash`: type=&str, meaning=Input for event_hash, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<bool>
+Semantic meaning: Result of is_event_processed
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.is_event_processed();
+```
+
+##### `mark_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<()>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `source_key`: type=&str, meaning=Input for source_key, valid values=Any valid &str, optional=No, default value=None
+* `event_hash`: type=&str, meaning=Input for event_hash, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<()>
+Semantic meaning: Result of mark_event_processed
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.mark_event_processed();
+```
+
+##### `save_cursor(cursor (&PollerSyncCursor)) -> anyhow::Result<()>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `cursor`: type=&PollerSyncCursor, meaning=Input for cursor, valid values=Any valid &PollerSyncCursor, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<()>
+Semantic meaning: Result of save_cursor
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.save_cursor();
+```
 
 **Private Methods:**
 
@@ -129,6 +249,10 @@ None.
 ```plantuml
 @startuml
 interface CursorStore {
+    +get_cursor(source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
+    +is_event_processed(source_key: &str, event_hash: &str) anyhow::Result<bool>
+    +mark_event_processed(source_key: &str, event_hash: &str) anyhow::Result<()>
+    +save_cursor(cursor: &PollerSyncCursor) anyhow::Result<()>
 }
 class InMemoryCursorStore {
     -get_cursor(source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
@@ -208,6 +332,10 @@ Main --> tokio__sync__RwLock : uses
 
 ```plantuml
 @startuml
+Caller --> CursorStore::get_cursor
+Caller --> CursorStore::is_event_processed
+Caller --> CursorStore::mark_event_processed
+Caller --> CursorStore::save_cursor
 Caller --> InMemoryCursorStore::new
 Caller --> PostgresCursorStore::new
 @enduml
@@ -221,7 +349,7 @@ Caller --> PostgresCursorStore::new
 autonumber
 participant "Client Interface" as Caller
 participant "Cursor_storeService" as Svc
-Caller -> Svc: execute()
+Caller -> Svc: get_cursor()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml
