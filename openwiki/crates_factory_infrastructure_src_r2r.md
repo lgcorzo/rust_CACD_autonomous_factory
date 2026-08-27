@@ -6,10 +6,10 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Detailed documentation for r2r.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-25T05:53:44Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: r2r.rs
@@ -88,7 +88,95 @@ None.
 
 **Public Methods:**
 
-None.
+##### `map_stacktrace_to_ast(stacktrace (&str)) -> anyhow::Result<String>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `stacktrace`: type=&str, meaning=Input for stacktrace, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<String>
+Semantic meaning: Result of map_stacktrace_to_ast
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.map_stacktrace_to_ast();
+```
+
+##### `push_osr_metric(metric (&factory_core::OsrMetric)) -> anyhow::Result<()>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `metric`: type=&factory_core::OsrMetric, meaning=Input for metric, valid values=Any valid &factory_core::OsrMetric, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<()>
+Semantic meaning: Result of push_osr_metric
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.push_osr_metric();
+```
+
+##### `search(query (&str)) -> anyhow::Result<String>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `query`: type=&str, meaning=Input for query, valid values=Any valid &str, optional=No, default value=None
+
+###### Output
+Return type: anyhow::Result<String>
+Semantic meaning: Result of search
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.search();
+```
 
 **Private Methods:**
 
@@ -111,6 +199,9 @@ class HttpR2rClient {
 }
 R2rClient <|-- HttpR2rClient : extends/implements
 interface R2rClient {
+    +map_stacktrace_to_ast(stacktrace: &str) anyhow::Result<String>
+    +push_osr_metric(metric: &factory_core::OsrMetric) anyhow::Result<()>
+    +search(query: &str) anyhow::Result<String>
 }
 @enduml
 
@@ -169,6 +260,9 @@ Main --> wiremock___Mock__MockServer__ResponseTemplate_ : uses
 ```plantuml
 @startuml
 Caller --> HttpR2rClient::new
+Caller --> R2rClient::map_stacktrace_to_ast
+Caller --> R2rClient::push_osr_metric
+Caller --> R2rClient::search
 @enduml
 
 ```

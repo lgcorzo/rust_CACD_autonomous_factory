@@ -6,10 +6,10 @@ title: "executor.rs"
 source_path: "crates/factory-core/src/executor.rs"
 description: "Detailed documentation for executor.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-24T05:31:17Z"
+timestamp: "2026-08-25T05:53:44Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "d073f5f"
+last_verified_commit: "e2707de"
 ---
 
 # File: executor.rs
@@ -58,7 +58,66 @@ None.
 
 **Public Methods:**
 
-None.
+##### `apply_patch(mission_id (&str), patch (&SurgicalPatch)) -> Result<ExecutionResult, FactoryError>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
+* `patch`: type=&SurgicalPatch, meaning=Input for patch, valid values=Any valid &SurgicalPatch, optional=No, default value=None
+
+###### Output
+Return type: Result<ExecutionResult, FactoryError>
+Semantic meaning: Result of apply_patch
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.apply_patch();
+```
+
+##### `verify_syntax(file_path (&std::path::Path)) -> Result<bool, FactoryError>`
+
+###### Description
+No description provided.
+
+###### Inputs
+* `file_path`: type=&std::path::Path, meaning=Input for file_path, valid values=Any valid &std::path::Path, optional=No, default value=None
+
+###### Output
+Return type: Result<bool, FactoryError>
+Semantic meaning: Result of verify_syntax
+Possible null values: Conditional
+Exceptions: None handled explicitly
+
+###### Side Effects
+Database updates: None
+File operations: None
+Network calls: None
+Cache: None
+State changes: Updates internal variables
+
+###### Complexity
+Time Complexity: O(1) mostly
+Space Complexity: O(1) mostly
+
+###### Example
+```
+let result = instance.verify_syntax();
+```
 
 **Private Methods:**
 
@@ -119,6 +178,8 @@ None.
 ```plantuml
 @startuml
 interface CodeSurgeryExecutor {
+    +apply_patch(mission_id: &str, patch: &SurgicalPatch) Result<ExecutionResult, FactoryError>
+    +verify_syntax(file_path: &std::path::Path) Result<bool, FactoryError>
 }
 class ExecutionResult {
 }
@@ -174,7 +235,8 @@ Main --> std__path__PathBuf : uses
 
 ```plantuml
 @startuml
-Caller --> Module : no public API
+Caller --> CodeSurgeryExecutor::apply_patch
+Caller --> CodeSurgeryExecutor::verify_syntax
 @enduml
 
 ```
@@ -186,7 +248,7 @@ Caller --> Module : no public API
 autonumber
 participant "Client Interface" as Caller
 participant "ExecutorService" as Svc
-Caller -> Svc: execute()
+Caller -> Svc: apply_patch()
 note right of Svc: Processing internal logic
 Svc --> Caller: result
 @enduml
