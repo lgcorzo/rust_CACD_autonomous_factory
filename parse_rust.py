@@ -75,7 +75,9 @@ def parse_rust(filepath):
                                         params_node = b_child.child_by_field_name('parameters')
                                         if params_node:
                                             for p in params_node.children:
-                                                if p.type == 'parameter':
+                                                if p.type == 'self_parameter':
+                                                    args.append({"name": "self", "type": "Self"})
+                                                elif p.type == 'parameter':
                                                     pat = p.child_by_field_name('pattern')
                                                     typ = p.child_by_field_name('type')
                                                     pat_text = get_node_text(pat, source_bytes) if pat else 'unknown'
@@ -148,7 +150,9 @@ def parse_rust(filepath):
                                     params_node = b_child.child_by_field_name('parameters')
                                     if params_node:
                                         for p in params_node.children:
-                                            if p.type == 'parameter':
+                                            if p.type == 'self_parameter':
+                                                args.append({"name": "self", "type": "Self"})
+                                            elif p.type == 'parameter':
                                                 pat = p.child_by_field_name('pattern')
                                                 typ = p.child_by_field_name('type')
                                                 pat_text = get_node_text(pat, source_bytes) if pat else "unknown"
