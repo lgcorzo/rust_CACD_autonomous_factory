@@ -73,7 +73,7 @@ def parse_ts(filepath):
                                     ret_type = "any"
                                     ret_node = b_child.child_by_field_name('return_type')
                                     if ret_node:
-                                        ret_type = get_node_text(ret_node, source_bytes)
+                                        ret_type = get_node_text(ret_node, source_bytes).lstrip(':').strip()
 
                                     methods.append({
                                         'name': m_name,
@@ -90,7 +90,7 @@ def parse_ts(filepath):
                                     f_name = get_node_text(f_name_node, source_bytes)
                                     f_type = "any"
                                     if f_type_node:
-                                        f_type = get_node_text(f_type_node, source_bytes)
+                                        f_type = get_node_text(f_type_node, source_bytes).lstrip(':').strip()
                                     fields.append({
                                         'name': f_name,
                                         'type': f_type
@@ -110,12 +110,26 @@ def parse_ts(filepath):
                     name_node = node.child_by_field_name('name')
                     if name_node:
                         name = get_node_text(name_node, source_bytes)
+                        args = []
+                        params = node.child_by_field_name('parameters')
+                        if params:
+                            for p in params.children:
+                                if p.type in ['required_parameter', 'optional_parameter']:
+                                    p_name_node = p.child_by_field_name('pattern') or p
+                                    p_name = get_node_text(p_name_node, source_bytes)
+                                    args.append({"name": p_name, "type": "any"})
+
+                        ret_type = "any"
+                        ret_node = node.child_by_field_name('return_type')
+                        if ret_node:
+                            ret_type = get_node_text(ret_node, source_bytes).lstrip(':').strip()
+
                         free_functions.append({
                             'name': name,
                             'is_pub': True,
                             'doc': '',
-                            'args': [],
-                            'ret_type': 'any'
+                            'args': args,
+                            'ret_type': ret_type
                         })
 
             for child in node.children:
