@@ -185,6 +185,8 @@ def write_file_doc(file_path, parsed, now):
 
     parsed['classes'].sort(key=lambda x: x['name'])
     parsed['free_functions'].sort(key=lambda x: x['name'])
+    if parsed.get("dependencies"):
+        parsed["dependencies"].sort()
     plantuml_classes = generate_plantuml_classes(parsed['classes'])
     seq_diagram = generate_plantuml_sequence(base_name, parsed['classes'], parsed['free_functions'])
 

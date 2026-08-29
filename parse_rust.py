@@ -85,7 +85,7 @@ def parse_rust(filepath):
                                                     args.append({'name': pat_text, 'type': typ_text})
                                         return_type_node = b_child.child_by_field_name('return_type')
                                         if return_type_node:
-                                            ret_type = get_node_text(return_type_node, source_bytes)
+                                            ret_type = get_node_text(return_type_node, source_bytes).replace("->", "").strip()
                                         methods.append({
                                             'name': func_name,
                                             'is_pub': is_pub,
@@ -160,7 +160,7 @@ def parse_rust(filepath):
                                                 args.append({"name": pat_text, "type": typ_text})
                                     return_type_node = b_child.child_by_field_name('return_type')
                                     if return_type_node:
-                                        ret_type = get_node_text(return_type_node, source_bytes)
+                                        ret_type = get_node_text(return_type_node, source_bytes).replace("->", "").strip()
 
                                     target_class['methods'].append({
                                         'name': func_name,
@@ -201,7 +201,7 @@ def parse_rust(filepath):
                                     args.append({"name": pat_text, "type": typ_text})
                         return_type_node = node.child_by_field_name('return_type')
                         if return_type_node:
-                            ret_type = get_node_text(return_type_node, source_bytes)
+                            ret_type = get_node_text(return_type_node, source_bytes).replace("->", "").strip()
 
                         free_functions.append({
                             'name': name,
