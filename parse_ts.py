@@ -68,7 +68,11 @@ def parse_ts(filepath):
                                             if p.type in ['required_parameter', 'optional_parameter']:
                                                 p_name_node = p.child_by_field_name('pattern') or p
                                                 p_name = get_node_text(p_name_node, source_bytes)
-                                                args.append({"name": p_name, "type": "any"})
+                                                p_type = "any"
+                                                p_type_node = p.child_by_field_name('type')
+                                                if p_type_node:
+                                                    p_type = get_node_text(p_type_node, source_bytes).lstrip(':').strip()
+                                                args.append({"name": p_name, "type": p_type})
 
                                     ret_type = "any"
                                     ret_node = b_child.child_by_field_name('return_type')
@@ -117,7 +121,11 @@ def parse_ts(filepath):
                                 if p.type in ['required_parameter', 'optional_parameter']:
                                     p_name_node = p.child_by_field_name('pattern') or p
                                     p_name = get_node_text(p_name_node, source_bytes)
-                                    args.append({"name": p_name, "type": "any"})
+                                    p_type = "any"
+                                    p_type_node = p.child_by_field_name('type')
+                                    if p_type_node:
+                                        p_type = get_node_text(p_type_node, source_bytes).lstrip(':').strip()
+                                    args.append({"name": p_name, "type": p_type})
 
                         ret_type = "any"
                         ret_node = node.child_by_field_name('return_type')
