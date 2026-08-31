@@ -6,10 +6,10 @@ title: "state.rs"
 source_path: "crates/factory-application/src/bridge/state.rs"
 description: "Detailed documentation for state.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: state.rs
@@ -98,12 +98,13 @@ Space Complexity: O(1) mostly
 let result = instance.load_checkpoint();
 ```
 
-##### `save_checkpoint(s3 (&dyn factory_infrastructure::S3Storage), bucket (&str)) -> anyhow::Result<()>`
+##### `save_checkpoint(self (Self), s3 (&dyn factory_infrastructure::S3Storage), bucket (&str)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `s3`: type=&dyn factory_infrastructure::S3Storage, meaning=Input for s3, valid values=Any valid &dyn factory_infrastructure::S3Storage, optional=No, default value=None
 * `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
 
@@ -190,7 +191,7 @@ class BridgeState {
     -get_checkpoint_key(session_id: &str) String
     +load_checkpoint(session_id: &str, s3: &dyn factory_infrastructure::S3Storage, bucket: &str) anyhow::Result<Option<Self>>
     +new(session_id: String) Self
-    +save_checkpoint(s3: &dyn factory_infrastructure::S3Storage, bucket: &str) anyhow::Result<()>
+    +save_checkpoint(self: Self, s3: &dyn factory_infrastructure::S3Storage, bucket: &str) anyhow::Result<()>
 }
 enum BridgeStatus {
 }

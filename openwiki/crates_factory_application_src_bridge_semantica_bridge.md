@@ -6,10 +6,10 @@ title: "semantica_bridge.rs"
 source_path: "crates/factory-application/src/bridge/semantica_bridge.rs"
 description: "Detailed documentation for semantica_bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: semantica_bridge.rs
@@ -61,12 +61,13 @@ Initialization: Sets up SemanticaBridge
 
 **Public Methods:**
 
-##### `process_agent_thought_event(event_payload (&str)) -> anyhow::Result<()>`
+##### `process_agent_thought_event(self (Self), event_payload (&str)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `event_payload`: type=&str, meaning=Input for event_payload, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -105,7 +106,7 @@ None.
 @startuml
 class SemanticaBridge {
     +new(semantica_client: Arc<dyn SemanticaClient>) Self
-    +process_agent_thought_event(event_payload: &str) anyhow::Result<()>
+    +process_agent_thought_event(self: Self, event_payload: &str) anyhow::Result<()>
 }
 @enduml
 

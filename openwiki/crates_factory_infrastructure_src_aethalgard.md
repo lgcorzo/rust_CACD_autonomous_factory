@@ -6,10 +6,10 @@ title: "aethalgard.rs"
 source_path: "crates/factory-infrastructure/src/aethalgard.rs"
 description: "Detailed documentation for aethalgard.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: aethalgard.rs
@@ -58,12 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `notify_remediation(mission_id (&str), error_details (&str)) -> anyhow::Result<()>`
+##### `notify_remediation(self (Self), mission_id (&str), error_details (&str)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 * `error_details`: type=&str, meaning=Input for error_details, valid values=Any valid &str, optional=No, default value=None
 
@@ -89,12 +90,13 @@ Space Complexity: O(1) mostly
 let result = instance.notify_remediation();
 ```
 
-##### `verify_causal_provenance(patch_id (&str)) -> anyhow::Result<bool>`
+##### `verify_causal_provenance(self (Self), patch_id (&str)) -> anyhow::Result<bool>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `patch_id`: type=&str, meaning=Input for patch_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -143,12 +145,13 @@ Initialization: Sets up HttpAethalgardClient
 
 **Public Methods:**
 
-##### `with_semantica_endpoint(endpoint (String)) -> Self`
+##### `with_semantica_endpoint(self (Self), endpoint (String)) -> Self`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `endpoint`: type=String, meaning=Input for endpoint, valid values=Any valid String, optional=No, default value=None
 
 ###### Output
@@ -175,8 +178,8 @@ let result = instance.with_semantica_endpoint();
 
 **Private Methods:**
 
-* `notify_remediation(mission_id (&str), error_details (&str)) -> anyhow::Result<()>`: Internal helper logic.
-* `verify_causal_provenance(patch_id (&str)) -> anyhow::Result<bool>`: Internal helper logic.
+* `notify_remediation(self (Self), mission_id (&str), error_details (&str)) -> anyhow::Result<()>`: Internal helper logic.
+* `verify_causal_provenance(self (Self), patch_id (&str)) -> anyhow::Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -187,14 +190,14 @@ None.
 ```plantuml
 @startuml
 interface AethalgardClient {
-    +notify_remediation(mission_id: &str, error_details: &str) anyhow::Result<()>
-    +verify_causal_provenance(patch_id: &str) anyhow::Result<bool>
+    +notify_remediation(self: Self, mission_id: &str, error_details: &str) anyhow::Result<()>
+    +verify_causal_provenance(self: Self, patch_id: &str) anyhow::Result<bool>
 }
 class HttpAethalgardClient {
     +new(webhook_url: String) Self
-    -notify_remediation(mission_id: &str, error_details: &str) anyhow::Result<()>
-    -verify_causal_provenance(patch_id: &str) anyhow::Result<bool>
-    +with_semantica_endpoint(endpoint: String) Self
+    -notify_remediation(self: Self, mission_id: &str, error_details: &str) anyhow::Result<()>
+    -verify_causal_provenance(self: Self, patch_id: &str) anyhow::Result<bool>
+    +with_semantica_endpoint(self: Self, endpoint: String) Self
 }
 AethalgardClient <|-- HttpAethalgardClient : extends/implements
 @enduml

@@ -6,10 +6,10 @@ title: "r2r.rs"
 source_path: "crates/factory-infrastructure/src/r2r.rs"
 description: "Detailed documentation for r2r.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: r2r.rs
@@ -68,10 +68,10 @@ None.
 
 **Private Methods:**
 
-* `get_token() -> anyhow::Result<String>`: Internal helper logic.
-* `map_stacktrace_to_ast(stacktrace (&str)) -> anyhow::Result<String>`: Internal helper logic.
-* `push_osr_metric(metric (&factory_core::OsrMetric)) -> anyhow::Result<()>`: Internal helper logic.
-* `search(query (&str)) -> anyhow::Result<String>`: Internal helper logic.
+* `get_token(self (Self)) -> anyhow::Result<String>`: Internal helper logic.
+* `map_stacktrace_to_ast(self (Self), stacktrace (&str)) -> anyhow::Result<String>`: Internal helper logic.
+* `push_osr_metric(self (Self), metric (&factory_core::OsrMetric)) -> anyhow::Result<()>`: Internal helper logic.
+* `search(self (Self), query (&str)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### R2rClient
 
@@ -88,12 +88,13 @@ None.
 
 **Public Methods:**
 
-##### `map_stacktrace_to_ast(stacktrace (&str)) -> anyhow::Result<String>`
+##### `map_stacktrace_to_ast(self (Self), stacktrace (&str)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `stacktrace`: type=&str, meaning=Input for stacktrace, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -118,12 +119,13 @@ Space Complexity: O(1) mostly
 let result = instance.map_stacktrace_to_ast();
 ```
 
-##### `push_osr_metric(metric (&factory_core::OsrMetric)) -> anyhow::Result<()>`
+##### `push_osr_metric(self (Self), metric (&factory_core::OsrMetric)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `metric`: type=&factory_core::OsrMetric, meaning=Input for metric, valid values=Any valid &factory_core::OsrMetric, optional=No, default value=None
 
 ###### Output
@@ -148,12 +150,13 @@ Space Complexity: O(1) mostly
 let result = instance.push_osr_metric();
 ```
 
-##### `search(query (&str)) -> anyhow::Result<String>`
+##### `search(self (Self), query (&str)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `query`: type=&str, meaning=Input for query, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -191,17 +194,17 @@ None.
 ```plantuml
 @startuml
 class HttpR2rClient {
-    -get_token() anyhow::Result<String>
-    -map_stacktrace_to_ast(stacktrace: &str) anyhow::Result<String>
+    -get_token(self: Self) anyhow::Result<String>
+    -map_stacktrace_to_ast(self: Self, stacktrace: &str) anyhow::Result<String>
     +new(url: String, user: String, pwd: String) Self
-    -push_osr_metric(metric: &factory_core::OsrMetric) anyhow::Result<()>
-    -search(query: &str) anyhow::Result<String>
+    -push_osr_metric(self: Self, metric: &factory_core::OsrMetric) anyhow::Result<()>
+    -search(self: Self, query: &str) anyhow::Result<String>
 }
 R2rClient <|-- HttpR2rClient : extends/implements
 interface R2rClient {
-    +map_stacktrace_to_ast(stacktrace: &str) anyhow::Result<String>
-    +push_osr_metric(metric: &factory_core::OsrMetric) anyhow::Result<()>
-    +search(query: &str) anyhow::Result<String>
+    +map_stacktrace_to_ast(self: Self, stacktrace: &str) anyhow::Result<String>
+    +push_osr_metric(self: Self, metric: &factory_core::OsrMetric) anyhow::Result<()>
+    +search(self: Self, query: &str) anyhow::Result<String>
 }
 @enduml
 

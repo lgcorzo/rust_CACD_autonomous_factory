@@ -6,10 +6,10 @@ title: "sandbox.rs"
 source_path: "crates/factory-mcp-server/src/sandbox.rs"
 description: "Detailed documentation for sandbox.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: sandbox.rs
@@ -86,7 +86,7 @@ None.
 
 **Private Methods:**
 
-* `execute(code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
+* `execute(self (Self), code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
 
 #### NativeSurgerySandboxDriver
 
@@ -107,8 +107,8 @@ None.
 
 **Private Methods:**
 
-* `execute(_code (&str), _language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
-* `execute_surgery(id (&str), patch (&factory_core::executor::SurgicalPatch)) -> factory_core::error::Result<factory_core::executor::ExecutionResult>`: Internal helper logic.
+* `execute(self (Self), _code (&str), _language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
+* `execute_surgery(self (Self), id (&str), patch (&factory_core::executor::SurgicalPatch)) -> factory_core::error::Result<factory_core::executor::ExecutionResult>`: Internal helper logic.
 
 #### SandboxDriver
 
@@ -125,12 +125,13 @@ None.
 
 **Public Methods:**
 
-##### `execute(code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`
+##### `execute(self (Self), code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `code`: type=&str, meaning=Input for code, valid values=Any valid &str, optional=No, default value=None
 * `language`: type=&str, meaning=Input for language, valid values=Any valid &str, optional=No, default value=None
 
@@ -156,12 +157,13 @@ Space Complexity: O(1) mostly
 let result = instance.execute();
 ```
 
-##### `execute_surgery(_id (&str), _patch (&factory_core::executor::SurgicalPatch)) -> factory_core::error::Result<factory_core::executor::ExecutionResult>`
+##### `execute_surgery(self (Self), _id (&str), _patch (&factory_core::executor::SurgicalPatch)) -> factory_core::error::Result<factory_core::executor::ExecutionResult>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `_id`: type=&str, meaning=Input for _id, valid values=Any valid &str, optional=No, default value=None
 * `_patch`: type=&factory_core::executor::SurgicalPatch, meaning=Input for _patch, valid values=Any valid &factory_core::executor::SurgicalPatch, optional=No, default value=None
 
@@ -231,7 +233,7 @@ None.
 
 **Private Methods:**
 
-* `execute(code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
+* `execute(self (Self), code (&str), language (&str)) -> anyhow::Result<ExecutionResult>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -244,22 +246,22 @@ None.
 class ExecutionResult {
 }
 class GvisorK8sDriver {
-    -execute(code: &str, language: &str) anyhow::Result<ExecutionResult>
+    -execute(self: Self, code: &str, language: &str) anyhow::Result<ExecutionResult>
 }
 SandboxDriver <|-- GvisorK8sDriver : extends/implements
 class NativeSurgerySandboxDriver {
-    -execute(_code: &str, _language: &str) anyhow::Result<ExecutionResult>
-    -execute_surgery(id: &str, patch: &factory_core::executor::SurgicalPatch) factory_core::error::Result<factory_core::executor::ExecutionResult>
+    -execute(self: Self, _code: &str, _language: &str) anyhow::Result<ExecutionResult>
+    -execute_surgery(self: Self, id: &str, patch: &factory_core::executor::SurgicalPatch) factory_core::error::Result<factory_core::executor::ExecutionResult>
 }
 SandboxDriver <|-- NativeSurgerySandboxDriver : extends/implements
 interface SandboxDriver {
-    +execute(code: &str, language: &str) anyhow::Result<ExecutionResult>
-    +execute_surgery(_id: &str, _patch: &factory_core::executor::SurgicalPatch) factory_core::error::Result<factory_core::executor::ExecutionResult>
+    +execute(self: Self, code: &str, language: &str) anyhow::Result<ExecutionResult>
+    +execute_surgery(self: Self, _id: &str, _patch: &factory_core::executor::SurgicalPatch) factory_core::error::Result<factory_core::executor::ExecutionResult>
 }
 enum SandboxMode {
 }
 class SubprocessDriver {
-    -execute(code: &str, language: &str) anyhow::Result<ExecutionResult>
+    -execute(self: Self, code: &str, language: &str) anyhow::Result<ExecutionResult>
 }
 SandboxDriver <|-- SubprocessDriver : extends/implements
 @enduml

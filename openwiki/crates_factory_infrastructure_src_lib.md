@@ -6,10 +6,10 @@ title: "lib.rs"
 source_path: "crates/factory-infrastructure/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: lib.rs
@@ -60,12 +60,13 @@ None.
 
 **Public Methods:**
 
-##### `get_object(bucket (&str), key (&str)) -> anyhow::Result<Vec<u8>>`
+##### `get_object(self (Self), bucket (&str), key (&str)) -> anyhow::Result<Vec<u8>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
 * `key`: type=&str, meaning=Input for key, valid values=Any valid &str, optional=No, default value=None
 
@@ -91,13 +92,13 @@ Space Complexity: O(1) mostly
 let result = instance.get_object();
 ```
 
-##### `list_buckets() -> anyhow::Result<Vec<String>>`
+##### `list_buckets(self (Self)) -> anyhow::Result<Vec<String>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<Vec<String>>
@@ -121,12 +122,13 @@ Space Complexity: O(1) mostly
 let result = instance.list_buckets();
 ```
 
-##### `list_objects(bucket (&str), prefix (Option<String>)) -> anyhow::Result<Vec<String>>`
+##### `list_objects(self (Self), bucket (&str), prefix (Option<String>)) -> anyhow::Result<Vec<String>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
 * `prefix`: type=Option<String>, meaning=Input for prefix, valid values=Any valid Option<String>, optional=No, default value=None
 
@@ -152,12 +154,13 @@ Space Complexity: O(1) mostly
 let result = instance.list_objects();
 ```
 
-##### `put_object(bucket (&str), key (&str), data (Vec<u8>)) -> anyhow::Result<()>`
+##### `put_object(self (Self), bucket (&str), key (&str), data (Vec<u8>)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `bucket`: type=&str, meaning=Input for bucket, valid values=Any valid &str, optional=No, default value=None
 * `key`: type=&str, meaning=Input for key, valid values=Any valid &str, optional=No, default value=None
 * `data`: type=Vec<u8>, meaning=Input for data, valid values=Any valid Vec<u8>, optional=No, default value=None
@@ -197,10 +200,10 @@ None.
 ```plantuml
 @startuml
 interface S3Storage {
-    +get_object(bucket: &str, key: &str) anyhow::Result<Vec<u8>>
-    +list_buckets() anyhow::Result<Vec<String>>
-    +list_objects(bucket: &str, prefix: Option<String>) anyhow::Result<Vec<String>>
-    +put_object(bucket: &str, key: &str, data: Vec<u8>) anyhow::Result<()>
+    +get_object(self: Self, bucket: &str, key: &str) anyhow::Result<Vec<u8>>
+    +list_buckets(self: Self) anyhow::Result<Vec<String>>
+    +list_objects(self: Self, bucket: &str, prefix: Option<String>) anyhow::Result<Vec<String>>
+    +put_object(self: Self, bucket: &str, key: &str, data: Vec<u8>) anyhow::Result<()>
 }
 @enduml
 

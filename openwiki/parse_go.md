@@ -6,10 +6,10 @@ title: "parse_go.py"
 source_path: "parse_go.py"
 description: "Detailed documentation for parse_go.py"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: parse_go.py

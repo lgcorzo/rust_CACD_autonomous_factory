@@ -6,10 +6,10 @@ title: "vault.rs"
 source_path: "crates/factory-infrastructure/src/vault.rs"
 description: "Detailed documentation for vault.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: vault.rs
@@ -67,8 +67,8 @@ None.
 
 **Private Methods:**
 
-* `issue_jit_token(audience (&str)) -> factory_core::error::Result<JitToken>`: Internal helper logic.
-* `validate_token(token (&JitToken)) -> factory_core::error::Result<bool>`: Internal helper logic.
+* `issue_jit_token(self (Self), audience (&str)) -> factory_core::error::Result<JitToken>`: Internal helper logic.
+* `validate_token(self (Self), token (&JitToken)) -> factory_core::error::Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -79,9 +79,9 @@ None.
 ```plantuml
 @startuml
 class VaultSecurityBounds {
-    -issue_jit_token(audience: &str) factory_core::error::Result<JitToken>
+    -issue_jit_token(self: Self, audience: &str) factory_core::error::Result<JitToken>
     +new(vault_addr: String, role_token: String) Self
-    -validate_token(token: &JitToken) factory_core::error::Result<bool>
+    -validate_token(self: Self, token: &JitToken) factory_core::error::Result<bool>
 }
 SecurityBounds <|-- VaultSecurityBounds : extends/implements
 @enduml
