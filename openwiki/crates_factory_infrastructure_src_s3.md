@@ -6,10 +6,10 @@ title: "s3.rs"
 source_path: "crates/factory-infrastructure/src/s3.rs"
 description: "Detailed documentation for s3.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: s3.rs
@@ -65,10 +65,10 @@ None.
 
 **Private Methods:**
 
-* `get_object(bucket (&str), key (&str)) -> anyhow::Result<Vec<u8>>`: Internal helper logic.
-* `list_buckets() -> anyhow::Result<Vec<String>>`: Internal helper logic.
-* `list_objects(bucket (&str), prefix (Option<String>)) -> anyhow::Result<Vec<String>>`: Internal helper logic.
-* `put_object(bucket (&str), key (&str), data (Vec<u8>)) -> anyhow::Result<()>`: Internal helper logic.
+* `get_object(self (Self), bucket (&str), key (&str)) -> anyhow::Result<Vec<u8>>`: Internal helper logic.
+* `list_buckets(self (Self)) -> anyhow::Result<Vec<String>>`: Internal helper logic.
+* `list_objects(self (Self), bucket (&str), prefix (Option<String>)) -> anyhow::Result<Vec<String>>`: Internal helper logic.
+* `put_object(self (Self), bucket (&str), key (&str), data (Vec<u8>)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -79,11 +79,11 @@ None.
 ```plantuml
 @startuml
 class AwsS3Storage {
-    -get_object(bucket: &str, key: &str) anyhow::Result<Vec<u8>>
-    -list_buckets() anyhow::Result<Vec<String>>
-    -list_objects(bucket: &str, prefix: Option<String>) anyhow::Result<Vec<String>>
+    -get_object(self: Self, bucket: &str, key: &str) anyhow::Result<Vec<u8>>
+    -list_buckets(self: Self) anyhow::Result<Vec<String>>
+    -list_objects(self: Self, bucket: &str, prefix: Option<String>) anyhow::Result<Vec<String>>
     +new() Self
-    -put_object(bucket: &str, key: &str, data: Vec<u8>) anyhow::Result<()>
+    -put_object(self: Self, bucket: &str, key: &str, data: Vec<u8>) anyhow::Result<()>
 }
 S3Storage <|-- AwsS3Storage : extends/implements
 @enduml

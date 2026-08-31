@@ -6,10 +6,10 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: zeroclaw.rs
@@ -62,12 +62,13 @@ Initialization: Sets up ZeroClawAgent
 
 **Public Methods:**
 
-##### `execute_task(mission_id (&str), task_description (&str), _files (&[String])) -> anyhow::Result<Value>`
+##### `execute_task(self (Self), mission_id (&str), task_description (&str), _files (&[String])) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 * `task_description`: type=&str, meaning=Input for task_description, valid values=Any valid &str, optional=No, default value=None
 * `_files`: type=&[String], meaning=Input for _files, valid values=Any valid &[String], optional=No, default value=None
@@ -94,12 +95,13 @@ Space Complexity: O(1) mostly
 let result = instance.execute_task();
 ```
 
-##### `introspect_k8s(mission_id (&str)) -> anyhow::Result<Value>`
+##### `introspect_k8s(self (Self), mission_id (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -124,12 +126,13 @@ Space Complexity: O(1) mostly
 let result = instance.introspect_k8s();
 ```
 
-##### `validate_mission(mission_id (&str), test_command (&str)) -> anyhow::Result<Value>`
+##### `validate_mission(self (Self), mission_id (&str), test_command (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 * `test_command`: type=&str, meaning=Input for test_command, valid values=Any valid &str, optional=No, default value=None
 
@@ -157,8 +160,8 @@ let result = instance.validate_mission();
 
 **Private Methods:**
 
-* `execute(task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
+* `execute(self (Self), task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name(self (Self)) -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -169,12 +172,12 @@ None.
 ```plantuml
 @startuml
 class ZeroClawAgent {
-    -execute(task_description: &str) anyhow::Result<Value>
-    +execute_task(mission_id: &str, task_description: &str, _files: &[String]) anyhow::Result<Value>
-    +introspect_k8s(mission_id: &str) anyhow::Result<Value>
-    -name() String
+    -execute(self: Self, task_description: &str) anyhow::Result<Value>
+    +execute_task(self: Self, mission_id: &str, task_description: &str, _files: &[String]) anyhow::Result<Value>
+    +introspect_k8s(self: Self, mission_id: &str) anyhow::Result<Value>
+    -name(self: Self) String
     +new(mcp_client: Arc<dyn McpClient>, aethalgard_client: Arc<dyn AethalgardClient>) Self
-    +validate_mission(mission_id: &str, test_command: &str) anyhow::Result<Value>
+    +validate_mission(self: Self, mission_id: &str, test_command: &str) anyhow::Result<Value>
 }
 Agent <|-- ZeroClawAgent : extends/implements
 @enduml

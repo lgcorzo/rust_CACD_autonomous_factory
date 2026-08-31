@@ -6,10 +6,10 @@ title: "ziti.rs"
 source_path: "crates/factory-infrastructure/src/ziti.rs"
 description: "Detailed documentation for ziti.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: ziti.rs
@@ -66,8 +66,8 @@ None.
 
 **Private Methods:**
 
-* `get_token() -> anyhow::Result<String>`: Internal helper logic.
-* `service_name() -> String`: Internal helper logic.
+* `get_token(self (Self)) -> anyhow::Result<String>`: Internal helper logic.
+* `service_name(self (Self)) -> String`: Internal helper logic.
 
 #### ZitiIdentity
 
@@ -84,13 +84,13 @@ None.
 
 **Public Methods:**
 
-##### `get_token() -> anyhow::Result<String>`
+##### `get_token(self (Self)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<String>
@@ -114,13 +114,13 @@ Space Complexity: O(1) mostly
 let result = instance.get_token();
 ```
 
-##### `service_name() -> String`
+##### `service_name(self (Self)) -> String`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: String
@@ -157,14 +157,14 @@ None.
 ```plantuml
 @startuml
 class OpenZitiIdentity {
-    -get_token() anyhow::Result<String>
+    -get_token(self: Self) anyhow::Result<String>
     +new(service: &str, identity_file: &str) Self
-    -service_name() String
+    -service_name(self: Self) String
 }
 ZitiIdentity <|-- OpenZitiIdentity : extends/implements
 interface ZitiIdentity {
-    +get_token() anyhow::Result<String>
-    +service_name() String
+    +get_token(self: Self) anyhow::Result<String>
+    +service_name(self: Self) String
 }
 @enduml
 

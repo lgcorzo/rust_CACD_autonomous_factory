@@ -6,10 +6,10 @@ title: "kafka.rs"
 source_path: "crates/factory-infrastructure/src/kafka.rs"
 description: "Detailed documentation for kafka.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: kafka.rs
@@ -58,12 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `publish(topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`
+##### `publish(self (Self), topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `topic`: type=&str, meaning=Input for topic, valid values=Any valid &str, optional=No, default value=None
 * `key`: type=&str, meaning=Input for key, valid values=Any valid &str, optional=No, default value=None
 * `payload`: type=&[u8], meaning=Input for payload, valid values=Any valid &[u8], optional=No, default value=None
@@ -90,12 +91,13 @@ Space Complexity: O(1) mostly
 let result = instance.publish();
 ```
 
-##### `publish_thought(mission_id (&str), thought (&str), agent (&str)) -> anyhow::Result<()>`
+##### `publish_thought(self (Self), mission_id (&str), thought (&str), agent (&str)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 * `thought`: type=&str, meaning=Input for thought, valid values=Any valid &str, optional=No, default value=None
 * `agent`: type=&str, meaning=Input for agent, valid values=Any valid &str, optional=No, default value=None
@@ -148,7 +150,7 @@ None.
 
 **Private Methods:**
 
-* `publish(topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`: Internal helper logic.
+* `publish(self (Self), topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`: Internal helper logic.
 
 #### SimpleMockKafkaClient
 
@@ -172,7 +174,7 @@ None.
 
 **Private Methods:**
 
-* `publish(topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`: Internal helper logic.
+* `publish(self (Self), topic (&str), key (&str), payload (&[u8])) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -183,17 +185,17 @@ None.
 ```plantuml
 @startuml
 interface KafkaClient {
-    +publish(topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
-    +publish_thought(mission_id: &str, thought: &str, agent: &str) anyhow::Result<()>
+    +publish(self: Self, topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
+    +publish_thought(self: Self, mission_id: &str, thought: &str, agent: &str) anyhow::Result<()>
 }
 class RdKafkaClient {
     +new(brokers: &str) anyhow::Result<Self>
-    -publish(topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
+    -publish(self: Self, topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
 }
 KafkaClient <|-- RdKafkaClient : extends/implements
 class SimpleMockKafkaClient {
     +new(_brokers: &str) anyhow::Result<Self>
-    -publish(topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
+    -publish(self: Self, topic: &str, key: &str, payload: &[u8]) anyhow::Result<()>
 }
 KafkaClient <|-- SimpleMockKafkaClient : extends/implements
 @enduml

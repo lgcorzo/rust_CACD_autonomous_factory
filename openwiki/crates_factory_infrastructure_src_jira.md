@@ -6,10 +6,10 @@ title: "jira.rs"
 source_path: "crates/factory-infrastructure/src/jira.rs"
 description: "Detailed documentation for jira.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: jira.rs
@@ -68,7 +68,7 @@ None.
 
 **Private Methods:**
 
-* `search_issues(query (&str)) -> anyhow::Result<String>`: Internal helper logic.
+* `search_issues(self (Self), query (&str)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### JiraClient
 
@@ -85,12 +85,13 @@ None.
 
 **Public Methods:**
 
-##### `search_issues(query (&str)) -> anyhow::Result<String>`
+##### `search_issues(self (Self), query (&str)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `query`: type=&str, meaning=Input for query, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -129,11 +130,11 @@ None.
 @startuml
 class HttpJiraClient {
     +new(url: String, username: String, api_token: String) Self
-    -search_issues(query: &str) anyhow::Result<String>
+    -search_issues(self: Self, query: &str) anyhow::Result<String>
 }
 JiraClient <|-- HttpJiraClient : extends/implements
 interface JiraClient {
-    +search_issues(query: &str) anyhow::Result<String>
+    +search_issues(self: Self, query: &str) anyhow::Result<String>
 }
 @enduml
 

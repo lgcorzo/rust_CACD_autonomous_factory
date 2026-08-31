@@ -6,10 +6,10 @@ title: "config.rs"
 source_path: "crates/factory-core/src/config.rs"
 description: "Detailed documentation for config.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: config.rs
@@ -90,13 +90,13 @@ Space Complexity: O(1) mostly
 let result = instance.from_file();
 ```
 
-##### `get_default_model() -> &str`
+##### `get_default_model(self (Self)) -> &str`
 
 ###### Description
 /// Retrieve the default agent model
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: &str
@@ -120,7 +120,7 @@ Space Complexity: O(1) mostly
 let result = instance.get_default_model();
 ```
 
-##### `get_model(agent_name (&str)) -> &str`
+##### `get_model(self (Self), agent_name (&str)) -> &str`
 
 ###### Description
 /// Retrieve model for a given agent or tool name.
@@ -128,6 +128,7 @@ let result = instance.get_default_model();
 /// If key is "planner" or "plan_mission", returns planner_model unless specifically overridden.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `agent_name`: type=&str, meaning=Input for agent_name, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -152,13 +153,13 @@ Space Complexity: O(1) mostly
 let result = instance.get_model();
 ```
 
-##### `get_planner_model() -> &str`
+##### `get_planner_model(self (Self)) -> &str`
 
 ###### Description
 /// Retrieve the planner model
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: &str
@@ -227,9 +228,9 @@ None.
 class AgentModelConfig {
     -default() Self
     +from_file(path: P) anyhow::Result<Self>
-    +get_default_model() &str
-    +get_model(agent_name: &str) &str
-    +get_planner_model() &str
+    +get_default_model(self: Self) &str
+    +get_model(self: Self, agent_name: &str) &str
+    +get_planner_model(self: Self) &str
     +load() Self
 }
 Default <|-- AgentModelConfig : extends/implements

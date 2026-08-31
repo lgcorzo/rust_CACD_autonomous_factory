@@ -6,10 +6,10 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Detailed documentation for nhi.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: nhi.rs
@@ -115,12 +115,13 @@ Initialization: Sets up VerifiableCredential
 
 **Public Methods:**
 
-##### `sign(signing_key (&ed25519_dalek::SigningKey), key_id (&str)) -> crate::error::Result<()>`
+##### `sign(self (Self), signing_key (&ed25519_dalek::SigningKey), key_id (&str)) -> crate::error::Result<()>`
 
 ###### Description
 /// Generates a JWS for the credential and attaches it to the `proof` field.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `signing_key`: type=&ed25519_dalek::SigningKey, meaning=Input for signing_key, valid values=Any valid &ed25519_dalek::SigningKey, optional=No, default value=None
 * `key_id`: type=&str, meaning=Input for key_id, valid values=Any valid &str, optional=No, default value=None
 
@@ -146,12 +147,13 @@ Space Complexity: O(1) mostly
 let result = instance.sign();
 ```
 
-##### `sign_async(signing_key (ed25519_dalek::SigningKey), key_id (String)) -> crate::error::Result<()>`
+##### `sign_async(self (Self), signing_key (ed25519_dalek::SigningKey), key_id (String)) -> crate::error::Result<()>`
 
 ###### Description
 /// Asynchronously signs credentials without blocking the Tokio task executor.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `signing_key`: type=ed25519_dalek::SigningKey, meaning=Input for signing_key, valid values=Any valid ed25519_dalek::SigningKey, optional=No, default value=None
 * `key_id`: type=String, meaning=Input for key_id, valid values=Any valid String, optional=No, default value=None
 
@@ -227,8 +229,8 @@ class CryptographicProof {
 }
 class VerifiableCredential {
     +new(id: String, issuer: String, credential_subject: AgentSubject) Self
-    +sign(signing_key: &ed25519_dalek::SigningKey, key_id: &str) crate::error::Result<()>
-    +sign_async(signing_key: ed25519_dalek::SigningKey, key_id: String) crate::error::Result<()>
+    +sign(self: Self, signing_key: &ed25519_dalek::SigningKey, key_id: &str) crate::error::Result<()>
+    +sign_async(self: Self, signing_key: ed25519_dalek::SigningKey, key_id: String) crate::error::Result<()>
     +sign_batch_async(credentials: &mut [VerifiableCredential], signing_key: &ed25519_dalek::SigningKey, key_id: &str) crate::error::Result<()>
 }
 @enduml

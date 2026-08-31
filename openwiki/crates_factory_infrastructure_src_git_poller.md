@@ -6,10 +6,10 @@ title: "git_poller.rs"
 source_path: "crates/factory-infrastructure/src/git_poller.rs"
 description: "Detailed documentation for git_poller.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: git_poller.rs
@@ -68,12 +68,13 @@ Initialization: Sets up GitPlatformPoller
 
 **Public Methods:**
 
-##### `poll_github_issues(repo (&str)) -> anyhow::Result<Vec<PolledIssueEvent>>`
+##### `poll_github_issues(self (Self), repo (&str)) -> anyhow::Result<Vec<PolledIssueEvent>>`
 
 ###### Description
 /// Polls GitHub repository for new/updated issues with control labels.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -98,12 +99,13 @@ Space Complexity: O(1) mostly
 let result = instance.poll_github_issues();
 ```
 
-##### `poll_github_pr_comments(repo (&str)) -> anyhow::Result<Vec<PRCommentEvent>>`
+##### `poll_github_pr_comments(self (Self), repo (&str)) -> anyhow::Result<Vec<PRCommentEvent>>`
 
 ###### Description
 /// Polls GitHub repository active PRs for directive comments.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -128,12 +130,13 @@ Space Complexity: O(1) mostly
 let result = instance.poll_github_pr_comments();
 ```
 
-##### `poll_gitlab_issues(project_id (&str)) -> anyhow::Result<Vec<PolledIssueEvent>>`
+##### `poll_gitlab_issues(self (Self), project_id (&str)) -> anyhow::Result<Vec<PolledIssueEvent>>`
 
 ###### Description
 /// Polls GitLab repository for new/updated issues.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -158,12 +161,13 @@ Space Complexity: O(1) mostly
 let result = instance.poll_gitlab_issues();
 ```
 
-##### `poll_gitlab_mr_notes(project_id (&str)) -> anyhow::Result<Vec<PRCommentEvent>>`
+##### `poll_gitlab_mr_notes(self (Self), project_id (&str)) -> anyhow::Result<Vec<PRCommentEvent>>`
 
 ###### Description
 /// Polls GitLab merge requests for comments/notes with directives.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `project_id`: type=&str, meaning=Input for project_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -188,12 +192,13 @@ Space Complexity: O(1) mostly
 let result = instance.poll_gitlab_mr_notes();
 ```
 
-##### `with_labels(labels (Vec<String>)) -> Self`
+##### `with_labels(self (Self), labels (Vec<String>)) -> Self`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `labels`: type=Vec<String>, meaning=Input for labels, valid values=Any valid Vec<String>, optional=No, default value=None
 
 ###### Output
@@ -232,11 +237,11 @@ None.
 @startuml
 class GitPlatformPoller {
     +new(github_client: Option<Arc<dyn GithubClient>>, gitlab_client: Option<Arc<dyn GitlabClient>>, cursor_store: Arc<dyn CursorStore>) Self
-    +poll_github_issues(repo: &str) anyhow::Result<Vec<PolledIssueEvent>>
-    +poll_github_pr_comments(repo: &str) anyhow::Result<Vec<PRCommentEvent>>
-    +poll_gitlab_issues(project_id: &str) anyhow::Result<Vec<PolledIssueEvent>>
-    +poll_gitlab_mr_notes(project_id: &str) anyhow::Result<Vec<PRCommentEvent>>
-    +with_labels(labels: Vec<String>) Self
+    +poll_github_issues(self: Self, repo: &str) anyhow::Result<Vec<PolledIssueEvent>>
+    +poll_github_pr_comments(self: Self, repo: &str) anyhow::Result<Vec<PRCommentEvent>>
+    +poll_gitlab_issues(self: Self, project_id: &str) anyhow::Result<Vec<PolledIssueEvent>>
+    +poll_gitlab_mr_notes(self: Self, project_id: &str) anyhow::Result<Vec<PRCommentEvent>>
+    +with_labels(self: Self, labels: Vec<String>) Self
 }
 @enduml
 

@@ -6,10 +6,10 @@ title: "sentry.rs"
 source_path: "crates/factory-infrastructure/src/sentry.rs"
 description: "Detailed documentation for sentry.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: sentry.rs
@@ -93,7 +93,7 @@ None.
 
 **Private Methods:**
 
-* `fetch_recent_crashes(project (&str), since_minutes (u64)) -> anyhow::Result<Vec<CrashEvent>>`: Internal helper logic.
+* `fetch_recent_crashes(self (Self), project (&str), since_minutes (u64)) -> anyhow::Result<Vec<CrashEvent>>`: Internal helper logic.
 
 #### SentryClient
 
@@ -110,12 +110,13 @@ None.
 
 **Public Methods:**
 
-##### `fetch_recent_crashes(project (&str), since_minutes (u64)) -> anyhow::Result<Vec<CrashEvent>>`
+##### `fetch_recent_crashes(self (Self), project (&str), since_minutes (u64)) -> anyhow::Result<Vec<CrashEvent>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `project`: type=&str, meaning=Input for project, valid values=Any valid &str, optional=No, default value=None
 * `since_minutes`: type=u64, meaning=Input for since_minutes, valid values=Any valid u64, optional=No, default value=None
 
@@ -156,12 +157,12 @@ None.
 class CrashEvent {
 }
 class HttpSentryClient {
-    -fetch_recent_crashes(project: &str, since_minutes: u64) anyhow::Result<Vec<CrashEvent>>
+    -fetch_recent_crashes(self: Self, project: &str, since_minutes: u64) anyhow::Result<Vec<CrashEvent>>
     +new(url: String, api_token: String) Self
 }
 SentryClient <|-- HttpSentryClient : extends/implements
 interface SentryClient {
-    +fetch_recent_crashes(project: &str, since_minutes: u64) anyhow::Result<Vec<CrashEvent>>
+    +fetch_recent_crashes(self: Self, project: &str, since_minutes: u64) anyhow::Result<Vec<CrashEvent>>
 }
 @enduml
 
