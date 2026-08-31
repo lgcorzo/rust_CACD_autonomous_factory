@@ -6,10 +6,10 @@ title: "circuit_breaker.rs"
 source_path: "crates/factory-application/src/workflows/circuit_breaker.rs"
 description: "Detailed documentation for circuit_breaker.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: circuit_breaker.rs
@@ -63,12 +63,13 @@ Initialization: Sets up CircuitBreakerGuard
 
 **Public Methods:**
 
-##### `evaluate_diff(diff (&str)) -> (CircuitBreakerStatus, SastScanResult)`
+##### `evaluate_diff(self (Self), diff (&str)) -> (CircuitBreakerStatus, SastScanResult)`
 
 ###### Description
 /// Evaluates the code diff against the security threshold and tracks attempts.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `diff`: type=&str, meaning=Input for diff, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -93,12 +94,13 @@ Space Complexity: O(1) mostly
 let result = instance.evaluate_diff();
 ```
 
-##### `format_stuck_alert(repo (&str), pr_number (u64), reason (&str)) -> String`
+##### `format_stuck_alert(self (Self), repo (&str), pr_number (u64), reason (&str)) -> String`
 
 ###### Description
 /// Generates human architect escalation message when stuck.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 * `pr_number`: type=u64, meaning=Input for pr_number, valid values=Any valid u64, optional=No, default value=None
 * `reason`: type=&str, meaning=Input for reason, valid values=Any valid &str, optional=No, default value=None
@@ -160,8 +162,8 @@ None.
 @startuml
 class CircuitBreakerGuard {
     -default() Self
-    +evaluate_diff(diff: &str) (CircuitBreakerStatus, SastScanResult)
-    +format_stuck_alert(repo: &str, pr_number: u64, reason: &str) String
+    +evaluate_diff(self: Self, diff: &str) (CircuitBreakerStatus, SastScanResult)
+    +format_stuck_alert(self: Self, repo: &str, pr_number: u64, reason: &str) String
     +new(max_attempts: u32, min_safety_score: f32) Self
 }
 Default <|-- CircuitBreakerGuard : extends/implements

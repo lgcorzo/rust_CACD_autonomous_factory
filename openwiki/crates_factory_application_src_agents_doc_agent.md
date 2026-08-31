@@ -6,10 +6,10 @@ title: "doc_agent.rs"
 source_path: "crates/factory-application/src/agents/doc_agent.rs"
 description: "Detailed documentation for doc_agent.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: doc_agent.rs
@@ -63,12 +63,13 @@ Initialization: Sets up DocumentationAgent
 
 **Public Methods:**
 
-##### `extract_code_deltas(commit_sha (&str)) -> anyhow::Result<String>`
+##### `extract_code_deltas(self (Self), commit_sha (&str)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `commit_sha`: type=&str, meaning=Input for commit_sha, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -93,12 +94,13 @@ Space Complexity: O(1) mostly
 let result = instance.extract_code_deltas();
 ```
 
-##### `generate_hazitek_report(mission_id (&str)) -> anyhow::Result<factory_core::ComplianceReport>`
+##### `generate_hazitek_report(self (Self), mission_id (&str)) -> anyhow::Result<factory_core::ComplianceReport>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -123,12 +125,13 @@ Space Complexity: O(1) mostly
 let result = instance.generate_hazitek_report();
 ```
 
-##### `run_post_merge_pipeline(mission_id (&str)) -> anyhow::Result<Value>`
+##### `run_post_merge_pipeline(self (Self), mission_id (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -155,9 +158,9 @@ let result = instance.run_post_merge_pipeline();
 
 **Private Methods:**
 
-* `execute(task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
-* `verify_osr() -> anyhow::Result<f32>`: Internal helper logic.
+* `execute(self (Self), task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name(self (Self)) -> String`: Internal helper logic.
+* `verify_osr(self (Self)) -> anyhow::Result<f32>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -168,13 +171,13 @@ None.
 ```plantuml
 @startuml
 class DocumentationAgent {
-    -execute(task_description: &str) anyhow::Result<Value>
-    +extract_code_deltas(commit_sha: &str) anyhow::Result<String>
-    +generate_hazitek_report(mission_id: &str) anyhow::Result<factory_core::ComplianceReport>
-    -name() String
+    -execute(self: Self, task_description: &str) anyhow::Result<Value>
+    +extract_code_deltas(self: Self, commit_sha: &str) anyhow::Result<String>
+    +generate_hazitek_report(self: Self, mission_id: &str) anyhow::Result<factory_core::ComplianceReport>
+    -name(self: Self) String
     +new(mcp_client: Arc<dyn McpClient>, r2r_client: Arc<dyn R2rClient>, superpowers_skills_root: std::path::PathBuf) Self
-    +run_post_merge_pipeline(mission_id: &str) anyhow::Result<Value>
-    -verify_osr() anyhow::Result<f32>
+    +run_post_merge_pipeline(self: Self, mission_id: &str) anyhow::Result<Value>
+    -verify_osr(self: Self) anyhow::Result<f32>
 }
 Agent <|-- DocumentationAgent : extends/implements
 @enduml

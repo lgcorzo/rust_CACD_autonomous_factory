@@ -6,10 +6,10 @@ title: "security_tests.rs"
 source_path: "crates/factory-core/tests/security_tests.rs"
 description: "Detailed documentation for security_tests.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: security_tests.rs
@@ -62,8 +62,8 @@ None.
 
 **Private Methods:**
 
-* `issue_jit_token(_aud (&str)) -> Result<JitToken>`: Internal helper logic.
-* `validate_token(_token (&JitToken)) -> Result<bool>`: Internal helper logic.
+* `issue_jit_token(self (Self), _aud (&str)) -> Result<JitToken>`: Internal helper logic.
+* `validate_token(self (Self), _token (&JitToken)) -> Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -74,8 +74,8 @@ None.
 ```plantuml
 @startuml
 class DummyBounds {
-    -issue_jit_token(_aud: &str) Result<JitToken>
-    -validate_token(_token: &JitToken) Result<bool>
+    -issue_jit_token(self: Self, _aud: &str) Result<JitToken>
+    -validate_token(self: Self, _token: &JitToken) Result<bool>
 }
 SecurityBounds <|-- DummyBounds : extends/implements
 @enduml

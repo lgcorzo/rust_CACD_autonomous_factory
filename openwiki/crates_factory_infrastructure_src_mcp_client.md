@@ -6,10 +6,10 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: mcp_client.rs
@@ -58,12 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `call_tool_json(name (&str), arguments (Value)) -> anyhow::Result<Value>`
+##### `call_tool_json(self (Self), name (&str), arguments (Value)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `name`: type=&str, meaning=Input for name, valid values=Any valid &str, optional=No, default value=None
 * `arguments`: type=Value, meaning=Input for arguments, valid values=Any valid Value, optional=No, default value=None
 
@@ -116,7 +117,7 @@ None.
 
 **Private Methods:**
 
-* `call_tool_json(name (&str), arguments (Value)) -> anyhow::Result<Value>`: Internal helper logic.
+* `call_tool_json(self (Self), name (&str), arguments (Value)) -> anyhow::Result<Value>`: Internal helper logic.
 
 #### McpSseClient
 
@@ -142,8 +143,8 @@ None.
 
 **Private Methods:**
 
-* `call_tool_json(name (&str), arguments (Value)) -> anyhow::Result<Value>`: Internal helper logic.
-* `get_session_url() -> anyhow::Result<String>`: Internal helper logic.
+* `call_tool_json(self (Self), name (&str), arguments (Value)) -> anyhow::Result<Value>`: Internal helper logic.
+* `get_session_url(self (Self)) -> anyhow::Result<String>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -154,16 +155,16 @@ None.
 ```plantuml
 @startuml
 interface McpClient {
-    +call_tool_json(name: &str, arguments: Value) anyhow::Result<Value>
+    +call_tool_json(self: Self, name: &str, arguments: Value) anyhow::Result<Value>
 }
 class McpHttpClient {
-    -call_tool_json(name: &str, arguments: Value) anyhow::Result<Value>
+    -call_tool_json(self: Self, name: &str, arguments: Value) anyhow::Result<Value>
     +new(base_url: String) Self
 }
 McpClient <|-- McpHttpClient : extends/implements
 class McpSseClient {
-    -call_tool_json(name: &str, arguments: Value) anyhow::Result<Value>
-    -get_session_url() anyhow::Result<String>
+    -call_tool_json(self: Self, name: &str, arguments: Value) anyhow::Result<Value>
+    -get_session_url(self: Self) anyhow::Result<String>
     +new(base_url: String) Self
 }
 McpClient <|-- McpSseClient : extends/implements

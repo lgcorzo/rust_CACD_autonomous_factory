@@ -6,10 +6,10 @@ title: "mod.rs"
 source_path: "crates/factory-mcp-server/src/tools/mod.rs"
 description: "Detailed documentation for mod.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: mod.rs
@@ -58,12 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `call(params (Value)) -> anyhow::Result<CallToolResult>`
+##### `call(self (Self), params (Value)) -> anyhow::Result<CallToolResult>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `params`: type=Value, meaning=Input for params, valid values=Any valid Value, optional=No, default value=None
 
 ###### Output
@@ -88,13 +89,13 @@ Space Complexity: O(1) mostly
 let result = instance.call();
 ```
 
-##### `description() -> String`
+##### `description(self (Self)) -> String`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: String
@@ -118,13 +119,13 @@ Space Complexity: O(1) mostly
 let result = instance.description();
 ```
 
-##### `input_schema() -> Value`
+##### `input_schema(self (Self)) -> Value`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: Value
@@ -148,13 +149,13 @@ Space Complexity: O(1) mostly
 let result = instance.input_schema();
 ```
 
-##### `name() -> String`
+##### `name(self (Self)) -> String`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: String
@@ -191,10 +192,10 @@ None.
 ```plantuml
 @startuml
 interface Tool {
-    +call(params: Value) anyhow::Result<CallToolResult>
-    +description() String
-    +input_schema() Value
-    +name() String
+    +call(self: Self, params: Value) anyhow::Result<CallToolResult>
+    +description(self: Self) String
+    +input_schema(self: Self) Value
+    +name(self: Self) String
 }
 @enduml
 

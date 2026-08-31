@@ -6,10 +6,10 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: security.rs
@@ -84,8 +84,8 @@ None.
 
 **Private Methods:**
 
-* `audit_content(_content (&str)) -> Result<AuditResult>`: Internal helper logic.
-* `validate_signature(data (&[u8]), signature (&str)) -> Result<bool>`: Internal helper logic.
+* `audit_content(self (Self), _content (&str)) -> Result<AuditResult>`: Internal helper logic.
+* `validate_signature(self (Self), data (&[u8]), signature (&str)) -> Result<bool>`: Internal helper logic.
 
 #### JitToken
 
@@ -179,13 +179,13 @@ Space Complexity: O(1) mostly
 let result = instance.inspect_diff();
 ```
 
-##### `passes_gate() -> bool`
+##### `passes_gate(self (Self)) -> bool`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: bool
@@ -228,12 +228,13 @@ None.
 
 **Public Methods:**
 
-##### `issue_jit_token(audience (&str)) -> Result<JitToken>`
+##### `issue_jit_token(self (Self), audience (&str)) -> Result<JitToken>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `audience`: type=&str, meaning=Input for audience, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -258,12 +259,13 @@ Space Complexity: O(1) mostly
 let result = instance.issue_jit_token();
 ```
 
-##### `validate_token(token (&JitToken)) -> Result<bool>`
+##### `validate_token(self (Self), token (&JitToken)) -> Result<bool>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `token`: type=&JitToken, meaning=Input for token, valid values=Any valid &JitToken, optional=No, default value=None
 
 ###### Output
@@ -288,12 +290,13 @@ Space Complexity: O(1) mostly
 let result = instance.validate_token();
 ```
 
-##### `wipe_token_from_memory(token (&mut JitToken)) -> None`
+##### `wipe_token_from_memory(self (Self), token (&mut JitToken)) -> None`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `token`: type=&mut JitToken, meaning=Input for token, valid values=Any valid &mut JitToken, optional=No, default value=None
 
 ###### Output
@@ -337,12 +340,13 @@ None.
 
 **Public Methods:**
 
-##### `audit_content(content (&str)) -> Result<AuditResult>`
+##### `audit_content(self (Self), content (&str)) -> Result<AuditResult>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `content`: type=&str, meaning=Input for content, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -367,12 +371,13 @@ Space Complexity: O(1) mostly
 let result = instance.audit_content();
 ```
 
-##### `validate_signature(data (&[u8]), signature (&str)) -> Result<bool>`
+##### `validate_signature(self (Self), data (&[u8]), signature (&str)) -> Result<bool>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `data`: type=&[u8], meaning=Input for data, valid values=Any valid &[u8], optional=No, default value=None
 * `signature`: type=&str, meaning=Input for signature, valid values=Any valid &str, optional=No, default value=None
 
@@ -413,8 +418,8 @@ None.
 class AuditResult {
 }
 class Ed25519SecurityValidator {
-    -audit_content(_content: &str) Result<AuditResult>
-    -validate_signature(data: &[u8], signature: &str) Result<bool>
+    -audit_content(self: Self, _content: &str) Result<AuditResult>
+    -validate_signature(self: Self, data: &[u8], signature: &str) Result<bool>
 }
 SecurityValidator <|-- Ed25519SecurityValidator : extends/implements
 class JitToken {
@@ -423,16 +428,16 @@ class SandboxConstraint {
 }
 class SastScanResult {
     +inspect_diff(diff: &str) Self
-    +passes_gate() bool
+    +passes_gate(self: Self) bool
 }
 interface SecurityBounds {
-    +issue_jit_token(audience: &str) Result<JitToken>
-    +validate_token(token: &JitToken) Result<bool>
-    +wipe_token_from_memory(token: &mut JitToken) None
+    +issue_jit_token(self: Self, audience: &str) Result<JitToken>
+    +validate_token(self: Self, token: &JitToken) Result<bool>
+    +wipe_token_from_memory(self: Self, token: &mut JitToken) None
 }
 interface SecurityValidator {
-    +audit_content(content: &str) Result<AuditResult>
-    +validate_signature(data: &[u8], signature: &str) Result<bool>
+    +audit_content(self: Self, content: &str) Result<AuditResult>
+    +validate_signature(self: Self, data: &[u8], signature: &str) Result<bool>
 }
 @enduml
 

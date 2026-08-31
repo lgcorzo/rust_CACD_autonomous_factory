@@ -6,10 +6,10 @@ title: "lib.rs"
 source_path: "crates/factory-application/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: lib.rs
@@ -58,12 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `execute(task_description (&str)) -> anyhow::Result<Value>`
+##### `execute(self (Self), task_description (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `task_description`: type=&str, meaning=Input for task_description, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -88,13 +89,13 @@ Space Complexity: O(1) mostly
 let result = instance.execute();
 ```
 
-##### `name() -> String`
+##### `name(self (Self)) -> String`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: String
@@ -131,8 +132,8 @@ None.
 ```plantuml
 @startuml
 interface Agent {
-    +execute(task_description: &str) anyhow::Result<Value>
-    +name() String
+    +execute(self: Self, task_description: &str) anyhow::Result<Value>
+    +name(self: Self) String
 }
 @enduml
 

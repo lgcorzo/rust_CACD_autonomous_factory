@@ -6,10 +6,10 @@ title: "spec_kit_tool.rs"
 source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
 description: "Detailed documentation for spec_kit_tool.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: spec_kit_tool.rs
@@ -66,7 +66,7 @@ None.
 
 **Private Methods:**
 
-* `invoke(command (SpecKitCommand), args (Vec<String>)) -> anyhow::Result<String>`: Internal helper logic.
+* `invoke(self (Self), command (SpecKitCommand), args (Vec<String>)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### MockSpecProvider
 
@@ -91,7 +91,7 @@ None.
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `invoke(command (SpecKitCommand), _args (Vec<String>)) -> anyhow::Result<String>`: Internal helper logic.
+* `invoke(self (Self), command (SpecKitCommand), _args (Vec<String>)) -> anyhow::Result<String>`: Internal helper logic.
 
 #### SpecKitCommand
 
@@ -132,12 +132,13 @@ Initialization: Sets up SpecKitTool
 
 **Public Methods:**
 
-##### `invoke_spec_kit(command (SpecKitCommand), args (Vec<String>)) -> anyhow::Result<String>`
+##### `invoke_spec_kit(self (Self), command (SpecKitCommand), args (Vec<String>)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `command`: type=SpecKitCommand, meaning=Input for command, valid values=Any valid SpecKitCommand, optional=No, default value=None
 * `args`: type=Vec<String>, meaning=Input for args, valid values=Any valid Vec<String>, optional=No, default value=None
 
@@ -195,10 +196,10 @@ let result = instance.with_provider();
 
 **Private Methods:**
 
-* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
-* `description() -> String`: Internal helper logic.
-* `input_schema() -> Value`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
+* `call(self (Self), params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `description(self (Self)) -> String`: Internal helper logic.
+* `input_schema(self (Self)) -> Value`: Internal helper logic.
+* `name(self (Self)) -> String`: Internal helper logic.
 
 #### SpecProvider
 
@@ -215,12 +216,13 @@ None.
 
 **Public Methods:**
 
-##### `invoke(command (SpecKitCommand), args (Vec<String>)) -> anyhow::Result<String>`
+##### `invoke(self (Self), command (SpecKitCommand), args (Vec<String>)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `command`: type=SpecKitCommand, meaning=Input for command, valid values=Any valid SpecKitCommand, optional=No, default value=None
 * `args`: type=Vec<String>, meaning=Input for args, valid values=Any valid Vec<String>, optional=No, default value=None
 
@@ -259,13 +261,13 @@ None.
 ```plantuml
 @startuml
 class CliSpecProvider {
-    -invoke(command: SpecKitCommand, args: Vec<String>) anyhow::Result<String>
+    -invoke(self: Self, command: SpecKitCommand, args: Vec<String>) anyhow::Result<String>
     +new(cli_path: String) Self
 }
 SpecProvider <|-- CliSpecProvider : extends/implements
 class MockSpecProvider {
     -default() Self
-    -invoke(command: SpecKitCommand, _args: Vec<String>) anyhow::Result<String>
+    -invoke(self: Self, command: SpecKitCommand, _args: Vec<String>) anyhow::Result<String>
     +new(specs_dir: std::path::PathBuf) Self
 }
 Default <|-- MockSpecProvider : extends/implements
@@ -273,17 +275,17 @@ SpecProvider <|-- MockSpecProvider : extends/implements
 enum SpecKitCommand {
 }
 class SpecKitTool {
-    -call(params: Value) anyhow::Result<CallToolResult>
-    -description() String
-    -input_schema() Value
-    +invoke_spec_kit(command: SpecKitCommand, args: Vec<String>) anyhow::Result<String>
-    -name() String
+    -call(self: Self, params: Value) anyhow::Result<CallToolResult>
+    -description(self: Self) String
+    -input_schema(self: Self) Value
+    +invoke_spec_kit(self: Self, command: SpecKitCommand, args: Vec<String>) anyhow::Result<String>
+    -name(self: Self) String
     +new(specify_cli_path: String) Self
     +with_provider(provider: Arc<dyn SpecProvider>) Self
 }
 Tool <|-- SpecKitTool : extends/implements
 interface SpecProvider {
-    +invoke(command: SpecKitCommand, args: Vec<String>) anyhow::Result<String>
+    +invoke(self: Self, command: SpecKitCommand, args: Vec<String>) anyhow::Result<String>
 }
 @enduml
 

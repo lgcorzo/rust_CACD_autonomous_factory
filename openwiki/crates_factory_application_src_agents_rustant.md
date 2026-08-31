@@ -6,10 +6,10 @@ title: "rustant.rs"
 source_path: "crates/factory-application/src/agents/rustant.rs"
 description: "Detailed documentation for rustant.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: rustant.rs
@@ -62,12 +62,13 @@ Initialization: Sets up RustantAgent
 
 **Public Methods:**
 
-##### `plan_mission(mission_id (&str), goal (&str)) -> anyhow::Result<Value>`
+##### `plan_mission(self (Self), mission_id (&str), goal (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 * `goal`: type=&str, meaning=Input for goal, valid values=Any valid &str, optional=No, default value=None
 
@@ -93,12 +94,13 @@ Space Complexity: O(1) mostly
 let result = instance.plan_mission();
 ```
 
-##### `review_mission(mission_id (&str), mission_results (&str)) -> anyhow::Result<Value>`
+##### `review_mission(self (Self), mission_id (&str), mission_results (&str)) -> anyhow::Result<Value>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `mission_id`: type=&str, meaning=Input for mission_id, valid values=Any valid &str, optional=No, default value=None
 * `mission_results`: type=&str, meaning=Input for mission_results, valid values=Any valid &str, optional=No, default value=None
 
@@ -126,8 +128,8 @@ let result = instance.review_mission();
 
 **Private Methods:**
 
-* `execute(task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
+* `execute(self (Self), task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name(self (Self)) -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -138,11 +140,11 @@ None.
 ```plantuml
 @startuml
 class RustantAgent {
-    -execute(task_description: &str) anyhow::Result<Value>
-    -name() String
+    -execute(self: Self, task_description: &str) anyhow::Result<Value>
+    -name(self: Self) String
     +new(mcp_client: Arc<dyn McpClient>, r2r_client: Arc<dyn R2rClient>) Self
-    +plan_mission(mission_id: &str, goal: &str) anyhow::Result<Value>
-    +review_mission(mission_id: &str, mission_results: &str) anyhow::Result<Value>
+    +plan_mission(self: Self, mission_id: &str, goal: &str) anyhow::Result<Value>
+    +review_mission(self: Self, mission_id: &str, mission_results: &str) anyhow::Result<Value>
 }
 Agent <|-- RustantAgent : extends/implements
 @enduml

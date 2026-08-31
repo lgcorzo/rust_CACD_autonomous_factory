@@ -6,10 +6,10 @@ title: "lib.rs"
 source_path: "crates/factory-mcp-server/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: lib.rs
@@ -76,12 +76,13 @@ Initialization: Sets up McpServer
 
 **Public Methods:**
 
-##### `add_tool(tool (Box<dyn Tool>)) -> None`
+##### `add_tool(self (Self), tool (Box<dyn Tool>)) -> None`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `tool`: type=Box<dyn Tool>, meaning=Input for tool, valid values=Any valid Box<dyn Tool>, optional=No, default value=None
 
 ###### Output
@@ -106,12 +107,13 @@ Space Complexity: O(1) mostly
 let result = instance.add_tool();
 ```
 
-##### `handle_request(request (JsonRpcRequest)) -> JsonRpcResponse`
+##### `handle_request(self (Self), request (JsonRpcRequest)) -> JsonRpcResponse`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `request`: type=JsonRpcRequest, meaning=Input for request, valid values=Any valid JsonRpcRequest, optional=No, default value=None
 
 ###### Output
@@ -168,13 +170,13 @@ Space Complexity: O(1) mostly
 let result = instance.post_handler();
 ```
 
-##### `register_default_tools() -> anyhow::Result<()>`
+##### `register_default_tools(self (Self)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<()>
@@ -231,9 +233,9 @@ let result = instance.sse_handler();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `error_response(id (Option<Value>), code (i32), message (&str)) -> JsonRpcResponse`: Internal helper logic.
-* `handle_call_tool(request (JsonRpcRequest)) -> JsonRpcResponse`: Internal helper logic.
-* `handle_list_tools(id (Option<Value>)) -> JsonRpcResponse`: Internal helper logic.
+* `error_response(self (Self), id (Option<Value>), code (i32), message (&str)) -> JsonRpcResponse`: Internal helper logic.
+* `handle_call_tool(self (Self), request (JsonRpcRequest)) -> JsonRpcResponse`: Internal helper logic.
+* `handle_list_tools(self (Self), id (Option<Value>)) -> JsonRpcResponse`: Internal helper logic.
 
 ### Exported Functions
 
@@ -244,15 +246,15 @@ None.
 ```plantuml
 @startuml
 class McpServer {
-    +add_tool(tool: Box<dyn Tool>) None
+    +add_tool(self: Self, tool: Box<dyn Tool>) None
     -default() Self
-    -error_response(id: Option<Value>, code: i32, message: &str) JsonRpcResponse
-    -handle_call_tool(request: JsonRpcRequest) JsonRpcResponse
-    -handle_list_tools(id: Option<Value>) JsonRpcResponse
-    +handle_request(request: JsonRpcRequest) JsonRpcResponse
+    -error_response(self: Self, id: Option<Value>, code: i32, message: &str) JsonRpcResponse
+    -handle_call_tool(self: Self, request: JsonRpcRequest) JsonRpcResponse
+    -handle_list_tools(self: Self, id: Option<Value>) JsonRpcResponse
+    +handle_request(self: Self, request: JsonRpcRequest) JsonRpcResponse
     +new() Self
     +post_handler(State(server): State<Arc<McpServer>>, Query(params): Query<HashMap<String, String>>, Json(request): Json<JsonRpcRequest>) Json<JsonRpcResponse>
-    +register_default_tools() anyhow::Result<()>
+    +register_default_tools(self: Self) anyhow::Result<()>
     +sse_handler(State(server): State<Arc<McpServer>>) Sse<impl Stream<Item = Result<Event, Infallible>>>
 }
 Default <|-- McpServer : extends/implements

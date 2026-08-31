@@ -6,10 +6,10 @@ title: "poller_service.rs"
 source_path: "crates/factory-application/src/poller_service.rs"
 description: "Detailed documentation for poller_service.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: poller_service.rs
@@ -91,12 +91,13 @@ Initialization: Sets up PollerDaemonService
 
 **Public Methods:**
 
-##### `poll_once(github_repos (&[String]), gitlab_projects (&[String])) -> PollerCycleStats`
+##### `poll_once(self (Self), github_repos (&[String]), gitlab_projects (&[String])) -> PollerCycleStats`
 
 ###### Description
 /// Executes a single polling cycle across configured repositories.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `github_repos`: type=&[String], meaning=Input for github_repos, valid values=Any valid &[String], optional=No, default value=None
 * `gitlab_projects`: type=&[String], meaning=Input for gitlab_projects, valid values=Any valid &[String], optional=No, default value=None
 
@@ -122,12 +123,13 @@ Space Complexity: O(1) mostly
 let result = instance.poll_once();
 ```
 
-##### `with_signing_key(signing_key (SigningKey), key_id (String)) -> Self`
+##### `with_signing_key(self (Self), signing_key (SigningKey), key_id (String)) -> Self`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `signing_key`: type=SigningKey, meaning=Input for signing_key, valid values=Any valid SigningKey, optional=No, default value=None
 * `key_id`: type=String, meaning=Input for key_id, valid values=Any valid String, optional=No, default value=None
 
@@ -155,8 +157,8 @@ let result = instance.with_signing_key();
 
 **Private Methods:**
 
-* `ingest_issue(issue (&PolledIssueEvent)) -> anyhow::Result<()>`: Internal helper logic.
-* `process_comment_directive(comment (&PRCommentEvent)) -> anyhow::Result<()>`: Internal helper logic.
+* `ingest_issue(self (Self), issue (&PolledIssueEvent)) -> anyhow::Result<()>`: Internal helper logic.
+* `process_comment_directive(self (Self), comment (&PRCommentEvent)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -169,11 +171,11 @@ None.
 class PollerCycleStats {
 }
 class PollerDaemonService {
-    -ingest_issue(issue: &PolledIssueEvent) anyhow::Result<()>
+    -ingest_issue(self: Self, issue: &PolledIssueEvent) anyhow::Result<()>
     +new(poller: Arc<GitPlatformPoller>, kafka_client: Arc<dyn KafkaClient>, semantica_client: Option<Arc<dyn SemanticaClient>>, comment_service: Arc<CommentControlService>) Self
-    +poll_once(github_repos: &[String], gitlab_projects: &[String]) PollerCycleStats
-    -process_comment_directive(comment: &PRCommentEvent) anyhow::Result<()>
-    +with_signing_key(signing_key: SigningKey, key_id: String) Self
+    +poll_once(self: Self, github_repos: &[String], gitlab_projects: &[String]) PollerCycleStats
+    -process_comment_directive(self: Self, comment: &PRCommentEvent) anyhow::Result<()>
+    +with_signing_key(self: Self, signing_key: SigningKey, key_id: String) Self
 }
 @enduml
 
