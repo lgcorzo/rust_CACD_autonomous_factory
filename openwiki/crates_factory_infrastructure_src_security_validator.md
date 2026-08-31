@@ -6,10 +6,10 @@ title: "security_validator.rs"
 source_path: "crates/factory-infrastructure/src/security_validator.rs"
 description: "Detailed documentation for security_validator.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: security_validator.rs
@@ -66,8 +66,8 @@ None.
 
 **Private Methods:**
 
-* `audit_content(content (&str)) -> factory_core::error::Result<AuditResult>`: Internal helper logic.
-* `validate_signature(data (&[u8]), signature_hex (&str)) -> factory_core::error::Result<bool>`: Internal helper logic.
+* `audit_content(self (Self), content (&str)) -> factory_core::error::Result<AuditResult>`: Internal helper logic.
+* `validate_signature(self (Self), data (&[u8]), signature_hex (&str)) -> factory_core::error::Result<bool>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -78,9 +78,9 @@ None.
 ```plantuml
 @startuml
 class Ed25519Validator {
-    -audit_content(content: &str) factory_core::error::Result<AuditResult>
+    -audit_content(self: Self, content: &str) factory_core::error::Result<AuditResult>
     +new(public_key_bytes: &[u8], mcp_client: Option<Arc<dyn McpClient>>) anyhow::Result<Self>
-    -validate_signature(data: &[u8], signature_hex: &str) factory_core::error::Result<bool>
+    -validate_signature(self: Self, data: &[u8], signature_hex: &str) factory_core::error::Result<bool>
 }
 SecurityValidator <|-- Ed25519Validator : extends/implements
 @enduml

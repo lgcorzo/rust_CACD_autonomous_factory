@@ -6,10 +6,10 @@ title: "inspect_kafka_topic.rs"
 source_path: "crates/factory-mcp-server/src/tools/inspect_kafka_topic.rs"
 description: "Detailed documentation for inspect_kafka_topic.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: inspect_kafka_topic.rs
@@ -65,11 +65,11 @@ None.
 
 **Private Methods:**
 
-* `call(params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
+* `call(self (Self), params (Value)) -> anyhow::Result<CallToolResult>`: Internal helper logic.
 * `default() -> Self`: Internal helper logic.
-* `description() -> String`: Internal helper logic.
-* `input_schema() -> Value`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
+* `description(self (Self)) -> String`: Internal helper logic.
+* `input_schema(self (Self)) -> Value`: Internal helper logic.
+* `name(self (Self)) -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -80,11 +80,11 @@ None.
 ```plantuml
 @startuml
 class InspectKafkaTopicTool {
-    -call(params: Value) anyhow::Result<CallToolResult>
+    -call(self: Self, params: Value) anyhow::Result<CallToolResult>
     -default() Self
-    -description() String
-    -input_schema() Value
-    -name() String
+    -description(self: Self) String
+    -input_schema(self: Self) Value
+    -name(self: Self) String
     +new() Self
 }
 Default <|-- InspectKafkaTopicTool : extends/implements

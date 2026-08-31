@@ -6,10 +6,10 @@ title: "comment_control.rs"
 source_path: "crates/factory-application/src/workflows/comment_control.rs"
 description: "Detailed documentation for comment_control.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: comment_control.rs
@@ -110,12 +110,13 @@ Initialization: Sets up CommentControlService
 
 **Public Methods:**
 
-##### `handle_directive(input (&CommentControlInput)) -> anyhow::Result<CommentControlOutput>`
+##### `handle_directive(self (Self), input (&CommentControlInput)) -> anyhow::Result<CommentControlOutput>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `input`: type=&CommentControlInput, meaning=Input for input, valid values=Any valid &CommentControlInput, optional=No, default value=None
 
 ###### Output
@@ -157,7 +158,7 @@ class CommentControlInput {
 class CommentControlOutput {
 }
 class CommentControlService {
-    +handle_directive(input: &CommentControlInput) anyhow::Result<CommentControlOutput>
+    +handle_directive(self: Self, input: &CommentControlInput) anyhow::Result<CommentControlOutput>
     +new(github_client: Option<Arc<dyn GithubClient>>, gitlab_client: Option<Arc<dyn GitlabClient>>, mcp_client: Arc<dyn McpClient>, r2r_client: Arc<dyn R2rClient>, aethalgard_client: Arc<dyn AethalgardClient>) Self
 }
 @enduml

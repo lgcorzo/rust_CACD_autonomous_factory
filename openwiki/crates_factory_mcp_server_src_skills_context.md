@@ -6,10 +6,10 @@ title: "context.rs"
 source_path: "crates/factory-mcp-server/src/skills/context.rs"
 description: "Detailed documentation for context.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: context.rs
@@ -58,12 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `format_for_llm(pruned_context (&str)) -> Value`
+##### `format_for_llm(self (Self), pruned_context (&str)) -> Value`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `pruned_context`: type=&str, meaning=Input for pruned_context, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -88,12 +89,13 @@ Space Complexity: O(1) mostly
 let result = instance.format_for_llm();
 ```
 
-##### `prune_context(raw_context (&str), max_chars (usize)) -> String`
+##### `prune_context(self (Self), raw_context (&str), max_chars (usize)) -> String`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `raw_context`: type=&str, meaning=Input for raw_context, valid values=Any valid &str, optional=No, default value=None
 * `max_chars`: type=usize, meaning=Input for max_chars, valid values=Any valid usize, optional=No, default value=None
 
@@ -132,8 +134,8 @@ None.
 ```plantuml
 @startuml
 class ContextSkill {
-    +format_for_llm(pruned_context: &str) Value
-    +prune_context(raw_context: &str, max_chars: usize) String
+    +format_for_llm(self: Self, pruned_context: &str) Value
+    +prune_context(self: Self, raw_context: &str, max_chars: usize) String
 }
 @enduml
 

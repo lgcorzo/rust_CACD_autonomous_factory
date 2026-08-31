@@ -6,10 +6,10 @@ title: "cursor_store.rs"
 source_path: "crates/factory-infrastructure/src/cursor_store.rs"
 description: "Detailed documentation for cursor_store.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: cursor_store.rs
@@ -58,12 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `get_cursor(source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`
+##### `get_cursor(self (Self), source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `source_key`: type=&str, meaning=Input for source_key, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -88,12 +89,13 @@ Space Complexity: O(1) mostly
 let result = instance.get_cursor();
 ```
 
-##### `is_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`
+##### `is_event_processed(self (Self), source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `source_key`: type=&str, meaning=Input for source_key, valid values=Any valid &str, optional=No, default value=None
 * `event_hash`: type=&str, meaning=Input for event_hash, valid values=Any valid &str, optional=No, default value=None
 
@@ -119,12 +121,13 @@ Space Complexity: O(1) mostly
 let result = instance.is_event_processed();
 ```
 
-##### `mark_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<()>`
+##### `mark_event_processed(self (Self), source_key (&str), event_hash (&str)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `source_key`: type=&str, meaning=Input for source_key, valid values=Any valid &str, optional=No, default value=None
 * `event_hash`: type=&str, meaning=Input for event_hash, valid values=Any valid &str, optional=No, default value=None
 
@@ -150,12 +153,13 @@ Space Complexity: O(1) mostly
 let result = instance.mark_event_processed();
 ```
 
-##### `save_cursor(cursor (&PollerSyncCursor)) -> anyhow::Result<()>`
+##### `save_cursor(self (Self), cursor (&PollerSyncCursor)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `cursor`: type=&PollerSyncCursor, meaning=Input for cursor, valid values=Any valid &PollerSyncCursor, optional=No, default value=None
 
 ###### Output
@@ -207,10 +211,10 @@ None.
 
 **Private Methods:**
 
-* `get_cursor(source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
-* `is_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`: Internal helper logic.
-* `mark_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<()>`: Internal helper logic.
-* `save_cursor(cursor (&PollerSyncCursor)) -> anyhow::Result<()>`: Internal helper logic.
+* `get_cursor(self (Self), source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
+* `is_event_processed(self (Self), source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`: Internal helper logic.
+* `mark_event_processed(self (Self), source_key (&str), event_hash (&str)) -> anyhow::Result<()>`: Internal helper logic.
+* `save_cursor(self (Self), cursor (&PollerSyncCursor)) -> anyhow::Result<()>`: Internal helper logic.
 
 #### PostgresCursorStore
 
@@ -235,10 +239,10 @@ None.
 
 **Private Methods:**
 
-* `get_cursor(source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
-* `is_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`: Internal helper logic.
-* `mark_event_processed(source_key (&str), event_hash (&str)) -> anyhow::Result<()>`: Internal helper logic.
-* `save_cursor(cursor (&PollerSyncCursor)) -> anyhow::Result<()>`: Internal helper logic.
+* `get_cursor(self (Self), source_key (&str)) -> anyhow::Result<Option<PollerSyncCursor>>`: Internal helper logic.
+* `is_event_processed(self (Self), source_key (&str), event_hash (&str)) -> anyhow::Result<bool>`: Internal helper logic.
+* `mark_event_processed(self (Self), source_key (&str), event_hash (&str)) -> anyhow::Result<()>`: Internal helper logic.
+* `save_cursor(self (Self), cursor (&PollerSyncCursor)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -249,25 +253,25 @@ None.
 ```plantuml
 @startuml
 interface CursorStore {
-    +get_cursor(source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
-    +is_event_processed(source_key: &str, event_hash: &str) anyhow::Result<bool>
-    +mark_event_processed(source_key: &str, event_hash: &str) anyhow::Result<()>
-    +save_cursor(cursor: &PollerSyncCursor) anyhow::Result<()>
+    +get_cursor(self: Self, source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
+    +is_event_processed(self: Self, source_key: &str, event_hash: &str) anyhow::Result<bool>
+    +mark_event_processed(self: Self, source_key: &str, event_hash: &str) anyhow::Result<()>
+    +save_cursor(self: Self, cursor: &PollerSyncCursor) anyhow::Result<()>
 }
 class InMemoryCursorStore {
-    -get_cursor(source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
-    -is_event_processed(source_key: &str, event_hash: &str) anyhow::Result<bool>
-    -mark_event_processed(source_key: &str, event_hash: &str) anyhow::Result<()>
+    -get_cursor(self: Self, source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
+    -is_event_processed(self: Self, source_key: &str, event_hash: &str) anyhow::Result<bool>
+    -mark_event_processed(self: Self, source_key: &str, event_hash: &str) anyhow::Result<()>
     +new() Self
-    -save_cursor(cursor: &PollerSyncCursor) anyhow::Result<()>
+    -save_cursor(self: Self, cursor: &PollerSyncCursor) anyhow::Result<()>
 }
 CursorStore <|-- InMemoryCursorStore : extends/implements
 class PostgresCursorStore {
-    -get_cursor(source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
-    -is_event_processed(source_key: &str, event_hash: &str) anyhow::Result<bool>
-    -mark_event_processed(source_key: &str, event_hash: &str) anyhow::Result<()>
+    -get_cursor(self: Self, source_key: &str) anyhow::Result<Option<PollerSyncCursor>>
+    -is_event_processed(self: Self, source_key: &str, event_hash: &str) anyhow::Result<bool>
+    -mark_event_processed(self: Self, source_key: &str, event_hash: &str) anyhow::Result<()>
     +new(database_url: String) Self
-    -save_cursor(cursor: &PollerSyncCursor) anyhow::Result<()>
+    -save_cursor(self: Self, cursor: &PollerSyncCursor) anyhow::Result<()>
 }
 CursorStore <|-- PostgresCursorStore : extends/implements
 @enduml

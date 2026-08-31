@@ -6,10 +6,10 @@ title: "telemetry_export.rs"
 source_path: "crates/factory-application/src/telemetry_export.rs"
 description: "Detailed documentation for telemetry_export.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: telemetry_export.rs
@@ -95,7 +95,7 @@ let result = instance.start_export_loop();
 
 **Private Methods:**
 
-* `push_to_openwebui(thought (&Value)) -> anyhow::Result<()>`: Internal helper logic.
+* `push_to_openwebui(self (Self), thought (&Value)) -> anyhow::Result<()>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -107,7 +107,7 @@ None.
 @startuml
 class TelemetryExporter {
     +new(kafka_brokers: String, openwebui_db_url: String) Self
-    -push_to_openwebui(thought: &Value) anyhow::Result<()>
+    -push_to_openwebui(self: Self, thought: &Value) anyhow::Result<()>
     +start_export_loop(self: Arc<Self>) anyhow::Result<()>
 }
 @enduml

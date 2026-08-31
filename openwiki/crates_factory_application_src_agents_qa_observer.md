@@ -6,10 +6,10 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Detailed documentation for qa_observer.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: qa_observer.rs
@@ -67,13 +67,13 @@ Initialization: Sets up QAObserverAgent
 
 **Public Methods:**
 
-##### `monitor_crashes() -> anyhow::Result<()>`
+##### `monitor_crashes(self (Self)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
-None.
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 
 ###### Output
 Return type: anyhow::Result<()>
@@ -100,8 +100,8 @@ let result = instance.monitor_crashes();
 **Private Methods:**
 
 * `default() -> Self`: Internal helper logic.
-* `execute(_task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
-* `name() -> String`: Internal helper logic.
+* `execute(self (Self), _task_description (&str)) -> anyhow::Result<Value>`: Internal helper logic.
+* `name(self (Self)) -> String`: Internal helper logic.
 
 ### Exported Functions
 
@@ -113,9 +113,9 @@ None.
 @startuml
 class QAObserverAgent {
     -default() Self
-    -execute(_task_description: &str) anyhow::Result<Value>
-    +monitor_crashes() anyhow::Result<()>
-    -name() String
+    -execute(self: Self, _task_description: &str) anyhow::Result<Value>
+    +monitor_crashes(self: Self) anyhow::Result<()>
+    -name(self: Self) String
     +new(sentry_url: String, sentry_token: String, sentry_project: String, gitlab_url: String, gitlab_token: String, gitlab_project: String, hatchet: Hatchet) Self
 }
 Agent <|-- QAObserverAgent : extends/implements

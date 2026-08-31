@@ -183,6 +183,14 @@ def write_file_doc(file_path, parsed, now):
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, f"{flattened_name}.md")
 
+    for c in parsed['classes']:
+        if 'methods' in c:
+            c['methods'].sort(key=lambda x: x['name'])
+        if 'fields' in c:
+            c['fields'].sort(key=lambda x: x['name'])
+        if 'implements' in c:
+            c['implements'].sort()
+
     parsed['classes'].sort(key=lambda x: x['name'])
     parsed['free_functions'].sort(key=lambda x: x['name'])
     if parsed.get("dependencies"):

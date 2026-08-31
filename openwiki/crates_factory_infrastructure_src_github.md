@@ -6,10 +6,10 @@ title: "github.rs"
 source_path: "crates/factory-infrastructure/src/github.rs"
 description: "Detailed documentation for github.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: github.rs
@@ -58,12 +58,13 @@ None.
 
 **Public Methods:**
 
-##### `create_issue(repo (&str), title (&str), body (&str)) -> anyhow::Result<GithubIssue>`
+##### `create_issue(self (Self), repo (&str), title (&str), body (&str)) -> anyhow::Result<GithubIssue>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 * `title`: type=&str, meaning=Input for title, valid values=Any valid &str, optional=No, default value=None
 * `body`: type=&str, meaning=Input for body, valid values=Any valid &str, optional=No, default value=None
@@ -90,12 +91,13 @@ Space Complexity: O(1) mostly
 let result = instance.create_issue();
 ```
 
-##### `create_pull_request(repo (&str), title (&str), head (&str), base (&str), body (&str)) -> anyhow::Result<String>`
+##### `create_pull_request(self (Self), repo (&str), title (&str), head (&str), base (&str), body (&str)) -> anyhow::Result<String>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 * `title`: type=&str, meaning=Input for title, valid values=Any valid &str, optional=No, default value=None
 * `head`: type=&str, meaning=Input for head, valid values=Any valid &str, optional=No, default value=None
@@ -124,12 +126,13 @@ Space Complexity: O(1) mostly
 let result = instance.create_pull_request();
 ```
 
-##### `list_active_pull_requests(repo (&str)) -> anyhow::Result<Vec<GithubPullRequest>>`
+##### `list_active_pull_requests(self (Self), repo (&str)) -> anyhow::Result<Vec<GithubPullRequest>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -154,12 +157,13 @@ Space Complexity: O(1) mostly
 let result = instance.list_active_pull_requests();
 ```
 
-##### `list_issues_updated_since(repo (&str), labels (Option<String>), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubIssue>>`
+##### `list_issues_updated_since(self (Self), repo (&str), labels (Option<String>), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubIssue>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 * `labels`: type=Option<String>, meaning=Input for labels, valid values=Any valid Option<String>, optional=No, default value=None
 * `since`: type=Option<DateTime<Utc>>, meaning=Input for since, valid values=Any valid Option<DateTime<Utc>>, optional=No, default value=None
@@ -186,12 +190,13 @@ Space Complexity: O(1) mostly
 let result = instance.list_issues_updated_since();
 ```
 
-##### `list_open_issues(repo (&str), labels (Option<String>)) -> anyhow::Result<Vec<GithubIssue>>`
+##### `list_open_issues(self (Self), repo (&str), labels (Option<String>)) -> anyhow::Result<Vec<GithubIssue>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 * `labels`: type=Option<String>, meaning=Input for labels, valid values=Any valid Option<String>, optional=No, default value=None
 
@@ -217,12 +222,13 @@ Space Complexity: O(1) mostly
 let result = instance.list_open_issues();
 ```
 
-##### `list_pull_request_comments(repo (&str), pr_number (u64), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubComment>>`
+##### `list_pull_request_comments(self (Self), repo (&str), pr_number (u64), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubComment>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 * `pr_number`: type=u64, meaning=Input for pr_number, valid values=Any valid u64, optional=No, default value=None
 * `since`: type=Option<DateTime<Utc>>, meaning=Input for since, valid values=Any valid Option<DateTime<Utc>>, optional=No, default value=None
@@ -249,12 +255,13 @@ Space Complexity: O(1) mostly
 let result = instance.list_pull_request_comments();
 ```
 
-##### `post_pull_request_comment(repo (&str), pr_number (u64), body (&str)) -> anyhow::Result<GithubComment>`
+##### `post_pull_request_comment(self (Self), repo (&str), pr_number (u64), body (&str)) -> anyhow::Result<GithubComment>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `repo`: type=&str, meaning=Input for repo, valid values=Any valid &str, optional=No, default value=None
 * `pr_number`: type=u64, meaning=Input for pr_number, valid values=Any valid u64, optional=No, default value=None
 * `body`: type=&str, meaning=Input for body, valid values=Any valid &str, optional=No, default value=None
@@ -437,13 +444,13 @@ let result = instance.with_url();
 
 **Private Methods:**
 
-* `create_issue(repo (&str), title (&str), body (&str)) -> anyhow::Result<GithubIssue>`: Internal helper logic.
-* `create_pull_request(repo (&str), title (&str), head (&str), base (&str), body (&str)) -> anyhow::Result<String>`: Internal helper logic.
-* `list_active_pull_requests(repo (&str)) -> anyhow::Result<Vec<GithubPullRequest>>`: Internal helper logic.
-* `list_issues_updated_since(repo (&str), labels (Option<String>), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
-* `list_open_issues(repo (&str), labels (Option<String>)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
-* `list_pull_request_comments(repo (&str), pr_number (u64), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubComment>>`: Internal helper logic.
-* `post_pull_request_comment(repo (&str), pr_number (u64), body (&str)) -> anyhow::Result<GithubComment>`: Internal helper logic.
+* `create_issue(self (Self), repo (&str), title (&str), body (&str)) -> anyhow::Result<GithubIssue>`: Internal helper logic.
+* `create_pull_request(self (Self), repo (&str), title (&str), head (&str), base (&str), body (&str)) -> anyhow::Result<String>`: Internal helper logic.
+* `list_active_pull_requests(self (Self), repo (&str)) -> anyhow::Result<Vec<GithubPullRequest>>`: Internal helper logic.
+* `list_issues_updated_since(self (Self), repo (&str), labels (Option<String>), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
+* `list_open_issues(self (Self), repo (&str), labels (Option<String>)) -> anyhow::Result<Vec<GithubIssue>>`: Internal helper logic.
+* `list_pull_request_comments(self (Self), repo (&str), pr_number (u64), since (Option<DateTime<Utc>>)) -> anyhow::Result<Vec<GithubComment>>`: Internal helper logic.
+* `post_pull_request_comment(self (Self), repo (&str), pr_number (u64), body (&str)) -> anyhow::Result<GithubComment>`: Internal helper logic.
 
 ### Exported Functions
 
@@ -454,13 +461,13 @@ None.
 ```plantuml
 @startuml
 interface GithubClient {
-    +create_issue(repo: &str, title: &str, body: &str) anyhow::Result<GithubIssue>
-    +create_pull_request(repo: &str, title: &str, head: &str, base: &str, body: &str) anyhow::Result<String>
-    +list_active_pull_requests(repo: &str) anyhow::Result<Vec<GithubPullRequest>>
-    +list_issues_updated_since(repo: &str, labels: Option<String>, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubIssue>>
-    +list_open_issues(repo: &str, labels: Option<String>) anyhow::Result<Vec<GithubIssue>>
-    +list_pull_request_comments(repo: &str, pr_number: u64, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubComment>>
-    +post_pull_request_comment(repo: &str, pr_number: u64, body: &str) anyhow::Result<GithubComment>
+    +create_issue(self: Self, repo: &str, title: &str, body: &str) anyhow::Result<GithubIssue>
+    +create_pull_request(self: Self, repo: &str, title: &str, head: &str, base: &str, body: &str) anyhow::Result<String>
+    +list_active_pull_requests(self: Self, repo: &str) anyhow::Result<Vec<GithubPullRequest>>
+    +list_issues_updated_since(self: Self, repo: &str, labels: Option<String>, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubIssue>>
+    +list_open_issues(self: Self, repo: &str, labels: Option<String>) anyhow::Result<Vec<GithubIssue>>
+    +list_pull_request_comments(self: Self, repo: &str, pr_number: u64, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubComment>>
+    +post_pull_request_comment(self: Self, repo: &str, pr_number: u64, body: &str) anyhow::Result<GithubComment>
 }
 class GithubComment {
 }
@@ -471,14 +478,14 @@ class GithubPullRequest {
 class GithubUser {
 }
 class HttpGithubClient {
-    -create_issue(repo: &str, title: &str, body: &str) anyhow::Result<GithubIssue>
-    -create_pull_request(repo: &str, title: &str, head: &str, base: &str, body: &str) anyhow::Result<String>
-    -list_active_pull_requests(repo: &str) anyhow::Result<Vec<GithubPullRequest>>
-    -list_issues_updated_since(repo: &str, labels: Option<String>, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubIssue>>
-    -list_open_issues(repo: &str, labels: Option<String>) anyhow::Result<Vec<GithubIssue>>
-    -list_pull_request_comments(repo: &str, pr_number: u64, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubComment>>
+    -create_issue(self: Self, repo: &str, title: &str, body: &str) anyhow::Result<GithubIssue>
+    -create_pull_request(self: Self, repo: &str, title: &str, head: &str, base: &str, body: &str) anyhow::Result<String>
+    -list_active_pull_requests(self: Self, repo: &str) anyhow::Result<Vec<GithubPullRequest>>
+    -list_issues_updated_since(self: Self, repo: &str, labels: Option<String>, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubIssue>>
+    -list_open_issues(self: Self, repo: &str, labels: Option<String>) anyhow::Result<Vec<GithubIssue>>
+    -list_pull_request_comments(self: Self, repo: &str, pr_number: u64, since: Option<DateTime<Utc>>) anyhow::Result<Vec<GithubComment>>
     +new(api_token: String) Self
-    -post_pull_request_comment(repo: &str, pr_number: u64, body: &str) anyhow::Result<GithubComment>
+    -post_pull_request_comment(self: Self, repo: &str, pr_number: u64, body: &str) anyhow::Result<GithubComment>
     +with_url(api_url: String, api_token: String) Self
 }
 GithubClient <|-- HttpGithubClient : extends/implements

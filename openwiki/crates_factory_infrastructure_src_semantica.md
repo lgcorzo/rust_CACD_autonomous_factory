@@ -6,10 +6,10 @@ title: "semantica.rs"
 source_path: "crates/factory-infrastructure/src/semantica.rs"
 description: "Detailed documentation for semantica.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-25T05:53:44Z"
+timestamp: "2026-08-31T05:39:54Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "e2707de"
+last_verified_commit: "7bf01b8"
 ---
 
 # File: semantica.rs
@@ -117,9 +117,9 @@ None.
 
 **Private Methods:**
 
-* `detect_conflicts(plan (&MissionPlan)) -> anyhow::Result<Vec<Conflict>>`: Internal helper logic.
-* `record_decision(record (&DecisionRecord)) -> anyhow::Result<()>`: Internal helper logic.
-* `verify_provenance(patch_id (&str)) -> anyhow::Result<ProvenanceReport>`: Internal helper logic.
+* `detect_conflicts(self (Self), plan (&MissionPlan)) -> anyhow::Result<Vec<Conflict>>`: Internal helper logic.
+* `record_decision(self (Self), record (&DecisionRecord)) -> anyhow::Result<()>`: Internal helper logic.
+* `verify_provenance(self (Self), patch_id (&str)) -> anyhow::Result<ProvenanceReport>`: Internal helper logic.
 
 #### MissionPlan
 
@@ -185,12 +185,13 @@ None.
 
 **Public Methods:**
 
-##### `detect_conflicts(plan (&MissionPlan)) -> anyhow::Result<Vec<Conflict>>`
+##### `detect_conflicts(self (Self), plan (&MissionPlan)) -> anyhow::Result<Vec<Conflict>>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `plan`: type=&MissionPlan, meaning=Input for plan, valid values=Any valid &MissionPlan, optional=No, default value=None
 
 ###### Output
@@ -215,12 +216,13 @@ Space Complexity: O(1) mostly
 let result = instance.detect_conflicts();
 ```
 
-##### `record_decision(record (&DecisionRecord)) -> anyhow::Result<()>`
+##### `record_decision(self (Self), record (&DecisionRecord)) -> anyhow::Result<()>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `record`: type=&DecisionRecord, meaning=Input for record, valid values=Any valid &DecisionRecord, optional=No, default value=None
 
 ###### Output
@@ -245,12 +247,13 @@ Space Complexity: O(1) mostly
 let result = instance.record_decision();
 ```
 
-##### `verify_provenance(patch_id (&str)) -> anyhow::Result<ProvenanceReport>`
+##### `verify_provenance(self (Self), patch_id (&str)) -> anyhow::Result<ProvenanceReport>`
 
 ###### Description
 No description provided.
 
 ###### Inputs
+* `self`: type=Self, meaning=Input for self, valid values=Any valid Self, optional=No, default value=None
 * `patch_id`: type=&str, meaning=Input for patch_id, valid values=Any valid &str, optional=No, default value=None
 
 ###### Output
@@ -292,10 +295,10 @@ class Conflict {
 class DecisionRecord {
 }
 class HttpSemanticaClient {
-    -detect_conflicts(plan: &MissionPlan) anyhow::Result<Vec<Conflict>>
+    -detect_conflicts(self: Self, plan: &MissionPlan) anyhow::Result<Vec<Conflict>>
     +new(endpoint: String, nhi_identity: Option<String>) Self
-    -record_decision(record: &DecisionRecord) anyhow::Result<()>
-    -verify_provenance(patch_id: &str) anyhow::Result<ProvenanceReport>
+    -record_decision(self: Self, record: &DecisionRecord) anyhow::Result<()>
+    -verify_provenance(self: Self, patch_id: &str) anyhow::Result<ProvenanceReport>
 }
 SemanticaClient <|-- HttpSemanticaClient : extends/implements
 class MissionPlan {
@@ -303,9 +306,9 @@ class MissionPlan {
 class ProvenanceReport {
 }
 interface SemanticaClient {
-    +detect_conflicts(plan: &MissionPlan) anyhow::Result<Vec<Conflict>>
-    +record_decision(record: &DecisionRecord) anyhow::Result<()>
-    +verify_provenance(patch_id: &str) anyhow::Result<ProvenanceReport>
+    +detect_conflicts(self: Self, plan: &MissionPlan) anyhow::Result<Vec<Conflict>>
+    +record_decision(self: Self, record: &DecisionRecord) anyhow::Result<()>
+    +verify_provenance(self: Self, patch_id: &str) anyhow::Result<ProvenanceReport>
 }
 @enduml
 
