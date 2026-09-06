@@ -6,10 +6,10 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Detailed documentation for zeroclaw.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-31T05:39:54Z"
+timestamp: "2026-09-06T06:54:11Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "7bf01b8"
+last_verified_commit: "e105fc6"
 ---
 
 # File: zeroclaw.rs

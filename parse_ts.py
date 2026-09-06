@@ -27,6 +27,7 @@ def parse_ts(filepath):
         classes = []
         free_functions = []
         dependencies = []
+        seen_funcs = set()
 
         def traverse(node):
             if node.type in ['import_statement']:
@@ -109,36 +110,40 @@ def parse_ts(filepath):
                         'implements': []
                     })
 
-            elif node.type == 'function_declaration':
-                if node.parent and node.parent.type == 'program':
-                    name_node = node.child_by_field_name('name')
+            elif node.type == 'function_declaration' or node.type == 'export_statement':
+                func_node = node if node.type == 'function_declaration' else node.child_by_field_name('declaration')
+
+                if func_node and func_node.type == 'function_declaration':
+                    name_node = func_node.child_by_field_name('name')
                     if name_node:
                         name = get_node_text(name_node, source_bytes)
-                        args = []
-                        params = node.child_by_field_name('parameters')
-                        if params:
-                            for p in params.children:
-                                if p.type in ['required_parameter', 'optional_parameter']:
-                                    p_name_node = p.child_by_field_name('pattern') or p
-                                    p_name = get_node_text(p_name_node, source_bytes)
-                                    p_type = "any"
-                                    p_type_node = p.child_by_field_name('type')
-                                    if p_type_node:
-                                        p_type = get_node_text(p_type_node, source_bytes).lstrip(':').strip()
-                                    args.append({"name": p_name, "type": p_type})
+                        if name not in seen_funcs:
+                            seen_funcs.add(name)
+                            args = []
+                            params = func_node.child_by_field_name('parameters')
+                            if params:
+                                for p in params.children:
+                                    if p.type in ['required_parameter', 'optional_parameter']:
+                                        p_name_node = p.child_by_field_name('pattern') or p
+                                        p_name = get_node_text(p_name_node, source_bytes)
+                                        p_type = "any"
+                                        p_type_node = p.child_by_field_name('type')
+                                        if p_type_node:
+                                            p_type = get_node_text(p_type_node, source_bytes).lstrip(':').strip()
+                                        args.append({"name": p_name, "type": p_type})
 
-                        ret_type = "any"
-                        ret_node = node.child_by_field_name('return_type')
-                        if ret_node:
-                            ret_type = get_node_text(ret_node, source_bytes).lstrip(':').strip()
+                            ret_type = "any"
+                            ret_node = func_node.child_by_field_name('return_type')
+                            if ret_node:
+                                ret_type = get_node_text(ret_node, source_bytes).lstrip(':').strip()
 
-                        free_functions.append({
-                            'name': name,
-                            'is_pub': True,
-                            'doc': '',
-                            'args': args,
-                            'ret_type': ret_type
-                        })
+                            free_functions.append({
+                                'name': name,
+                                'is_pub': True,
+                                'doc': '',
+                                'args': args,
+                                'ret_type': ret_type
+                            })
 
             for child in node.children:
                 traverse(child)

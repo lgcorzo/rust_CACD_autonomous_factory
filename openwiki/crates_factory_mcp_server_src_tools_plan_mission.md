@@ -6,10 +6,10 @@ title: "plan_mission.rs"
 source_path: "crates/factory-mcp-server/src/tools/plan_mission.rs"
 description: "Detailed documentation for plan_mission.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-31T05:39:54Z"
+timestamp: "2026-09-06T06:54:11Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "7bf01b8"
+last_verified_commit: "e105fc6"
 ---
 
 # File: plan_mission.rs

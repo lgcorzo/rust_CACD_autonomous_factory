@@ -6,10 +6,10 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Detailed documentation for security.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-31T05:39:54Z"
+timestamp: "2026-09-06T06:54:11Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "7bf01b8"
+last_verified_commit: "e105fc6"
 ---
 
 # File: security.rs
@@ -433,7 +433,7 @@ class SastScanResult {
 interface SecurityBounds {
     +issue_jit_token(self: Self, audience: &str) Result<JitToken>
     +validate_token(self: Self, token: &JitToken) Result<bool>
-    +wipe_token_from_memory(self: Self, token: &mut JitToken) None
+    +wipe_token_from_memory(self: Self, token: &mut JitToken)
 }
 interface SecurityValidator {
     +audit_content(self: Self, content: &str) Result<AuditResult>

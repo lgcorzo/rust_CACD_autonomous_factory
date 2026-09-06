@@ -6,10 +6,10 @@ title: "lib.rs"
 source_path: "crates/factory-mcp-server/src/lib.rs"
 description: "Detailed documentation for lib.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-31T05:39:54Z"
+timestamp: "2026-09-06T06:54:11Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "7bf01b8"
+last_verified_commit: "e105fc6"
 ---
 
 # File: lib.rs
@@ -246,7 +246,7 @@ None.
 ```plantuml
 @startuml
 class McpServer {
-    +add_tool(self: Self, tool: Box<dyn Tool>) None
+    +add_tool(self: Self, tool: Box<dyn Tool>)
     -default() Self
     -error_response(self: Self, id: Option<Value>, code: i32, message: &str) JsonRpcResponse
     -handle_call_tool(self: Self, request: JsonRpcRequest) JsonRpcResponse

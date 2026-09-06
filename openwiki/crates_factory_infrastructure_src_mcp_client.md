@@ -6,10 +6,10 @@ title: "mcp_client.rs"
 source_path: "crates/factory-infrastructure/src/mcp_client.rs"
 description: "Detailed documentation for mcp_client.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-31T05:39:54Z"
+timestamp: "2026-09-06T06:54:11Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "7bf01b8"
+last_verified_commit: "e105fc6"
 ---
 
 # File: mcp_client.rs

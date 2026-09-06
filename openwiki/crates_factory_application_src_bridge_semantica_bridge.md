@@ -6,10 +6,10 @@ title: "semantica_bridge.rs"
 source_path: "crates/factory-application/src/bridge/semantica_bridge.rs"
 description: "Detailed documentation for semantica_bridge.rs"
 tags: ["documentation", "ast", "openwiki"]
-timestamp: "2026-08-31T05:39:54Z"
+timestamp: "2026-09-06T06:54:11Z"
 generated: "agent:okf-professional-documenter"
 verified: "true"
-last_verified_commit: "7bf01b8"
+last_verified_commit: "e105fc6"
 ---
 
 # File: semantica_bridge.rs

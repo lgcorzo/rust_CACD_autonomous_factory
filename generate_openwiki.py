@@ -76,7 +76,16 @@ def generate_plantuml_classes(classes):
             visibility = "+" if m.get('is_pub', True) else "-"
             args_str = ", ".join([f"{a['name']}: {a['type']}" for a in m.get('args', [])])
             ret_type = m.get('ret_type', 'None').strip()
-            puml += f"    {visibility}{m['name']}({args_str}) {ret_type}\n"
+
+            if ret_type.startswith(":"):
+                ret_type = ret_type[1:].strip()
+            if ret_type.startswith("->"):
+                ret_type = ret_type[2:].strip()
+
+            if ret_type and ret_type != 'None':
+                puml += f"    {visibility}{m['name']}({args_str}) {ret_type}\n"
+            else:
+                puml += f"    {visibility}{m['name']}({args_str})\n"
 
         puml += "}\n"
 
