@@ -133,7 +133,8 @@ mod tests {
         assert!(result.is_error);
 
         if let crate::protocol::McpContent::Text { text } = &result.content[0] {
-            assert!(text.contains("Error: Invalid mission_id. Path traversal characters are not allowed."));
+            assert!(text
+                .contains("Error: Invalid mission_id. Path traversal characters are not allowed."));
         } else {
             panic!("Expected text content");
         }
@@ -142,13 +143,29 @@ mod tests {
     #[tokio::test]
     async fn test_bridge_tool_valid_mission_id() {
         let tool = BridgeTool;
+        let test_mission_id = "test_mission_valid_123";
 
-        let params = json!({
-            "mission_id": "test_mission_123",
+        // Test save action
+        let save_params = json!({
+            "mission_id": test_mission_id,
+            "action": "save",
+            "state": { "step": 1, "data": "test" }
+        });
+
+        let save_result = tool.call(save_params).await.unwrap();
+        assert!(!save_result.is_error);
+
+        // Test load action
+        let load_params = json!({
+            "mission_id": test_mission_id,
             "action": "load"
         });
 
-        let result = tool.call(params).await.unwrap();
-        assert!(!result.is_error);
+        let load_result = tool.call(load_params).await.unwrap();
+        assert!(!load_result.is_error);
+
+        // Clean up test file
+        let checkpoint_path = BridgeTool::get_checkpoint_path(test_mission_id);
+        let _ = std::fs::remove_file(checkpoint_path);
     }
 }
