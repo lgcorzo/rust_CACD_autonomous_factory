@@ -32,7 +32,18 @@ The codebase is organized as a unified Rust workspace for maximum modularity and
 Missions are orchestrated using a robust **6-phase DAG** in **Hatchet** with database-backed `StepCheckpoint` recovery:
 `Ingestion` → `Plan (Rustant)` → `Code (ZeroClaw)` → `Validation (ZeroClaw)` → `Review (Rustant)` → `Delivery (GitOps)`.
 
-### 3. Integrated Intelligence & Security
+### 3. Integrated Target Repositories
+
+Dark Gravity continuously polls and autonomously executes missions across configured repositories:
+
+| Target Repository | Domain | Autonomous Workflow Focus |
+|:---|:---|:---|
+| [`lgcorzo/rust_CACD_autonomous_factory`](https://github.com/lgcorzo/rust_CACD_autonomous_factory) | Autonomous Multi-Agent Engine | Self-evolution, DAG workflows & MCP servers |
+| [`lgcorzo/lince-rs`](https://github.com/lgcorzo/lince-rs) | 2D Irregular Nesting & CAM Engine | Algorithmic optimization to surpass OptaLog benchmarks |
+| [`lgcorzo-lab/autonomous_factory`](https://gitlab.com/lgcorzo-lab/autonomous_factory) | Architecture & Knowledge Base | Spec-Kit SDD contracts, C4 diagrams, OSR audits |
+| [`lgcorzo/fastapi-autogen-team`](https://github.com/lgcorzo/fastapi-autogen-team) | Agentic Access Layer | R2R/Confluent document services |
+
+### 4. Integrated Intelligence & Security
 
 - **Rustant**: Leverages **R2rClient** for semantic code search and context retrieval to inform specification design and planning.
 - **ZeroClaw**: Compiles and executes code in secure **Firecracker micro-VMs** via a sandboxed executor driver.
