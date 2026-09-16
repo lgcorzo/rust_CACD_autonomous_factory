@@ -39,7 +39,7 @@ Dark Gravity continuously polls and autonomously executes missions across config
 | Target Repository | Domain | Autonomous Workflow Focus |
 |:---|:---|:---|
 | [`lgcorzo/rust_CACD_autonomous_factory`](https://github.com/lgcorzo/rust_CACD_autonomous_factory) | Autonomous Multi-Agent Engine | Self-evolution, DAG workflows & MCP servers |
-| [`lgcorzo/lince-rs`](https://gitlab.com/lgcorzo/lince-rs) | 2D Irregular Nesting & CAM Engine | Algorithmic optimization to surpass OptaLog benchmarks |
+| [`lgcorzo/lince-rs`](https://gitlab.com/lgcorzo/lince-rs) | Otimization process | Algorithmic optimization to control agents costs |
 | [`lgcorzo-lab/autonomous_factory`](https://gitlab.com/lgcorzo-lab/autonomous_factory) | Architecture & Knowledge Base | Spec-Kit SDD contracts, C4 diagrams, OSR audits |
 | [`lgcorzo/fastapi-autogen-team`](https://github.com/lgcorzo/fastapi-autogen-team) | Agentic Access Layer | R2R/Confluent document services |
 
