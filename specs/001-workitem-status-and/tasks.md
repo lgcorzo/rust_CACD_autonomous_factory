@@ -19,9 +19,9 @@
 
 **Purpose**: Establish data models, protobuf extensions, and provenance representations across workspace crates.
 
-- [ ] T001 Extend `MissionInput` struct with `source_platform`, `repository`, and `issue_number` in `crates/factory-application/src/workflows/autonomous_mission.rs`
-- [ ] T002 [P] Define `GitlabCommitAction` and `GitDeliveryResult` models in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T003 [P] Ensure `PollerDaemonService` serializes `source_platform`, `repository`, and `issue_number` into `MissionInput` payload in `crates/factory-application/src/poller_service.rs`
+- [x] T001 Extend `MissionInput` struct with `source_platform`, `repository`, and `issue_number` in `crates/factory-application/src/workflows/autonomous_mission.rs`
+- [x] T002 [P] Define `GitlabCommitAction` and `GitDeliveryResult` models in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T003 [P] Ensure `PollerDaemonService` serializes `source_platform`, `repository`, and `issue_number` into `MissionInput` payload in `crates/factory-application/src/poller_service.rs`
 
 ---
 
@@ -29,8 +29,8 @@
 
 **Purpose**: Extend abstract traits `GitlabClient` and `GithubClient` with mock support for unit tests.
 
-- [ ] T004 Extend `GitlabClient` trait with `post_issue_note`, `create_branch`, `create_commit_files`, and `create_merge_request` in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T005 [P] Extend `GithubClient` trait with `post_issue_comment` and `create_branch` in `crates/factory-infrastructure/src/github.rs`
+- [x] T004 Extend `GitlabClient` trait with `post_issue_note`, `create_branch`, `create_commit_files`, and `create_merge_request` in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T005 [P] Extend `GithubClient` trait with `post_issue_comment` and `create_branch` in `crates/factory-infrastructure/src/github.rs`
 
 **Checkpoint**: Core traits and data structures defined; user story implementations can begin.
 
@@ -43,16 +43,16 @@
 **Independent Test**: Mock unit tests verify that HTTP `POST /issues/:id/notes` and `POST /issues/:number/comments` are executed with formatted Markdown bodies containing mission ID and phase markers.
 
 ### Tests for User Story 1 ⚠️
-- [ ] T006 [P] [US1] Unit test for `HttpGitlabClient::post_issue_note` with mock HTTP responder in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T007 [P] [US1] Unit test for `HttpGithubClient::post_issue_comment` with mock HTTP responder in `crates/factory-infrastructure/src/github.rs`
+- [x] T006 [P] [US1] Unit test for `HttpGitlabClient::post_issue_note` with mock HTTP responder in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T007 [P] [US1] Unit test for `HttpGithubClient::post_issue_comment` with mock HTTP responder in `crates/factory-infrastructure/src/github.rs`
 
 ### Implementation for User Story 1
-- [ ] T008 [US1] Implement `post_issue_note` on `HttpGitlabClient` via `POST /api/v4/projects/{id}/issues/{iid}/notes` in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T009 [P] [US1] Implement `post_issue_comment` on `HttpGithubClient` via `POST /repos/{owner}/{repo}/issues/{number}/comments` in `crates/factory-infrastructure/src/github.rs`
-- [ ] T010 [US1] Add non-blocking milestone commenting helper `post_mission_milestone` in `crates/factory-application/src/workflows/autonomous_mission.rs`
-- [ ] T011 [US1] Instrument `rustant-plan` task to emit "Planning Initiated" and "Plan Formulated" comments in `crates/factory-application/src/workflows/autonomous_mission.rs`
-- [ ] T012 [US1] Instrument `zeroclaw-execute` and `zeroclaw-validate` tasks to emit test verification comments in `crates/factory-application/src/workflows/autonomous_mission.rs`
-- [ ] T013 [US1] Instrument `rustant-review` task to emit security audit score comments in `crates/factory-application/src/workflows/autonomous_mission.rs`
+- [x] T008 [US1] Implement `post_issue_note` on `HttpGitlabClient` via `POST /api/v4/projects/{id}/issues/{iid}/notes` in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T009 [P] [US1] Implement `post_issue_comment` on `HttpGithubClient` via `POST /repos/{owner}/{repo}/issues/{number}/comments` in `crates/factory-infrastructure/src/github.rs`
+- [x] T010 [US1] Add non-blocking milestone commenting helper `post_mission_milestone` in `crates/factory-application/src/workflows/autonomous_mission.rs`
+- [x] T011 [US1] Instrument `rustant-plan` task to emit "Planning Initiated" and "Plan Formulated" comments in `crates/factory-application/src/workflows/autonomous_mission.rs`
+- [x] T012 [US1] Instrument `zeroclaw-execute` and `zeroclaw-validate` tasks to emit test verification comments in `crates/factory-application/src/workflows/autonomous_mission.rs`
+- [x] T013 [US1] Instrument `rustant-review` task to emit security audit score comments in `crates/factory-application/src/workflows/autonomous_mission.rs`
 
 **Checkpoint**: At this point, any ingested work item receives automated, structured milestone comments as the DAG progresses.
 
@@ -65,19 +65,19 @@
 **Independent Test**: Mock unit tests verify `create_branch`, `create_commit_files`, and `create_merge_request` invoke the corresponding platform endpoints and return genuine MR web URLs.
 
 ### Tests for User Story 2 ⚠️
-- [ ] T014 [P] [US2] Unit test for `HttpGitlabClient::create_branch` in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T015 [P] [US2] Unit test for `HttpGitlabClient::create_commit_files` (multi-file atomic commit) in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T016 [P] [US2] Unit test for `HttpGitlabClient::create_merge_request` in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T017 [P] [US2] Unit test for `HttpGithubClient::create_branch` in `crates/factory-infrastructure/src/github.rs`
+- [x] T014 [P] [US2] Unit test for `HttpGitlabClient::create_branch` in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T015 [P] [US2] Unit test for `HttpGitlabClient::create_commit_files` (multi-file atomic commit) in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T016 [P] [US2] Unit test for `HttpGitlabClient::create_merge_request` in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T017 [P] [US2] Unit test for `HttpGithubClient::create_branch` in `crates/factory-infrastructure/src/github.rs`
 
 ### Implementation for User Story 2
-- [ ] T018 [US2] Implement `create_branch` on `HttpGitlabClient` via `POST /api/v4/projects/{id}/repository/branches` in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T019 [US2] Implement `create_commit_files` on `HttpGitlabClient` via `POST /api/v4/projects/{id}/repository/commits` in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T020 [US2] Implement `create_merge_request` on `HttpGitlabClient` via `POST /api/v4/projects/{id}/merge_requests` in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T021 [P] [US2] Implement `create_branch` on `HttpGithubClient` via `POST /repos/{owner}/{repo}/git/refs` in `crates/factory-infrastructure/src/github.rs`
-- [ ] T022 [US2] Wire `HttpGitlabClient` and `HttpGithubClient` dependencies into `create_mission_workflow` in `crates/factory-application/src/workflows/autonomous_mission.rs`
-- [ ] T023 [US2] Pass platform clients into `create_mission_workflow` from `crates/factory-cli/src/main.rs`
-- [ ] T024 [US2] Refactor Phase 5 (`factory-deliver`) to generate remote branch, commit file actions, open real MR targeting `main`, and post completion comment with the real MR link in `crates/factory-application/src/workflows/autonomous_mission.rs`
+- [x] T018 [US2] Implement `create_branch` on `HttpGitlabClient` via `POST /api/v4/projects/{id}/repository/branches` in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T019 [US2] Implement `create_commit_files` on `HttpGitlabClient` via `POST /api/v4/projects/{id}/repository/commits` in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T020 [US2] Implement `create_merge_request` on `HttpGitlabClient` via `POST /api/v4/projects/{id}/merge_requests` in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T021 [P] [US2] Implement `create_branch` on `HttpGithubClient` via `POST /repos/{owner}/{repo}/git/refs` in `crates/factory-infrastructure/src/github.rs`
+- [x] T022 [US2] Wire `HttpGitlabClient` and `HttpGithubClient` dependencies into `create_mission_workflow` in `crates/factory-application/src/workflows/autonomous_mission.rs`
+- [x] T023 [US2] Pass platform clients into `create_mission_workflow` from `crates/factory-cli/src/main.rs`
+- [x] T024 [US2] Refactor Phase 5 (`factory-deliver`) to generate remote branch, commit file actions, open real MR targeting `main`, and post completion comment with the real MR link in `crates/factory-application/src/workflows/autonomous_mission.rs`
 
 **Checkpoint**: At this point, Phase 5 successfully creates genuine remote branches and Merge Requests on GitLab and GitHub without mock stubs.
 
@@ -90,8 +90,8 @@
 **Independent Test**: Verify that a rejected security review or failed validation emits an escalation comment detailing failure logs and stash tags.
 
 ### Implementation for User Story 3
-- [ ] T025 [US3] Instrument failure branch in Phase 5 (`factory-deliver`) to post rejection diagnostic comments to the originating work item in `crates/factory-application/src/workflows/autonomous_mission.rs`
-- [ ] T026 [US3] Add circuit breaker escalation comment emitter in `crates/factory-application/src/workflows/comment_control.rs` and `crates/factory-application/src/poller_service.rs`
+- [x] T025 [US3] Instrument failure branch in Phase 5 (`factory-deliver`) to post rejection diagnostic comments to the originating work item in `crates/factory-application/src/workflows/autonomous_mission.rs`
+- [x] T026 [US3] Add circuit breaker escalation comment emitter in `crates/factory-application/src/workflows/comment_control.rs` and `crates/factory-application/src/poller_service.rs`
 
 ---
 
@@ -99,10 +99,10 @@
 
 **Purpose**: Ensure zero compiler warnings, clean formatting, and 100% test passing across the Cargo workspace.
 
-- [ ] T027 [P] Run `cargo fmt --all -- --check` across the entire workspace
-- [ ] T028 [P] Run `cargo clippy --workspace -- -D warnings` and fix any warnings
-- [ ] T029 Execute full test suite `cargo test --workspace` and ensure all tests pass
-- [ ] T030 Validate scenarios from `specs/001-workitem-status-and/quickstart.md`
+- [x] T027 [P] Run `cargo fmt --all -- --check` across the entire workspace
+- [x] T028 [P] Run `cargo clippy --workspace -- -D warnings` and fix any warnings
+- [x] T029 Execute full test suite `cargo test --workspace` and ensure all tests pass
+- [x] T030 Validate scenarios from `specs/001-workitem-status-and/quickstart.md`
 
 ---
 
