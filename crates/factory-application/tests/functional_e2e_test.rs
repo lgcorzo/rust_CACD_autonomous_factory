@@ -288,6 +288,7 @@ async fn test_live_k8s_dark_gravity_e2e_mission() {
                 goal: "E2E Functional Validation Test on Live K8s Cluster with All 7 Checks"
                     .to_string(),
                 repository_path: String::new(),
+                ..Default::default()
             };
 
             let run_res = hatchet

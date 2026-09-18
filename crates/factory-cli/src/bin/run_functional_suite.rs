@@ -125,6 +125,7 @@ async fn main() -> anyhow::Result<()> {
                 goal: "Kubernetes Functional Test Suite Run".to_string(),
                 repository_path: "/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory"
                     .to_string(),
+                ..Default::default()
             };
 
             println!(

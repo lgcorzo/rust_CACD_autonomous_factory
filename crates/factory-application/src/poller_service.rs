@@ -157,6 +157,8 @@ impl PollerDaemonService {
 
         let payload = serde_json::json!({
             "mission_id": format!("{}-{}", issue.repository.replace('/', "-"), issue.issue_number),
+            "goal": format!("Title: {}\nDescription: {}", issue.title, issue.body),
+            "repository_path": issue.repository,
             "source_platform": issue.source_platform,
             "repository": issue.repository,
             "issue_id": issue.issue_id,
