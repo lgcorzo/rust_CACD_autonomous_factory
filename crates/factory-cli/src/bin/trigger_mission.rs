@@ -38,6 +38,7 @@ async fn main() -> anyhow::Result<()> {
         mission_id: Some(mission_id.clone()),
         goal: goal.clone(),
         repository_path: String::new(),
+        ..Default::default()
     };
 
     tracing::info!(

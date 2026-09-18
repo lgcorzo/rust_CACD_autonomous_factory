@@ -85,6 +85,20 @@ pub trait GithubClient: Send + Sync {
         base: &str,
         body: &str,
     ) -> anyhow::Result<String>;
+
+    async fn post_issue_comment(
+        &self,
+        repo: &str,
+        issue_number: u64,
+        body: &str,
+    ) -> anyhow::Result<GithubComment>;
+
+    async fn create_branch(
+        &self,
+        repo: &str,
+        branch: &str,
+        base_branch: &str,
+    ) -> anyhow::Result<String>;
 }
 
 pub struct HttpGithubClient {
@@ -319,6 +333,95 @@ impl GithubClient for HttpGithubClient {
         let html_url = body_val["html_url"].as_str().unwrap_or("").to_string();
         Ok(html_url)
     }
+
+    async fn post_issue_comment(
+        &self,
+        repo: &str,
+        issue_number: u64,
+        body: &str,
+    ) -> anyhow::Result<GithubComment> {
+        let url = format!(
+            "{}/repos/{}/issues/{}/comments",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            issue_number
+        );
+        let payload = serde_json::json!({
+            "body": body
+        });
+
+        let mut req = self.client.post(&url).json(&payload);
+        if !self.api_token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.api_token));
+            req = req.header("Accept", "application/vnd.github.v3+json");
+        }
+
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitHub post issue comment failed with status {}", status);
+            anyhow::bail!("GitHub post issue comment failed with status {}", status);
+        }
+
+        let comment: GithubComment = res.json().await?;
+        Ok(comment)
+    }
+
+    async fn create_branch(
+        &self,
+        repo: &str,
+        branch: &str,
+        base_branch: &str,
+    ) -> anyhow::Result<String> {
+        let ref_url = format!(
+            "{}/repos/{}/git/ref/heads/{}",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            base_branch
+        );
+        let mut req = self.client.get(&ref_url);
+        if !self.api_token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.api_token));
+            req = req.header("Accept", "application/vnd.github.v3+json");
+        }
+
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitHub get base branch ref failed with status {}", status);
+            anyhow::bail!("GitHub get base branch ref failed with status {}", status);
+        }
+
+        let ref_data: serde_json::Value = res.json().await?;
+        let sha = ref_data["object"]["sha"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("Missing commit SHA in base ref"))?;
+
+        let create_url = format!(
+            "{}/repos/{}/git/refs",
+            self.api_url.trim_end_matches('/'),
+            repo
+        );
+        let payload = serde_json::json!({
+            "ref": format!("refs/heads/{}", branch),
+            "sha": sha
+        });
+
+        let mut create_req = self.client.post(&create_url).json(&payload);
+        if !self.api_token.is_empty() {
+            create_req = create_req.header("Authorization", format!("Bearer {}", self.api_token));
+            create_req = create_req.header("Accept", "application/vnd.github.v3+json");
+        }
+
+        let create_res = create_req.send().await?;
+        if !create_res.status().is_success() {
+            let status = create_res.status();
+            tracing::error!("GitHub create branch failed with status {}", status);
+            anyhow::bail!("GitHub create branch failed with status {}", status);
+        }
+
+        Ok(branch.to_string())
+    }
 }
 
 #[cfg(test)]
@@ -451,5 +554,73 @@ mod tests {
 
         assert_eq!(comment.id, 502);
         assert_eq!(comment.body, "Aethelgard status: DAG healthy, 0 errors.");
+    }
+
+    #[tokio::test]
+    async fn test_github_post_issue_comment() {
+        let mock_server = MockServer::start().await;
+
+        let comment_resp = ResponseTemplate::new(201).set_body_json(serde_json::json!({
+            "id": 601,
+            "body": "🚀 **Dark Gravity Mission Ingested**",
+            "user": { "login": "dark-gravity-bot" },
+            "html_url": "https://github.com/my-org/my-repo/issues/42#issuecomment-601",
+            "updated_at": "2026-09-18T20:00:00Z"
+        }));
+
+        Mock::given(method("POST"))
+            .and(path("/repos/my-org/my-repo/issues/42/comments"))
+            .respond_with(comment_resp)
+            .mount(&mock_server)
+            .await;
+
+        let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
+        let comment = client
+            .post_issue_comment("my-org/my-repo", 42, "🚀 **Dark Gravity Mission Ingested**")
+            .await
+            .unwrap();
+
+        assert_eq!(comment.id, 601);
+        assert_eq!(comment.body, "🚀 **Dark Gravity Mission Ingested**");
+    }
+
+    #[tokio::test]
+    async fn test_github_create_branch() {
+        let mock_server = MockServer::start().await;
+
+        let ref_resp = ResponseTemplate::new(200).set_body_json(serde_json::json!({
+            "ref": "refs/heads/main",
+            "object": {
+                "sha": "aa218f56b14c9653891f9e74264a383fa43fefbd",
+                "type": "commit"
+            }
+        }));
+
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/git/ref/heads/main"))
+            .respond_with(ref_resp)
+            .mount(&mock_server)
+            .await;
+
+        let create_resp = ResponseTemplate::new(201).set_body_json(serde_json::json!({
+            "ref": "refs/heads/mission-1234",
+            "object": {
+                "sha": "aa218f56b14c9653891f9e74264a383fa43fefbd"
+            }
+        }));
+
+        Mock::given(method("POST"))
+            .and(path("/repos/my-org/my-repo/git/refs"))
+            .respond_with(create_resp)
+            .mount(&mock_server)
+            .await;
+
+        let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
+        let branch = client
+            .create_branch("my-org/my-repo", "mission-1234", "main")
+            .await
+            .unwrap();
+
+        assert_eq!(branch, "mission-1234");
     }
 }

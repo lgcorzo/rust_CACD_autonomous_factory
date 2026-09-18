@@ -76,4 +76,6 @@ pub use sentry::{CrashEvent, HttpSentryClient, SentryClient};
 
 #[cfg(any(test, feature = "test-utils"))]
 pub use gitlab::MockGitlabClient;
-pub use gitlab::{GitlabClient, GitlabIssue, HttpGitlabClient};
+pub use gitlab::{
+    GitDeliveryResult, GitlabClient, GitlabCommitAction, GitlabIssue, HttpGitlabClient,
+};
