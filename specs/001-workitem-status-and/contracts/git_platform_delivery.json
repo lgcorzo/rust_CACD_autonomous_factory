@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GitPlatformDeliveryContract",
+  "description": "Contract for autonomous factory work item progress updates and remote branch delivery",
+  "definitions": {
+    "WorkItemProgressNotification": {
+      "type": "object",
+      "required": ["source_platform", "repository", "issue_number", "phase", "status", "markdown_body"],
+      "properties": {
+        "source_platform": {
+          "type": "string",
+          "enum": ["gitlab", "github"]
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$"
+        },
+        "issue_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "phase": {
+          "type": "string",
+          "enum": ["ingestion", "plan", "execute", "validate", "review", "deliver", "failure"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["in_progress", "completed", "failed", "rejected"]
+        },
+        "markdown_body": {
+          "type": "string"
+        }
+      }
+    },
+    "RemoteBranchDelivery": {
+      "type": "object",
+      "required": ["source_platform", "repository", "branch_name", "target_branch", "title", "files"],
+      "properties": {
+        "source_platform": {
+          "type": "string",
+          "enum": ["gitlab", "github"]
+        },
+        "repository": {
+          "type": "string"
+        },
+        "branch_name": {
+          "type": "string"
+        },
+        "target_branch": {
+          "type": "string",
+          "default": "main"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "content"],
+            "properties": {
+              "path": { "type": "string" },
+              "content": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
