@@ -10,6 +10,14 @@
 
 ---
 
+## Clarifications
+
+### Session 2026-09-18
+- Q: How should the factory agents record progress updates on the originating GitLab / GitHub issue? → A: Option A (Incremental Milestone Comments) - Post a new structured Markdown milestone comment at each key DAG phase transition (Ingestion, Plan, Code/Validate, Review, Delivery/Failure) to preserve an immutable audit trail and trigger notification feeds.
+- Q: How should the factory create the remote branch and deliver code changes in Phase 5? → A: Option A (Platform API Delivery) - Extend HttpGitlabClient and HttpGithubClient with post_issue_comment, create_branch, create_commit_files, and create_merge_request to perform atomic, credential-safe delivery via REST/GraphQL API without requiring shell git commands or workspace cloning.
+
+---
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Real-Time Status Comments on Originating Work Items (Priority: P1)
@@ -85,10 +93,10 @@ So that manual inspection and auto-remediation agents (like Jules) can inspect t
   - Validation completion (`ZeroClaw Validate` test suite results)
   - Review completion (`Rustant Review` approval/rejection outcome)
 - **FR-004**: System MUST format all status comments in clean, readable Markdown with standard icons, timestamps, and stage checklists.
-- **FR-005**: Phase 5 (`factory-deliver`) MUST execute real Git operations against the target repository:
-  - Create/checkout a dedicated mission branch
-  - Commit all generated files and patches
-  - Push the branch to the remote origin using platform authentication
+- **FR-005**: Phase 5 (`factory-deliver`) MUST execute real Git operations against the target repository via authenticated REST/GraphQL APIs:
+  - Create the remote mission branch via API (`create_branch`)
+  - Commit all generated files and patches via Commits API (`create_commit_files`)
+  - Authenticate using configured platform tokens (`GITLAB_API_TOKEN` / `GITHUB_API_TOKEN`) without shell credential exposure
 - **FR-006**: Phase 5 (`factory-deliver`) MUST create a real remote Merge Request (GitLab) or Pull Request (GitHub) connecting the pushed branch to the default repository branch.
 - **FR-007**: Phase 5 (`factory-deliver`) MUST post the final clickable Merge Request URL directly into the originating work item comment thread.
 - **FR-008**: System MUST handle git credential authentication dynamically using configured platform tokens (`GITLAB_API_TOKEN` / `GITHUB_API_TOKEN`).
