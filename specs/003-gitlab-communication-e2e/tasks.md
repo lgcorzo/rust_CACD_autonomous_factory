@@ -17,8 +17,8 @@
 
 **Purpose**: Test framework dependencies and contract schema validation
 
-- [ ] T001 Inspect and ensure dev-dependencies (`wiremock`, `tokio`, `serde_json`, `chrono`) are configured in crates/factory-application/Cargo.toml and crates/factory-infrastructure/Cargo.toml
-- [ ] T002 [P] Verify JSON schema contract validation for diagnostic scorecards in specs/003-gitlab-communication-e2e/contracts/gitlab_e2e_contract.json
+- [x] T001 Inspect and ensure dev-dependencies (`wiremock`, `tokio`, `serde_json`, `chrono`) are configured in crates/factory-application/Cargo.toml and crates/factory-infrastructure/Cargo.toml
+- [x] T002 [P] Verify JSON schema contract validation for diagnostic scorecards in specs/003-gitlab-communication-e2e/contracts/gitlab_e2e_contract.json
 
 ---
 
@@ -28,9 +28,9 @@
 
 **⚠️ CRITICAL**: Must be completed before User Story implementation begins
 
-- [ ] T003 [P] Implement GitlabVerificationReport and GitlabCheckResult domain data structures in crates/factory-application/src/gitlab_verifier.rs
-- [ ] T004 [P] Expose current user authentication check and project metadata probe methods in crates/factory-infrastructure/src/gitlab.rs
-- [ ] T005 Implement GitlabVerifier engine in crates/factory-application/src/gitlab_verifier.rs and export module in crates/factory-application/src/lib.rs
+- [x] T003 [P] Implement GitlabVerificationReport and GitlabCheckResult domain data structures in crates/factory-application/src/gitlab_verifier.rs
+- [x] T004 [P] Expose current user authentication check and project metadata probe methods in crates/factory-infrastructure/src/gitlab.rs
+- [x] T005 Implement GitlabVerifier engine in crates/factory-application/src/gitlab_verifier.rs and export module in crates/factory-application/src/lib.rs
 
 **Checkpoint**: Foundational verification models and engine ready for test harness integration.
 
@@ -44,12 +44,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [P] [US1] Create mock GitLab MR note fixtures for directives (/status, /interact, /spec, /refine, /retry, /validate) in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T007 [P] [US1] Set up wiremock server route expectations for MR notes, emoji awards, and note replies in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T008 [US1] Implement test asserting immediate eyes reaction award (POST /award_emoji) upon discovering tagged developer note in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T009 [US1] Implement test asserting Markdown resolution reply is posted back to MR thread (POST /notes) in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T010 [US1] Implement test asserting bot self-authored notes (DARK_GRAVITY_BOT_USERNAME) are ignored to prevent loops in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T011 [US1] Implement test asserting cursor idempotency guarantees zero duplicate reactions or comments in subsequent polling runs in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T006 [P] [US1] Create mock GitLab MR note fixtures for directives (/status, /interact, /spec, /refine, /retry, /validate) in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T007 [P] [US1] Set up wiremock server route expectations for MR notes, emoji awards, and note replies in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T008 [US1] Implement test asserting immediate eyes reaction award (POST /award_emoji) upon discovering tagged developer note in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T009 [US1] Implement test asserting Markdown resolution reply is posted back to MR thread (POST /notes) in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T010 [US1] Implement test asserting bot self-authored notes (DARK_GRAVITY_BOT_USERNAME) are ignored to prevent loops in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T011 [US1] Implement test asserting cursor idempotency guarantees zero duplicate reactions or comments in subsequent polling runs in crates/factory-application/tests/gitlab_e2e_integration_test.rs
 
 **Checkpoint**: User Story 1 (MR Directive & Reaction flow) fully verified end-to-end under wiremock.
 
@@ -63,10 +63,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [P] [US2] Add mock GitLab issue fixtures with autonomous-mission tags and resource bounds in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T013 [US2] Implement test validating resource limit extraction (CPU, RAM, Timeout) from GitLab issue body in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T014 [US2] Implement test validating Ed25519-signed NHI Verifiable Credential creation for ingested issue in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T015 [US2] Implement test asserting issue cursor persistence prevents re-ingestion in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T012 [P] [US2] Add mock GitLab issue fixtures with autonomous-mission tags and resource bounds in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T013 [US2] Implement test validating resource limit extraction (CPU, RAM, Timeout) from GitLab issue body in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T014 [US2] Implement test validating Ed25519-signed NHI Verifiable Credential creation for ingested issue in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T015 [US2] Implement test asserting issue cursor persistence prevents re-ingestion in crates/factory-application/tests/gitlab_e2e_integration_test.rs
 
 **Checkpoint**: User Story 2 (Issue Intake & Ingestion flow) verified end-to-end under wiremock.
 
@@ -80,10 +80,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T016 [P] [US3] Add gitlab-verify subcommand and CLI arguments (--gitlab-url, --gitlab-token, --gitlab-projects, --json) in crates/factory-cli/src/main.rs
-- [ ] T017 [US3] Wire GitlabVerifier into factory-cli to render formatted ASCII health table and JSON scorecard in crates/factory-cli/src/main.rs
-- [ ] T018 [P] [US3] Implement token-gated live GitLab integration test in crates/factory-application/tests/gitlab_live_e2e.rs
-- [ ] T019 [US3] Implement error diagnostic formatting and remediation hints in crates/factory-application/src/gitlab_verifier.rs for authentication failures (401) and missing projects (404)
+- [x] T016 [P] [US3] Add gitlab-verify subcommand and CLI arguments (--gitlab-url, --gitlab-token, --gitlab-projects, --json) in crates/factory-cli/src/main.rs
+- [x] T017 [US3] Wire GitlabVerifier into factory-cli to render formatted ASCII health table and JSON scorecard in crates/factory-cli/src/main.rs
+- [x] T018 [P] [US3] Implement token-gated live GitLab integration test in crates/factory-application/tests/gitlab_live_e2e.rs
+- [x] T019 [US3] Implement error diagnostic formatting and remediation hints in crates/factory-application/src/gitlab_verifier.rs for authentication failures (401) and missing projects (404)
 
 **Checkpoint**: User Story 3 (CLI Diagnostic & Live Platform Verification) complete.
 
@@ -93,9 +93,9 @@
 
 **Purpose**: End-to-end regression testing, formatting, and linting compliance
 
-- [ ] T020 Run complete hermetic E2E test suite in crates/factory-application/tests/gitlab_e2e_integration_test.rs
-- [ ] T021 [P] Verify full workspace unit and integration test pass: cargo test --workspace
-- [ ] T022 [P] Enforce formatting and clippy linter cleanliness: cargo fmt -- --check && cargo clippy --workspace --all-targets -- -D warnings
+- [x] T020 Run complete hermetic E2E test suite in crates/factory-application/tests/gitlab_e2e_integration_test.rs
+- [x] T021 [P] Verify full workspace unit and integration test pass: cargo test --workspace
+- [x] T022 [P] Enforce formatting and clippy linter cleanliness: cargo fmt -- --check && cargo clippy --workspace --all-targets -- -D warnings
 
 ---
 
