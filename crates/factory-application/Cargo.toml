@@ -32,3 +32,4 @@ chrono.workspace = true
 
 [dev-dependencies]
 factory-infrastructure = { path = "../factory-infrastructure", features = ["test-utils"] }
+wiremock = { workspace = true }

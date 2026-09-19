@@ -82,6 +82,24 @@ enum Commands {
         )]
         bot_username: String,
     },
+    /// Verify GitLab connectivity, authentication, and communication channels
+    GitlabVerify {
+        #[arg(long, env = "GITLAB_URL", default_value = "https://gitlab.com")]
+        gitlab_url: String,
+
+        #[arg(long, env = "GITLAB_API_TOKEN")]
+        gitlab_token: Option<String>,
+
+        #[arg(
+            long,
+            env = "GITLAB_PROJECTS",
+            default_value = "lgcorzo/fastapi-autogen-team"
+        )]
+        gitlab_projects: String,
+
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 #[tokio::main]
@@ -316,6 +334,97 @@ async fn main() -> anyhow::Result<()> {
                 std::process::exit(0);
             } else {
                 tracing::error!("OSR validation failed with {}%", osr * 100.0);
+                std::process::exit(1);
+            }
+        }
+        Commands::GitlabVerify {
+            gitlab_url,
+            gitlab_token,
+            gitlab_projects,
+            json,
+        } => {
+            let token = match gitlab_token {
+                Some(t) if !t.trim().is_empty() => t,
+                _ => {
+                    eprintln!("Error: GITLAB_API_TOKEN is required for gitlab-verify.");
+                    anyhow::bail!("GITLAB_API_TOKEN is required.");
+                }
+            };
+
+            let projects: Vec<String> = gitlab_projects
+                .split(',')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect();
+
+            let client = std::sync::Arc::new(
+                factory_infrastructure::gitlab::HttpGitlabClient::new(gitlab_url.clone(), token),
+            );
+            let verifier =
+                factory_application::gitlab_verifier::GitlabVerifier::new(client, gitlab_url);
+
+            let report = verifier.verify_all(&projects).await;
+
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!();
+                println!(
+                    "┌─────────────────────────────────────────────────────────────────────────────┐"
+                );
+                println!(
+                    "│              Dark Gravity GitLab Communication Health Scorecard              │"
+                );
+                println!(
+                    "├───────────────────────────────┬───────────────────────────┬─────────────────┤"
+                );
+                println!(
+                    "│ Check                         │ Target                    │ Status          │"
+                );
+                println!(
+                    "├───────────────────────────────┼───────────────────────────┼─────────────────┤"
+                );
+                for check in &report.checks {
+                    let status_str = match check.status {
+                        factory_application::gitlab_verifier::CheckStatus::Success => {
+                            format!("PASSED ({}ms)", check.latency_ms)
+                        }
+                        factory_application::gitlab_verifier::CheckStatus::Warning => {
+                            format!("WARNING ({}ms)", check.latency_ms)
+                        }
+                        factory_application::gitlab_verifier::CheckStatus::Failure => {
+                            format!("FAILED ({}ms)", check.latency_ms)
+                        }
+                        factory_application::gitlab_verifier::CheckStatus::Skipped => {
+                            "SKIPPED".to_string()
+                        }
+                    };
+                    let target_display = if check.target.len() > 25 {
+                        format!("{}...", &check.target[..22])
+                    } else {
+                        check.target.clone()
+                    };
+                    println!(
+                        "│ {:<29} │ {:<25} │ {:<15} │",
+                        check.check_name, target_display, status_str
+                    );
+                }
+                println!(
+                    "└───────────────────────────────┴───────────────────────────┴─────────────────┘"
+                );
+                println!("Overall Status: {:?}", report.overall_status);
+                println!("Execution Duration: {}ms", report.execution_duration_ms);
+                println!();
+                for check in &report.checks {
+                    if let Some(hint) = &check.remediation_hint {
+                        println!("⚠️ [Remediation for '{}']: {}", check.check_name, hint);
+                    }
+                }
+            }
+
+            if report.overall_status
+                == factory_application::gitlab_verifier::VerificationStatus::Failed
+            {
                 std::process::exit(1);
             }
         }

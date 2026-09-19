@@ -10,9 +10,13 @@ pub trait Agent: Send + Sync {
 
 pub mod agents;
 pub mod bridge;
+pub mod gitlab_verifier;
 pub mod poller_service;
 pub mod telemetry_export;
 pub mod utils;
 pub mod workflows;
 
+pub use gitlab_verifier::{
+    CheckStatus, GitlabCheckResult, GitlabVerificationReport, GitlabVerifier, VerificationStatus,
+};
 pub use poller_service::{PollerCycleStats, PollerDaemonService};

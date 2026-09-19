@@ -147,6 +147,10 @@ pub trait GitlabClient: Send + Sync {
         note_id: u64,
         emoji_name: &str,
     ) -> anyhow::Result<GitlabAwardEmoji>;
+
+    async fn check_current_user(&self) -> anyhow::Result<GitlabAuthor>;
+
+    async fn get_project(&self, project_id: &str) -> anyhow::Result<bool>;
 }
 
 pub struct HttpGitlabClient {
@@ -541,6 +545,50 @@ impl GitlabClient for HttpGitlabClient {
         let emoji: GitlabAwardEmoji = res.json().await?;
         Ok(emoji)
     }
+
+    async fn check_current_user(&self) -> anyhow::Result<GitlabAuthor> {
+        let get_url = format!("{}/api/v4/user", self.url.trim_end_matches('/'));
+        let res = self
+            .client
+            .get(&get_url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab check current user failed with status {}", status);
+            anyhow::bail!("GitLab check current user failed with status {}", status);
+        }
+
+        let user: GitlabAuthor = res.json().await?;
+        Ok(user)
+    }
+
+    async fn get_project(&self, project_id: &str) -> anyhow::Result<bool> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let get_url = format!(
+            "{}/api/v4/projects/{}",
+            self.url.trim_end_matches('/'),
+            encoded_project_id
+        );
+        let res = self
+            .client
+            .get(&get_url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .send()
+            .await?;
+
+        if res.status().is_success() {
+            Ok(true)
+        } else if res.status() == reqwest::StatusCode::NOT_FOUND {
+            Ok(false)
+        } else {
+            let status = res.status();
+            tracing::error!("GitLab get project failed with status {}", status);
+            anyhow::bail!("GitLab get project failed with status {}", status);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -792,5 +840,51 @@ mod tests {
             mr.web_url,
             "https://gitlab.com/my-org/my-project/-/merge_requests/12"
         );
+    }
+
+    #[tokio::test]
+    async fn test_gitlab_check_current_user() {
+        let mock_server = MockServer::start().await;
+        let client = HttpGitlabClient::new(mock_server.uri(), "test_token".to_string());
+
+        let user_resp = json!({
+            "username": "darkgravity-bot"
+        });
+
+        Mock::given(method("GET"))
+            .and(path("/api/v4/user"))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(user_resp))
+            .mount(&mock_server)
+            .await;
+
+        let user = client.check_current_user().await.unwrap();
+        assert_eq!(user.username, "darkgravity-bot");
+    }
+
+    #[tokio::test]
+    async fn test_gitlab_get_project() {
+        let mock_server = MockServer::start().await;
+        let client = HttpGitlabClient::new(mock_server.uri(), "test_token".to_string());
+
+        Mock::given(method("GET"))
+            .and(path("/api/v4/projects/my-org%2Fmy-project"))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({"id": 123})))
+            .mount(&mock_server)
+            .await;
+
+        Mock::given(method("GET"))
+            .and(path("/api/v4/projects/my-org%2Fmissing-project"))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(404))
+            .mount(&mock_server)
+            .await;
+
+        let exists = client.get_project("my-org/my-project").await.unwrap();
+        assert!(exists);
+
+        let missing = client.get_project("my-org/missing-project").await.unwrap();
+        assert!(!missing);
     }
 }
