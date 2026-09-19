@@ -140,7 +140,11 @@ impl GitPlatformPoller {
 
                 if let Some(directive) = PRDirective::parse(&comment.body) {
                     if let Err(e) = client.add_comment_reaction(repo, comment.id, "eyes").await {
-                        tracing::warn!("Failed to add eyes reaction to GitHub comment {}: {}", comment.id, e);
+                        tracing::warn!(
+                            "Failed to add eyes reaction to GitHub comment {}: {}",
+                            comment.id,
+                            e
+                        );
                     }
 
                     let updated_at = comment.updated_at.unwrap_or_else(Utc::now);

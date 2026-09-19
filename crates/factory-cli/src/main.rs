@@ -196,12 +196,8 @@ async fn main() -> anyhow::Result<()> {
             };
 
             let poller = Arc::new(
-                GitPlatformPoller::new(
-                    gh_client.clone(),
-                    gl_client.clone(),
-                    cursor_store,
-                )
-                .with_bot_username(bot_username),
+                GitPlatformPoller::new(gh_client.clone(), gl_client.clone(), cursor_store)
+                    .with_bot_username(bot_username),
             );
 
             let mcp_client = Arc::new(McpHttpClient::new(mcp_url));

@@ -16,7 +16,9 @@ async fn test_gitlab_add_merge_request_note_award_emoji() {
     });
 
     Mock::given(method("POST"))
-        .and(path("/api/v4/projects/my-group%2Fmy-project/merge_requests/12/notes/34/award_emoji"))
+        .and(path(
+            "/api/v4/projects/my-group%2Fmy-project/merge_requests/12/notes/34/award_emoji",
+        ))
         .and(header("PRIVATE-TOKEN", "gl-token-123"))
         .respond_with(ResponseTemplate::new(201).set_body_json(response_body))
         .mount(&mock_server)
