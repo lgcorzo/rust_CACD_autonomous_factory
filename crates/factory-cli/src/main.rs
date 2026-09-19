@@ -74,6 +74,13 @@ enum Commands {
             default_value = "http://jules-cloud-vm.internal:8080/mcp"
         )]
         aethalgard_webhook_url: String,
+
+        #[arg(
+            long,
+            env = "DARK_GRAVITY_BOT_USERNAME",
+            default_value = "darkgravity-bot"
+        )]
+        bot_username: String,
     },
 }
 
@@ -149,6 +156,7 @@ async fn main() -> anyhow::Result<()> {
             r2r_url,
             kafka_brokers,
             aethalgard_webhook_url,
+            bot_username,
         } => {
             use factory_application::poller_service::PollerDaemonService;
             use factory_application::workflows::comment_control::CommentControlService;
@@ -187,11 +195,10 @@ async fn main() -> anyhow::Result<()> {
                 Arc::new(InMemoryCursorStore::new())
             };
 
-            let poller = Arc::new(GitPlatformPoller::new(
-                gh_client.clone(),
-                gl_client.clone(),
-                cursor_store,
-            ));
+            let poller = Arc::new(
+                GitPlatformPoller::new(gh_client.clone(), gl_client.clone(), cursor_store)
+                    .with_bot_username(bot_username),
+            );
 
             let mcp_client = Arc::new(McpHttpClient::new(mcp_url));
             let r2r_user = std::env::var("R2R_SUPERUSER_EMAIL")

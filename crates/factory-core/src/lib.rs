@@ -186,15 +186,33 @@ pub enum PRDirective {
     Refine { instruction: String },
     Retry,
     Status,
+    Validate,
+    Interact { prompt: String },
 }
 
 impl PRDirective {
     pub fn parse(text: &str) -> Option<Self> {
         let trimmed = text.trim();
-        let command_str = if let Some(idx) = trimmed.find("@dark-gravity") {
-            trimmed[idx + "@dark-gravity".len()..].trim()
+        let lower = trimmed.to_lowercase();
+
+        let tags = ["@darkgravity", "@dark-gravity", "@antigravity"];
+        let mut matched_tag = None;
+        for tag in tags {
+            if let Some(pos) = lower.find(tag) {
+                matched_tag = Some((pos, pos + tag.len()));
+                break;
+            }
+        }
+
+        let command_str = if let Some((start, end)) = matched_tag {
+            let after = trimmed[end..].trim();
+            if !after.is_empty() {
+                after.to_string()
+            } else {
+                trimmed[..start].trim().to_string()
+            }
         } else if trimmed.starts_with('/') {
-            trimmed
+            trimmed.to_string()
         } else {
             return None;
         };
@@ -211,6 +229,12 @@ impl PRDirective {
             Some(PRDirective::Retry)
         } else if command_str.starts_with("/status") {
             Some(PRDirective::Status)
+        } else if command_str.starts_with("/validate") {
+            Some(PRDirective::Validate)
+        } else if !command_str.is_empty() {
+            Some(PRDirective::Interact {
+                prompt: command_str.trim().to_string(),
+            })
         } else {
             None
         }
@@ -255,6 +279,8 @@ pub struct PRCommentEvent {
     pub directive: PRDirective,
     pub updated_at: DateTime<Utc>,
     pub html_url: String,
+    #[serde(default)]
+    pub thread_context: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
