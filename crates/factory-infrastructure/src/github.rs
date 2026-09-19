@@ -23,9 +23,16 @@ pub struct GithubPullRequest {
     pub updated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct GithubUser {
     pub login: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct GithubReaction {
+    pub id: u64,
+    pub content: String,
+    pub user: Option<GithubUser>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -99,6 +106,13 @@ pub trait GithubClient: Send + Sync {
         branch: &str,
         base_branch: &str,
     ) -> anyhow::Result<String>;
+
+    async fn add_comment_reaction(
+        &self,
+        repo: &str,
+        comment_id: u64,
+        reaction: &str,
+    ) -> anyhow::Result<GithubReaction>;
 }
 
 pub struct HttpGithubClient {
@@ -421,6 +435,38 @@ impl GithubClient for HttpGithubClient {
         }
 
         Ok(branch.to_string())
+    }
+
+    async fn add_comment_reaction(
+        &self,
+        repo: &str,
+        comment_id: u64,
+        reaction: &str,
+    ) -> anyhow::Result<GithubReaction> {
+        let url = format!(
+            "{}/repos/{}/issues/comments/{}/reactions",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            comment_id
+        );
+        let payload = serde_json::json!({ "content": reaction });
+
+        let mut req = self.client.post(&url).json(&payload);
+        if !self.api_token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.api_token));
+        }
+        req = req.header("Accept", "application/vnd.github+json");
+        req = req.header("User-Agent", "DarkGravity-Factory");
+
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitHub add comment reaction failed with status {}", status);
+            anyhow::bail!("GitHub add comment reaction failed with status {}", status);
+        }
+
+        let reaction_obj: GithubReaction = res.json().await?;
+        Ok(reaction_obj)
     }
 }
 

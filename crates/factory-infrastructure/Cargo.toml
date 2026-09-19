@@ -33,6 +33,7 @@ base64 = "0.22"
 ziti-sdk = "0.3"
 
 [dev-dependencies]
+factory-infrastructure = { path = ".", features = ["test-utils"] }
 rand = "0.8"
 
 

@@ -23,7 +23,7 @@ pub struct GitlabMergeRequest {
     pub updated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct GitlabAuthor {
     pub username: String,
 }
@@ -42,6 +42,13 @@ pub struct GitlabCommitAction {
     pub file_path: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct GitlabAwardEmoji {
+    pub id: u64,
+    pub name: String,
+    pub user: GitlabAuthor,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -132,6 +139,14 @@ pub trait GitlabClient: Send + Sync {
         title: &str,
         description: &str,
     ) -> anyhow::Result<GitlabMergeRequest>;
+
+    async fn add_merge_request_note_award_emoji(
+        &self,
+        project_id: &str,
+        mr_iid: u64,
+        note_id: u64,
+        emoji_name: &str,
+    ) -> anyhow::Result<GitlabAwardEmoji>;
 }
 
 pub struct HttpGitlabClient {
@@ -490,6 +505,41 @@ impl GitlabClient for HttpGitlabClient {
 
         let mr: GitlabMergeRequest = res.json().await?;
         Ok(mr)
+    }
+
+    async fn add_merge_request_note_award_emoji(
+        &self,
+        project_id: &str,
+        mr_iid: u64,
+        note_id: u64,
+        emoji_name: &str,
+    ) -> anyhow::Result<GitlabAwardEmoji> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let post_url = format!(
+            "{}/api/v4/projects/{}/merge_requests/{}/notes/{}/award_emoji",
+            self.url.trim_end_matches('/'),
+            encoded_project_id,
+            mr_iid,
+            note_id
+        );
+        let payload = serde_json::json!({ "name": emoji_name });
+
+        let res = self
+            .client
+            .post(&post_url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .json(&payload)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab add award emoji failed with status {}", status);
+            anyhow::bail!("GitLab add award emoji failed with status {}", status);
+        }
+
+        let emoji: GitlabAwardEmoji = res.json().await?;
+        Ok(emoji)
     }
 }
 
