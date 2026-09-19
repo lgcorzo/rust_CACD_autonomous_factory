@@ -10,6 +10,7 @@ pub struct GitPlatformPoller {
     gitlab_client: Option<Arc<dyn GitlabClient>>,
     cursor_store: Arc<dyn CursorStore>,
     required_issue_labels: Vec<String>,
+    bot_username: Option<String>,
 }
 
 impl GitPlatformPoller {
@@ -26,11 +27,17 @@ impl GitPlatformPoller {
                 "autonomous-mission".to_string(),
                 "dark-gravity".to_string(),
             ],
+            bot_username: None,
         }
     }
 
     pub fn with_labels(mut self, labels: Vec<String>) -> Self {
         self.required_issue_labels = labels;
+        self
+    }
+
+    pub fn with_bot_username(mut self, bot_username: impl Into<String>) -> Self {
+        self.bot_username = Some(bot_username.into());
         self
     }
 
@@ -115,7 +122,13 @@ impl GitPlatformPoller {
             let comments = client
                 .list_pull_request_comments(repo, pr.number, since)
                 .await?;
-            for comment in comments {
+            for comment in &comments {
+                if let Some(bot) = &self.bot_username {
+                    if comment.user.login.eq_ignore_ascii_case(bot) {
+                        continue;
+                    }
+                }
+
                 let event_hash = format!("comment:{}:{}:{}", repo, pr.number, comment.id);
                 if self
                     .cursor_store
@@ -126,17 +139,32 @@ impl GitPlatformPoller {
                 }
 
                 if let Some(directive) = PRDirective::parse(&comment.body) {
+                    if let Err(e) = client.add_comment_reaction(repo, comment.id, "eyes").await {
+                        tracing::warn!(
+                            "Failed to add eyes reaction to GitHub comment {}: {}",
+                            comment.id,
+                            e
+                        );
+                    }
+
                     let updated_at = comment.updated_at.unwrap_or_else(Utc::now);
+                    let thread_context: Vec<String> = comments
+                        .iter()
+                        .take_while(|c| c.id != comment.id)
+                        .map(|c| format!("{}: {}", c.user.login, c.body))
+                        .collect();
+
                     let event = PRCommentEvent {
                         source_platform: "github".to_string(),
                         repository: repo.to_string(),
                         pr_number: pr.number,
                         comment_id: comment.id,
-                        author: comment.user.login,
-                        body: comment.body,
+                        author: comment.user.login.clone(),
+                        body: comment.body.clone(),
                         directive,
                         updated_at,
-                        html_url: comment.html_url,
+                        html_url: comment.html_url.clone(),
+                        thread_context,
                     };
 
                     self.cursor_store
@@ -245,7 +273,13 @@ impl GitPlatformPoller {
             let notes = client
                 .list_merge_request_notes(project_id, mr.iid, since)
                 .await?;
-            for note in notes {
+            for note in &notes {
+                if let Some(bot) = &self.bot_username {
+                    if note.author.username.eq_ignore_ascii_case(bot) {
+                        continue;
+                    }
+                }
+
                 let event_hash = format!("note:{}:{}:{}", project_id, mr.iid, note.id);
                 if self
                     .cursor_store
@@ -256,17 +290,35 @@ impl GitPlatformPoller {
                 }
 
                 if let Some(directive) = PRDirective::parse(&note.body) {
+                    if let Err(e) = client
+                        .add_merge_request_note_award_emoji(project_id, mr.iid, note.id, "eyes")
+                        .await
+                    {
+                        tracing::warn!(
+                            "Failed to add eyes reaction to GitLab MR note {}: {}",
+                            note.id,
+                            e
+                        );
+                    }
+
                     let updated_at = note.updated_at.unwrap_or_else(Utc::now);
+                    let thread_context: Vec<String> = notes
+                        .iter()
+                        .take_while(|n| n.id != note.id)
+                        .map(|n| format!("{}: {}", n.author.username, n.body))
+                        .collect();
+
                     let event = PRCommentEvent {
                         source_platform: "gitlab".to_string(),
                         repository: project_id.to_string(),
                         pr_number: mr.iid,
                         comment_id: note.id,
-                        author: note.author.username,
-                        body: note.body,
+                        author: note.author.username.clone(),
+                        body: note.body.clone(),
                         directive,
                         updated_at,
                         html_url: format!("{}/#note_{}", mr.web_url, note.id),
+                        thread_context,
                     };
 
                     self.cursor_store
@@ -294,15 +346,26 @@ mod tests {
     use super::*;
     use crate::cursor_store::InMemoryCursorStore;
     use crate::github::{
-        GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient,
+        GithubComment, GithubIssue, GithubPullRequest, GithubReaction, GithubUser, MockGithubClient,
     };
     use crate::gitlab::{
-        GitlabAuthor, GitlabIssue, GitlabMergeRequest, GitlabNote, MockGitlabClient,
+        GitlabAuthor, GitlabAwardEmoji, GitlabIssue, GitlabMergeRequest, GitlabNote,
+        MockGitlabClient,
     };
 
     #[tokio::test]
     async fn test_github_poller_issue_and_directive_flow() {
         let mut mock_gh = MockGithubClient::new();
+
+        mock_gh
+            .expect_add_comment_reaction()
+            .returning(|_repo, _comment_id, reaction| {
+                Ok(GithubReaction {
+                    id: 1,
+                    content: reaction.to_string(),
+                    user: None,
+                })
+            });
 
         mock_gh
             .expect_list_issues_updated_since()
@@ -392,6 +455,18 @@ mod tests {
     #[tokio::test]
     async fn test_gitlab_poller_issue_and_directive_flow() {
         let mut mock_gl = MockGitlabClient::new();
+
+        mock_gl
+            .expect_add_merge_request_note_award_emoji()
+            .returning(|_project, _mr_iid, _note_id, name| {
+                Ok(GitlabAwardEmoji {
+                    id: 1,
+                    name: name.to_string(),
+                    user: GitlabAuthor {
+                        username: "darkgravity-bot".to_string(),
+                    },
+                })
+            });
 
         mock_gl
             .expect_list_issues_updated_since()

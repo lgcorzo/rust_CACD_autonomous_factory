@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MRCommentInteractionEvent",
+  "description": "Contract for merge request comments tagged for Dark Gravity interaction and acknowledgment",
+  "type": "object",
+  "required": [
+    "source_platform",
+    "repository",
+    "pr_number",
+    "comment_id",
+    "author",
+    "body",
+    "directive",
+    "updated_at",
+    "html_url"
+  ],
+  "properties": {
+    "source_platform": {
+      "type": "string",
+      "enum": ["gitlab", "github"]
+    },
+    "repository": {
+      "type": "string",
+      "description": "Project ID or owner/repo format"
+    },
+    "pr_number": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "comment_id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "author": {
+      "type": "string",
+      "description": "Username of the comment author"
+    },
+    "body": {
+      "type": "string",
+      "description": "Raw markdown body of the comment"
+    },
+    "directive": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["spec", "refine", "retry", "status", "validate", "interact"]
+        },
+        "payload": {
+          "type": ["string", "object", "null"]
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "html_url": {
+      "type": "string",
+      "format": "uri"
+    }
+  }
+}

@@ -1969,6 +1969,7 @@ dependencies = [
  "chrono",
  "ed25519-dalek",
  "factory-core",
+ "factory-infrastructure",
  "futures-util",
  "hex",
  "mockall",
