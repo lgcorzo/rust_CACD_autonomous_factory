@@ -52,6 +52,76 @@ Dark Gravity continuously polls and autonomously executes missions across config
 
 ---
 
+## 🎮 Controlling Dark Gravity from GitLab & GitHub
+
+Dark Gravity includes native outbound polling daemons and event handlers that listen for issues, work items, and pull/merge request discussions across configured GitHub and GitLab repositories.
+
+### 1. Triggering Missions via Issues & Work Items
+
+To trigger an autonomous mission, create an issue or work item in any integrated repository (such as `lgcorzo/rust_CACD_autonomous_factory` or `lgcorzo/lince-rs`):
+
+- **Required Labels** (at least one):
+  - `autonomous-mission`
+  - `dark-gravity`
+- **Resource Limits Definition**:
+  Include an explicit resource limit block within the issue description. The poller automatically parses these constraints using regex:
+  ```markdown
+  Resource limits: CPU: 500m, RAM: 512Mi, Timeout: 300s
+  ```
+- **Autonomous Ingestion & Zero-Trust Identity**:
+  1. The poller extracts title, description, labels, and resource limits.
+  2. Generates a cryptographic **Ed25519-signed Verifiable Credential (VC)** for Non-Human Identity (NHI) under `did:factory:dark-gravity-euskadi`.
+  3. Publishes the mission specification to Kafka topic `mission-input`.
+  4. Records the event in the `CursorStore` to ensure **idempotent, single-execution processing** across polling intervals.
+
+### 2. Interactive Directives on PRs and MRs
+
+Dark Gravity actively listens to comments on active GitHub Pull Requests (PRs) and GitLab Merge Requests (MRs). When a developer or architect tags the bot with a directive:
+
+```text
+@darkgravity /<command> [optional prompt/instruction]
+```
+*(Also accepts `@dark-gravity`)*
+
+#### Supported Directives
+
+| Directive | Description | Agent Action |
+|:---|:---|:---|
+| `@darkgravity /status` | Queries real-time factory health and DAG state. | Generates a markdown system report with repository, PR target, DAG health, sandbox status, and FinOps budget state. |
+| `@darkgravity /interact <prompt>` | Natural-language query or technical instruction. | Triggers Rustant (PO) to analyze the query with contextual knowledge and reply directly in the thread. |
+| `@darkgravity /spec <prompt>` | Requests a specification review or modification. | Triggers Rustant (PO) to re-evaluate `spec.md` against provided requirements and stage revisions. |
+| `@darkgravity /refine <instruction>` | Requests localized code edits or targeted bugfixes. | Triggers ZeroClaw (Dev) to apply surgical code mutations in the gVisor sandbox (≤30MiB RAM). |
+| `@darkgravity /validate` | Requests full test and security verification. | Executes automated test suites and SAST security gates within the sandbox, reporting CVE and pass/fail status. |
+| `@darkgravity /retry` | Forces a restart of the execution loop. | Restarts the Aethelgard verification loop and re-runs failed test suites. |
+
+### 3. Immediate Feedback & Loop Prevention
+
+- **Instant Acknowledgement**: Upon receiving any valid directive, Dark Gravity immediately awards an **`👀` (eyes)** emoji reaction to the user's note/comment to signal receipt before processing begins.
+- **Contextual Thread Replies**: Once execution finishes, Dark Gravity replies directly to the originating discussion thread with structured markdown reports.
+- **Bot Loop Suppression**: Any notes authored by `DARK_GRAVITY_BOT_USERNAME` (default `darkgravity-bot`) are automatically ignored to prevent recursive comment loops.
+
+### 4. Live Health Probing CLI
+
+Operators can verify GitLab/GitHub connectivity, token scopes, and project accessibility using the native CLI:
+
+```bash
+# Verify live GitLab communication and project permissions
+cargo run --bin factory-cli -- gitlab-verify \
+  --gitlab-token "$GITLAB_API_TOKEN" \
+  --gitlab-projects "lgcorzo/lince-rs,lgcorzo/fastapi-autogen-team"
+
+# Output machine-readable JSON scorecard
+cargo run --bin factory-cli -- gitlab-verify --json
+```
+
+### 5. Branch & Pull Request Policy: Human-in-the-Loop (HITL)
+
+- Autonomous agents create isolated feature branches, commit code, and open Pull Requests (GitHub) or Merge Requests (GitLab).
+- **Strict Manual Merge Requirement**: Dark Gravity **never** automatically merges PRs or MRs into `main` or default production branches.
+- Once all automated CI/CD and CodeQL checks pass, the agent hands off the PR/MR link to the human developer for final manual review and merge.
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
