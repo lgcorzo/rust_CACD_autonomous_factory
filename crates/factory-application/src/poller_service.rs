@@ -219,7 +219,7 @@ mod tests {
     use factory_infrastructure::aethalgard::MockAethalgardClient;
     use factory_infrastructure::cursor_store::InMemoryCursorStore;
     use factory_infrastructure::github::{
-        GithubComment, GithubIssue, GithubPullRequest, GithubUser, MockGithubClient,
+        GithubComment, GithubIssue, GithubPullRequest, GithubReaction, GithubUser, MockGithubClient,
     };
     use factory_infrastructure::kafka::SimpleMockKafkaClient;
     use factory_infrastructure::mcp_client::MockMcpClient;
@@ -228,6 +228,16 @@ mod tests {
     #[tokio::test]
     async fn test_poller_daemon_full_cycle() {
         let mut mock_gh = MockGithubClient::new();
+
+        mock_gh
+            .expect_add_comment_reaction()
+            .returning(|_repo, _comment_id, reaction| {
+                Ok(GithubReaction {
+                    id: 1,
+                    content: reaction.to_string(),
+                    user: None,
+                })
+            });
 
         mock_gh
             .expect_list_issues_updated_since()
