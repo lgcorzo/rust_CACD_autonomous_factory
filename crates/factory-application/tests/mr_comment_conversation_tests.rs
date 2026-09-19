@@ -91,7 +91,11 @@ async fn test_comment_control_interact_and_validate_directives() {
     let output_interact = service.handle_directive(&input_interact).await.unwrap();
     assert_eq!(output_interact.directive_type, "interact");
     assert!(output_interact.comment_posted);
-    assert!(output_interact.response_body.contains("can you explain the architectural impact?"));
+    assert!(
+        output_interact
+            .response_body
+            .contains("can you explain the architectural impact?")
+    );
 
     // Test 2: GitLab Validate Directive
     let input_validate = CommentControlInput {
@@ -104,7 +108,8 @@ async fn test_comment_control_interact_and_validate_directives() {
             body: "@darkgravity /validate".to_string(),
             directive: PRDirective::Validate,
             updated_at: Utc::now(),
-            html_url: "https://gitlab.com/gitlab-org/gl-repo/-/merge_requests/88#note_502".to_string(),
+            html_url: "https://gitlab.com/gitlab-org/gl-repo/-/merge_requests/88#note_502"
+                .to_string(),
             thread_context: vec![],
         },
     };

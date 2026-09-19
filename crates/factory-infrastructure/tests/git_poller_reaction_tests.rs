@@ -2,7 +2,9 @@ use chrono::Utc;
 use factory_core::PRDirective;
 use factory_infrastructure::cursor_store::InMemoryCursorStore;
 use factory_infrastructure::git_poller::GitPlatformPoller;
-use factory_infrastructure::github::{GithubComment, GithubPullRequest, GithubReaction, GithubUser, MockGithubClient};
+use factory_infrastructure::github::{
+    GithubComment, GithubPullRequest, GithubReaction, GithubUser, MockGithubClient,
+};
 use factory_infrastructure::gitlab::{
     GitlabAuthor, GitlabAwardEmoji, GitlabMergeRequest, GitlabNote, MockGitlabClient,
 };
