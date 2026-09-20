@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SastEvaluationContract",
+  "description": "Schema for heterogeneous LLM-as-a-Judge and static analysis evaluation output in Aethelgard Loop",
+  "type": "object",
+  "properties": {
+    "scan_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "judge_model_family": {
+      "type": "string",
+      "description": "Identifier of the independent evaluator model family (e.g. gpt-4o, claude-3-5-sonnet, deepseek-r1)"
+    },
+    "generator_model_family": {
+      "type": "string",
+      "description": "Identifier of the generator model (e.g. bonsai-27b-ternary, qwen-2.5-coder-7b)"
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 10.0
+    },
+    "is_safe": {
+      "type": "boolean"
+    },
+    "critical_vulnerabilities_detected": {
+      "type": "boolean"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gate_passed": {
+      "type": "boolean",
+      "description": "True only if score >= 8.0 and critical_vulnerabilities_detected is false"
+    }
+  },
+  "required": [
+    "scan_id",
+    "evaluated_at",
+    "judge_model_family",
+    "generator_model_family",
+    "score",
+    "is_safe",
+    "critical_vulnerabilities_detected",
+    "gate_passed"
+  ]
+}
