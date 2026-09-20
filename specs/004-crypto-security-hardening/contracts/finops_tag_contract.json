@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FinOpsTagContract",
+  "description": "Schema for Virtual Tag (Vtag) injection into LiteLLM inference headers and StackSpend budget tracking",
+  "type": "object",
+  "properties": {
+    "team": {
+      "type": "string",
+      "default": "dark-gravity-ops"
+    },
+    "epic": {
+      "type": "string"
+    },
+    "microservice": {
+      "type": "string",
+      "default": "factory-application"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["production", "staging", "development"]
+    },
+    "cost_center": {
+      "type": "string",
+      "default": "eu-rd-grants"
+    },
+    "daily_budget_usd": {
+      "type": "number",
+      "default": 50.0
+    },
+    "hardstop_percentage": {
+      "type": "number",
+      "default": 0.90
+    },
+    "velocity_threshold_usd_per_min": {
+      "type": "number",
+      "default": 1.00
+    }
+  },
+  "required": ["team", "epic", "microservice", "environment", "cost_center"]
+}

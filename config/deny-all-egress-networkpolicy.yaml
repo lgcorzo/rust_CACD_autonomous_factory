@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sandbox-deny-all-egress
+  namespace: factory-sandbox
+  labels:
+    security.darkgravity.io/tier: zero-trust
+    security.darkgravity.io/policy: deny-all-egress
+spec:
+  podSelector:
+    matchLabels:
+      security.darkgravity.io/sandbox: gvisor
+  policyTypes:
+    - Egress
+  egress: [] # Empty egress list strictly drops 100% of outbound packets
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: sandbox-deny-all-egress-cilium
+  namespace: factory-sandbox
+  labels:
+    security.darkgravity.io/tier: zero-trust
+spec:
+  endpointSelector:
+    matchLabels:
+      security.darkgravity.io/sandbox: gvisor
+  egress: [] # Cilium eBPF drop: zero raw socket / outbound transmission allowed

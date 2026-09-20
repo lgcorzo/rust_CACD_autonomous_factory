@@ -109,13 +109,28 @@ pub struct OsrMetric {
     pub timestamp: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct FinOpsTag {
     pub team: String,
     pub epic: String,
     pub microservice: String,
     pub environment: String,
     pub cost_center: String,
+}
+
+impl FinOpsTag {
+    pub fn to_headers(&self) -> Vec<(String, String)> {
+        vec![
+            ("x-vtags-team".to_string(), self.team.clone()),
+            ("x-vtags-epic".to_string(), self.epic.clone()),
+            (
+                "x-vtags-microservice".to_string(),
+                self.microservice.clone(),
+            ),
+            ("x-vtags-environment".to_string(), self.environment.clone()),
+            ("x-vtags-cost-center".to_string(), self.cost_center.clone()),
+        ]
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

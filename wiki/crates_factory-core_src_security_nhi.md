@@ -4,7 +4,7 @@ title: "nhi.rs"
 source_path: "crates/factory-core/src/security/nhi.rs"
 description: "Documentation for crates/factory-core/src/security/nhi.rs"
 tags: [rust, module]
-last_verified_commit: "beeed91"
+last_verified_commit: "3341ecf4"
 ---
 
 # nhi.rs

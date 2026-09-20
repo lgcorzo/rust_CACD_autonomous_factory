@@ -22,11 +22,11 @@ async fn main() -> anyhow::Result<()> {
     println!("\n[Phase 1] Pre-flight Infrastructure & Resource Clamping Probe...");
 
     let hatchet_url = std::env::var("HATCHET_CLIENT_REST_URL")
-        .unwrap_or_else(|_| "http://hatchet.orchestrators.svc.cluster.local:8080".to_string());
+        .unwrap_or_else(|_| "https://hatchet.orchestrators.svc.cluster.local:8080".to_string());
     let litellm_url = std::env::var("LITELLM_BASE_URL")
-        .unwrap_or_else(|_| "http://litellm.llm-apps.svc.cluster.local:80/v1".to_string());
+        .unwrap_or_else(|_| "https://litellm.llm-apps.svc.cluster.local:80/v1".to_string());
     let r2r_url = std::env::var("R2R_URL")
-        .unwrap_or_else(|_| "http://r2r.llm-apps.svc.cluster.local:7272".to_string());
+        .unwrap_or_else(|_| "https://r2r.llm-apps.svc.cluster.local:7272".to_string());
 
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(5))

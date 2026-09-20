@@ -100,3 +100,6 @@ Welcome to the Dark Gravity Autonomous Factory documentation.
 * [[crates_factory-infrastructure_tests_kafka_integration]]
 * [[crates_factory-mcp-server_tests_gvisor_integration]]
 * [[crates_factory-mcp-server_tests_security_tests]]
+* [[crates_factory-application_src_bridge_kafka_bridge]]
+* [[crates_factory-application_src_workflows_circuit_breaker]]
+* [[crates_factory-cli_src_bin_run_functional_suite]]

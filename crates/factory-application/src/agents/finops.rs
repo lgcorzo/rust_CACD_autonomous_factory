@@ -9,6 +9,25 @@ use std::time::Duration;
 /// downgrade logging from ERROR to WARN and apply maximum backoff.
 const CIRCUIT_BREAKER_THRESHOLD: u32 = 5;
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum BudgetEvaluation {
+    Healthy {
+        spend: f64,
+        velocity: f64,
+    },
+    VelocityAnomaly {
+        spend: f64,
+        velocity: f64,
+        alert: String,
+    },
+    HardStop {
+        spend: f64,
+        velocity: f64,
+        max_budget: f64,
+        alert: String,
+    },
+}
+
 pub struct FinOpsAgent {
     litellm_base_url: String,
     api_key: String,
@@ -54,6 +73,85 @@ impl FinOpsAgent {
             client: Client::new(),
             tag,
         }
+    }
+
+    /// Injects Virtual Tags (x-vtags-*) into an outgoing HTTP request.
+    pub fn inject_vtags(&self, mut request: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
+        for (k, v) in self.tag.to_headers() {
+            request = request.header(k, v);
+        }
+        request
+    }
+
+    /// Evaluates spend velocity (> +$1.00 / 60s) and 90% hardstop threshold ($45.00 of $50.00).
+    pub fn evaluate_spend_delta(
+        &self,
+        current_spend: f64,
+        previous_spend: f64,
+        max_daily_budget: f64,
+    ) -> BudgetEvaluation {
+        let velocity = current_spend - previous_spend;
+        let hardstop_threshold = max_daily_budget * 0.90;
+
+        if current_spend >= hardstop_threshold {
+            let alert = format!(
+                "HARDSTOP TRIGGERED! Spend ${:.2} reached 90% threshold of daily budget (${:.2}). Halting missions.",
+                current_spend, max_daily_budget
+            );
+            BudgetEvaluation::HardStop {
+                spend: current_spend,
+                velocity,
+                max_budget: max_daily_budget,
+                alert,
+            }
+        } else if velocity > 1.0 {
+            let alert = format!(
+                "ANOMALY DETECTED! High token spend velocity: +${:.2} in 60s! Total: ${:.2}",
+                velocity, current_spend
+            );
+            BudgetEvaluation::VelocityAnomaly {
+                spend: current_spend,
+                velocity,
+                alert,
+            }
+        } else {
+            BudgetEvaluation::Healthy {
+                spend: current_spend,
+                velocity,
+            }
+        }
+    }
+
+    /// Dispatches budget-exceeded event to Kafka upon HardStop threshold breach.
+    pub async fn dispatch_budget_exceeded_event(
+        &self,
+        kafka: &dyn factory_infrastructure::KafkaClient,
+        mission_id: &str,
+        current_spend: f64,
+        max_daily_budget: f64,
+    ) -> anyhow::Result<()> {
+        let payload = serde_json::json!({
+            "event_type": "budget-exceeded",
+            "mission_id": mission_id,
+            "current_spend": current_spend,
+            "max_daily_budget": max_daily_budget,
+            "threshold": "90%",
+            "timestamp": chrono::Utc::now().to_rfc3339(),
+            "tags": {
+                "team": self.tag.team,
+                "epic": self.tag.epic,
+                "microservice": self.tag.microservice,
+                "environment": self.tag.environment,
+                "cost_center": self.tag.cost_center,
+            }
+        });
+        kafka
+            .publish(
+                "budget-exceeded",
+                mission_id,
+                &serde_json::to_vec(&payload)?,
+            )
+            .await
     }
 
     pub async fn monitor_budget(&self) -> anyhow::Result<()> {
@@ -118,31 +216,24 @@ impl FinOpsAgent {
                                 .unwrap_or(50.0);
                             let hardstop_threshold = max_daily_budget * 0.90;
 
-                            // Preventative Anomaly Detection: check velocity
-                            let spend_velocity = spend - previous_spend;
-                            if spend_velocity > 1.0 {
-                                tracing::error!(
-                                    "ANOMALY DETECTED! High token spend velocity: +${:.2} in 60s! Total: ${:.2}",
-                                    spend_velocity,
-                                    spend
-                                );
-                            }
-
-                            // HardStop Cutoff at 90% Daily Budget
-                            if spend >= hardstop_threshold {
-                                tracing::error!(
-                                    "HARDSTOP TRIGGERED! Spend ${:.2} reached 90% threshold of daily budget (${:.2}). Halting missions.",
-                                    spend,
-                                    max_daily_budget
-                                );
-                            } else {
-                                tracing::info!(
-                                    "Current spend: ${:.2} / ${:.2} (Limit: ${:.2}). Velocity: +${:.2}/min. Budget is healthy.",
-                                    spend,
-                                    max_daily_budget,
-                                    hardstop_threshold,
-                                    spend_velocity
-                                );
+                            let evaluation =
+                                self.evaluate_spend_delta(spend, previous_spend, max_daily_budget);
+                            match evaluation {
+                                BudgetEvaluation::HardStop { alert, .. } => {
+                                    tracing::error!("{}", alert);
+                                }
+                                BudgetEvaluation::VelocityAnomaly { alert, .. } => {
+                                    tracing::warn!("{}", alert);
+                                }
+                                BudgetEvaluation::Healthy { velocity, .. } => {
+                                    tracing::info!(
+                                        "Current spend: ${:.2} / ${:.2} (Limit: ${:.2}). Velocity: +${:.2}/min. Budget is healthy.",
+                                        spend,
+                                        max_daily_budget,
+                                        hardstop_threshold,
+                                        velocity
+                                    );
+                                }
                             }
                             previous_spend = spend;
                         } else {
@@ -208,7 +299,7 @@ mod tests {
     #[test]
     fn test_finops_agent_strips_v1_suffix() {
         let agent = FinOpsAgent::new(
-            "http://litellm.local:4000/v1".to_string(),
+            "https://litellm.local:4000/v1".to_string(),
             "key".to_string(),
             test_tag(),
         );
@@ -216,12 +307,110 @@ mod tests {
         // But the URL construction in monitor_budget appends /spend/logs.
         // So a raw URL with /v1 would become /v1/spend/logs.
         // This test verifies the URL stored.
-        assert_eq!(agent.litellm_base_url, "http://litellm.local:4000/v1");
+        assert_eq!(agent.litellm_base_url, "https://litellm.local:4000/v1");
     }
 
     #[test]
     fn test_finops_agent_empty_url_guard() {
         let agent = FinOpsAgent::new(String::new(), "key".to_string(), test_tag());
         assert!(agent.litellm_base_url.is_empty());
+    }
+
+    #[test]
+    fn test_finops_inject_vtags() {
+        let agent = FinOpsAgent::new(
+            "https://litellm:4000".to_string(),
+            "key".to_string(),
+            test_tag(),
+        );
+        let client = Client::new();
+        let req = client.get("https://litellm:4000/v1/chat/completions");
+        let tagged_req = agent.inject_vtags(req).build().unwrap();
+
+        let headers = tagged_req.headers();
+        assert_eq!(headers.get("x-vtags-team").unwrap(), "test-team");
+        assert_eq!(headers.get("x-vtags-epic").unwrap(), "E1.0");
+        assert_eq!(headers.get("x-vtags-microservice").unwrap(), "test-svc");
+        assert_eq!(headers.get("x-vtags-environment").unwrap(), "test");
+        assert_eq!(headers.get("x-vtags-cost-center").unwrap(), "test-cc");
+    }
+
+    #[test]
+    fn test_spend_velocity_anomaly_detection() {
+        let agent = FinOpsAgent::new(
+            "https://litellm:4000".to_string(),
+            "key".to_string(),
+            test_tag(),
+        );
+
+        // Velocity within normal limit: +$0.50 in 60s
+        let eval_normal = agent.evaluate_spend_delta(10.50, 10.00, 50.0);
+        assert_eq!(
+            eval_normal,
+            BudgetEvaluation::Healthy {
+                spend: 10.50,
+                velocity: 0.50,
+            }
+        );
+
+        // Velocity anomaly: +$1.50 in 60s (> +$1.00 / 60s threshold)
+        let eval_anomaly = agent.evaluate_spend_delta(11.50, 10.00, 50.0);
+        match eval_anomaly {
+            BudgetEvaluation::VelocityAnomaly {
+                spend,
+                velocity,
+                alert,
+            } => {
+                assert_eq!(spend, 11.50);
+                assert!((velocity - 1.50).abs() < f64::EPSILON);
+                assert!(alert.contains("ANOMALY DETECTED"));
+            }
+            _ => panic!("Expected VelocityAnomaly"),
+        }
+    }
+
+    #[test]
+    fn test_hardstop_threshold_tripping() {
+        let agent = FinOpsAgent::new(
+            "https://litellm:4000".to_string(),
+            "key".to_string(),
+            test_tag(),
+        );
+
+        // 90% of $50.00 = $45.00
+        let eval_under = agent.evaluate_spend_delta(44.90, 44.00, 50.0);
+        assert!(matches!(eval_under, BudgetEvaluation::Healthy { .. }));
+
+        // HardStop breached at $45.00
+        let eval_hardstop = agent.evaluate_spend_delta(45.00, 44.50, 50.0);
+        match eval_hardstop {
+            BudgetEvaluation::HardStop {
+                spend,
+                max_budget,
+                alert,
+                ..
+            } => {
+                assert_eq!(spend, 45.00);
+                assert_eq!(max_budget, 50.0);
+                assert!(alert.contains("HARDSTOP TRIGGERED"));
+            }
+            _ => panic!("Expected HardStop"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_dispatch_budget_exceeded_event() {
+        use factory_infrastructure::SimpleMockKafkaClient;
+        let agent = FinOpsAgent::new(
+            "https://litellm:4000".to_string(),
+            "key".to_string(),
+            test_tag(),
+        );
+        let mock_kafka = SimpleMockKafkaClient::new("localhost:9092").unwrap();
+
+        let result = agent
+            .dispatch_budget_exceeded_event(&mock_kafka, "mission-budget-test", 45.50, 50.0)
+            .await;
+        assert!(result.is_ok());
     }
 }

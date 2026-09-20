@@ -4,7 +4,7 @@ title: "zeroclaw.rs"
 source_path: "crates/factory-application/src/agents/zeroclaw.rs"
 description: "Documentation for crates/factory-application/src/agents/zeroclaw.rs"
 tags: [rust, module]
-last_verified_commit: "beeed91"
+last_verified_commit: "3341ecf4"
 ---
 
 # zeroclaw.rs

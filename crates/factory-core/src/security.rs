@@ -3,11 +3,39 @@ use async_trait::async_trait;
 
 pub mod nhi;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct SandboxConstraint {
     pub max_memory_mb: u32,
     pub max_cpu_cores: f32,
     pub network_egress_allowed: bool,
+}
+
+impl Default for SandboxConstraint {
+    fn default() -> Self {
+        Self {
+            max_memory_mb: 30,
+            max_cpu_cores: 0.25,
+            network_egress_allowed: false,
+        }
+    }
+}
+
+impl SandboxConstraint {
+    pub fn gvisor_default() -> Self {
+        Self::default()
+    }
+
+    pub fn sidecar_default() -> Self {
+        Self {
+            max_memory_mb: 20,
+            max_cpu_cores: 0.10,
+            network_egress_allowed: false,
+        }
+    }
+
+    pub fn validate_bounds(&self) -> bool {
+        self.max_memory_mb <= 30 && self.max_cpu_cores <= 0.25
+    }
 }
 
 /// Trait for validating requests or agent responses.
@@ -137,5 +165,44 @@ pub trait SecurityBounds: Send + Sync {
     fn wipe_token_from_memory(&self, token: &mut JitToken) {
         use zeroize::Zeroize;
         token.zeroize();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use zeroize::Zeroize;
+
+    #[test]
+    fn test_zeroize() {
+        let mut token = JitToken {
+            token: "super-secret-vault-token-xyz".to_string(),
+        };
+        let ptr = token.token.as_ptr();
+        let len = token.token.len();
+
+        token.zeroize();
+        let wiped = unsafe { std::slice::from_raw_parts(ptr, len) };
+        assert!(wiped.iter().all(|&b| b == 0));
+    }
+
+    #[test]
+    fn test_sandbox_constraint_validation() {
+        let default_constraint = SandboxConstraint::gvisor_default();
+        assert_eq!(default_constraint.max_memory_mb, 30);
+        assert!((default_constraint.max_cpu_cores - 0.25).abs() < f32::EPSILON);
+        assert!(default_constraint.validate_bounds());
+
+        let sidecar_constraint = SandboxConstraint::sidecar_default();
+        assert_eq!(sidecar_constraint.max_memory_mb, 20);
+        assert!((sidecar_constraint.max_cpu_cores - 0.10).abs() < f32::EPSILON);
+        assert!(sidecar_constraint.validate_bounds());
+
+        let over_limit = SandboxConstraint {
+            max_memory_mb: 64,
+            max_cpu_cores: 0.50,
+            network_egress_allowed: true,
+        };
+        assert!(!over_limit.validate_bounds());
     }
 }

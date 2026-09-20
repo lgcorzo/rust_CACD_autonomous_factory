@@ -143,6 +143,76 @@ impl VerifiableCredential {
 
         Ok(())
     }
+
+    /// Verifies the cryptographic proof of a Verifiable Credential against an Ed25519 verifying key.
+    pub fn verify(
+        &self,
+        verifying_key: &ed25519_dalek::VerifyingKey,
+    ) -> crate::error::Result<bool> {
+        use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
+        use ed25519_dalek::{Signature, Verifier};
+
+        let proof = match &self.proof {
+            Some(p) => p,
+            None => return Ok(false),
+        };
+
+        let parts: Vec<&str> = proof.jws.split("..").collect();
+        if parts.len() != 2 {
+            return Ok(false);
+        }
+        let encoded_header = parts[0];
+        let encoded_signature = parts[1];
+
+        let sig_bytes = URL_SAFE_NO_PAD.decode(encoded_signature).map_err(|e| {
+            crate::error::FactoryError::Security(format!("Base64 signature decode error: {}", e))
+        })?;
+
+        if sig_bytes.len() != 64 {
+            return Ok(false);
+        }
+        let mut sig_array = [0u8; 64];
+        sig_array.copy_from_slice(&sig_bytes);
+        let signature = Signature::from_bytes(&sig_array);
+
+        let mut clone_no_proof = self.clone();
+        clone_no_proof.proof = None;
+        let payload_json = serde_json::to_string(&clone_no_proof).map_err(|e| {
+            crate::error::FactoryError::Security(format!("Serialization error: {}", e))
+        })?;
+
+        let signing_input = format!("{}.{}", encoded_header, payload_json);
+        Ok(verifying_key
+            .verify(signing_input.as_bytes(), &signature)
+            .is_ok())
+    }
+
+    /// Asynchronously verifies a batch of verifiable credentials concurrently.
+    pub async fn verify_batch_async(
+        credentials: &[VerifiableCredential],
+        verifying_key: &ed25519_dalek::VerifyingKey,
+    ) -> crate::error::Result<bool> {
+        let mut handles = Vec::with_capacity(credentials.len());
+
+        for vc in credentials.iter() {
+            let vc_clone = vc.clone();
+            let key_clone = *verifying_key;
+            handles.push(tokio::task::spawn_blocking(
+                move || -> crate::error::Result<bool> { vc_clone.verify(&key_clone) },
+            ));
+        }
+
+        for handle in handles {
+            let is_valid = handle.await.map_err(|e| {
+                crate::error::FactoryError::Security(format!("Batch verify join error: {}", e))
+            })??;
+            if !is_valid {
+                return Ok(false);
+            }
+        }
+
+        Ok(true)
+    }
 }
 
 #[cfg(test)]
@@ -182,5 +252,13 @@ pub mod tests {
 
         assert!(batch[0].proof.is_some());
         assert!(batch[1].proof.is_some());
+
+        let verifying_key = signing_key.verifying_key();
+        assert!(vc.verify(&verifying_key).unwrap());
+        assert!(
+            VerifiableCredential::verify_batch_async(&batch, &verifying_key)
+                .await
+                .unwrap()
+        );
     }
 }

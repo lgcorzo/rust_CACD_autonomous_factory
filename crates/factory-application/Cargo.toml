@@ -26,6 +26,7 @@ rdkafka = { workspace = true }
 zeroize = "1.8.1"
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
 rand = "0.8"
+sha2 = "0.10"
 
 tokio-test = { workspace = true }
 chrono.workspace = true

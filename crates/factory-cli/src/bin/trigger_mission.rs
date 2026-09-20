@@ -83,6 +83,7 @@ async fn main() -> anyhow::Result<()> {
         source_platform,
         repository,
         issue_number,
+        ..Default::default()
     };
 
     tracing::info!(

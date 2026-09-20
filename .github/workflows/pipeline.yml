@@ -18,10 +18,15 @@ on:
 env:
   DOCKER_IMAGE: lgcorzo/dark-gravity-factory
 
+permissions:
+  contents: read
+
 jobs:
   governance-gates:
     name: Governance Gates
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
