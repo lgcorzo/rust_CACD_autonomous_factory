@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Documentation for crates/factory-core/src/security.rs"
 tags: [rust, module]
-last_verified_commit: "aec579ea"
+last_verified_commit: "3341ecf4"
 ---
 
 # security.rs
