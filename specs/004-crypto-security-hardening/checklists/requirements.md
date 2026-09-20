@@ -32,4 +32,5 @@
 ## Notes
 
 - All 5 user stories and 15 functional requirements directly address the Dark Gravity V7.2 cryptographic security audit, implementing systematic remediations for VULN-01 through VULN-05, and establishing regulatory alignment with EU AI Act, SOC 2 Type II, and ISO/IEC 25059.
+- Clarification session completed using authoritative Dark Gravity V7 architectural sources from NotebookLM (notebook: 116d5f03-2fb0-4fa7-bd7c-1c9849920abc).
 - Specification is complete and ready for `/speckit-plan`.
