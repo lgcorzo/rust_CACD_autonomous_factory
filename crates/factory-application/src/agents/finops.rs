@@ -299,7 +299,7 @@ mod tests {
     #[test]
     fn test_finops_agent_strips_v1_suffix() {
         let agent = FinOpsAgent::new(
-            "http://litellm.local:4000/v1".to_string(),
+            "https://litellm.local:4000/v1".to_string(),
             "key".to_string(),
             test_tag(),
         );
@@ -307,7 +307,7 @@ mod tests {
         // But the URL construction in monitor_budget appends /spend/logs.
         // So a raw URL with /v1 would become /v1/spend/logs.
         // This test verifies the URL stored.
-        assert_eq!(agent.litellm_base_url, "http://litellm.local:4000/v1");
+        assert_eq!(agent.litellm_base_url, "https://litellm.local:4000/v1");
     }
 
     #[test]
@@ -319,12 +319,12 @@ mod tests {
     #[test]
     fn test_finops_inject_vtags() {
         let agent = FinOpsAgent::new(
-            "http://litellm:4000".to_string(),
+            "https://litellm:4000".to_string(),
             "key".to_string(),
             test_tag(),
         );
         let client = Client::new();
-        let req = client.get("http://litellm:4000/v1/chat/completions");
+        let req = client.get("https://litellm:4000/v1/chat/completions");
         let tagged_req = agent.inject_vtags(req).build().unwrap();
 
         let headers = tagged_req.headers();
@@ -338,7 +338,7 @@ mod tests {
     #[test]
     fn test_spend_velocity_anomaly_detection() {
         let agent = FinOpsAgent::new(
-            "http://litellm:4000".to_string(),
+            "https://litellm:4000".to_string(),
             "key".to_string(),
             test_tag(),
         );
@@ -372,7 +372,7 @@ mod tests {
     #[test]
     fn test_hardstop_threshold_tripping() {
         let agent = FinOpsAgent::new(
-            "http://litellm:4000".to_string(),
+            "https://litellm:4000".to_string(),
             "key".to_string(),
             test_tag(),
         );
@@ -402,7 +402,7 @@ mod tests {
     async fn test_dispatch_budget_exceeded_event() {
         use factory_infrastructure::SimpleMockKafkaClient;
         let agent = FinOpsAgent::new(
-            "http://litellm:4000".to_string(),
+            "https://litellm:4000".to_string(),
             "key".to_string(),
             test_tag(),
         );
