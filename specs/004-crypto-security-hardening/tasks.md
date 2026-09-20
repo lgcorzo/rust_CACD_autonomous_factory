@@ -17,8 +17,8 @@
 
 **Purpose**: Test framework dependencies, benchmark configurations, and contract schema validation
 
-- [ ] T001 Inspect and verify dev-dependencies (`zeroize`, `ed25519-dalek`, `wiremock`, `criterion`) in crates/factory-core/Cargo.toml and crates/factory-application/Cargo.toml
-- [ ] T002 [P] Verify JSON schema contract validation in specs/004-crypto-security-hardening/contracts/circuit_breaker_contract.json, specs/004-crypto-security-hardening/contracts/sast_evaluation_contract.json, and specs/004-crypto-security-hardening/contracts/finops_tag_contract.json
+- [x] T001 Inspect and verify dev-dependencies (`zeroize`, `ed25519-dalek`, `wiremock`, `criterion`) in crates/factory-core/Cargo.toml and crates/factory-application/Cargo.toml
+- [x] T002 [P] Verify JSON schema contract validation in specs/004-crypto-security-hardening/contracts/circuit_breaker_contract.json, specs/004-crypto-security-hardening/contracts/sast_evaluation_contract.json, and specs/004-crypto-security-hardening/contracts/finops_tag_contract.json
 
 ---
 
@@ -28,9 +28,9 @@
 
 **⚠️ CRITICAL**: Must be completed before User Story implementation begins
 
-- [ ] T003 [P] Verify SandboxConstraint data structures and resource clamping definitions in crates/factory-core/src/security.rs
-- [ ] T004 [P] Verify FinOpsTag metadata structure serialization and header mappings in crates/factory-core/src/lib.rs
-- [ ] T005 Implement diff-hash computation helper using sha2 to generate SHA-256 digests of patches in crates/factory-application/src/workflows/circuit_breaker.rs
+- [x] T003 [P] Verify SandboxConstraint data structures and resource clamping definitions in crates/factory-core/src/security.rs
+- [x] T004 [P] Verify FinOpsTag metadata structure serialization and header mappings in crates/factory-core/src/lib.rs
+- [x] T005 Implement diff-hash computation helper using sha2 to generate SHA-256 digests of patches in crates/factory-application/src/workflows/circuit_breaker.rs
 
 **Checkpoint**: Foundational models and cryptographic utilities ready for User Story implementations.
 
@@ -44,10 +44,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [P] [US1] Implement memory zeroization unit test verifying Zeroize on drop for JitToken in crates/factory-core/src/security.rs
-- [ ] T007 [P] [US1] Configure Criterion memory wipe benchmark verifying < 4.33 µs wipe latency in benches/zeroize_benchmark.rs
-- [ ] T008 [US1] Add validation logic to enforce gVisor runtime constraints (<= 30 MiB RAM for app, <= 20 MiB RAM for sidecar) in crates/factory-application/src/agents/zeroclaw.rs
-- [ ] T009 [P] [US1] Create Kubernetes gVisor Pod sandbox profile and NetworkPolicy manifests in config/sandbox-gvisor-profile.yaml
+- [x] T006 [P] [US1] Implement memory zeroization unit test verifying Zeroize on drop for JitToken in crates/factory-core/src/security.rs
+- [x] T007 [P] [US1] Configure Criterion memory wipe benchmark verifying < 4.33 µs wipe latency in benches/zeroize_benchmark.rs
+- [x] T008 [US1] Add validation logic to enforce gVisor runtime constraints (<= 30 MiB RAM for app, <= 20 MiB RAM for sidecar) in crates/factory-application/src/agents/zeroclaw.rs
+- [x] T009 [P] [US1] Create Kubernetes gVisor Pod sandbox profile and NetworkPolicy manifests in config/sandbox-gvisor-profile.yaml
 
 **Checkpoint**: User Story 1 (Kernel Sandboxing & Memory Hygiene) fully functional and testable independently.
 
@@ -61,10 +61,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T010 [P] [US2] Add repository and agent path isolation (secret/data/repos/<repo>/*) to VaultSecurityBounds::issue_jit_token in crates/factory-infrastructure/src/vault.rs
-- [ ] T011 [P] [US2] Implement unit tests verifying 5-minute (300s) non-renewable TTL enforcement and expired token rejection in crates/factory-infrastructure/src/vault.rs
-- [ ] T012 [US2] Implement signature validation with Ed25519SecurityValidator on Git commit payloads in crates/factory-infrastructure/src/security_validator.rs
-- [ ] T013 [US2] Wire NHI credential issuance and JIT token attachment into mission initialization in crates/factory-application/src/workflows/autonomous_mission.rs
+- [x] T010 [P] [US2] Add repository and agent path isolation (secret/data/repos/<repo>/*) to VaultSecurityBounds::issue_jit_token in crates/factory-infrastructure/src/vault.rs
+- [x] T011 [P] [US2] Implement unit tests verifying 5-minute (300s) non-renewable TTL enforcement and expired token rejection in crates/factory-infrastructure/src/vault.rs
+- [x] T012 [US2] Implement signature validation with Ed25519SecurityValidator on Git commit payloads in crates/factory-infrastructure/src/security_validator.rs
+- [x] T013 [US2] Wire NHI credential issuance and JIT token attachment into mission initialization in crates/factory-application/src/workflows/autonomous_mission.rs
 
 **Checkpoint**: User Story 2 (NHI & JIT Ephemeral Access) fully functional and testable independently.
 
@@ -78,10 +78,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T014 [P] [US3] Implement diff_hash_history tracking and deadlock detection in CircuitBreakerGuard::evaluate_diff in crates/factory-application/src/workflows/circuit_breaker.rs
-- [ ] T015 [P] [US3] Add unit test verifying deadlock detection trips AgentStuck on attempt 2 upon duplicate diff hash in crates/factory-application/src/workflows/circuit_breaker.rs
-- [ ] T016 [US3] Configure LiteLLM multi-model routing enforcing independent frontier model family for security_review in config/litellm_proxy_config.yaml
-- [ ] T017 [US3] Wire circuit breaker freeze, JIT revocation, and HITL Vertex 3 escalation into Hatchet DAG execution in crates/factory-application/src/workflows/autonomous_mission.rs
+- [x] T014 [P] [US3] Implement diff_hash_history tracking and deadlock detection in CircuitBreakerGuard::evaluate_diff in crates/factory-application/src/workflows/circuit_breaker.rs
+- [x] T015 [P] [US3] Add unit test verifying deadlock detection trips AgentStuck on attempt 2 upon duplicate diff hash in crates/factory-application/src/workflows/circuit_breaker.rs
+- [x] T016 [US3] Configure LiteLLM multi-model routing enforcing independent frontier model family for security_review in config/litellm_proxy_config.yaml
+- [x] T017 [US3] Wire circuit breaker freeze, JIT revocation, and HITL Vertex 3 escalation into Hatchet DAG execution in crates/factory-application/src/workflows/autonomous_mission.rs
 
 **Checkpoint**: User Story 3 (Adaptive Circuit Breaker & SAST Gate) fully functional and testable independently.
 
@@ -95,10 +95,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T018 [P] [US4] Implement FinOpsTag HTTP header injection (x-vtags-team, x-vtags-epic, x-vtags-microservice, x-vtags-cost_center) in crates/factory-application/src/agents/finops.rs
-- [ ] T019 [P] [US4] Implement spend velocity anomaly detection (> +$1.00 / 60s) with warning alert in crates/factory-application/src/agents/finops.rs
-- [ ] T020 [US4] Implement HardStop cutoff at 90% daily budget with Kafka budget-exceeded event dispatch in crates/factory-application/src/agents/finops.rs
-- [ ] T021 [P] [US4] Create Deny-All egress Kubernetes NetworkPolicy manifest for sandbox pods in config/deny-all-egress-networkpolicy.yaml
+- [x] T018 [P] [US4] Implement FinOpsTag HTTP header injection (x-vtags-team, x-vtags-epic, x-vtags-microservice, x-vtags-cost_center) in crates/factory-application/src/agents/finops.rs
+- [x] T019 [P] [US4] Implement spend velocity anomaly detection (> +$1.00 / 60s) with warning alert in crates/factory-application/src/agents/finops.rs
+- [x] T020 [US4] Implement HardStop cutoff at 90% daily budget with Kafka budget-exceeded event dispatch in crates/factory-application/src/agents/finops.rs
+- [x] T021 [P] [US4] Create Deny-All egress Kubernetes NetworkPolicy manifest for sandbox pods in config/deny-all-egress-networkpolicy.yaml
 
 **Checkpoint**: User Story 4 (FinOps Guardrails & Egress Dropping) fully functional and testable independently.
 
@@ -112,9 +112,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T022 [P] [US5] Implement concurrent batch verification helper verify_batch_async in crates/factory-core/src/security/nhi.rs
-- [ ] T023 [US5] Integrate async batch signing into Kafka event publishing pipeline in crates/factory-application/src/bridge/kafka_bridge.rs
-- [ ] T024 [P] [US5] Add performance benchmark for async batch Ed25519 signing in benches/crypto_benchmark.rs
+- [x] T022 [P] [US5] Implement concurrent batch verification helper verify_batch_async in crates/factory-core/src/security/nhi.rs
+- [x] T023 [US5] Integrate async batch signing into Kafka event publishing pipeline in crates/factory-application/src/bridge/kafka_bridge.rs
+- [x] T024 [P] [US5] Add performance benchmark for async batch Ed25519 signing in benches/crypto_benchmark.rs
 
 **Checkpoint**: User Story 5 (Async Batch Cryptographic Pipeline) fully functional and testable independently.
 
@@ -124,9 +124,9 @@
 
 **Purpose**: Quickstart scenario validation, full workspace regression testing, and formatting/clippy cleanliness
 
-- [ ] T025 [P] Run and validate all scenarios from specs/004-crypto-security-hardening/quickstart.md
-- [ ] T026 [P] Execute complete workspace unit and integration test pass: cargo test --workspace
-- [ ] T027 [P] Enforce formatting and clippy cleanliness: cargo fmt -- --check && cargo clippy --workspace --all-targets -- -D warnings
+- [x] T025 [P] Run and validate all scenarios from specs/004-crypto-security-hardening/quickstart.md
+- [x] T026 [P] Execute complete workspace unit and integration test pass: cargo test --workspace
+- [x] T027 [P] Enforce formatting and clippy cleanliness: cargo fmt -- --check && cargo clippy --workspace --all-targets -- -D warnings
 
 ---
 

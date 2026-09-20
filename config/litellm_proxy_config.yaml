@@ -1,0 +1,62 @@
+# LiteLLM Proxy Configuration: Heterogeneous Multi-Model Routing & Governance
+# Enforces strict frontier model separation: Code Generation vs SAST Security Review
+
+model_list:
+  # Primary code generation and planning models
+  - model_name: gpt-oss-120b
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: "os.environ/OPENAI_API_KEY"
+      tags:
+        - "team:dark-gravity-ops"
+        - "epic:E6.3"
+        - "tier:planning"
+
+  - model_name: ollama/qwen2.5:7b
+    litellm_params:
+      model: ollama/qwen2.5:7b
+      api_base: "http://ollama.factory-sandbox.svc.cluster.local:11434"
+      tags:
+        - "team:dark-gravity-ops"
+        - "epic:E6.3"
+        - "tier:worker"
+
+  # Independent Frontier SAST Governance Review Model (Separated model family from worker/generator)
+  - model_name: security_review
+    litellm_params:
+      model: anthropic/claude-3-5-sonnet-20241022
+      api_key: "os.environ/ANTHROPIC_API_KEY"
+      tags:
+        - "team:dark-gravity-ops"
+        - "epic:E6.3"
+        - "tier:sast-governance"
+        - "independent_frontier:true"
+      rpm: 100
+      tpm: 100000
+
+  # Fallback Independent Reviewer
+  - model_name: security_review_fallback
+    litellm_params:
+      model: deepseek/deepseek-reasoner
+      api_key: "os.environ/DEEPSEEK_API_KEY"
+      tags:
+        - "team:dark-gravity-ops"
+        - "epic:E6.3"
+        - "tier:sast-governance-fallback"
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+  telemetry: false
+  virtual_key_spend_tracking: true
+  max_budget: 50.0
+  budget_duration: "1d"
+
+router_settings:
+  routing_strategy: "latency-based-routing"
+  redis_host: "redis.factory-sandbox.svc.cluster.local"
+  redis_port: 6379
+
+general_settings:
+  master_key: "os.environ/LITELLM_MASTER_KEY"
+  store_model_in_db: false

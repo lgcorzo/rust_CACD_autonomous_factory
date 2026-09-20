@@ -205,6 +205,40 @@ impl ZeroClawAgent {
 
         Ok(result)
     }
+
+    pub fn validate_sandbox_constraints(
+        app_constraint: &factory_core::security::SandboxConstraint,
+        sidecar_constraint: &factory_core::security::SandboxConstraint,
+    ) -> anyhow::Result<()> {
+        if app_constraint.max_memory_mb > 30 {
+            anyhow::bail!(
+                "Application sandbox memory constraint breached: {} MiB exceeds limit of 30 MiB",
+                app_constraint.max_memory_mb
+            );
+        }
+        if app_constraint.max_cpu_cores > 0.25 {
+            anyhow::bail!(
+                "Application sandbox CPU constraint breached: {} cores exceeds limit of 0.25 cores",
+                app_constraint.max_cpu_cores
+            );
+        }
+        if sidecar_constraint.max_memory_mb > 20 {
+            anyhow::bail!(
+                "Sidecar sandbox memory constraint breached: {} MiB exceeds limit of 20 MiB",
+                sidecar_constraint.max_memory_mb
+            );
+        }
+        if sidecar_constraint.max_cpu_cores > 0.10 {
+            anyhow::bail!(
+                "Sidecar sandbox CPU constraint breached: {} cores exceeds limit of 0.10 cores",
+                sidecar_constraint.max_cpu_cores
+            );
+        }
+        if app_constraint.network_egress_allowed || sidecar_constraint.network_egress_allowed {
+            anyhow::bail!("Network egress not permitted in strict gVisor sandbox profile");
+        }
+        Ok(())
+    }
 }
 
 #[async_trait]
@@ -216,5 +250,45 @@ impl Agent for ZeroClawAgent {
     async fn execute(&self, task_description: &str) -> anyhow::Result<Value> {
         // Default to executing a general task with a temporary ID if no specific action specified
         self.execute_task("default-id", task_description, &[]).await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use factory_core::security::SandboxConstraint;
+
+    #[test]
+    fn test_validate_sandbox_constraints_valid() {
+        let app = SandboxConstraint::gvisor_default();
+        let sidecar = SandboxConstraint::sidecar_default();
+        assert!(ZeroClawAgent::validate_sandbox_constraints(&app, &sidecar).is_ok());
+    }
+
+    #[test]
+    fn test_validate_sandbox_constraints_exceeded_app_ram() {
+        let mut app = SandboxConstraint::gvisor_default();
+        app.max_memory_mb = 35;
+        let sidecar = SandboxConstraint::sidecar_default();
+        let err = ZeroClawAgent::validate_sandbox_constraints(&app, &sidecar).unwrap_err();
+        assert!(err.to_string().contains("35 MiB exceeds limit of 30 MiB"));
+    }
+
+    #[test]
+    fn test_validate_sandbox_constraints_exceeded_sidecar_ram() {
+        let app = SandboxConstraint::gvisor_default();
+        let mut sidecar = SandboxConstraint::sidecar_default();
+        sidecar.max_memory_mb = 25;
+        let err = ZeroClawAgent::validate_sandbox_constraints(&app, &sidecar).unwrap_err();
+        assert!(err.to_string().contains("25 MiB exceeds limit of 20 MiB"));
+    }
+
+    #[test]
+    fn test_validate_sandbox_constraints_egress_disallowed() {
+        let mut app = SandboxConstraint::gvisor_default();
+        app.network_egress_allowed = true;
+        let sidecar = SandboxConstraint::sidecar_default();
+        let err = ZeroClawAgent::validate_sandbox_constraints(&app, &sidecar).unwrap_err();
+        assert!(err.to_string().contains("Network egress not permitted"));
     }
 }

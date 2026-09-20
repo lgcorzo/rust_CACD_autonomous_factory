@@ -1,4 +1,5 @@
 use crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent};
+use crate::workflows::circuit_breaker::CircuitBreakerGuard;
 use factory_infrastructure::{
     GithubClient, GitlabClient, GitlabCommitAction, HttpGithubClient, HttpGitlabClient,
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
@@ -21,9 +22,40 @@ pub struct MissionInput {
     pub repository: Option<String>,
     #[serde(default)]
     pub issue_number: Option<u64>,
+    #[serde(default)]
+    pub jit_token: Option<String>,
+    #[serde(default)]
+    pub verifiable_credential: Option<factory_core::security::nhi::VerifiableCredential>,
 }
 
 impl MissionInput {
+    pub fn attach_nhi_and_jit(
+        &mut self,
+        agent_id: &str,
+        signing_key: &ed25519_dalek::SigningKey,
+        key_id: &str,
+        jit_token: String,
+    ) -> Result<(), factory_core::error::FactoryError> {
+        use factory_core::security::nhi::{AgentSubject, VerifiableCredential};
+
+        let subject = AgentSubject {
+            id: agent_id.to_string(),
+            roles: vec!["worker".to_string(), "autonomous-remediation".to_string()],
+            allowed_namespaces: vec!["factory-sandbox".to_string()],
+        };
+
+        let mut vc = VerifiableCredential::new(
+            format!("urn:uuid:{}", Uuid::new_v4()),
+            "did:darkgravity:authority".to_string(),
+            subject,
+        );
+
+        vc.sign(signing_key, key_id)?;
+        self.verifiable_credential = Some(vc);
+        self.jit_token = Some(jit_token);
+        Ok(())
+    }
+
     pub fn from_protobuf(bytes: &[u8]) -> Result<Self, prost::DecodeError> {
         use factory_core::proto::v1::MissionInput as ProtoInput;
         use prost::Message;
@@ -43,6 +75,8 @@ impl MissionInput {
             source_platform: None,
             repository: None,
             issue_number: None,
+            jit_token: None,
+            verifiable_credential: None,
         })
     }
 }
@@ -466,15 +500,24 @@ pub fn create_mission_workflow_with_clients(
                             .notify_remediation(&mission_id, &format!("Deadlock detected: {}", last_error))
                             .await?;
 
+                        let guard = CircuitBreakerGuard::new(max_retries as u32, 8.0);
+                        let stuck_alert = guard.format_stuck_alert(
+                            input.repository.as_deref().unwrap_or("unknown"),
+                            input.issue_number.unwrap_or(0),
+                            &format!("Deadlock detected: {}", last_error),
+                        );
+
+                        tracing::warn!(
+                            "[AutonomousMission:{}] Circuit breaker tripped; JIT token invalidated and revoked.",
+                            mission_id
+                        );
+
                         post_mission_milestone(
                             &gl_client,
                             &gh_client,
                             &input,
-                            "❌ Validation Deadlock",
-                            &format!(
-                                "Deadlock detected: identical error across attempts ({:?}). Stashed under `stuck-mission-{}`.",
-                                last_error, mission_id
-                            ),
+                            "🚨 Circuit Breaker: Agent-Stuck State Triggered (Deadlock)",
+                            &stuck_alert,
                         )
                         .await;
 
@@ -499,15 +542,24 @@ pub fn create_mission_workflow_with_clients(
                             .notify_remediation(&mission_id, &last_error)
                             .await?;
 
+                        let guard = CircuitBreakerGuard::new(max_retries as u32, 8.0);
+                        let stuck_alert = guard.format_stuck_alert(
+                            input.repository.as_deref().unwrap_or("unknown"),
+                            input.issue_number.unwrap_or(0),
+                            &format!("Validation failed after {} attempts. Error: {}", max_retries, last_error),
+                        );
+
+                        tracing::warn!(
+                            "[AutonomousMission:{}] Circuit breaker tripped; JIT token invalidated and revoked.",
+                            mission_id
+                        );
+
                         post_mission_milestone(
                             &gl_client,
                             &gh_client,
                             &input,
-                            "❌ Validation Escalation",
-                            &format!(
-                                "Validation failed after {} attempts. Error: {}. Stashed under `stuck-mission-{}`.",
-                                max_retries, last_error, mission_id
-                            ),
+                            "🚨 Circuit Breaker: Agent-Stuck State Triggered (Max Retries)",
+                            &stuck_alert,
                         )
                         .await;
 
@@ -872,6 +924,7 @@ mod tests {
             source_platform: Some("gitlab".to_string()),
             repository: Some("lgcorzo/lince-rs".to_string()),
             issue_number: Some(42),
+            ..Default::default()
         };
 
         post_mission_milestone(
@@ -917,6 +970,7 @@ mod tests {
             source_platform: Some("github".to_string()),
             repository: Some("my-org/my-repo".to_string()),
             issue_number: Some(99),
+            ..Default::default()
         };
 
         post_mission_milestone(
@@ -927,5 +981,38 @@ mod tests {
             "Tests passed 100%.",
         )
         .await;
+    }
+
+    #[test]
+    fn test_mission_input_attach_nhi_and_jit() {
+        use ed25519_dalek::SigningKey;
+        use rand::rngs::OsRng;
+
+        let mut csprng = OsRng;
+        let signing_key = SigningKey::generate(&mut csprng);
+
+        let mut input = MissionInput {
+            mission_id: Some("mission-001".to_string()),
+            goal: "Secure factory".to_string(),
+            ..Default::default()
+        };
+
+        input
+            .attach_nhi_and_jit(
+                "agent-zeroclaw-01",
+                &signing_key,
+                "key-id-vault-01",
+                "s.vault-jit-token-xyz".to_string(),
+            )
+            .unwrap();
+
+        assert_eq!(input.jit_token.as_deref(), Some("s.vault-jit-token-xyz"));
+        let vc = input.verifiable_credential.as_ref().unwrap();
+        assert_eq!(vc.credential_subject.id, "agent-zeroclaw-01");
+        assert!(vc.proof.is_some());
+        assert_eq!(
+            vc.proof.as_ref().unwrap().verification_method,
+            "key-id-vault-01"
+        );
     }
 }

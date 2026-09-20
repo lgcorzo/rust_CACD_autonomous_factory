@@ -152,6 +152,7 @@ impl QAObserverAgent {
                                     source_platform: Some("gitlab".to_string()),
                                     repository: Some(self.gitlab_project.clone()),
                                     issue_number: Some(issue.iid),
+                                    ..Default::default()
                                 };
 
                                 let workflow = self.hatchet.workflow::<MissionInput, crate::workflows::autonomous_mission::MissionOutput>("AutonomousMission").build().unwrap();
