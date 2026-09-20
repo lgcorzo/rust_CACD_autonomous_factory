@@ -4,7 +4,7 @@ title: "trigger_mission.rs"
 source_path: "crates/factory-cli/src/bin/trigger_mission.rs"
 description: "Documentation for crates/factory-cli/src/bin/trigger_mission.rs"
 tags: [rust, module]
-last_verified_commit: "beeed91"
+last_verified_commit: "aec579ea"
 ---
 
 # trigger_mission.rs

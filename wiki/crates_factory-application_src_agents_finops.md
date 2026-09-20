@@ -4,7 +4,7 @@ title: "finops.rs"
 source_path: "crates/factory-application/src/agents/finops.rs"
 description: "Documentation for crates/factory-application/src/agents/finops.rs"
 tags: [rust, module]
-last_verified_commit: "beeed91"
+last_verified_commit: "aec579ea"
 ---
 
 # finops.rs
@@ -15,6 +15,9 @@ Source File: `crates/factory-application/src/agents/finops.rs`
 
 ```mermaid
 classDiagram
+    class BudgetEvaluation {
+        <<enumeration>>
+    }
     class FinOpsAgent
 ```
 

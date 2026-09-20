@@ -4,7 +4,7 @@ title: "security_validator.rs"
 source_path: "crates/factory-infrastructure/src/security_validator.rs"
 description: "Documentation for crates/factory-infrastructure/src/security_validator.rs"
 tags: [rust, module]
-last_verified_commit: "beeed91"
+last_verified_commit: "aec579ea"
 ---
 
 # security_validator.rs

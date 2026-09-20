@@ -4,7 +4,7 @@ title: "qa_observer.rs"
 source_path: "crates/factory-application/src/agents/qa_observer.rs"
 description: "Documentation for crates/factory-application/src/agents/qa_observer.rs"
 tags: [rust, module]
-last_verified_commit: "beeed91"
+last_verified_commit: "aec579ea"
 ---
 
 # qa_observer.rs

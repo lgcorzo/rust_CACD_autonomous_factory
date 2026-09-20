@@ -4,7 +4,7 @@ title: "lib.rs"
 source_path: "crates/factory-core/src/lib.rs"
 description: "Documentation for crates/factory-core/src/lib.rs"
 tags: [rust, module]
-last_verified_commit: "beeed91"
+last_verified_commit: "aec579ea"
 ---
 
 # lib.rs
@@ -34,6 +34,16 @@ classDiagram
     class FinOpsTag
     class ComplianceReport
     class UserFeedbackPayload
+    class DailyBudgetConfig
+    class SpendVelocityAlert
+    class SentryCrashRecord
+    class CausalProvenanceNode
+    class PRDirective {
+        <<enumeration>>
+    }
+    class PolledIssueEvent
+    class PRCommentEvent
+    class PollerSyncCursor
 ```
 
 ## Execution Flow
