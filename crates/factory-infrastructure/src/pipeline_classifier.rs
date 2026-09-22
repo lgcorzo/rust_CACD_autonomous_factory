@@ -76,7 +76,7 @@ impl RegexPipelineClassifier {
             ClassificationRule {
                 category: ErrorCategory::InfrastructureBuild,
                 pattern: Regex::new(
-                    r"(?i)docker\s+build.*(?:COPY failed|apt-get.*E:)|protoc.*not found|cmake.*error",
+                    r"(?i)docker\s+build.*(?:COPY failed|failed)|E:\s+Unable to locate package|protoc.*not found|cmake.*error",
                 )
                 .unwrap(),
                 sub_type: Some("build_tool"),

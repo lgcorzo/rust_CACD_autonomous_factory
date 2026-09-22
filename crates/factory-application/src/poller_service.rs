@@ -1,4 +1,5 @@
 use crate::workflows::comment_control::{CommentControlInput, CommentControlService};
+use crate::workflows::pipeline_remediation::PipelineRemediationService;
 use ed25519_dalek::SigningKey;
 use factory_core::security::nhi::{AgentSubject, VerifiableCredential};
 use factory_core::{PRCommentEvent, PolledIssueEvent};
@@ -13,6 +14,10 @@ use std::sync::Arc;
 pub struct PollerCycleStats {
     pub issues_ingested: usize,
     pub directives_processed: usize,
+    /// Number of pipeline failures routed to autonomous remediation missions.
+    pub pipelines_remediated: usize,
+    /// Number of pipeline failures escalated to human review.
+    pub pipelines_escalated: usize,
     pub errors: Vec<String>,
 }
 
@@ -21,6 +26,8 @@ pub struct PollerDaemonService {
     kafka_client: Arc<dyn KafkaClient>,
     semantica_client: Option<Arc<dyn SemanticaClient>>,
     comment_service: Arc<CommentControlService>,
+    /// Optional pipeline remediation service for autonomous CI/CD error fixing.
+    remediation_service: Option<Arc<PipelineRemediationService>>,
     signing_key: SigningKey,
     key_id: String,
 }
@@ -40,9 +47,16 @@ impl PollerDaemonService {
             kafka_client,
             semantica_client,
             comment_service,
+            remediation_service: None,
             signing_key,
             key_id: "did:key:dark-gravity-poller-nhi#1".to_string(),
         }
+    }
+
+    /// Attach a pipeline remediation service to enable autonomous CI/CD error fixing.
+    pub fn with_remediation_service(mut self, service: Arc<PipelineRemediationService>) -> Self {
+        self.remediation_service = Some(service);
+        self
     }
 
     pub fn with_signing_key(mut self, signing_key: SigningKey, key_id: String) -> Self {
@@ -95,6 +109,32 @@ impl PollerDaemonService {
                     .errors
                     .push(format!("GitHub comment poll error for {}: {}", repo, e)),
             }
+
+            // GitHub Pipeline Runs
+            if let Some(remediation) = &self.remediation_service {
+                match self.poller.poll_github_pipeline_runs(repo).await {
+                    Ok(pipeline_events) => {
+                        for event in pipeline_events {
+                            match remediation.handle_pipeline_failure(&event).await {
+                                Ok(factory_core::RemediationStatus::Pending) => {
+                                    stats.pipelines_remediated += 1;
+                                }
+                                Ok(factory_core::RemediationStatus::Escalated) => {
+                                    stats.pipelines_escalated += 1;
+                                }
+                                Ok(_) => {}
+                                Err(e) => stats.errors.push(format!(
+                                    "GitHub pipeline remediation error for {}: {}",
+                                    repo, e
+                                )),
+                            }
+                        }
+                    }
+                    Err(e) => stats
+                        .errors
+                        .push(format!("GitHub pipeline poll error for {}: {}", repo, e)),
+                }
+            }
         }
 
         // 2. GitLab Issues
@@ -132,6 +172,32 @@ impl PollerDaemonService {
                 Err(e) => stats
                     .errors
                     .push(format!("GitLab note poll error for {}: {}", project, e)),
+            }
+
+            // 3. GitLab Pipeline Runs
+            if let Some(remediation) = &self.remediation_service {
+                match self.poller.poll_gitlab_pipeline_runs(project).await {
+                    Ok(pipeline_events) => {
+                        for event in pipeline_events {
+                            match remediation.handle_pipeline_failure(&event).await {
+                                Ok(factory_core::RemediationStatus::Pending) => {
+                                    stats.pipelines_remediated += 1;
+                                }
+                                Ok(factory_core::RemediationStatus::Escalated) => {
+                                    stats.pipelines_escalated += 1;
+                                }
+                                Ok(_) => {}
+                                Err(e) => stats.errors.push(format!(
+                                    "GitLab pipeline remediation error for {}: {}",
+                                    project, e
+                                )),
+                            }
+                        }
+                    }
+                    Err(e) => stats
+                        .errors
+                        .push(format!("GitLab pipeline poll error for {}: {}", project, e)),
+                }
             }
         }
 

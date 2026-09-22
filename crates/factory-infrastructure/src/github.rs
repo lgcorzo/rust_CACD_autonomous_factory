@@ -839,4 +839,86 @@ mod tests {
 
         assert_eq!(branch, "mission-1234");
     }
+
+    // ── Pipeline Error Remediation Tests (T015–T016) ──
+
+    #[tokio::test]
+    async fn test_list_failed_github_workflow_runs() {
+        let mock_server = MockServer::start().await;
+
+        let runs_resp = ResponseTemplate::new(200).set_body_json(serde_json::json!({
+            "workflow_runs": [
+                {
+                    "id": 9001,
+                    "name": "CI/CD Pipeline",
+                    "status": "completed",
+                    "conclusion": "failure",
+                    "html_url": "https://github.com/my-org/my-repo/actions/runs/9001",
+                    "updated_at": "2026-09-20T12:00:00Z"
+                }
+            ]
+        }));
+
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/actions/runs"))
+            .and(header("Authorization", "Bearer test-token"))
+            .respond_with(runs_resp)
+            .mount(&mock_server)
+            .await;
+
+        let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
+        let runs = client
+            .list_failed_workflow_runs("my-org/my-repo", None)
+            .await
+            .unwrap();
+
+        assert_eq!(runs.len(), 1);
+        assert_eq!(runs[0].id, 9001);
+        assert_eq!(runs[0].conclusion.as_deref(), Some("failure"));
+    }
+
+    #[tokio::test]
+    async fn test_get_github_job_log() {
+        let mock_server = MockServer::start().await;
+
+        // Test normal log
+        let log_content = "error[E0308]: mismatched types\n  --> src/lib.rs:15:5";
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/actions/jobs/42/logs"))
+            .and(header("Authorization", "Bearer test-token"))
+            .respond_with(
+                ResponseTemplate::new(200).set_body_string(log_content),
+            )
+            .mount(&mock_server)
+            .await;
+
+        let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
+        let log = client
+            .get_job_log("my-org/my-repo", 42)
+            .await
+            .unwrap();
+
+        assert_eq!(log, log_content);
+        assert!(log.len() <= 10 * 1024);
+
+        // Test 10KB truncation
+        let mock_server2 = MockServer::start().await;
+        let client2 = HttpGithubClient::with_url(mock_server2.uri(), "test-token".to_string());
+        let large_log = "y".repeat(20 * 1024); // 20KB
+
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/actions/jobs/99/logs"))
+            .and(header("Authorization", "Bearer test-token"))
+            .respond_with(
+                ResponseTemplate::new(200).set_body_string(large_log),
+            )
+            .mount(&mock_server2)
+            .await;
+
+        let truncated = client2
+            .get_job_log("my-org/my-repo", 99)
+            .await
+            .unwrap();
+        assert_eq!(truncated.len(), 10 * 1024);
+    }
 }
