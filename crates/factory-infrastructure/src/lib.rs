@@ -26,6 +26,7 @@ pub mod semantica;
 pub mod sentry;
 pub mod vault;
 pub mod ziti;
+pub mod pipeline_classifier;
 
 pub use cursor_store::{CursorStore, InMemoryCursorStore, PostgresCursorStore};
 pub use git_poller::GitPlatformPoller;
@@ -79,3 +80,5 @@ pub use gitlab::MockGitlabClient;
 pub use gitlab::{
     GitDeliveryResult, GitlabClient, GitlabCommitAction, GitlabIssue, HttpGitlabClient,
 };
+
+pub use pipeline_classifier::{PipelineClassifier, RegexPipelineClassifier};

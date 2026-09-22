@@ -44,6 +44,50 @@ pub struct GithubComment {
     pub updated_at: Option<DateTime<Utc>>,
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+// GitHub Actions Workflow Run API Types
+// ──────────────────────────────────────────────────────────────────────────────
+
+/// GitHub Actions workflow run.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GithubWorkflowRun {
+    pub id: u64,
+    pub name: Option<String>,
+    pub status: String,
+    pub conclusion: Option<String>,
+    pub html_url: String,
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+/// GitHub Actions workflow job.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GithubWorkflowJob {
+    pub id: u64,
+    pub name: String,
+    pub conclusion: Option<String>,
+    #[serde(default)]
+    pub steps: Vec<GithubWorkflowStep>,
+}
+
+/// GitHub Actions workflow step within a job.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GithubWorkflowStep {
+    pub name: String,
+    pub conclusion: Option<String>,
+}
+
+/// Wrapper for workflow runs list response.
+#[derive(Deserialize, Debug)]
+pub struct GithubWorkflowRunsResponse {
+    pub workflow_runs: Vec<GithubWorkflowRun>,
+}
+
+/// Wrapper for workflow jobs list response.
+#[derive(Deserialize, Debug)]
+pub struct GithubWorkflowJobsResponse {
+    pub jobs: Vec<GithubWorkflowJob>,
+}
+
 #[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait]
 pub trait GithubClient: Send + Sync {
@@ -52,6 +96,7 @@ pub trait GithubClient: Send + Sync {
         repo: &str,
         title: &str,
         body: &str,
+        labels: &[String],
     ) -> anyhow::Result<GithubIssue>;
 
     async fn list_open_issues(
@@ -113,6 +158,29 @@ pub trait GithubClient: Send + Sync {
         comment_id: u64,
         reaction: &str,
     ) -> anyhow::Result<GithubReaction>;
+
+    // ── Pipeline Error Remediation Methods ──
+
+    /// List failed workflow runs for a repository.
+    async fn list_failed_workflow_runs(
+        &self,
+        repo: &str,
+        since: Option<DateTime<Utc>>,
+    ) -> anyhow::Result<Vec<GithubWorkflowRun>>;
+
+    /// Get jobs for a specific workflow run.
+    async fn get_workflow_run_jobs(
+        &self,
+        repo: &str,
+        run_id: u64,
+    ) -> anyhow::Result<Vec<GithubWorkflowJob>>;
+
+    /// Download the log for a specific job (truncated to 10KB).
+    async fn get_job_log(
+        &self,
+        repo: &str,
+        job_id: u64,
+    ) -> anyhow::Result<String>;
 }
 
 pub struct HttpGithubClient {
@@ -145,16 +213,20 @@ impl GithubClient for HttpGithubClient {
         repo: &str,
         title: &str,
         body: &str,
+        labels: &[String],
     ) -> anyhow::Result<GithubIssue> {
         let url = format!(
             "{}/repos/{}/issues",
             self.api_url.trim_end_matches('/'),
             repo
         );
-        let payload = serde_json::json!({
+        let mut payload = serde_json::json!({
             "title": title,
             "body": body
         });
+        if !labels.is_empty() {
+            payload["labels"] = serde_json::json!(labels);
+        }
 
         let mut req = self.client.post(&url).json(&payload);
         if !self.api_token.is_empty() {
@@ -468,6 +540,103 @@ impl GithubClient for HttpGithubClient {
         let reaction_obj: GithubReaction = res.json().await?;
         Ok(reaction_obj)
     }
+
+    // ── Pipeline Error Remediation Methods ──
+
+    async fn list_failed_workflow_runs(
+        &self,
+        repo: &str,
+        since: Option<DateTime<Utc>>,
+    ) -> anyhow::Result<Vec<GithubWorkflowRun>> {
+        let mut url = format!(
+            "{}/repos/{}/actions/runs?status=failure",
+            self.api_url.trim_end_matches('/'),
+            repo
+        );
+        if let Some(s) = since {
+            url.push_str(&format!("&created=>={}", urlencoding::encode(&s.to_rfc3339())));
+        }
+
+        let mut req = self.client.get(&url);
+        if !self.api_token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.api_token));
+            req = req.header("Accept", "application/vnd.github.v3+json");
+        }
+
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitHub list failed workflow runs failed with status {}", status);
+            anyhow::bail!("GitHub list failed workflow runs failed with status {}", status);
+        }
+
+        let response: GithubWorkflowRunsResponse = res.json().await?;
+        Ok(response.workflow_runs)
+    }
+
+    async fn get_workflow_run_jobs(
+        &self,
+        repo: &str,
+        run_id: u64,
+    ) -> anyhow::Result<Vec<GithubWorkflowJob>> {
+        let url = format!(
+            "{}/repos/{}/actions/runs/{}/jobs",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            run_id
+        );
+
+        let mut req = self.client.get(&url);
+        if !self.api_token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.api_token));
+            req = req.header("Accept", "application/vnd.github.v3+json");
+        }
+
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitHub get workflow run jobs failed with status {}", status);
+            anyhow::bail!("GitHub get workflow run jobs failed with status {}", status);
+        }
+
+        let response: GithubWorkflowJobsResponse = res.json().await?;
+        Ok(response.jobs)
+    }
+
+    async fn get_job_log(
+        &self,
+        repo: &str,
+        job_id: u64,
+    ) -> anyhow::Result<String> {
+        let url = format!(
+            "{}/repos/{}/actions/jobs/{}/logs",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            job_id
+        );
+
+        let mut req = self.client.get(&url);
+        if !self.api_token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.api_token));
+            req = req.header("Accept", "application/vnd.github.v3+json");
+        }
+
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitHub get job log failed with status {}", status);
+            anyhow::bail!("GitHub get job log failed with status {}", status);
+        }
+
+        let log_text = res.text().await?;
+        // Truncate to 10KB
+        let max_len = 10 * 1024;
+        if log_text.len() > max_len {
+            Ok(log_text[..max_len].to_string())
+        } else {
+            Ok(log_text)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -501,6 +670,7 @@ mod tests {
                 "my-org/my-repo",
                 "Bug in production",
                 "Detailed crash report",
+                &[],
             )
             .await
             .unwrap();
