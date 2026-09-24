@@ -19,6 +19,7 @@ pub mod gitlab;
 pub mod jira;
 pub mod kafka;
 pub mod mcp_client;
+pub mod pipeline_classifier;
 pub mod r2r;
 pub mod s3;
 pub mod security_validator;
@@ -79,3 +80,5 @@ pub use gitlab::MockGitlabClient;
 pub use gitlab::{
     GitDeliveryResult, GitlabClient, GitlabCommitAction, GitlabIssue, HttpGitlabClient,
 };
+
+pub use pipeline_classifier::{PipelineClassifier, RegexPipelineClassifier};

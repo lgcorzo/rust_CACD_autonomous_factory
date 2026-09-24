@@ -59,6 +59,31 @@ pub struct GitDeliveryResult {
     pub mr_web_url: String,
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+// GitLab CI Pipeline API Types (T012)
+// ──────────────────────────────────────────────────────────────────────────────
+
+/// GitLab CI pipeline run.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GitlabPipeline {
+    pub id: u64,
+    pub status: String,
+    pub web_url: String,
+    #[serde(rename = "ref")]
+    pub ref_: Option<String>,
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+/// GitLab CI pipeline job within a pipeline.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GitlabPipelineJob {
+    pub id: u64,
+    pub name: String,
+    pub status: String,
+    pub stage: String,
+    pub web_url: String,
+}
+
 #[cfg_attr(any(test, feature = "test-utils"), mockall::automock)]
 #[async_trait]
 pub trait GitlabClient: Send + Sync {
@@ -151,6 +176,25 @@ pub trait GitlabClient: Send + Sync {
     async fn check_current_user(&self) -> anyhow::Result<GitlabAuthor>;
 
     async fn get_project(&self, project_id: &str) -> anyhow::Result<bool>;
+
+    // ── Pipeline Error Remediation Methods ──
+
+    /// List failed CI pipeline runs for a GitLab project.
+    async fn list_failed_pipelines(
+        &self,
+        project_id: &str,
+        since: Option<DateTime<Utc>>,
+    ) -> anyhow::Result<Vec<GitlabPipeline>>;
+
+    /// Get the jobs for a specific pipeline.
+    async fn get_pipeline_jobs(
+        &self,
+        project_id: &str,
+        pipeline_id: u64,
+    ) -> anyhow::Result<Vec<GitlabPipelineJob>>;
+
+    /// Download the log trace for a specific job (truncated to 10KB).
+    async fn get_job_trace(&self, project_id: &str, job_id: u64) -> anyhow::Result<String>;
 }
 
 pub struct HttpGitlabClient {
@@ -589,6 +633,105 @@ impl GitlabClient for HttpGitlabClient {
             anyhow::bail!("GitLab get project failed with status {}", status);
         }
     }
+
+    // ── Pipeline Error Remediation Implementations (T024–T026) ──
+
+    async fn list_failed_pipelines(
+        &self,
+        project_id: &str,
+        since: Option<DateTime<Utc>>,
+    ) -> anyhow::Result<Vec<GitlabPipeline>> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let mut url = format!(
+            "{}/api/v4/projects/{}/pipelines?status=failed&order_by=updated_at&sort=desc",
+            self.url.trim_end_matches('/'),
+            encoded_project_id
+        );
+        if let Some(s) = since {
+            url.push_str(&format!(
+                "&updated_after={}",
+                urlencoding::encode(&s.to_rfc3339())
+            ));
+        }
+
+        let res = self
+            .client
+            .get(&url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab list failed pipelines failed with status {}", status);
+            anyhow::bail!("GitLab list failed pipelines failed with status {}", status);
+        }
+
+        let pipelines: Vec<GitlabPipeline> = res.json().await?;
+        Ok(pipelines)
+    }
+
+    async fn get_pipeline_jobs(
+        &self,
+        project_id: &str,
+        pipeline_id: u64,
+    ) -> anyhow::Result<Vec<GitlabPipelineJob>> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let url = format!(
+            "{}/api/v4/projects/{}/pipelines/{}/jobs",
+            self.url.trim_end_matches('/'),
+            encoded_project_id,
+            pipeline_id
+        );
+
+        let res = self
+            .client
+            .get(&url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab get pipeline jobs failed with status {}", status);
+            anyhow::bail!("GitLab get pipeline jobs failed with status {}", status);
+        }
+
+        let jobs: Vec<GitlabPipelineJob> = res.json().await?;
+        Ok(jobs)
+    }
+
+    async fn get_job_trace(&self, project_id: &str, job_id: u64) -> anyhow::Result<String> {
+        let encoded_project_id = urlencoding::encode(project_id);
+        let url = format!(
+            "{}/api/v4/projects/{}/jobs/{}/trace",
+            self.url.trim_end_matches('/'),
+            encoded_project_id,
+            job_id
+        );
+
+        let res = self
+            .client
+            .get(&url)
+            .header("PRIVATE-TOKEN", &self.api_token)
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            let status = res.status();
+            tracing::error!("GitLab get job trace failed with status {}", status);
+            anyhow::bail!("GitLab get job trace failed with status {}", status);
+        }
+
+        let trace = res.text().await?;
+        // Truncate to 10KB
+        let max_len = 10 * 1024;
+        if trace.len() > max_len {
+            Ok(trace[..max_len].to_string())
+        } else {
+            Ok(trace)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -886,5 +1029,110 @@ mod tests {
 
         let missing = client.get_project("my-org/missing-project").await.unwrap();
         assert!(!missing);
+    }
+
+    // ── Pipeline Error Remediation Tests (T017–T018) ──
+
+    #[tokio::test]
+    async fn test_list_failed_gitlab_pipelines() {
+        let mock_server = MockServer::start().await;
+        let client = HttpGitlabClient::new(mock_server.uri(), "test_token".to_string());
+
+        let pipelines_resp = json!([
+            {
+                "id": 201,
+                "status": "failed",
+                "web_url": "https://gitlab.com/my-org/my-project/-/pipelines/201",
+                "ref_": "main",
+                "updated_at": "2026-09-20T10:00:00Z"
+            }
+        ]);
+
+        Mock::given(method("GET"))
+            .and(path("/api/v4/projects/my-org%2Fmy-project/pipelines"))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(pipelines_resp))
+            .mount(&mock_server)
+            .await;
+
+        let pipelines = client
+            .list_failed_pipelines("my-org/my-project", None)
+            .await
+            .unwrap();
+
+        assert_eq!(pipelines.len(), 1);
+        assert_eq!(pipelines[0].id, 201);
+        assert_eq!(pipelines[0].status, "failed");
+    }
+
+    #[tokio::test]
+    async fn test_get_gitlab_job_trace() {
+        let mock_server = MockServer::start().await;
+        let client = HttpGitlabClient::new(mock_server.uri(), "test_token".to_string());
+
+        // Test normal trace
+        let trace_content = "error[E0308]: mismatched types\n  --> src/lib.rs:15:5";
+        Mock::given(method("GET"))
+            .and(path("/api/v4/projects/my-org%2Fmy-project/jobs/42/trace"))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(trace_content))
+            .mount(&mock_server)
+            .await;
+
+        let trace = client.get_job_trace("my-org/my-project", 42).await.unwrap();
+        assert_eq!(trace, trace_content);
+        assert!(trace.len() <= 10 * 1024);
+
+        // Test 10KB truncation
+        let mock_server2 = MockServer::start().await;
+        let client2 = HttpGitlabClient::new(mock_server2.uri(), "test_token".to_string());
+        let large_trace = "x".repeat(20 * 1024); // 20KB
+        Mock::given(method("GET"))
+            .and(path("/api/v4/projects/my-org%2Fmy-project/jobs/99/trace"))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(large_trace.clone()))
+            .mount(&mock_server2)
+            .await;
+
+        let truncated = client2
+            .get_job_trace("my-org/my-project", 99)
+            .await
+            .unwrap();
+        assert_eq!(truncated.len(), 10 * 1024);
+    }
+
+    #[tokio::test]
+    async fn test_get_gitlab_pipeline_jobs() {
+        let mock_server = MockServer::start().await;
+        let client = HttpGitlabClient::new(mock_server.uri(), "test_token".to_string());
+
+        let jobs_resp = json!([
+            {
+                "id": 301,
+                "name": "rust-test",
+                "status": "failed",
+                "stage": "test",
+                "web_url": "https://gitlab.com/my-org/my-project/-/jobs/301"
+            }
+        ]);
+
+        Mock::given(method("GET"))
+            .and(path(
+                "/api/v4/projects/my-org%2Fmy-project/pipelines/201/jobs",
+            ))
+            .and(header("PRIVATE-TOKEN", "test_token"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(jobs_resp))
+            .mount(&mock_server)
+            .await;
+
+        let jobs = client
+            .get_pipeline_jobs("my-org/my-project", 201)
+            .await
+            .unwrap();
+
+        assert_eq!(jobs.len(), 1);
+        assert_eq!(jobs[0].id, 301);
+        assert_eq!(jobs[0].name, "rust-test");
+        assert_eq!(jobs[0].status, "failed");
     }
 }

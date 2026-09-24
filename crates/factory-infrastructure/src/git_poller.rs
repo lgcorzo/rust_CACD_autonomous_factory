@@ -339,6 +339,178 @@ impl GitPlatformPoller {
 
         Ok(note_events)
     }
+
+    // ── Pipeline Error Remediation Polling (T027–T028) ──
+
+    /// Poll GitHub Actions for newly failed workflow runs in a repository.
+    ///
+    /// Uses the cursor key `github:{repo}:pipelines` for idempotent tracking.
+    /// Fetches the failing jobs and their logs to build [`PipelineFailureEvent`]s.
+    pub async fn poll_github_pipeline_runs(
+        &self,
+        repo: &str,
+    ) -> anyhow::Result<Vec<factory_core::PipelineFailureEvent>> {
+        use factory_core::PipelineFailureEvent;
+
+        let client = match &self.github_client {
+            Some(c) => c,
+            None => return Ok(vec![]),
+        };
+
+        let cursor_key = format!("github:{}:pipelines", repo);
+        let cursor = self.cursor_store.get_cursor(&cursor_key).await?;
+        let since = cursor.as_ref().map(|c| c.last_polled_at);
+
+        let runs = client.list_failed_workflow_runs(repo, since).await?;
+        let mut events = Vec::new();
+        let mut last_id = cursor.as_ref().map(|c| c.last_processed_id).unwrap_or(0);
+
+        for run in runs {
+            let event_hash = format!("pipeline:{}:{}", repo, run.id);
+            if self
+                .cursor_store
+                .is_event_processed(&cursor_key, &event_hash)
+                .await?
+            {
+                continue;
+            }
+
+            // Fetch failing jobs for this run
+            let jobs = client.get_workflow_run_jobs(repo, run.id).await?;
+            let failing_job = jobs
+                .iter()
+                .find(|j| j.conclusion.as_deref() == Some("failure"))
+                .or_else(|| jobs.first());
+
+            let (job_name, failing_step, job_id) = if let Some(job) = failing_job {
+                let step_name = job
+                    .steps
+                    .iter()
+                    .find(|s| s.conclusion.as_deref() == Some("failure"))
+                    .map(|s| s.name.clone());
+                (job.name.clone(), step_name, Some(job.id))
+            } else {
+                ("unknown".to_string(), None, None)
+            };
+
+            // Fetch log (best-effort)
+            let error_log = if let Some(jid) = job_id {
+                client.get_job_log(repo, jid).await.unwrap_or_default()
+            } else {
+                String::new()
+            };
+
+            let event = PipelineFailureEvent {
+                source_platform: "github".to_string(),
+                repository: repo.to_string(),
+                run_id: run.id,
+                workflow_name: run.name.unwrap_or_else(|| "unknown".to_string()),
+                failing_job: job_name,
+                failing_step,
+                error_log,
+                run_url: run.html_url,
+                detected_at: Utc::now(),
+            };
+
+            self.cursor_store
+                .mark_event_processed(&cursor_key, &event_hash)
+                .await?;
+            last_id = run.id.max(last_id);
+            events.push(event);
+        }
+
+        let updated_cursor = factory_core::PollerSyncCursor {
+            source_key: cursor_key.clone(),
+            last_polled_at: Utc::now(),
+            last_processed_id: last_id,
+            processed_hashes: vec![],
+        };
+        self.cursor_store.save_cursor(&updated_cursor).await?;
+
+        Ok(events)
+    }
+
+    /// Poll GitLab CI for newly failed pipeline runs in a project.
+    ///
+    /// Uses the cursor key `gitlab:{project}:pipelines` for idempotent tracking.
+    pub async fn poll_gitlab_pipeline_runs(
+        &self,
+        project: &str,
+    ) -> anyhow::Result<Vec<factory_core::PipelineFailureEvent>> {
+        use factory_core::PipelineFailureEvent;
+
+        let client = match &self.gitlab_client {
+            Some(c) => c,
+            None => return Ok(vec![]),
+        };
+
+        let cursor_key = format!("gitlab:{}:pipelines", project);
+        let cursor = self.cursor_store.get_cursor(&cursor_key).await?;
+        let since = cursor.as_ref().map(|c| c.last_polled_at);
+
+        let pipelines = client.list_failed_pipelines(project, since).await?;
+        let mut events = Vec::new();
+        let mut last_id = cursor.as_ref().map(|c| c.last_processed_id).unwrap_or(0);
+
+        for pipeline in pipelines {
+            let event_hash = format!("pipeline:{}:{}", project, pipeline.id);
+            if self
+                .cursor_store
+                .is_event_processed(&cursor_key, &event_hash)
+                .await?
+            {
+                continue;
+            }
+
+            // Fetch failing jobs for this pipeline
+            let jobs = client.get_pipeline_jobs(project, pipeline.id).await?;
+            let failing_job = jobs
+                .iter()
+                .find(|j| j.status == "failed")
+                .or_else(|| jobs.first());
+
+            let (job_name, job_id) = if let Some(job) = failing_job {
+                (job.name.clone(), Some(job.id))
+            } else {
+                ("unknown".to_string(), None)
+            };
+
+            // Fetch log trace (best-effort)
+            let error_log = if let Some(jid) = job_id {
+                client.get_job_trace(project, jid).await.unwrap_or_default()
+            } else {
+                String::new()
+            };
+
+            let event = PipelineFailureEvent {
+                source_platform: "gitlab".to_string(),
+                repository: project.to_string(),
+                run_id: pipeline.id,
+                workflow_name: pipeline.ref_.unwrap_or_else(|| "unknown".to_string()),
+                failing_job: job_name,
+                failing_step: None, // GitLab doesn't have steps like GitHub
+                error_log,
+                run_url: pipeline.web_url,
+                detected_at: Utc::now(),
+            };
+
+            self.cursor_store
+                .mark_event_processed(&cursor_key, &event_hash)
+                .await?;
+            last_id = pipeline.id.max(last_id);
+            events.push(event);
+        }
+
+        let updated_cursor = factory_core::PollerSyncCursor {
+            source_key: cursor_key.clone(),
+            last_polled_at: Utc::now(),
+            last_processed_id: last_id,
+            processed_hashes: vec![],
+        };
+        self.cursor_store.save_cursor(&updated_cursor).await?;
+
+        Ok(events)
+    }
 }
 
 #[cfg(test)]
@@ -520,5 +692,128 @@ mod tests {
         assert_eq!(notes.len(), 1);
         assert_eq!(notes[0].author, "devops-engineer");
         assert_eq!(notes[0].directive, PRDirective::Retry);
+    }
+
+    // ── Pipeline Polling Tests (T019–T020) ──
+
+    #[tokio::test]
+    async fn test_poll_github_pipeline_runs() {
+        use crate::github::{GithubWorkflowJob, GithubWorkflowRun, GithubWorkflowStep};
+
+        let mut mock_gh = MockGithubClient::new();
+
+        mock_gh
+            .expect_list_failed_workflow_runs()
+            .returning(|_repo, _since| {
+                Ok(vec![GithubWorkflowRun {
+                    id: 9001,
+                    name: Some("CI/CD Pipeline".to_string()),
+                    status: "completed".to_string(),
+                    conclusion: Some("failure".to_string()),
+                    html_url: "https://github.com/my-org/my-repo/actions/runs/9001".to_string(),
+                    updated_at: Some(Utc::now()),
+                }])
+            });
+
+        mock_gh
+            .expect_get_workflow_run_jobs()
+            .returning(|_repo, _run_id| {
+                Ok(vec![GithubWorkflowJob {
+                    id: 42,
+                    name: "Rust CI (Lint & Test)".to_string(),
+                    conclusion: Some("failure".to_string()),
+                    steps: vec![GithubWorkflowStep {
+                        name: "Lint with Clippy".to_string(),
+                        conclusion: Some("failure".to_string()),
+                    }],
+                }])
+            });
+
+        mock_gh.expect_get_job_log().returning(|_repo, _job_id| {
+            Ok("error[E0308]: mismatched types\n  --> src/lib.rs:15:5".to_string())
+        });
+
+        let cursor_store = Arc::new(InMemoryCursorStore::new());
+        let poller = GitPlatformPoller::new(Some(Arc::new(mock_gh)), None, cursor_store.clone());
+
+        let events = poller
+            .poll_github_pipeline_runs("my-org/my-repo")
+            .await
+            .unwrap();
+
+        assert_eq!(events.len(), 1);
+        let event = &events[0];
+        assert_eq!(event.run_id, 9001);
+        assert_eq!(event.source_platform, "github");
+        assert_eq!(event.repository, "my-org/my-repo");
+        assert_eq!(event.workflow_name, "CI/CD Pipeline");
+        assert_eq!(event.failing_job, "Rust CI (Lint & Test)");
+        assert_eq!(event.failing_step.as_deref(), Some("Lint with Clippy"));
+        assert!(event.error_log.contains("error[E0308]"));
+    }
+
+    #[tokio::test]
+    async fn test_pipeline_cursor_idempotency() {
+        use crate::github::{GithubWorkflowJob, GithubWorkflowRun};
+
+        let mut mock_gh = MockGithubClient::new();
+
+        // list_failed_workflow_runs called twice, returns same run both times
+        mock_gh
+            .expect_list_failed_workflow_runs()
+            .times(2)
+            .returning(|_repo, _since| {
+                Ok(vec![GithubWorkflowRun {
+                    id: 9001,
+                    name: Some("CI/CD Pipeline".to_string()),
+                    status: "completed".to_string(),
+                    conclusion: Some("failure".to_string()),
+                    html_url: "https://github.com/my-org/my-repo/actions/runs/9001".to_string(),
+                    updated_at: Some(Utc::now()),
+                }])
+            });
+
+        // get_workflow_run_jobs and get_job_log are called only once (first poll)
+        mock_gh
+            .expect_get_workflow_run_jobs()
+            .times(1)
+            .returning(|_repo, _run_id| {
+                Ok(vec![GithubWorkflowJob {
+                    id: 42,
+                    name: "rust-test".to_string(),
+                    conclusion: Some("failure".to_string()),
+                    steps: vec![],
+                }])
+            });
+
+        mock_gh
+            .expect_get_job_log()
+            .times(1)
+            .returning(|_repo, _job_id| Ok("error log".to_string()));
+
+        let cursor_store = Arc::new(InMemoryCursorStore::new());
+        let poller = GitPlatformPoller::new(Some(Arc::new(mock_gh)), None, cursor_store.clone());
+
+        // First poll: detects the failure
+        let events_first = poller
+            .poll_github_pipeline_runs("my-org/my-repo")
+            .await
+            .unwrap();
+        assert_eq!(
+            events_first.len(),
+            1,
+            "First poll should detect the failure"
+        );
+
+        // Second poll: same run_id is idempotently skipped
+        let events_second = poller
+            .poll_github_pipeline_runs("my-org/my-repo")
+            .await
+            .unwrap();
+        assert_eq!(
+            events_second.len(),
+            0,
+            "Second poll should not re-process the same run"
+        );
     }
 }

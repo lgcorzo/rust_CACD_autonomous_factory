@@ -120,6 +120,26 @@ cargo run --bin factory-cli -- gitlab-verify --json
 - **Strict Manual Merge Requirement**: Dark Gravity **never** automatically merges PRs or MRs into `main` or default production branches.
 - Once all automated CI/CD and CodeQL checks pass, the agent hands off the PR/MR link to the human developer for final manual review and merge.
 
+### 6. Autonomous Pipeline Error Remediation
+
+Dark Gravity continuously monitors CI/CD pipelines across GitHub and GitLab repositories to autonomously triage, remediate, or escalate errors:
+
+- **Detection**: The outbound poller queries GitHub Actions (`GET /repos/{repo}/actions/runs?status=failure`) and GitLab CI (`GET /projects/{id}/pipelines?status=failed`), extracting run IDs, failing jobs/steps, and error logs (truncated safely to 10KB).
+- **Classification**: Errors are parsed using an ordered regex classification engine into 7 canonical categories:
+  - `LintViolation`: `cargo clippy`, `eslint`, formatting warnings/errors.
+  - `CodeCompilation`: Rust compiler errors (`error[E0308]`), syntax or type errors.
+  - `TestFailure`: Unit, integration, or E2E assertion failures.
+  - `InfrastructureBuild`: Dockerfile build failures, apt-get, package installation failures.
+  - `InfrastructureTransient`: Network timeouts, rate limits, transient connection drops.
+  - `SecurityAudit`: Cargo audit / RUSTSEC advisory failures.
+  - `Unknown`: Unrecognized error patterns (always escalated to human review).
+- **Autonomous Mission Triggering**: Remediable failures construct a remediation mission payload signed with Ed25519 Non-Human Identity (NHI) credentials and publish to the `mission-input` Kafka topic.
+- **Safety Guards & Governance**:
+  - **Self-Referential Safety Guard**: Any failure originating from `lgcorzo/rust_CACD_autonomous_factory` is immediately escalated to a human engineer via a GitHub issue, strictly preventing recursion loops.
+  - **Concurrency Control**: Remediations are throttled by `MAX_CONCURRENT_REMEDIATIONS` (default: 3) via an async semaphore.
+  - **Recurring Failure Escalation**: Error fingerprints (SHA-256 hash of category + file + rule/test) are tracked in `CursorStore`. If the same error fingerprint recurs 3 times consecutively, it automatically escalates to human review.
+  - **Full Observability**: Error classifications and remediation outcomes are emitted to Kafka topics `agent-thought` and `mission-artifact`.
+
 ---
 
 ## 🚀 Getting Started

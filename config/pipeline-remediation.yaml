@@ -1,0 +1,57 @@
+# Pipeline Error Remediation Configuration
+# Spec: specs/005-pipeline-error-remediation/spec.md
+# Architecture: Onion Architecture (factory-application + factory-infrastructure)
+
+# Concurrency & Rate Limiting
+concurrency:
+  # Maximum concurrent autonomous remediation missions executing simultaneously.
+  # Environment variable: MAX_CONCURRENT_REMEDIATIONS
+  # Default: 3
+  max_concurrent_remediations: 3
+
+# Polling & Detection
+polling:
+  # Polling interval in seconds for CI/CD pipeline failure checks.
+  # Environment variable: PIPELINE_POLL_INTERVAL_SECS
+  # Default: 30
+  pipeline_poll_interval_secs: 30
+
+  # GitHub repositories to poll for failed workflow runs.
+  # Environment variable: GITHUB_REPOS (comma-separated)
+  github_repositories:
+    - "lgcorzo/rust_CACD_autonomous_factory"
+
+  # GitLab projects to poll for failed pipeline jobs.
+  # Environment variable: GITLAB_PROJECTS (comma-separated)
+  gitlab_projects:
+    - "lgcorzo/lince-rs"
+    - "lgcorzo-lab/autonomous_factory"
+    - "lgcorzo/fastapi-autogen-team"
+
+# Safety & Governance
+safety:
+  # Self-referential safety guard repository.
+  # Any failure detected in this repository will ALWAYS escalate to human review
+  # via GitHub issue creation and NEVER spawn an autonomous remediation mission.
+  # Environment variable: SELF_REPO_GUARD
+  # Default: "lgcorzo/rust_CACD_autonomous_factory"
+  self_referential_guard_repo: "lgcorzo/rust_CACD_autonomous_factory"
+
+  # Recurring failure escalation threshold.
+  # When the same error fingerprint (SHA-256) is observed this many times consecutively,
+  # further autonomous attempts halt and the error is escalated to a human engineer.
+  # Default: 3
+  recurring_failure_escalation_threshold: 3
+
+  # Maximum log size retained for classifier processing (tail truncation).
+  # Default: 10240 bytes (10KB)
+  max_log_truncation_bytes: 10240
+
+# Telemetry & Messaging Topics
+telemetry:
+  # Kafka topic for dispatching remediation missions
+  mission_input_topic: "mission-input"
+  # Kafka topic for agent thought reasoning and classification steps
+  agent_thought_topic: "agent-thought"
+  # Kafka topic for recording remediation outcomes and post-mortem artifacts
+  mission_artifact_topic: "mission-artifact"
