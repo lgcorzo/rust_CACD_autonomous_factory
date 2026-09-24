@@ -162,9 +162,7 @@ impl PipelineClassifier for RegexPipelineClassifier {
                     None
                 };
 
-                let key_for_fingerprint = rule_name
-                    .clone()
-                    .or_else(|| test_name.clone());
+                let key_for_fingerprint = rule_name.clone().or_else(|| test_name.clone());
 
                 let error_fingerprint =
                     Self::generate_fingerprint(&rule.category, &file_path, &key_for_fingerprint);
@@ -273,7 +271,8 @@ docker build failed
 
     #[test]
     fn test_classify_transient_error() {
-        let log = "fatal: unable to access 'https://github.com/org/repo.git/': Connection timed out";
+        let log =
+            "fatal: unable to access 'https://github.com/org/repo.git/': Connection timed out";
         let result = classifier().classify(log);
         assert_eq!(result.category, ErrorCategory::InfrastructureTransient);
         assert!(!result.is_remediable);

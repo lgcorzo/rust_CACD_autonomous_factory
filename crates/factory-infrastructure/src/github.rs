@@ -176,11 +176,7 @@ pub trait GithubClient: Send + Sync {
     ) -> anyhow::Result<Vec<GithubWorkflowJob>>;
 
     /// Download the log for a specific job (truncated to 10KB).
-    async fn get_job_log(
-        &self,
-        repo: &str,
-        job_id: u64,
-    ) -> anyhow::Result<String>;
+    async fn get_job_log(&self, repo: &str, job_id: u64) -> anyhow::Result<String>;
 }
 
 pub struct HttpGithubClient {
@@ -554,7 +550,10 @@ impl GithubClient for HttpGithubClient {
             repo
         );
         if let Some(s) = since {
-            url.push_str(&format!("&created=>={}", urlencoding::encode(&s.to_rfc3339())));
+            url.push_str(&format!(
+                "&created=>={}",
+                urlencoding::encode(&s.to_rfc3339())
+            ));
         }
 
         let mut req = self.client.get(&url);
@@ -566,8 +565,14 @@ impl GithubClient for HttpGithubClient {
         let res = req.send().await?;
         if !res.status().is_success() {
             let status = res.status();
-            tracing::error!("GitHub list failed workflow runs failed with status {}", status);
-            anyhow::bail!("GitHub list failed workflow runs failed with status {}", status);
+            tracing::error!(
+                "GitHub list failed workflow runs failed with status {}",
+                status
+            );
+            anyhow::bail!(
+                "GitHub list failed workflow runs failed with status {}",
+                status
+            );
         }
 
         let response: GithubWorkflowRunsResponse = res.json().await?;
@@ -603,11 +608,7 @@ impl GithubClient for HttpGithubClient {
         Ok(response.jobs)
     }
 
-    async fn get_job_log(
-        &self,
-        repo: &str,
-        job_id: u64,
-    ) -> anyhow::Result<String> {
+    async fn get_job_log(&self, repo: &str, job_id: u64) -> anyhow::Result<String> {
         let url = format!(
             "{}/repos/{}/actions/jobs/{}/logs",
             self.api_url.trim_end_matches('/'),
@@ -886,17 +887,12 @@ mod tests {
         Mock::given(method("GET"))
             .and(path("/repos/my-org/my-repo/actions/jobs/42/logs"))
             .and(header("Authorization", "Bearer test-token"))
-            .respond_with(
-                ResponseTemplate::new(200).set_body_string(log_content),
-            )
+            .respond_with(ResponseTemplate::new(200).set_body_string(log_content))
             .mount(&mock_server)
             .await;
 
         let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
-        let log = client
-            .get_job_log("my-org/my-repo", 42)
-            .await
-            .unwrap();
+        let log = client.get_job_log("my-org/my-repo", 42).await.unwrap();
 
         assert_eq!(log, log_content);
         assert!(log.len() <= 10 * 1024);
@@ -909,16 +905,11 @@ mod tests {
         Mock::given(method("GET"))
             .and(path("/repos/my-org/my-repo/actions/jobs/99/logs"))
             .and(header("Authorization", "Bearer test-token"))
-            .respond_with(
-                ResponseTemplate::new(200).set_body_string(large_log),
-            )
+            .respond_with(ResponseTemplate::new(200).set_body_string(large_log))
             .mount(&mock_server2)
             .await;
 
-        let truncated = client2
-            .get_job_log("my-org/my-repo", 99)
-            .await
-            .unwrap();
+        let truncated = client2.get_job_log("my-org/my-repo", 99).await.unwrap();
         assert_eq!(truncated.len(), 10 * 1024);
     }
 }

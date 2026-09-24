@@ -10,3 +10,4 @@ pub use circuit_breaker::{CircuitBreakerGuard, CircuitBreakerStatus};
 pub use comment_control::{CommentControlInput, CommentControlOutput, CommentControlService};
 pub use deep_research::{DeepSearchInput, DeepSearchOutput, create_deep_research_workflow};
 pub use develop_task::{TaskInput, TaskOutput, create_develop_task_workflow};
+pub use pipeline_remediation::PipelineRemediationService;

@@ -20,11 +20,11 @@
 
 **Purpose**: Add the `regex` dependency and create the new module files with empty stubs
 
-- [ ] T001 Add `regex = "1"` to `[workspace.dependencies]` in `Cargo.toml` and to `factory-infrastructure/Cargo.toml` dependencies
-- [ ] T002 [P] Create empty module file `crates/factory-infrastructure/src/pipeline_classifier.rs` with module doc comment
-- [ ] T003 [P] Create empty module file `crates/factory-application/src/workflows/pipeline_remediation.rs` with module doc comment
-- [ ] T004 Register `pipeline_classifier` module in `crates/factory-infrastructure/src/lib.rs` with pub re-exports
-- [ ] T005 Register `pipeline_remediation` module in `crates/factory-application/src/workflows/mod.rs`
+- [x] T001 Add `regex = "1"` to `[workspace.dependencies]` in `Cargo.toml` and to `factory-infrastructure/Cargo.toml` dependencies
+- [x] T002 [P] Create empty module file `crates/factory-infrastructure/src/pipeline_classifier.rs` with module doc comment
+- [x] T003 [P] Create empty module file `crates/factory-application/src/workflows/pipeline_remediation.rs` with module doc comment
+- [x] T004 Register `pipeline_classifier` module in `crates/factory-infrastructure/src/lib.rs` with pub re-exports
+- [x] T005 Register `pipeline_remediation` module in `crates/factory-application/src/workflows/mod.rs`
 
 ---
 
@@ -34,15 +34,15 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 [P] Add `ErrorCategory` enum with 7 variants and `is_remediable()` method to `crates/factory-core/src/lib.rs` (per data-model.md)
-- [ ] T007 [P] Add `PipelineFailureEvent` struct to `crates/factory-core/src/lib.rs` with all fields from data-model.md
-- [ ] T008 [P] Add `ErrorClassification` struct to `crates/factory-core/src/lib.rs` with `error_fingerprint` generation
-- [ ] T009 [P] Add `RemediationStatus` enum (Pending, InProgress, Success, Failed, Escalated) to `crates/factory-core/src/lib.rs`
-- [ ] T010 [P] Add `RemediationOutcome` struct to `crates/factory-core/src/lib.rs`
-- [ ] T011 [P] Add `GithubWorkflowRun`, `GithubWorkflowJob`, `GithubWorkflowStep` response structs to `crates/factory-infrastructure/src/github.rs`
-- [ ] T012 [P] Add `GitlabPipeline`, `GitlabPipelineJob` response structs to `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T013 [P] Write unit tests for `ErrorCategory::is_remediable()` in `crates/factory-core/src/lib.rs` (test all 7 variants)
-- [ ] T014 [P] Write unit tests for `PipelineFailureEvent` and `ErrorClassification` serialization/deserialization roundtrip in `crates/factory-core/src/lib.rs`
+- [x] T006 [P] Add `ErrorCategory` enum with 7 variants and `is_remediable()` method to `crates/factory-core/src/lib.rs` (per data-model.md)
+- [x] T007 [P] Add `PipelineFailureEvent` struct to `crates/factory-core/src/lib.rs` with all fields from data-model.md
+- [x] T008 [P] Add `ErrorClassification` struct to `crates/factory-core/src/lib.rs` with `error_fingerprint` generation
+- [x] T009 [P] Add `RemediationStatus` enum (Pending, InProgress, Success, Failed, Escalated) to `crates/factory-core/src/lib.rs`
+- [x] T010 [P] Add `RemediationOutcome` struct to `crates/factory-core/src/lib.rs`
+- [x] T011 [P] Add `GithubWorkflowRun`, `GithubWorkflowJob`, `GithubWorkflowStep` response structs to `crates/factory-infrastructure/src/github.rs`
+- [x] T012 [P] Add `GitlabPipeline`, `GitlabPipelineJob` response structs to `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T013 [P] Write unit tests for `ErrorCategory::is_remediable()` in `crates/factory-core/src/lib.rs` (test all 7 variants)
+- [x] T014 [P] Write unit tests for `PipelineFailureEvent` and `ErrorClassification` serialization/deserialization roundtrip in `crates/factory-core/src/lib.rs`
 
 **Checkpoint**: Foundation ready — all domain entities compilable and tested; user story implementation can begin
 
@@ -56,25 +56,25 @@
 
 ### Tests for User Story 1
 
-- [ ] T015 [P] [US1] Write `wiremock` test `test_list_failed_github_workflow_runs` in `crates/factory-infrastructure/src/github.rs` — mock `GET /repos/{repo}/actions/runs?status=failure` and verify deserialization
-- [ ] T016 [P] [US1] Write `wiremock` test `test_get_github_job_log` in `crates/factory-infrastructure/src/github.rs` — mock the job log endpoint and verify 10KB truncation
-- [ ] T017 [P] [US1] Write `wiremock` test `test_list_failed_gitlab_pipelines` in `crates/factory-infrastructure/src/gitlab.rs` — mock `GET /projects/{id}/pipelines?status=failed` and verify deserialization
-- [ ] T018 [P] [US1] Write `wiremock` test `test_get_gitlab_job_trace` in `crates/factory-infrastructure/src/gitlab.rs` — mock job trace endpoint and verify truncation
-- [ ] T019 [US1] Write integration test `test_poll_github_pipeline_runs` in `crates/factory-infrastructure/src/git_poller.rs` — end-to-end mock: poller detects failure, constructs `PipelineFailureEvent`, marks cursor as processed
-- [ ] T020 [US1] Write integration test `test_pipeline_cursor_idempotency` in `crates/factory-infrastructure/src/git_poller.rs` — verify same run ID is not re-processed on second poll
+- [x] T015 [P] [US1] Write `wiremock` test `test_list_failed_github_workflow_runs` in `crates/factory-infrastructure/src/github.rs` — mock `GET /repos/{repo}/actions/runs?status=failure` and verify deserialization
+- [x] T016 [P] [US1] Write `wiremock` test `test_get_github_job_log` in `crates/factory-infrastructure/src/github.rs` — mock the job log endpoint and verify 10KB truncation
+- [x] T017 [P] [US1] Write `wiremock` test `test_list_failed_gitlab_pipelines` in `crates/factory-infrastructure/src/gitlab.rs` — mock `GET /projects/{id}/pipelines?status=failed` and verify deserialization
+- [x] T018 [P] [US1] Write `wiremock` test `test_get_gitlab_job_trace` in `crates/factory-infrastructure/src/gitlab.rs` — mock job trace endpoint and verify truncation
+- [x] T019 [US1] Write integration test `test_poll_github_pipeline_runs` in `crates/factory-infrastructure/src/git_poller.rs` — end-to-end mock: poller detects failure, constructs `PipelineFailureEvent`, marks cursor as processed
+- [x] T020 [US1] Write integration test `test_pipeline_cursor_idempotency` in `crates/factory-infrastructure/src/git_poller.rs` — verify same run ID is not re-processed on second poll
 
 ### Implementation for User Story 1
 
-- [ ] T021 [US1] Add `list_failed_workflow_runs(&self, repo: &str, since: Option<DateTime<Utc>>) -> Result<Vec<GithubWorkflowRun>>` to `GithubClient` trait and `HttpGithubClient` impl in `crates/factory-infrastructure/src/github.rs`
-- [ ] T022 [US1] Add `get_workflow_run_jobs(&self, repo: &str, run_id: u64) -> Result<Vec<GithubWorkflowJob>>` to `GithubClient` trait and `HttpGithubClient` impl in `crates/factory-infrastructure/src/github.rs`
-- [ ] T023 [US1] Add `get_job_log(&self, repo: &str, job_id: u64) -> Result<String>` to `GithubClient` trait and `HttpGithubClient` impl in `crates/factory-infrastructure/src/github.rs` (truncate to 10KB)
-- [ ] T024 [US1] Add `list_failed_pipelines(&self, project_id: &str, since: Option<DateTime<Utc>>) -> Result<Vec<GitlabPipeline>>` to `GitlabClient` trait and `HttpGitlabClient` impl in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T025 [US1] Add `get_pipeline_jobs(&self, project_id: &str, pipeline_id: u64) -> Result<Vec<GitlabPipelineJob>>` to `GitlabClient` trait and `HttpGitlabClient` impl in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T026 [US1] Add `get_job_trace(&self, project_id: &str, job_id: u64) -> Result<String>` to `GitlabClient` trait and `HttpGitlabClient` impl in `crates/factory-infrastructure/src/gitlab.rs` (truncate to 10KB)
-- [ ] T027 [US1] Implement `poll_github_pipeline_runs(&self, repo: &str) -> Result<Vec<PipelineFailureEvent>>` in `crates/factory-infrastructure/src/git_poller.rs` — cursor key `github:{repo}:pipelines`, iterate failed runs, fetch jobs/logs, build `PipelineFailureEvent`, mark processed
-- [ ] T028 [US1] Implement `poll_gitlab_pipeline_runs(&self, project: &str) -> Result<Vec<PipelineFailureEvent>>` in `crates/factory-infrastructure/src/git_poller.rs` — cursor key `gitlab:{project}:pipelines`, same pattern
-- [ ] T029 [US1] Update `MockGithubClient` expectations in `crates/factory-infrastructure/src/github.rs` to include new trait methods (mockall auto-derives)
-- [ ] T030 [US1] Update `MockGitlabClient` expectations in `crates/factory-infrastructure/src/gitlab.rs` to include new trait methods (mockall auto-derives)
+- [x] T021 [US1] Add `list_failed_workflow_runs(&self, repo: &str, since: Option<DateTime<Utc>>) -> Result<Vec<GithubWorkflowRun>>` to `GithubClient` trait and `HttpGithubClient` impl in `crates/factory-infrastructure/src/github.rs`
+- [x] T022 [US1] Add `get_workflow_run_jobs(&self, repo: &str, run_id: u64) -> Result<Vec<GithubWorkflowJob>>` to `GithubClient` trait and `HttpGithubClient` impl in `crates/factory-infrastructure/src/github.rs`
+- [x] T023 [US1] Add `get_job_log(&self, repo: &str, job_id: u64) -> Result<String>` to `GithubClient` trait and `HttpGithubClient` impl in `crates/factory-infrastructure/src/github.rs` (truncate to 10KB)
+- [x] T024 [US1] Add `list_failed_pipelines(&self, project_id: &str, since: Option<DateTime<Utc>>) -> Result<Vec<GitlabPipeline>>` to `GitlabClient` trait and `HttpGitlabClient` impl in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T025 [US1] Add `get_pipeline_jobs(&self, project_id: &str, pipeline_id: u64) -> Result<Vec<GitlabPipelineJob>>` to `GitlabClient` trait and `HttpGitlabClient` impl in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T026 [US1] Add `get_job_trace(&self, project_id: &str, job_id: u64) -> Result<String>` to `GitlabClient` trait and `HttpGitlabClient` impl in `crates/factory-infrastructure/src/gitlab.rs` (truncate to 10KB)
+- [x] T027 [US1] Implement `poll_github_pipeline_runs(&self, repo: &str) -> Result<Vec<PipelineFailureEvent>>` in `crates/factory-infrastructure/src/git_poller.rs` — cursor key `github:{repo}:pipelines`, iterate failed runs, fetch jobs/logs, build `PipelineFailureEvent`, mark processed
+- [x] T028 [US1] Implement `poll_gitlab_pipeline_runs(&self, project: &str) -> Result<Vec<PipelineFailureEvent>>` in `crates/factory-infrastructure/src/git_poller.rs` — cursor key `gitlab:{project}:pipelines`, same pattern
+- [x] T029 [US1] Update `MockGithubClient` expectations in `crates/factory-infrastructure/src/github.rs` to include new trait methods (mockall auto-derives)
+- [x] T030 [US1] Update `MockGitlabClient` expectations in `crates/factory-infrastructure/src/gitlab.rs` to include new trait methods (mockall auto-derives)
 
 **Checkpoint**: Pipeline failure detection works for both GitHub and GitLab — events captured with full metadata, idempotent polling confirmed
 
@@ -88,22 +88,22 @@
 
 ### Tests for User Story 2
 
-- [ ] T031 [P] [US2] Write unit test `test_classify_clippy_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with `error[clippy::unused_variable]`, expect `LintViolation` + rule name extracted
-- [ ] T032 [P] [US2] Write unit test `test_classify_compilation_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with `error[E0308]: mismatched types`, expect `CodeCompilation` + file/line extracted
-- [ ] T033 [P] [US2] Write unit test `test_classify_test_failure` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with `test core::test_parse ... FAILED`, expect `TestFailure` + test name extracted
-- [ ] T034 [P] [US2] Write unit test `test_classify_docker_build_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with Docker apt-get failure, expect `InfrastructureBuild`
-- [ ] T035 [P] [US2] Write unit test `test_classify_transient_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with `Connection timed out`, expect `InfrastructureTransient`
-- [ ] T036 [P] [US2] Write unit test `test_classify_security_audit` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with RUSTSEC advisory, expect `SecurityAudit` + crate name extracted
-- [ ] T037 [P] [US2] Write unit test `test_classify_unknown_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with unrecognized pattern, expect `Unknown`
-- [ ] T038 [US2] Write unit test `test_error_fingerprint_deterministic` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — same input produces same fingerprint; different inputs produce different fingerprints
+- [x] T031 [P] [US2] Write unit test `test_classify_clippy_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with `error[clippy::unused_variable]`, expect `LintViolation` + rule name extracted
+- [x] T032 [P] [US2] Write unit test `test_classify_compilation_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with `error[E0308]: mismatched types`, expect `CodeCompilation` + file/line extracted
+- [x] T033 [P] [US2] Write unit test `test_classify_test_failure` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with `test core::test_parse ... FAILED`, expect `TestFailure` + test name extracted
+- [x] T034 [P] [US2] Write unit test `test_classify_docker_build_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with Docker apt-get failure, expect `InfrastructureBuild`
+- [x] T035 [P] [US2] Write unit test `test_classify_transient_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with `Connection timed out`, expect `InfrastructureTransient`
+- [x] T036 [P] [US2] Write unit test `test_classify_security_audit` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with RUSTSEC advisory, expect `SecurityAudit` + crate name extracted
+- [x] T037 [P] [US2] Write unit test `test_classify_unknown_error` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — input log with unrecognized pattern, expect `Unknown`
+- [x] T038 [US2] Write unit test `test_error_fingerprint_deterministic` in `crates/factory-infrastructure/src/pipeline_classifier.rs` — same input produces same fingerprint; different inputs produce different fingerprints
 
 ### Implementation for User Story 2
 
-- [ ] T039 [US2] Define `PipelineClassifier` trait with `fn classify(&self, error_log: &str) -> ErrorClassification` in `crates/factory-infrastructure/src/pipeline_classifier.rs`
-- [ ] T040 [US2] Implement `RegexPipelineClassifier` struct with ordered regex rule table (per research.md R3) in `crates/factory-infrastructure/src/pipeline_classifier.rs`
-- [ ] T041 [US2] Implement metadata extraction methods: `extract_file_line()`, `extract_clippy_rule()`, `extract_test_name()`, `extract_crate_name()` in `crates/factory-infrastructure/src/pipeline_classifier.rs`
-- [ ] T042 [US2] Implement `error_fingerprint` generation (SHA-256 hash of category + file + rule/test) in `crates/factory-infrastructure/src/pipeline_classifier.rs`
-- [ ] T043 [US2] Add `pub use pipeline_classifier::{PipelineClassifier, RegexPipelineClassifier}` to `crates/factory-infrastructure/src/lib.rs`
+- [x] T039 [US2] Define `PipelineClassifier` trait with `fn classify(&self, error_log: &str) -> ErrorClassification` in `crates/factory-infrastructure/src/pipeline_classifier.rs`
+- [x] T040 [US2] Implement `RegexPipelineClassifier` struct with ordered regex rule table (per research.md R3) in `crates/factory-infrastructure/src/pipeline_classifier.rs`
+- [x] T041 [US2] Implement metadata extraction methods: `extract_file_line()`, `extract_clippy_rule()`, `extract_test_name()`, `extract_crate_name()` in `crates/factory-infrastructure/src/pipeline_classifier.rs`
+- [x] T042 [US2] Implement `error_fingerprint` generation (SHA-256 hash of category + file + rule/test) in `crates/factory-infrastructure/src/pipeline_classifier.rs`
+- [x] T043 [US2] Add `pub use pipeline_classifier::{PipelineClassifier, RegexPipelineClassifier}` to `crates/factory-infrastructure/src/lib.rs`
 
 **Checkpoint**: Classifier correctly categorizes all 7 error types with metadata extraction — all unit tests pass
 
@@ -117,23 +117,23 @@
 
 ### Tests for User Story 3
 
-- [ ] T044 [US3] Write integration test `test_pipeline_remediation_full_cycle` in `crates/factory-application/src/poller_service.rs` — mock pipeline failure detection → classification → mission published to Kafka
-- [ ] T045 [US3] Write test `test_self_referential_safety_guard` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify `lgcorzo/rust_CACD_autonomous_factory` failures create a GitHub issue instead of a mission
-- [ ] T046 [US3] Write test `test_unknown_error_creates_issue` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify `Unknown` category creates a GitHub issue tagged `pipeline-failure-unknown`
-- [ ] T047 [US3] Write test `test_concurrency_limiter` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify `Semaphore` prevents exceeding `MAX_CONCURRENT_REMEDIATIONS`
-- [ ] T048 [US3] Write test `test_transient_error_retry` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify `InfrastructureTransient` errors trigger retry before escalation
+- [x] T044 [US3] Write integration test `test_pipeline_remediation_full_cycle` in `crates/factory-application/src/poller_service.rs` — mock pipeline failure detection → classification → mission published to Kafka
+- [x] T045 [US3] Write test `test_self_referential_safety_guard` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify `lgcorzo/rust_CACD_autonomous_factory` failures create a GitHub issue instead of a mission
+- [x] T046 [US3] Write test `test_unknown_error_creates_issue` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify `Unknown` category creates a GitHub issue tagged `pipeline-failure-unknown`
+- [x] T047 [US3] Write test `test_concurrency_limiter` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify `Semaphore` prevents exceeding `MAX_CONCURRENT_REMEDIATIONS`
+- [x] T048 [US3] Write test `test_transient_error_retry` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify `InfrastructureTransient` errors trigger retry before escalation
 
 ### Implementation for User Story 3
 
-- [ ] T049 [US3] Create `PipelineRemediationService` struct in `crates/factory-application/src/workflows/pipeline_remediation.rs` with dependencies: `KafkaClient`, `GithubClient`, `GitlabClient`, `PipelineClassifier`, `Semaphore`
-- [ ] T050 [US3] Implement `handle_pipeline_failure(&self, event: &PipelineFailureEvent) -> Result<()>` — classify → check safety guard → route to remediation or escalation in `crates/factory-application/src/workflows/pipeline_remediation.rs`
-- [ ] T051 [US3] Implement `trigger_remediation_mission(&self, event: &PipelineFailureEvent, classification: &ErrorClassification) -> Result<()>` — construct mission payload (per contracts/kafka-events.md), sign NHI VC, publish to `mission-input` in `crates/factory-application/src/workflows/pipeline_remediation.rs`
-- [ ] T052 [US3] Implement `escalate_to_human(&self, event: &PipelineFailureEvent, classification: &ErrorClassification) -> Result<()>` — create GitHub issue or GitLab work item with error context in `crates/factory-application/src/workflows/pipeline_remediation.rs`
-- [ ] T053 [US3] Implement self-referential safety guard: if `event.repository == "lgcorzo/rust_CACD_autonomous_factory"`, route to `escalate_to_human()` in `crates/factory-application/src/workflows/pipeline_remediation.rs`
-- [ ] T054 [US3] Implement transient error retry logic: retry up to 3 times with exponential backoff before escalating `InfrastructureTransient` errors in `crates/factory-application/src/workflows/pipeline_remediation.rs`
-- [ ] T055 [US3] Add pipeline failure polling to `PollerDaemonService::poll_once()` — after existing issue/comment polling, poll `poll_github_pipeline_runs()` and `poll_gitlab_pipeline_runs()`, route each event through `PipelineRemediationService::handle_pipeline_failure()` in `crates/factory-application/src/poller_service.rs`
-- [ ] T056 [US3] Add `pipelines_remediated: usize` and `pipelines_escalated: usize` counters to `PollerCycleStats` in `crates/factory-application/src/poller_service.rs`
-- [ ] T057 [US3] Wire `PipelineRemediationService` into the CLI worker daemon — construct it with the same dependencies and pass to `PollerDaemonService` in `crates/factory-cli/src/main.rs`
+- [x] T049 [US3] Create `PipelineRemediationService` struct in `crates/factory-application/src/workflows/pipeline_remediation.rs` with dependencies: `KafkaClient`, `GithubClient`, `GitlabClient`, `PipelineClassifier`, `Semaphore`
+- [x] T050 [US3] Implement `handle_pipeline_failure(&self, event: &PipelineFailureEvent) -> Result<()>` — classify → check safety guard → route to remediation or escalation in `crates/factory-application/src/workflows/pipeline_remediation.rs`
+- [x] T051 [US3] Implement `trigger_remediation_mission(&self, event: &PipelineFailureEvent, classification: &ErrorClassification) -> Result<()>` — construct mission payload (per contracts/kafka-events.md), sign NHI VC, publish to `mission-input` in `crates/factory-application/src/workflows/pipeline_remediation.rs`
+- [x] T052 [US3] Implement `escalate_to_human(&self, event: &PipelineFailureEvent, classification: &ErrorClassification) -> Result<()>` — create GitHub issue or GitLab work item with error context in `crates/factory-application/src/workflows/pipeline_remediation.rs`
+- [x] T053 [US3] Implement self-referential safety guard: if `event.repository == "lgcorzo/rust_CACD_autonomous_factory"`, route to `escalate_to_human()` in `crates/factory-application/src/workflows/pipeline_remediation.rs`
+- [x] T054 [US3] Implement transient error retry logic: retry up to 3 times with exponential backoff before escalating `InfrastructureTransient` errors in `crates/factory-application/src/workflows/pipeline_remediation.rs`
+- [x] T055 [US3] Add pipeline failure polling to `PollerDaemonService::poll_once()` — after existing issue/comment polling, poll `poll_github_pipeline_runs()` and `poll_gitlab_pipeline_runs()`, route each event through `PipelineRemediationService::handle_pipeline_failure()` in `crates/factory-application/src/poller_service.rs`
+- [x] T056 [US3] Add `pipelines_remediated: usize` and `pipelines_escalated: usize` counters to `PollerCycleStats` in `crates/factory-application/src/poller_service.rs`
+- [x] T057 [US3] Wire `PipelineRemediationService` into the CLI worker daemon — construct it with the same dependencies and pass to `PollerDaemonService` in `crates/factory-cli/src/main.rs`
 
 **Checkpoint**: End-to-end flow works: pipeline failure → classify → remediation mission OR escalation issue — with safety guard and concurrency limit
 
@@ -147,17 +147,17 @@
 
 ### Tests for User Story 4
 
-- [ ] T058 [P] [US4] Write test `test_remediation_success_telemetry` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify success outcome publishes to `mission-artifact` Kafka topic with mission ID, category, and time-to-fix
-- [ ] T059 [P] [US4] Write test `test_remediation_failure_telemetry` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify failure outcome publishes to Kafka with failure reason
-- [ ] T060 [US4] Write test `test_recurring_failure_escalation` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify 3 consecutive identical failures (same fingerprint) triggers escalation to human review
+- [x] T058 [P] [US4] Write test `test_remediation_success_telemetry` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify success outcome publishes to `mission-artifact` Kafka topic with mission ID, category, and time-to-fix
+- [x] T059 [P] [US4] Write test `test_remediation_failure_telemetry` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify failure outcome publishes to Kafka with failure reason
+- [x] T060 [US4] Write test `test_recurring_failure_escalation` in `crates/factory-application/src/workflows/pipeline_remediation.rs` — verify 3 consecutive identical failures (same fingerprint) triggers escalation to human review
 
 ### Implementation for User Story 4
 
-- [ ] T061 [US4] Implement `record_remediation_outcome(&self, outcome: &RemediationOutcome) -> Result<()>` — publish to `mission-artifact` Kafka topic in `crates/factory-application/src/workflows/pipeline_remediation.rs`
-- [ ] T062 [US4] Implement `publish_classification_thought(&self, event: &PipelineFailureEvent, classification: &ErrorClassification) -> Result<()>` — publish to `agent-thought` Kafka topic in `crates/factory-application/src/workflows/pipeline_remediation.rs`
-- [ ] T063 [US4] Implement recurring failure detection: track `(repository, error_fingerprint)` counter in `CursorStore`, escalate after 3 consecutive identical failures in `crates/factory-application/src/workflows/pipeline_remediation.rs`
-- [ ] T064 [US4] Add recurring failure counter methods `increment_failure_count()` and `get_failure_count()` to `CursorStore` trait in `crates/factory-infrastructure/src/cursor_store.rs`
-- [ ] T065 [US4] Implement recurring failure counter in `InMemoryCursorStore` and `PostgresCursorStore` in `crates/factory-infrastructure/src/cursor_store.rs`
+- [x] T061 [US4] Implement `record_remediation_outcome(&self, outcome: &RemediationOutcome) -> Result<()>` — publish to `mission-artifact` Kafka topic in `crates/factory-application/src/workflows/pipeline_remediation.rs`
+- [x] T062 [US4] Implement `publish_classification_thought(&self, event: &PipelineFailureEvent, classification: &ErrorClassification) -> Result<()>` — publish to `agent-thought` Kafka topic in `crates/factory-application/src/workflows/pipeline_remediation.rs`
+- [x] T063 [US4] Implement recurring failure detection: track `(repository, error_fingerprint)` counter in `CursorStore`, escalate after 3 consecutive identical failures in `crates/factory-application/src/workflows/pipeline_remediation.rs`
+- [x] T064 [US4] Add recurring failure counter methods `increment_failure_count()` and `get_failure_count()` to `CursorStore` trait in `crates/factory-infrastructure/src/cursor_store.rs`
+- [x] T065 [US4] Implement recurring failure counter in `InMemoryCursorStore` and `PostgresCursorStore` in `crates/factory-infrastructure/src/cursor_store.rs`
 
 **Checkpoint**: Full observability loop — all remediation outcomes logged to Kafka, recurring failures detected and escalated
 
@@ -167,13 +167,14 @@
 
 **Purpose**: Quality gates, documentation, and workspace-level validation
 
-- [ ] T066 Run `cargo fmt --all -- --check` and fix any formatting issues
-- [ ] T067 Run `cargo clippy --workspace -- -D warnings` and fix any lint warnings
-- [ ] T068 Run `cargo test --workspace -- --skip smoke` and verify all tests pass (including new pipeline remediation tests)
-- [ ] T069 [P] Update `README.md` to document the pipeline error remediation feature in the Automation Workflow section
-- [ ] T070 [P] Add pipeline remediation configuration to `config/` directory — document `MAX_CONCURRENT_REMEDIATIONS`, `PIPELINE_POLL_INTERVAL_SECS`, `SELF_REPO_GUARD` env vars
-- [ ] T071 Run full quickstart.md validation scenarios (Scenarios 1–5) and verify all pass
-- [ ] T072 Run `cargo build --release` to verify production build succeeds
+- [x] T066 Run `cargo fmt --all -- --check` and fix any formatting issues
+- [x] T067 Run `cargo clippy --workspace -- -D warnings` and fix any lint warnings
+- [x] T068 Run `cargo test --workspace -- --skip smoke` and verify all tests pass (including new pipeline remediation tests)
+- [x] T069 [P] Update `README.md` to document the pipeline error remediation feature in the Automation Workflow section
+- [x] T070 [P] Add pipeline remediation configuration to `config/` directory — document `MAX_CONCURRENT_REMEDIATIONS`, `PIPELINE_POLL_INTERVAL_SECS`, `SELF_REPO_GUARD` env vars
+- [x] T071 Run full quickstart.md validation scenarios (Scenarios 1–5) and verify all pass
+- [x] T072 Run `cargo build --release` to verify production build succeeds
+
 
 ---
 

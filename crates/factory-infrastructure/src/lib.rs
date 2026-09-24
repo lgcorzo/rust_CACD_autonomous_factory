@@ -19,6 +19,7 @@ pub mod gitlab;
 pub mod jira;
 pub mod kafka;
 pub mod mcp_client;
+pub mod pipeline_classifier;
 pub mod r2r;
 pub mod s3;
 pub mod security_validator;
@@ -26,7 +27,6 @@ pub mod semantica;
 pub mod sentry;
 pub mod vault;
 pub mod ziti;
-pub mod pipeline_classifier;
 
 pub use cursor_store::{CursorStore, InMemoryCursorStore, PostgresCursorStore};
 pub use git_poller::GitPlatformPoller;

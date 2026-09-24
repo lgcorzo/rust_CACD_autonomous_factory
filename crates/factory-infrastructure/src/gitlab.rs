@@ -194,11 +194,7 @@ pub trait GitlabClient: Send + Sync {
     ) -> anyhow::Result<Vec<GitlabPipelineJob>>;
 
     /// Download the log trace for a specific job (truncated to 10KB).
-    async fn get_job_trace(
-        &self,
-        project_id: &str,
-        job_id: u64,
-    ) -> anyhow::Result<String>;
+    async fn get_job_trace(&self, project_id: &str, job_id: u64) -> anyhow::Result<String>;
 }
 
 pub struct HttpGitlabClient {
@@ -652,7 +648,10 @@ impl GitlabClient for HttpGitlabClient {
             encoded_project_id
         );
         if let Some(s) = since {
-            url.push_str(&format!("&updated_after={}", urlencoding::encode(&s.to_rfc3339())));
+            url.push_str(&format!(
+                "&updated_after={}",
+                urlencoding::encode(&s.to_rfc3339())
+            ));
         }
 
         let res = self
@@ -702,11 +701,7 @@ impl GitlabClient for HttpGitlabClient {
         Ok(jobs)
     }
 
-    async fn get_job_trace(
-        &self,
-        project_id: &str,
-        job_id: u64,
-    ) -> anyhow::Result<String> {
+    async fn get_job_trace(&self, project_id: &str, job_id: u64) -> anyhow::Result<String> {
         let encoded_project_id = urlencoding::encode(project_id);
         let url = format!(
             "{}/api/v4/projects/{}/jobs/{}/trace",
@@ -1084,10 +1079,7 @@ mod tests {
             .mount(&mock_server)
             .await;
 
-        let trace = client
-            .get_job_trace("my-org/my-project", 42)
-            .await
-            .unwrap();
+        let trace = client.get_job_trace("my-org/my-project", 42).await.unwrap();
         assert_eq!(trace, trace_content);
         assert!(trace.len() <= 10 * 1024);
 
@@ -1125,7 +1117,9 @@ mod tests {
         ]);
 
         Mock::given(method("GET"))
-            .and(path("/api/v4/projects/my-org%2Fmy-project/pipelines/201/jobs"))
+            .and(path(
+                "/api/v4/projects/my-org%2Fmy-project/pipelines/201/jobs",
+            ))
             .and(header("PRIVATE-TOKEN", "test_token"))
             .respond_with(ResponseTemplate::new(200).set_body_json(jobs_resp))
             .mount(&mock_server)

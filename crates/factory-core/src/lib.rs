@@ -475,7 +475,10 @@ mod pipeline_tests {
         let deserialized: PipelineFailureEvent = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.run_id, 12345);
         assert_eq!(deserialized.source_platform, "github");
-        assert_eq!(deserialized.failing_step.as_deref(), Some("Lint with Clippy"));
+        assert_eq!(
+            deserialized.failing_step.as_deref(),
+            Some("Lint with Clippy")
+        );
     }
 
     #[test]

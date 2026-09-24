@@ -477,10 +477,7 @@ impl GitPlatformPoller {
 
             // Fetch log trace (best-effort)
             let error_log = if let Some(jid) = job_id {
-                client
-                    .get_job_trace(project, jid)
-                    .await
-                    .unwrap_or_default()
+                client.get_job_trace(project, jid).await.unwrap_or_default()
             } else {
                 String::new()
             };
@@ -489,9 +486,7 @@ impl GitPlatformPoller {
                 source_platform: "gitlab".to_string(),
                 repository: project.to_string(),
                 run_id: pipeline.id,
-                workflow_name: pipeline
-                    .ref_
-                    .unwrap_or_else(|| "unknown".to_string()),
+                workflow_name: pipeline.ref_.unwrap_or_else(|| "unknown".to_string()),
                 failing_job: job_name,
                 failing_step: None, // GitLab doesn't have steps like GitHub
                 error_log,
@@ -734,18 +729,12 @@ mod tests {
                 }])
             });
 
-        mock_gh
-            .expect_get_job_log()
-            .returning(|_repo, _job_id| {
-                Ok("error[E0308]: mismatched types\n  --> src/lib.rs:15:5".to_string())
-            });
+        mock_gh.expect_get_job_log().returning(|_repo, _job_id| {
+            Ok("error[E0308]: mismatched types\n  --> src/lib.rs:15:5".to_string())
+        });
 
         let cursor_store = Arc::new(InMemoryCursorStore::new());
-        let poller = GitPlatformPoller::new(
-            Some(Arc::new(mock_gh)),
-            None,
-            cursor_store.clone(),
-        );
+        let poller = GitPlatformPoller::new(Some(Arc::new(mock_gh)), None, cursor_store.clone());
 
         let events = poller
             .poll_github_pipeline_runs("my-org/my-repo")
@@ -803,18 +792,18 @@ mod tests {
             .returning(|_repo, _job_id| Ok("error log".to_string()));
 
         let cursor_store = Arc::new(InMemoryCursorStore::new());
-        let poller = GitPlatformPoller::new(
-            Some(Arc::new(mock_gh)),
-            None,
-            cursor_store.clone(),
-        );
+        let poller = GitPlatformPoller::new(Some(Arc::new(mock_gh)), None, cursor_store.clone());
 
         // First poll: detects the failure
         let events_first = poller
             .poll_github_pipeline_runs("my-org/my-repo")
             .await
             .unwrap();
-        assert_eq!(events_first.len(), 1, "First poll should detect the failure");
+        assert_eq!(
+            events_first.len(),
+            1,
+            "First poll should detect the failure"
+        );
 
         // Second poll: same run_id is idempotently skipped
         let events_second = poller

@@ -9,8 +9,7 @@ use chrono::Utc;
 use ed25519_dalek::SigningKey;
 use factory_core::security::nhi::{AgentSubject, VerifiableCredential};
 use factory_core::{
-    ErrorCategory, ErrorClassification, PipelineFailureEvent, RemediationOutcome,
-    RemediationStatus,
+    ErrorCategory, ErrorClassification, PipelineFailureEvent, RemediationOutcome, RemediationStatus,
 };
 use factory_infrastructure::cursor_store::CursorStore;
 use factory_infrastructure::github::GithubClient;
@@ -116,31 +115,32 @@ impl PipelineRemediationService {
         }
 
         // 4. Check recurring failure threshold (T063)
-        if classification.is_remediable {
-            if let Some(store) = &self.cursor_store {
-                let count = store
-                    .increment_failure_count(&classification.error_fingerprint)
-                    .await
-                    .unwrap_or(1);
-                if count >= RECURRING_FAILURE_ESCALATION_THRESHOLD {
-                    tracing::warn!(
-                        "Recurring failure #{} for fingerprint {} in {}. Escalating.",
-                        count,
-                        classification.error_fingerprint,
-                        event.repository
-                    );
-                    self.escalate_to_human(event, &classification).await?;
-                    return Ok(RemediationStatus::Escalated);
-                }
+        if classification.is_remediable
+            && let Some(store) = &self.cursor_store
+        {
+            let count = store
+                .increment_failure_count(&classification.error_fingerprint)
+                .await
+                .unwrap_or(1);
+            if count >= RECURRING_FAILURE_ESCALATION_THRESHOLD {
+                tracing::warn!(
+                    "Recurring failure #{} for fingerprint {} in {}. Escalating.",
+                    count,
+                    classification.error_fingerprint,
+                    event.repository
+                );
+                self.escalate_to_human(event, &classification).await?;
+                return Ok(RemediationStatus::Escalated);
             }
         }
 
         // 5. Route based on classification
         if classification.is_remediable {
             // Acquire semaphore permit to limit concurrent remediations
-            let _permit = self.semaphore.acquire().await.map_err(|e| {
-                anyhow::anyhow!("Failed to acquire remediation semaphore: {}", e)
-            })?;
+            let _permit =
+                self.semaphore.acquire().await.map_err(|e| {
+                    anyhow::anyhow!("Failed to acquire remediation semaphore: {}", e)
+                })?;
 
             self.trigger_remediation_mission(event, &classification)
                 .await?;
@@ -404,9 +404,7 @@ impl PipelineRemediationService {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use factory_infrastructure::github::{
-        GithubIssue, MockGithubClient,
-    };
+    use factory_infrastructure::github::{GithubIssue, MockGithubClient};
     use factory_infrastructure::kafka::SimpleMockKafkaClient;
     use factory_infrastructure::pipeline_classifier::RegexPipelineClassifier;
 
@@ -419,10 +417,7 @@ mod tests {
             failing_job: "Rust CI".to_string(),
             failing_step: Some("Lint".to_string()),
             error_log: error_log.to_string(),
-            run_url: format!(
-                "https://github.com/{}/actions/runs/12345",
-                repo
-            ),
+            run_url: format!("https://github.com/{}/actions/runs/12345", repo),
             detected_at: Utc::now(),
         }
     }
@@ -446,12 +441,8 @@ mod tests {
         let kafka = Arc::new(SimpleMockKafkaClient::new("mock").unwrap());
         let classifier = Arc::new(RegexPipelineClassifier::new());
 
-        let service = PipelineRemediationService::new(
-            kafka,
-            Some(Arc::new(mock_gh)),
-            None,
-            classifier,
-        );
+        let service =
+            PipelineRemediationService::new(kafka, Some(Arc::new(mock_gh)), None, classifier);
 
         let event = make_event(
             SELF_REFERENTIAL_REPO,
@@ -497,12 +488,8 @@ mod tests {
         let kafka = Arc::new(SimpleMockKafkaClient::new("mock").unwrap());
         let classifier = Arc::new(RegexPipelineClassifier::new());
 
-        let service = PipelineRemediationService::new(
-            kafka,
-            Some(Arc::new(mock_gh)),
-            None,
-            classifier,
-        );
+        let service =
+            PipelineRemediationService::new(kafka, Some(Arc::new(mock_gh)), None, classifier);
 
         let event = make_event(
             "lgcorzo/lince-rs",
@@ -598,7 +585,9 @@ mod tests {
     async fn test_concurrency_limiter() {
         // Set max to 2 concurrent remediations
         // SAFETY: Test environment, no other threads reading this var concurrently.
-        unsafe { std::env::set_var("MAX_CONCURRENT_REMEDIATIONS", "2"); }
+        unsafe {
+            std::env::set_var("MAX_CONCURRENT_REMEDIATIONS", "2");
+        }
 
         let kafka = Arc::new(SimpleMockKafkaClient::new("mock").unwrap());
         let classifier = Arc::new(RegexPipelineClassifier::new());
@@ -619,7 +608,9 @@ mod tests {
         assert_eq!(service.semaphore.available_permits(), 1);
 
         // SAFETY: Test environment
-        unsafe { std::env::remove_var("MAX_CONCURRENT_REMEDIATIONS"); }
+        unsafe {
+            std::env::remove_var("MAX_CONCURRENT_REMEDIATIONS");
+        }
     }
 
     // ── T048: Transient error does not escalate test ──
@@ -647,10 +638,7 @@ mod tests {
 
         // Separate from OOMKilled
         let oom_event = make_event("lgcorzo/lince-rs", "OOMKilled: container ran out of memory");
-        let oom_result = service
-            .handle_pipeline_failure(&oom_event)
-            .await
-            .unwrap();
+        let oom_result = service.handle_pipeline_failure(&oom_event).await.unwrap();
         assert_eq!(
             oom_result,
             RemediationStatus::Pending,
@@ -680,7 +668,10 @@ mod tests {
         let result = service
             .record_remediation_outcome(&outcome, &event, &classification)
             .await;
-        assert!(result.is_ok(), "Success telemetry should publish without error");
+        assert!(
+            result.is_ok(),
+            "Success telemetry should publish without error"
+        );
     }
 
     #[tokio::test]
@@ -703,7 +694,10 @@ mod tests {
         let result = service
             .record_remediation_outcome(&outcome, &event, &classification)
             .await;
-        assert!(result.is_ok(), "Failure telemetry should publish without error");
+        assert!(
+            result.is_ok(),
+            "Failure telemetry should publish without error"
+        );
     }
 
     // ── T060: Recurring failure escalation test ──
@@ -730,23 +724,27 @@ mod tests {
         let classifier = Arc::new(RegexPipelineClassifier::new());
         let cursor_store = Arc::new(InMemoryCursorStore::new());
 
-        let service = PipelineRemediationService::new(
-            kafka,
-            Some(Arc::new(mock_gh)),
-            None,
-            classifier,
-        )
-        .with_cursor_store(cursor_store.clone());
+        let service =
+            PipelineRemediationService::new(kafka, Some(Arc::new(mock_gh)), None, classifier)
+                .with_cursor_store(cursor_store.clone());
 
         let error_log = "error[E0308]: mismatched types\n  --> src/lib.rs:15:5";
         let event = make_event("lgcorzo/lince-rs", error_log);
 
         // First 2 failures: should return Pending (trigger mission)
         let r1 = service.handle_pipeline_failure(&event).await.unwrap();
-        assert_eq!(r1, RemediationStatus::Pending, "First failure: mission triggered");
+        assert_eq!(
+            r1,
+            RemediationStatus::Pending,
+            "First failure: mission triggered"
+        );
 
         let r2 = service.handle_pipeline_failure(&event).await.unwrap();
-        assert_eq!(r2, RemediationStatus::Pending, "Second failure: mission triggered");
+        assert_eq!(
+            r2,
+            RemediationStatus::Pending,
+            "Second failure: mission triggered"
+        );
 
         // Third failure: exceeds threshold → escalate
         let r3 = service.handle_pipeline_failure(&event).await.unwrap();

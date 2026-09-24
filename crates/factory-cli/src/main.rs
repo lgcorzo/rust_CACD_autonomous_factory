@@ -178,10 +178,11 @@ async fn main() -> anyhow::Result<()> {
         } => {
             use factory_application::poller_service::PollerDaemonService;
             use factory_application::workflows::comment_control::CommentControlService;
+            use factory_application::workflows::pipeline_remediation::PipelineRemediationService;
             use factory_infrastructure::{
                 GitPlatformPoller, HttpAethalgardClient, HttpGithubClient, HttpGitlabClient,
                 HttpR2rClient, HttpSemanticaClient, InMemoryCursorStore, KafkaClient,
-                McpHttpClient, PostgresCursorStore,
+                McpHttpClient, PostgresCursorStore, RegexPipelineClassifier,
             };
             use std::sync::Arc;
 
@@ -214,7 +215,7 @@ async fn main() -> anyhow::Result<()> {
             };
 
             let poller = Arc::new(
-                GitPlatformPoller::new(gh_client.clone(), gl_client.clone(), cursor_store)
+                GitPlatformPoller::new(gh_client.clone(), gl_client.clone(), cursor_store.clone())
                     .with_bot_username(bot_username),
             );
 
@@ -248,15 +249,26 @@ async fn main() -> anyhow::Result<()> {
             };
 
             let comment_service = Arc::new(CommentControlService::new(
-                gh_client,
-                gl_client,
+                gh_client.clone(),
+                gl_client.clone(),
                 mcp_client,
                 r2r_client,
                 aethalgard_client,
             ));
 
+            let remediation_service = Arc::new(
+                PipelineRemediationService::new(
+                    kafka_client.clone(),
+                    gh_client.clone(),
+                    gl_client.clone(),
+                    Arc::new(RegexPipelineClassifier::new()),
+                )
+                .with_cursor_store(cursor_store.clone()),
+            );
+
             let daemon =
-                PollerDaemonService::new(poller, kafka_client, semantica_client, comment_service);
+                PollerDaemonService::new(poller, kafka_client, semantica_client, comment_service)
+                    .with_remediation_service(remediation_service);
 
             let gh_repos_list: Vec<String> = github_repos
                 .split(',')
@@ -279,11 +291,17 @@ async fn main() -> anyhow::Result<()> {
 
             loop {
                 let stats = daemon.poll_once(&gh_repos_list, &gl_projects_list).await;
-                if stats.issues_ingested > 0 || stats.directives_processed > 0 {
+                if stats.issues_ingested > 0
+                    || stats.directives_processed > 0
+                    || stats.pipelines_remediated > 0
+                    || stats.pipelines_escalated > 0
+                {
                     tracing::info!(
-                        "Poll cycle: {} issues ingested, {} directives processed",
+                        "Poll cycle: {} issues ingested, {} directives processed, {} pipelines remediated, {} pipelines escalated",
                         stats.issues_ingested,
-                        stats.directives_processed
+                        stats.directives_processed,
+                        stats.pipelines_remediated,
+                        stats.pipelines_escalated
                     );
                 }
                 if !stats.errors.is_empty() {
