@@ -19,8 +19,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 
-# Build all workspace members
-RUN cargo build --release --workspace
+# Build all workspace members with the real Kafka implementation enabled for
+# factory-cli. Without this feature, the poller silently uses mock Kafka.
+RUN cargo build --release --workspace --features factory-cli/production,factory-mcp-server/production
 
 # Stage 2: Final runtime image
 FROM debian:bookworm-slim

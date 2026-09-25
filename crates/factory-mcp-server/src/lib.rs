@@ -55,8 +55,10 @@ impl McpServer {
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
         };
+        #[cfg(not(feature = "production"))]
+        use factory_infrastructure::SimpleMockKafkaClient;
         use factory_infrastructure::{
-            HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient, SimpleMockKafkaClient,
+            HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient,
         };
 
         let sandbox_mode =
@@ -108,13 +110,12 @@ impl McpServer {
 
         let kafka_brokers =
             std::env::var("KAFKA_BROKERS").unwrap_or_else(|_| "localhost:9092".to_string());
+        #[cfg(feature = "production")]
         let kafka_client: Arc<dyn KafkaClient> =
-            if kafka_brokers == "mock" || kafka_brokers.is_empty() {
-                Arc::new(SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
-            } else {
-                // In a real application we would use RdKafkaClient, using Mock for simplicity if not production
-                Arc::new(SimpleMockKafkaClient::new(&kafka_brokers).unwrap())
-            };
+            Arc::new(factory_infrastructure::RdKafkaClient::new(&kafka_brokers)?);
+        #[cfg(not(feature = "production"))]
+        let kafka_client: Arc<dyn KafkaClient> =
+            Arc::new(SimpleMockKafkaClient::new(&kafka_brokers).unwrap());
 
         self.add_tool(Box::new(ExecuteCodeTool::new(sandbox_driver.clone())))
             .await;
