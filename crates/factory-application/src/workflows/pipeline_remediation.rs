@@ -245,9 +245,17 @@ impl PipelineRemediationService {
         event: &PipelineFailureEvent,
         classification: &ErrorClassification,
     ) -> anyhow::Result<()> {
+        let escalation_key = format!(
+            "{}:{}:{:?}:{}",
+            event.source_platform,
+            event.repository,
+            classification.category,
+            classification.error_fingerprint
+        );
+        let escalation_marker = format!("<!-- dark-gravity-escalation-key: {} -->", escalation_key);
         let title = format!(
-            "[Pipeline Remediation] {:?} failure in {} (run #{})",
-            classification.category, event.repository, event.run_id
+            "[Pipeline Remediation] {:?} failure in {}",
+            classification.category, event.repository
         );
 
         let body = format!(
@@ -268,7 +276,7 @@ impl PipelineRemediationService {
             - **Rule/Test**: {}\n\
             - **Fingerprint**: `{}`\n\n\
             ---\n\
-            *This issue was created automatically by Dark Gravity Pipeline Remediation.*",
+            *This issue was created automatically by Dark Gravity Pipeline Remediation.*\n\n{}",
             event.repository,
             event.workflow_name,
             event.failing_job,
@@ -288,6 +296,7 @@ impl PipelineRemediationService {
                 .or(classification.test_name.as_deref())
                 .unwrap_or("N/A"),
             classification.error_fingerprint,
+            escalation_marker,
         );
 
         let label = if classification.category == ErrorCategory::Unknown {
@@ -299,12 +308,44 @@ impl PipelineRemediationService {
         match event.source_platform.as_str() {
             "github" => {
                 if let Some(gh) = &self.github_client {
+                    let existing = gh
+                        .list_open_issues(&event.repository, Some(label.to_string()))
+                        .await?;
+                    if existing.iter().any(|issue| {
+                        issue
+                            .body
+                            .as_deref()
+                            .is_some_and(|body| body.contains(&escalation_marker))
+                    }) {
+                        tracing::info!(
+                            "Escalation already exists for {} in {}",
+                            escalation_key,
+                            event.repository
+                        );
+                        return Ok(());
+                    }
                     gh.create_issue(&event.repository, &title, &body, &[label.to_string()])
                         .await?;
                 }
             }
             "gitlab" => {
                 if let Some(gl) = &self.gitlab_client {
+                    let existing = gl
+                        .list_open_issues(&event.repository, Some(label.to_string()))
+                        .await?;
+                    if existing.iter().any(|issue| {
+                        issue
+                            .description
+                            .as_deref()
+                            .is_some_and(|description| description.contains(&escalation_marker))
+                    }) {
+                        tracing::info!(
+                            "Escalation already exists for {} in {}",
+                            escalation_key,
+                            event.repository
+                        );
+                        return Ok(());
+                    }
                     gl.create_issue_with_labels(
                         &event.repository,
                         &title,
@@ -426,6 +467,9 @@ mod tests {
     async fn test_self_referential_safety_guard() {
         let mut mock_gh = MockGithubClient::new();
         mock_gh
+            .expect_list_open_issues()
+            .returning(|_repo, _labels| Ok(Vec::new()));
+        mock_gh
             .expect_create_issue()
             .returning(|_repo, _title, _body, _labels| {
                 Ok(GithubIssue {
@@ -472,6 +516,9 @@ mod tests {
     #[tokio::test]
     async fn test_unknown_error_creates_issue() {
         let mut mock_gh = MockGithubClient::new();
+        mock_gh
+            .expect_list_open_issues()
+            .returning(|_repo, _labels| Ok(Vec::new()));
         mock_gh
             .expect_create_issue()
             .returning(|_repo, _title, _body, _labels| {
@@ -707,6 +754,9 @@ mod tests {
         use factory_infrastructure::cursor_store::InMemoryCursorStore;
 
         let mut mock_gh = MockGithubClient::new();
+        mock_gh
+            .expect_list_open_issues()
+            .returning(|_repo, _labels| Ok(Vec::new()));
         mock_gh
             .expect_create_issue()
             .returning(|_repo, _title, _body, _labels| {
