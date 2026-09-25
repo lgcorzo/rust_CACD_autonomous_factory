@@ -1,4 +1,9 @@
 use clap::{Parser, Subcommand};
+use factory_application::workflows::{MissionInput, MissionOutput};
+use hatchet_sdk::Runnable;
+use rdkafka::config::ClientConfig;
+use rdkafka::consumer::{Consumer, StreamConsumer};
+use rdkafka::message::Message;
 
 #[global_allocator]
 static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
@@ -7,6 +12,70 @@ static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 struct Cli {
     #[command(subcommand)]
     command: Commands,
+}
+
+async fn run_mission_consumer(kafka_brokers: String) -> anyhow::Result<()> {
+    let consumer: StreamConsumer = ClientConfig::new()
+        .set("bootstrap.servers", &kafka_brokers)
+        .set("group.id", "factory-mission-consumer")
+        .set("enable.auto.commit", "false")
+        .set("auto.offset.reset", "earliest")
+        .create()?;
+    consumer.subscribe(&["mission-input"])?;
+
+    let hatchet = hatchet_sdk::Hatchet::from_env().await?;
+    let workflow = hatchet
+        .workflow::<MissionInput, MissionOutput>("darkgravitymission-dev-lgcorzo")
+        .build()
+        .map_err(|e| anyhow::anyhow!("failed to build mission workflow: {e}"))?;
+
+    tracing::info!(
+        brokers = %kafka_brokers,
+        consumer_group = "factory-mission-consumer",
+        "Mission consumer started"
+    );
+
+    loop {
+        match consumer.recv().await {
+            Ok(message) => {
+                let payload = match message.payload_view::<str>() {
+                    Some(Ok(payload)) => payload,
+                    Some(Err(error)) => {
+                        tracing::error!(error = %error, "Invalid UTF-8 mission payload");
+                        continue;
+                    }
+                    None => {
+                        tracing::warn!("Skipping mission message without payload");
+                        continue;
+                    }
+                };
+
+                let input: MissionInput = match serde_json::from_str(payload) {
+                    Ok(input) => input,
+                    Err(error) => {
+                        tracing::error!(error = %error, "Invalid mission-input JSON payload");
+                        continue;
+                    }
+                };
+                let mission_id = input.mission_id.clone().unwrap_or_else(|| "unknown".into());
+
+                match workflow.run_no_wait(&input, None).await {
+                    Ok(run) => {
+                        tracing::info!(mission_id = %mission_id, ?run, "Mission dispatched to Hatchet");
+                        if let Err(error) =
+                            consumer.commit_message(&message, rdkafka::consumer::CommitMode::Async)
+                        {
+                            tracing::error!(mission_id = %mission_id, error = %error, "Failed to commit mission message");
+                        }
+                    }
+                    Err(error) => {
+                        tracing::error!(mission_id = %mission_id, error = %error, "Failed to dispatch mission to Hatchet");
+                    }
+                }
+            }
+            Err(error) => tracing::error!(error = %error, "Mission consumer receive failed"),
+        }
+    }
 }
 
 #[derive(Subcommand)]
@@ -148,7 +217,7 @@ async fn main() -> anyhow::Result<()> {
                 &hatchet,
                 mcp_url.clone(),
                 r2r_url.clone(),
-                kafka_brokers,
+                kafka_brokers.clone(),
                 aethalgard_webhook_url,
             );
             let task_wf =
@@ -163,6 +232,8 @@ async fn main() -> anyhow::Result<()> {
                 worker,
                 &deep_research_wf,
             );
+
+            tokio::spawn(run_mission_consumer(kafka_brokers));
 
             worker.start().await?;
         }

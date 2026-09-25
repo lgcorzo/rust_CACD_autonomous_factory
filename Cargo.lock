@@ -1926,6 +1926,7 @@ dependencies = [
  "factory-infrastructure",
  "hatchet-sdk",
  "jemallocator",
+ "rdkafka",
  "reqwest 0.12.28",
  "sentry",
  "serde_json",
