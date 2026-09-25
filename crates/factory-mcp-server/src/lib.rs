@@ -55,11 +55,11 @@ impl McpServer {
             spec_kit_tasks_to_issues::SpecKitTasksToIssuesTool, spec_kit_tool::SpecKitTool,
             update_mission_status::UpdateMissionStatusTool,
         };
+        #[cfg(not(feature = "production"))]
+        use factory_infrastructure::SimpleMockKafkaClient;
         use factory_infrastructure::{
             HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient,
         };
-        #[cfg(not(feature = "production"))]
-        use factory_infrastructure::SimpleMockKafkaClient;
 
         let sandbox_mode =
             std::env::var("SANDBOX_MODE").unwrap_or_else(|_| "subprocess".to_string());
