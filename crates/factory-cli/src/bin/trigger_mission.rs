@@ -91,6 +91,29 @@ async fn main() -> anyhow::Result<()> {
         mission_id,
         goal
     );
+
+    // Inspect local SDD tasks if available
+    if let Ok(entries) = std::fs::read_dir("specs") {
+        let mut dirs: Vec<_> = entries.filter_map(|e| e.ok()).collect();
+        dirs.sort_by_key(|dir| {
+            dir.metadata()
+                .and_then(|m| m.modified())
+                .unwrap_or(std::time::SystemTime::UNIX_EPOCH)
+        });
+        if let Some(latest) = dirs.last() {
+            if let Ok(tasks_content) = std::fs::read_to_string(latest.path().join("tasks.md")) {
+                let parsed =
+                    factory_application::agents::RustantAgent::parse_sdd_tasks(&tasks_content);
+                tracing::info!(
+                    "Discovered {} SDD tasks in {:?} for Hatchet orchestration: {:?}",
+                    parsed.len(),
+                    latest.path(),
+                    parsed.iter().map(|t| &t.id).collect::<Vec<_>>()
+                );
+            }
+        }
+    }
+
     match hatchet
         .workflow::<MissionInput, factory_application::workflows::MissionOutput>(
             "darkgravitymission-dev-lgcorzo",

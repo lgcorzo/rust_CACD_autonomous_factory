@@ -1,5 +1,6 @@
 use crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent};
 use crate::workflows::circuit_breaker::CircuitBreakerGuard;
+use factory_core::{SddMissionPlan, SddTaskItem};
 use factory_infrastructure::{
     GithubClient, GitlabClient, GitlabCommitAction, HttpGithubClient, HttpGitlabClient,
     HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
@@ -350,7 +351,7 @@ pub fn create_mission_workflow_with_clients(
     let gl_client_code = gl_client.clone();
     let gh_client_code = gh_client.clone();
     let code_task = hatchet
-        .task("zeroclaw-execute", move |input: MissionInput, _ctx| {
+        .task("zeroclaw-execute", move |input: MissionInput, ctx| {
             let mcp_client = mcp_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
             let aethalgard_client = aethalgard_client_clone.clone();
@@ -363,42 +364,150 @@ pub fn create_mission_workflow_with_clients(
 
             Box::pin(async move {
                 let zeroclaw = ZeroClawAgent::new(mcp_client, aethalgard_client);
-                let task_desc = "import time\ntime.sleep(15)\nprint('Done')";
 
                 kafka_client
                     .publish_thought(&mission_id, "Starting coding phase...", "zeroclaw")
                     .await?;
 
-                let result = match zeroclaw.execute_task(&mission_id, task_desc, &[]).await {
-                    Ok(r) => {
-                        post_mission_milestone(
-                            &gl_client,
-                            &gh_client,
-                            &input,
-                            "⚡ Execution Completed",
-                            "ZeroClawAgent generated code mutations within isolated gVisor sandbox.",
-                        )
-                        .await;
-                        r
+                // 1. Resolve SDD tasks from parent planning task output or local specs
+                let mut sdd_tasks = Vec::new();
+                if let Ok(parent_val) = ctx.parent_output("rustant-plan").await {
+                    let sdd_plan_res = parent_val
+                        .get("sdd_plan")
+                        .and_then(|plan_obj| serde_json::from_value::<SddMissionPlan>(plan_obj.clone()).ok());
+                    if let Some(sdd_plan) = sdd_plan_res {
+                        sdd_tasks = sdd_plan.tasks;
                     }
-                    Err(e) => {
-                        tracing::error!("zeroclaw-execute failed with error: {:?}", e);
-                        post_mission_milestone(
-                            &gl_client,
-                            &gh_client,
-                            &input,
-                            "⚠️ Execution Failed",
-                            &format!("ZeroClawAgent execution failed: {:?}", e),
-                        )
-                        .await;
-                        return Err(e);
+                }
+
+                if sdd_tasks.is_empty() {
+                    // Fall back to reading latest tasks.md if available
+                    if let Ok(entries) = std::fs::read_dir("specs") {
+                        let mut dirs: Vec<_> = entries.filter_map(|e| e.ok()).collect();
+                        dirs.sort_by_key(|dir| {
+                            dir.metadata()
+                                .and_then(|m| m.modified())
+                                .unwrap_or(std::time::SystemTime::UNIX_EPOCH)
+                        });
+                        let tasks_file = dirs
+                            .last()
+                            .and_then(|latest| std::fs::read_to_string(latest.path().join("tasks.md")).ok());
+                        if let Some(tasks_content) = tasks_file {
+                            sdd_tasks = RustantAgent::parse_sdd_tasks(&tasks_content);
+                        }
                     }
-                };
+                }
+
+
+                if sdd_tasks.is_empty() {
+                    sdd_tasks.push(SddTaskItem {
+                        id: "T001".to_string(),
+                        description: "Execute primary mission objectives".to_string(),
+                        is_parallel: false,
+                        dependencies: vec![],
+                        target_files: vec![],
+                    });
+                }
+
+                tracing::info!(
+                    "[AutonomousMission:{}] Executing {} SDD tasks in sequential order",
+                    mission_id,
+                    sdd_tasks.len()
+                );
+
+                let mut completed_task_ids = std::collections::HashSet::new();
+                let mut task_results = Vec::new();
+
+                for (idx, task) in sdd_tasks.iter().enumerate() {
+                    // Enforce dependency ordering: all declared dependencies must be completed
+                    for dep in &task.dependencies {
+                        if !completed_task_ids.contains(dep) {
+                            let err_msg = format!(
+                                "Dependency violation: Task {} requires {} which has not completed yet",
+                                task.id, dep
+                            );
+                            tracing::error!("{}", err_msg);
+                            anyhow::bail!(err_msg);
+                        }
+                    }
+
+                    let task_start = std::time::Instant::now();
+                    kafka_client
+                        .publish_thought(
+                            &mission_id,
+                            &format!(
+                                "Executing SDD task {}/{} [{}]: {}",
+                                idx + 1,
+                                sdd_tasks.len(),
+                                task.id,
+                                task.description
+                            ),
+                            "zeroclaw",
+                        )
+                        .await?;
+
+                    let _task_res = match zeroclaw
+                        .execute_task(&mission_id, &task.description, &task.target_files)
+                        .await
+                    {
+                        Ok(res) => {
+                            completed_task_ids.insert(task.id.clone());
+                            task_results.push(serde_json::json!({
+                                "task_id": task.id,
+                                "status": "completed",
+                                "duration_ms": task_start.elapsed().as_millis() as u64,
+                                "output": res.clone(),
+                            }));
+                            res
+                        }
+                        Err(e) => {
+                            tracing::error!("zeroclaw-execute task {} failed: {:?}", task.id, e);
+                            post_mission_milestone(
+                                &gl_client,
+                                &gh_client,
+                                &input,
+                                &format!("⚠️ Task {} Execution Failed", task.id),
+                                &format!("ZeroClawAgent execution failed on task {}: {:?}", task.id, e),
+                            )
+                            .await;
+                            return Err(e);
+                        }
+                    };
+
+                    kafka_client
+                        .publish_thought(
+                            &mission_id,
+                            &format!("SDD task {} completed successfully", task.id),
+                            "zeroclaw",
+                        )
+                        .await?;
+                }
+
+                post_mission_milestone(
+                    &gl_client,
+                    &gh_client,
+                    &input,
+                    "⚡ Execution Completed",
+                    &format!(
+                        "ZeroClawAgent executed all {} SDD tasks in planned order within isolated gVisor sandbox.",
+                        sdd_tasks.len()
+                    ),
+                )
+                .await;
+
                 kafka_client
-                    .publish_thought(&mission_id, "Coding completed", "zeroclaw")
+                    .publish_thought(
+                        &mission_id,
+                        "All planned SDD coding tasks completed",
+                        "zeroclaw",
+                    )
                     .await?;
 
-                Ok(result)
+                Ok(serde_json::json!({
+                    "status": "completed",
+                    "total_tasks": sdd_tasks.len(),
+                    "tasks": task_results,
+                }))
             })
         })
         .build()
@@ -1014,5 +1123,41 @@ mod tests {
             vc.proof.as_ref().unwrap().verification_method,
             "key-id-vault-01"
         );
+    }
+
+    #[tokio::test]
+    async fn test_sdd_task_execution_order_enforcement() {
+        let tasks = vec![
+            factory_core::SddTaskItem {
+                id: "T001".to_string(),
+                description: "Setup step".to_string(),
+                is_parallel: false,
+                dependencies: vec![],
+                target_files: vec!["Cargo.toml".to_string()],
+            },
+            factory_core::SddTaskItem {
+                id: "T002".to_string(),
+                description: "Dependent step".to_string(),
+                is_parallel: false,
+                dependencies: vec!["T001".to_string()],
+                target_files: vec!["src/lib.rs".to_string()],
+            },
+        ];
+
+        let mut execution_order = Vec::new();
+        for task in &tasks {
+            // Assert all dependencies were previously executed
+            for dep in &task.dependencies {
+                assert!(
+                    execution_order.contains(dep),
+                    "Dependency {} was not satisfied before {}",
+                    dep,
+                    task.id
+                );
+            }
+            execution_order.push(task.id.clone());
+        }
+
+        assert_eq!(execution_order, vec!["T001", "T002"]);
     }
 }

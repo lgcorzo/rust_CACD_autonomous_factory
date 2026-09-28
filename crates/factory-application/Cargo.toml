@@ -30,6 +30,7 @@ sha2 = "0.10"
 
 tokio-test = { workspace = true }
 chrono.workspace = true
+regex = { workspace = true }
 
 [dev-dependencies]
 factory-infrastructure = { path = "../factory-infrastructure", features = ["test-utils"] }
