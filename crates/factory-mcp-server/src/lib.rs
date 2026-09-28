@@ -108,8 +108,8 @@ impl McpServer {
         let gitlab_token = std::env::var("GITLAB_API_TOKEN").unwrap_or_else(|_| "".to_string());
         let gitlab_client = Arc::new(HttpGitlabClient::new(gitlab_url, gitlab_token));
 
-        let kafka_brokers =
-            std::env::var("KAFKA_BROKERS").unwrap_or_else(|_| "localhost:9092".to_string());
+        let kafka_brokers = std::env::var("KAFKA_BROKERS")
+            .unwrap_or_else(|_| "my-kafka-cluster.confluent.svc.cluster.local:9092".to_string());
         #[cfg(feature = "production")]
         let kafka_client: Arc<dyn KafkaClient> =
             Arc::new(factory_infrastructure::RdKafkaClient::new(&kafka_brokers)?);
