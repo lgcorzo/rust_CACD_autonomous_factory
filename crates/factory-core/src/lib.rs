@@ -431,11 +431,47 @@ pub struct RemediationOutcome {
     pub completed_at: DateTime<Utc>,
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+// SDD (Spec-Driven Development) Task Models
+// ──────────────────────────────────────────────────────────────────────────────
+
+/// Individual task parsed from SDD tasks.md
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct SddTaskItem {
+    pub id: String,
+    pub description: String,
+    #[serde(default)]
+    pub is_parallel: bool,
+    #[serde(default)]
+    pub dependencies: Vec<String>,
+    #[serde(default)]
+    pub target_files: Vec<String>,
+}
+
+/// Structured plan output emitted by RustantAgent and consumed by Hatchet
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct SddMissionPlan {
+    pub mission_id: String,
+    pub spec_version: String,
+    pub tasks: Vec<SddTaskItem>,
+    pub total_tasks: usize,
+}
+
+/// Execution outcome per task run controlled by Hatchet
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct TaskExecutionResult {
+    pub task_id: String,
+    pub status: String,
+    pub hatchet_run_id: String,
+    pub duration_ms: u64,
+}
+
 pub mod proto {
     pub mod v1 {
         include!(concat!(env!("OUT_DIR"), "/dark_gravity.factory.v1.rs"));
     }
 }
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Pipeline Error Remediation Tests
@@ -539,4 +575,29 @@ mod pipeline_tests {
         assert_eq!(deserialized.result, RemediationStatus::Success);
         assert!(deserialized.pipeline_passed);
     }
+
+    #[test]
+    fn test_sdd_task_item_and_mission_plan_roundtrip() {
+        let task = SddTaskItem {
+            id: "T001".to_string(),
+            description: "Add regex dependency to Cargo.toml".to_string(),
+            is_parallel: true,
+            dependencies: vec![],
+            target_files: vec!["Cargo.toml".to_string()],
+        };
+
+        let plan = SddMissionPlan {
+            mission_id: "mission-123".to_string(),
+            spec_version: "1.0.0".to_string(),
+            tasks: vec![task.clone()],
+            total_tasks: 1,
+        };
+
+        let json = serde_json::to_string(&plan).expect("serialize plan");
+        let deserialized: SddMissionPlan = serde_json::from_str(&json).expect("deserialize plan");
+        assert_eq!(deserialized.tasks.len(), 1);
+        assert_eq!(deserialized.tasks[0].id, "T001");
+        assert!(deserialized.tasks[0].is_parallel);
+    }
 }
+
