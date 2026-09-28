@@ -12,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use uuid::Uuid;
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct MissionInput {
     pub mission_id: Option<String>,
@@ -373,12 +372,11 @@ pub fn create_mission_workflow_with_clients(
                 // 1. Resolve SDD tasks from parent planning task output or local specs
                 let mut sdd_tasks = Vec::new();
                 if let Ok(parent_val) = ctx.parent_output("rustant-plan").await {
-                    if let Some(plan_obj) = parent_val.get("sdd_plan") {
-                        if let Ok(sdd_plan) =
-                            serde_json::from_value::<SddMissionPlan>(plan_obj.clone())
-                        {
-                            sdd_tasks = sdd_plan.tasks;
-                        }
+                    let sdd_plan_res = parent_val
+                        .get("sdd_plan")
+                        .and_then(|plan_obj| serde_json::from_value::<SddMissionPlan>(plan_obj.clone()).ok());
+                    if let Some(sdd_plan) = sdd_plan_res {
+                        sdd_tasks = sdd_plan.tasks;
                     }
                 }
 
@@ -391,15 +389,15 @@ pub fn create_mission_workflow_with_clients(
                                 .and_then(|m| m.modified())
                                 .unwrap_or(std::time::SystemTime::UNIX_EPOCH)
                         });
-                        if let Some(latest) = dirs.last() {
-                            if let Ok(tasks_content) =
-                                std::fs::read_to_string(latest.path().join("tasks.md"))
-                            {
-                                sdd_tasks = RustantAgent::parse_sdd_tasks(&tasks_content);
-                            }
+                        let tasks_file = dirs
+                            .last()
+                            .and_then(|latest| std::fs::read_to_string(latest.path().join("tasks.md")).ok());
+                        if let Some(tasks_content) = tasks_file {
+                            sdd_tasks = RustantAgent::parse_sdd_tasks(&tasks_content);
                         }
                     }
                 }
+
 
                 if sdd_tasks.is_empty() {
                     sdd_tasks.push(SddTaskItem {
@@ -515,7 +513,6 @@ pub fn create_mission_workflow_with_clients(
         .build()
         .unwrap()
         .add_parent(&plan_task);
-
 
     // 3. Validation Phase (ZeroClaw)
     let mcp_client_clone = mcp_client.clone();
@@ -1164,4 +1161,3 @@ mod tests {
         assert_eq!(execution_order, vec!["T001", "T002"]);
     }
 }
-

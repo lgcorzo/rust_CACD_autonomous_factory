@@ -143,10 +143,8 @@ impl RustantAgent {
             }
 
             let mut dependencies = Vec::new();
-            if !is_parallel {
-                if let Some(prev) = &previous_task_id {
-                    dependencies.push(prev.clone());
-                }
+            if let (false, Some(prev)) = (is_parallel, &previous_task_id) {
+                dependencies.push(prev.clone());
             }
             previous_task_id = Some(id.clone());
 
@@ -161,7 +159,6 @@ impl RustantAgent {
 
         tasks
     }
-
 
     pub async fn review_mission(
         &self,
@@ -219,7 +216,10 @@ mod tests {
 
         assert_eq!(parsed[1].id, "T002");
         assert!(parsed[1].is_parallel);
-        assert!(parsed[1].target_files.contains(&"crates/factory-infrastructure/src/pipeline_classifier.rs".to_string()));
+        assert!(
+            parsed[1]
+                .target_files
+                .contains(&"crates/factory-infrastructure/src/pipeline_classifier.rs".to_string())
+        );
     }
 }
-
