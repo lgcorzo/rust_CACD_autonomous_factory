@@ -42,6 +42,7 @@ Dark Gravity continuously polls and autonomously executes missions across config
 | [`lgcorzo/lince-rs`](https://gitlab.com/lgcorzo/lince-rs) | Otimization process | Algorithmic optimization to control agents costs |
 | [`lgcorzo-lab/autonomous_factory`](https://gitlab.com/lgcorzo-lab/autonomous_factory) | Architecture & Knowledge Base | Spec-Kit SDD contracts, C4 diagrams, OSR audits |
 | [`lgcorzo/fastapi-autogen-team`](https://github.com/lgcorzo/fastapi-autogen-team) | Agentic Access Layer | R2R/Confluent document services |
+| [`lgcorzo/mlops-python-package`](https://github.com/lgcorzo/mlops-python-package) | MLOps & ML Pipelines | Automated testing, DVC/Poetry dependency validation & CI/CD error remediation |
 
 ### 4. Integrated Intelligence & Security
 
