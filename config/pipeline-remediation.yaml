@@ -20,6 +20,7 @@ polling:
   # Environment variable: GITHUB_REPOS (comma-separated)
   github_repositories:
     - "lgcorzo/rust_CACD_autonomous_factory"
+    - "lgcorzo/mlops-python-package"
 
   # GitLab projects to poll for failed pipeline jobs.
   # Environment variable: GITLAB_PROJECTS (comma-separated)
