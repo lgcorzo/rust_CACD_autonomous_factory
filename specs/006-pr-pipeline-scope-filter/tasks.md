@@ -15,7 +15,7 @@
 
 **Purpose**: Baseline verification of existing test harness and workspace integrity
 
-- [ ] T001 Run existing test suites for `factory-core`, `factory-infrastructure`, and `factory-application` to establish green baseline via `cargo test -p factory-core -p factory-infrastructure -p factory-application`
+- [x] T001 Run existing test suites for `factory-core`, `factory-infrastructure`, and `factory-application` to establish green baseline via `cargo test -p factory-core -p factory-infrastructure -p factory-application`
 
 ---
 
@@ -25,10 +25,10 @@
 
 **⚠️ CRITICAL**: Blocks all user stories
 
-- [ ] T002 Extend `PipelineFailureEvent` in `crates/factory-core/src/lib.rs` with `pr_number: Option<u64>`, `head_branch: Option<String>`, and `head_sha: Option<String>`
-- [ ] T003 [P] Extend `GithubWorkflowRun`, `GithubWorkflowRunPr`, and `GithubWorkflowBranchRef` in `crates/factory-infrastructure/src/github.rs` to deserialize `pull_requests`, `head_branch`, and `head_sha`
-- [ ] T004 [P] Extend `GitlabPipeline` (with `sha`, `source`) and `GitlabMergeRequest` (with `source_branch`, `sha`) in `crates/factory-infrastructure/src/gitlab.rs`
-- [ ] T005 Implement `PipelineScopeVerdict` enum and `PipelineScopeFilter` matching utility in `crates/factory-core/src/lib.rs`
+- [x] T002 Extend `PipelineFailureEvent` in `crates/factory-core/src/lib.rs` with `pr_number: Option<u64>`, `head_branch: Option<String>`, and `head_sha: Option<String>`
+- [x] T003 [P] Extend `GithubWorkflowRun`, `GithubWorkflowRunPr`, and `GithubWorkflowBranchRef` in `crates/factory-infrastructure/src/github.rs` to deserialize `pull_requests`, `head_branch`, and `head_sha`
+- [x] T004 [P] Extend `GitlabPipeline` (with `sha`, `source`) and `GitlabMergeRequest` (with `source_branch`, `sha`) in `crates/factory-infrastructure/src/gitlab.rs`
+- [x] T005 Implement `PipelineScopeVerdict` enum and `PipelineScopeFilter` matching utility in `crates/factory-core/src/lib.rs`
 
 **Checkpoint**: Foundation ready — domain models and API representations updated with zero compilation errors.
 
@@ -44,15 +44,15 @@
 
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T006 [P] [US1] Unit tests for `PipelineScopeFilter::evaluate_github` and `PipelineScopeFilter::evaluate_gitlab` in `crates/factory-core/tests/pipeline_scope_filter_tests.rs`
-- [ ] T007 [P] [US1] Integration tests in `crates/factory-infrastructure/src/git_poller.rs` verifying `poll_github_pipeline_runs` early-exits on empty active PRs and skips non-PR workflow runs
-- [ ] T008 [P] [US1] Integration tests in `crates/factory-infrastructure/src/git_poller.rs` verifying `poll_gitlab_pipeline_runs` early-exits on empty active MRs and filters by MR source branch
+- [x] T006 [P] [US1] Unit tests for `PipelineScopeFilter::evaluate_github` and `PipelineScopeFilter::evaluate_gitlab` in `crates/factory-core/tests/pipeline_scope_filter_tests.rs`
+- [x] T007 [P] [US1] Integration tests in `crates/factory-infrastructure/src/git_poller.rs` verifying `poll_github_pipeline_runs` early-exits on empty active PRs and skips non-PR workflow runs
+- [x] T008 [P] [US1] Integration tests in `crates/factory-infrastructure/src/git_poller.rs` verifying `poll_gitlab_pipeline_runs` early-exits on empty active MRs and filters by MR source branch
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Update `poll_github_pipeline_runs` in `crates/factory-infrastructure/src/git_poller.rs` to fetch `list_active_pull_requests(repo)`, early-exit if empty, and filter failed runs against active PRs
-- [ ] T010 [US1] Update `poll_gitlab_pipeline_runs` in `crates/factory-infrastructure/src/git_poller.rs` to fetch `list_active_merge_requests(project)`, early-exit if empty, and filter failed pipelines against active MRs
-- [ ] T011 [US1] Update `CursorStore` recording in `crates/factory-infrastructure/src/git_poller.rs` to mark skipped non-PR runs as processed so they are never re-evaluated on subsequent cycles
+- [x] T009 [US1] Update `poll_github_pipeline_runs` in `crates/factory-infrastructure/src/git_poller.rs` to fetch `list_active_pull_requests(repo)`, early-exit if empty, and filter failed runs against active PRs
+- [x] T010 [US1] Update `poll_gitlab_pipeline_runs` in `crates/factory-infrastructure/src/git_poller.rs` to fetch `list_active_merge_requests(project)`, early-exit if empty, and filter failed pipelines against active MRs
+- [x] T011 [US1] Update `CursorStore` recording in `crates/factory-infrastructure/src/git_poller.rs` to mark skipped non-PR runs as processed so they are never re-evaluated on subsequent cycles
 
 **Checkpoint**: User Story 1 functional — non-PR pipelines completely ignored across GitHub and GitLab polling cycles.
 
@@ -66,12 +66,12 @@
 
 ### Tests for User Story 2
 
-- [ ] T012 [P] [US2] Unit test in `crates/factory-infrastructure/src/git_poller.rs` asserting emitted `PipelineFailureEvent` carries populated `pr_number`, `head_branch`, and `head_sha`
+- [x] T012 [P] [US2] Unit test in `crates/factory-infrastructure/src/git_poller.rs` asserting emitted `PipelineFailureEvent` carries populated `pr_number`, `head_branch`, and `head_sha`
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Attach `pr_number`, `head_branch`, and `head_sha` when constructing `PipelineFailureEvent` in `crates/factory-infrastructure/src/git_poller.rs`
-- [ ] T014 [US2] Update `PollerDaemonService::poll_once` in `crates/factory-application/src/poller_service.rs` to log PR context in polling cycle statistics and trace outputs
+- [x] T013 [US2] Attach `pr_number`, `head_branch`, and `head_sha` when constructing `PipelineFailureEvent` in `crates/factory-infrastructure/src/git_poller.rs`
+- [x] T014 [US2] Update `PollerDaemonService::poll_once` in `crates/factory-application/src/poller_service.rs` to log PR context in polling cycle statistics and trace outputs
 
 **Checkpoint**: User Story 2 functional — failure events include complete PR linkage metadata.
 
@@ -85,12 +85,12 @@
 
 ### Tests for User Story 3
 
-- [ ] T015 [P] [US3] Unit test in `crates/factory-application/src/workflows/pipeline_remediation.rs` asserting that `handle_pipeline_failure` returns `RemediationStatus::Skipped` and creates no issue when `pr_number` is `None`
+- [x] T015 [P] [US3] Unit test in `crates/factory-application/src/workflows/pipeline_remediation.rs` asserting that `handle_pipeline_failure` returns `RemediationStatus::Skipped` and creates no issue when `pr_number` is `None`
 
 ### Implementation for User Story 3
 
-- [ ] T016 [US3] Add `pr_number` presence check in `PipelineRemediationService::handle_pipeline_failure` in `crates/factory-application/src/workflows/pipeline_remediation.rs`, returning `Ok(RemediationStatus::Skipped)` if missing
-- [ ] T017 [US3] For self-referential repo `lgcorzo/rust_CACD_autonomous_factory`, format human escalations as PR comments on the offending PR rather than standalone repository issues
+- [x] T016 [US3] Add `pr_number` presence check in `PipelineRemediationService::handle_pipeline_failure` in `crates/factory-application/src/workflows/pipeline_remediation.rs`, returning `Ok(RemediationStatus::Skipped)` if missing
+- [x] T017 [US3] For self-referential repo `lgcorzo/rust_CACD_autonomous_factory`, format human escalations as PR comments on the offending PR rather than standalone repository issues
 
 **Checkpoint**: User Story 3 functional — zero false-positive issues can ever be created in issue trackers.
 
@@ -100,9 +100,9 @@
 
 **Purpose**: Full workspace validation, formatting, linting, and knowledge graph synchronization
 
-- [ ] T018 Run `cargo test --workspace` to ensure all crates pass unit and integration tests cleanly
-- [ ] T019 [P] Run `cargo clippy --workspace --all-targets -- -D warnings` and `cargo fmt --check` to enforce lint and style standards
-- [ ] T020 Run `graphify update .` to synchronize macro AST architecture graph with new types and methods
+- [x] T018 Run `cargo test --workspace` to ensure all crates pass unit and integration tests cleanly
+- [x] T019 [P] Run `cargo clippy --workspace --all-targets -- -D warnings` and `cargo fmt --check` to enforce lint and style standards
+- [x] T020 Run `graphify update .` to synchronize macro AST architecture graph with new types and methods
 
 ---
 

@@ -22,6 +22,8 @@ async fn test_gitlab_poller_applies_eyes_reaction_and_ignores_bot() {
         web_url: "https://gitlab.com/repo/mrs/10".to_string(),
         state: "opened".to_string(),
         updated_at: Some(Utc::now()),
+        source_branch: None,
+        sha: None,
     };
 
     let user_note = GitlabNote {
@@ -108,6 +110,7 @@ async fn test_github_poller_applies_eyes_reaction_and_ignores_bot() {
         state: "open".to_string(),
         html_url: "https://github.com/owner/repo/pull/20".to_string(),
         updated_at: Some(Utc::now()),
+        head: None,
     };
 
     let user_comment = GithubComment {

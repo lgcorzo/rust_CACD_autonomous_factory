@@ -323,6 +323,8 @@ mod tests {
                     web_url: "https://gitlab.com/org/project/merge_requests/5".to_string(),
                     state: "opened".to_string(),
                     updated_at: None,
+                    source_branch: None,
+                    sha: None,
                 }])
             });
 

@@ -350,12 +350,38 @@ impl GitPlatformPoller {
         &self,
         repo: &str,
     ) -> anyhow::Result<Vec<factory_core::PipelineFailureEvent>> {
-        use factory_core::PipelineFailureEvent;
+        use factory_core::{PipelineFailureEvent, PipelineScopeFilter, PipelineScopeVerdict};
 
         let client = match &self.github_client {
             Some(c) => c,
             None => return Ok(vec![]),
         };
+
+        // Fetch active pull requests first
+        let active_prs = client
+            .list_active_pull_requests(repo)
+            .await
+            .unwrap_or_default();
+        if active_prs.is_empty() {
+            tracing::debug!(
+                repo,
+                "No active PRs found; skipping GitHub pipeline failure polling"
+            );
+            return Ok(vec![]);
+        }
+
+        let pr_tuples: Vec<(u64, String, Option<String>)> = active_prs
+            .iter()
+            .map(|pr| {
+                let branch = pr
+                    .head
+                    .as_ref()
+                    .and_then(|h| h.branch_ref.clone())
+                    .unwrap_or_default();
+                let sha = pr.head.as_ref().and_then(|h| h.sha.clone());
+                (pr.number, branch, sha)
+            })
+            .collect();
 
         let cursor_key = format!("github:{}:pipelines", repo);
         let cursor = self.cursor_store.get_cursor(&cursor_key).await?;
@@ -374,6 +400,37 @@ impl GitPlatformPoller {
             {
                 continue;
             }
+
+            // Scope filter: Check whether run is associated with an active PR
+            let run_pr_numbers: Vec<u64> = run.pull_requests.iter().map(|pr| pr.number).collect();
+            let verdict = PipelineScopeFilter::evaluate_github(
+                run.event.as_deref(),
+                run.head_branch.as_deref(),
+                run.head_sha.as_deref(),
+                &run_pr_numbers,
+                &pr_tuples,
+            );
+
+            let (pr_number, head_branch, head_sha) = match verdict {
+                PipelineScopeVerdict::Included {
+                    pr_number,
+                    head_branch,
+                    head_sha,
+                } => (Some(pr_number), Some(head_branch), head_sha),
+                verdict => {
+                    tracing::debug!(
+                        repo,
+                        run_id = run.id,
+                        ?verdict,
+                        "Skipping non-PR GitHub workflow run and marking as processed"
+                    );
+                    self.cursor_store
+                        .mark_event_processed(&cursor_key, &event_hash)
+                        .await?;
+                    last_id = run.id.max(last_id);
+                    continue;
+                }
+            };
 
             // Fetch failing jobs for this run
             let jobs = client.get_workflow_run_jobs(repo, run.id).await?;
@@ -410,6 +467,9 @@ impl GitPlatformPoller {
                 error_log,
                 run_url: run.html_url,
                 detected_at: Utc::now(),
+                pr_number,
+                head_branch,
+                head_sha,
             };
 
             self.cursor_store
@@ -437,12 +497,36 @@ impl GitPlatformPoller {
         &self,
         project: &str,
     ) -> anyhow::Result<Vec<factory_core::PipelineFailureEvent>> {
-        use factory_core::PipelineFailureEvent;
+        use factory_core::{PipelineFailureEvent, PipelineScopeFilter, PipelineScopeVerdict};
 
         let client = match &self.gitlab_client {
             Some(c) => c,
             None => return Ok(vec![]),
         };
+
+        // Fetch active merge requests first
+        let active_mrs = client
+            .list_active_merge_requests(project)
+            .await
+            .unwrap_or_default();
+        if active_mrs.is_empty() {
+            tracing::debug!(
+                project,
+                "No active MRs found; skipping GitLab pipeline failure polling"
+            );
+            return Ok(vec![]);
+        }
+
+        let mr_tuples: Vec<(u64, String, Option<String>)> = active_mrs
+            .iter()
+            .map(|mr| {
+                (
+                    mr.iid,
+                    mr.source_branch.clone().unwrap_or_default(),
+                    mr.sha.clone(),
+                )
+            })
+            .collect();
 
         let cursor_key = format!("gitlab:{}:pipelines", project);
         let cursor = self.cursor_store.get_cursor(&cursor_key).await?;
@@ -461,6 +545,35 @@ impl GitPlatformPoller {
             {
                 continue;
             }
+
+            // Scope filter: Check whether pipeline is associated with an active MR
+            let verdict = PipelineScopeFilter::evaluate_gitlab(
+                pipeline.ref_.as_deref(),
+                pipeline.sha.as_deref(),
+                pipeline.source.as_deref(),
+                &mr_tuples,
+            );
+
+            let (pr_number, head_branch, head_sha) = match verdict {
+                PipelineScopeVerdict::Included {
+                    pr_number,
+                    head_branch,
+                    head_sha,
+                } => (Some(pr_number), Some(head_branch), head_sha),
+                verdict => {
+                    tracing::debug!(
+                        project,
+                        pipeline_id = pipeline.id,
+                        ?verdict,
+                        "Skipping non-MR GitLab pipeline and marking as processed"
+                    );
+                    self.cursor_store
+                        .mark_event_processed(&cursor_key, &event_hash)
+                        .await?;
+                    last_id = pipeline.id.max(last_id);
+                    continue;
+                }
+            };
 
             // Fetch failing jobs for this pipeline
             let jobs = client.get_pipeline_jobs(project, pipeline.id).await?;
@@ -492,6 +605,9 @@ impl GitPlatformPoller {
                 error_log,
                 run_url: pipeline.web_url,
                 detected_at: Utc::now(),
+                pr_number,
+                head_branch,
+                head_sha,
             };
 
             self.cursor_store
@@ -565,6 +681,7 @@ mod tests {
                     html_url: "https://github.com/my-org/my-repo/pull/10".to_string(),
                     state: "open".to_string(),
                     updated_at: Some(Utc::now()),
+                    head: None,
                 }])
             });
 
@@ -664,6 +781,8 @@ mod tests {
                     web_url: "https://gitlab.com/my-org/my-proj/-/merge_requests/15".to_string(),
                     state: "opened".to_string(),
                     updated_at: Some(Utc::now()),
+                    source_branch: None,
+                    sha: None,
                 }])
             });
 
@@ -698,9 +817,30 @@ mod tests {
 
     #[tokio::test]
     async fn test_poll_github_pipeline_runs() {
-        use crate::github::{GithubWorkflowJob, GithubWorkflowRun, GithubWorkflowStep};
+        use crate::github::{
+            GithubPullRequest, GithubWorkflowBranchRef, GithubWorkflowJob, GithubWorkflowRun,
+            GithubWorkflowRunPr, GithubWorkflowStep,
+        };
 
         let mut mock_gh = MockGithubClient::new();
+
+        mock_gh
+            .expect_list_active_pull_requests()
+            .returning(|_repo| {
+                Ok(vec![GithubPullRequest {
+                    id: 101,
+                    number: 404,
+                    title: "PR 404".to_string(),
+                    body: None,
+                    html_url: "https://github.com/my-org/my-repo/pull/404".to_string(),
+                    state: "open".to_string(),
+                    updated_at: Some(Utc::now()),
+                    head: Some(GithubWorkflowBranchRef {
+                        branch_ref: Some("feat/pr-scope".to_string()),
+                        sha: Some("abc1234".to_string()),
+                    }),
+                }])
+            });
 
         mock_gh
             .expect_list_failed_workflow_runs()
@@ -712,6 +852,15 @@ mod tests {
                     conclusion: Some("failure".to_string()),
                     html_url: "https://github.com/my-org/my-repo/actions/runs/9001".to_string(),
                     updated_at: Some(Utc::now()),
+                    pull_requests: vec![GithubWorkflowRunPr {
+                        id: 101,
+                        number: 404,
+                        head: None,
+                        base: None,
+                    }],
+                    head_branch: Some("feat/pr-scope".to_string()),
+                    head_sha: Some("abc1234".to_string()),
+                    event: Some("pull_request".to_string()),
                 }])
             });
 
@@ -750,13 +899,37 @@ mod tests {
         assert_eq!(event.failing_job, "Rust CI (Lint & Test)");
         assert_eq!(event.failing_step.as_deref(), Some("Lint with Clippy"));
         assert!(event.error_log.contains("error[E0308]"));
+        assert_eq!(event.pr_number, Some(404));
+        assert_eq!(event.head_branch.as_deref(), Some("feat/pr-scope"));
+        assert_eq!(event.head_sha.as_deref(), Some("abc1234"));
     }
 
     #[tokio::test]
     async fn test_pipeline_cursor_idempotency() {
-        use crate::github::{GithubWorkflowJob, GithubWorkflowRun};
+        use crate::github::{
+            GithubPullRequest, GithubWorkflowBranchRef, GithubWorkflowJob, GithubWorkflowRun,
+            GithubWorkflowRunPr,
+        };
 
         let mut mock_gh = MockGithubClient::new();
+
+        mock_gh
+            .expect_list_active_pull_requests()
+            .returning(|_repo| {
+                Ok(vec![GithubPullRequest {
+                    id: 101,
+                    number: 404,
+                    title: "PR 404".to_string(),
+                    body: None,
+                    html_url: "https://github.com/my-org/my-repo/pull/404".to_string(),
+                    state: "open".to_string(),
+                    updated_at: Some(Utc::now()),
+                    head: Some(GithubWorkflowBranchRef {
+                        branch_ref: Some("feat/pr-scope".to_string()),
+                        sha: Some("abc1234".to_string()),
+                    }),
+                }])
+            });
 
         // list_failed_workflow_runs called twice, returns same run both times
         mock_gh
@@ -770,6 +943,15 @@ mod tests {
                     conclusion: Some("failure".to_string()),
                     html_url: "https://github.com/my-org/my-repo/actions/runs/9001".to_string(),
                     updated_at: Some(Utc::now()),
+                    pull_requests: vec![GithubWorkflowRunPr {
+                        id: 101,
+                        number: 404,
+                        head: None,
+                        base: None,
+                    }],
+                    head_branch: Some("feat/pr-scope".to_string()),
+                    head_sha: Some("abc1234".to_string()),
+                    event: Some("pull_request".to_string()),
                 }])
             });
 
@@ -814,6 +996,228 @@ mod tests {
             events_second.len(),
             0,
             "Second poll should not re-process the same run"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_poll_github_pipeline_runs_early_exit_on_empty_prs() {
+        let mut mock_gh = MockGithubClient::new();
+
+        // 0 active PRs returned -> early exit without querying failed runs
+        mock_gh
+            .expect_list_active_pull_requests()
+            .times(1)
+            .returning(|_repo| Ok(vec![]));
+
+        mock_gh.expect_list_failed_workflow_runs().never();
+
+        let cursor_store = Arc::new(InMemoryCursorStore::new());
+        let poller = GitPlatformPoller::new(Some(Arc::new(mock_gh)), None, cursor_store);
+
+        let events = poller
+            .poll_github_pipeline_runs("my-org/my-repo")
+            .await
+            .unwrap();
+        assert!(
+            events.is_empty(),
+            "Must return empty when no active PRs exist"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_poll_github_pipeline_runs_skips_non_pr_runs() {
+        use crate::github::{GithubPullRequest, GithubWorkflowBranchRef, GithubWorkflowRun};
+
+        let mut mock_gh = MockGithubClient::new();
+
+        // Active PR on feature branch
+        mock_gh
+            .expect_list_active_pull_requests()
+            .returning(|_repo| {
+                Ok(vec![GithubPullRequest {
+                    id: 101,
+                    number: 404,
+                    title: "PR 404".to_string(),
+                    body: None,
+                    html_url: "https://github.com/my-org/my-repo/pull/404".to_string(),
+                    state: "open".to_string(),
+                    updated_at: Some(Utc::now()),
+                    head: Some(GithubWorkflowBranchRef {
+                        branch_ref: Some("feat/pr-scope".to_string()),
+                        sha: Some("abc1234".to_string()),
+                    }),
+                }])
+            });
+
+        // Run is on main (push event), NOT associated with PR 404
+        mock_gh
+            .expect_list_failed_workflow_runs()
+            .returning(|_repo, _since| {
+                Ok(vec![GithubWorkflowRun {
+                    id: 9999,
+                    name: Some("CI on main".to_string()),
+                    status: "completed".to_string(),
+                    conclusion: Some("failure".to_string()),
+                    html_url: "https://github.com/my-org/my-repo/actions/runs/9999".to_string(),
+                    updated_at: Some(Utc::now()),
+                    pull_requests: vec![],
+                    head_branch: Some("main".to_string()),
+                    head_sha: Some("deadbeef".to_string()),
+                    event: Some("push".to_string()),
+                }])
+            });
+
+        // Job log and jobs should never be fetched for a skipped run
+        mock_gh.expect_get_workflow_run_jobs().never();
+        mock_gh.expect_get_job_log().never();
+
+        let cursor_store = Arc::new(InMemoryCursorStore::new());
+        let poller = GitPlatformPoller::new(Some(Arc::new(mock_gh)), None, cursor_store.clone());
+
+        let events = poller
+            .poll_github_pipeline_runs("my-org/my-repo")
+            .await
+            .unwrap();
+
+        assert!(events.is_empty(), "Non-PR workflow runs must be skipped");
+
+        // Verify skipped run was marked as processed in cursor store (T011)
+        let is_processed = cursor_store
+            .is_event_processed(
+                "github:my-org/my-repo:pipelines",
+                "pipeline:my-org/my-repo:9999",
+            )
+            .await
+            .unwrap();
+        assert!(
+            is_processed,
+            "Skipped run must be marked as processed to avoid re-evaluation"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_poll_gitlab_pipeline_runs_early_exit_on_empty_mrs() {
+        let mut mock_gl = MockGitlabClient::new();
+
+        // 0 active MRs returned -> early exit without querying failed pipelines
+        mock_gl
+            .expect_list_active_merge_requests()
+            .times(1)
+            .returning(|_project| Ok(vec![]));
+
+        mock_gl.expect_list_failed_pipelines().never();
+
+        let cursor_store = Arc::new(InMemoryCursorStore::new());
+        let poller = GitPlatformPoller::new(None, Some(Arc::new(mock_gl)), cursor_store);
+
+        let events = poller
+            .poll_gitlab_pipeline_runs("my-org/my-proj")
+            .await
+            .unwrap();
+        assert!(
+            events.is_empty(),
+            "Must return empty when no active MRs exist"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_poll_gitlab_pipeline_runs_filters_by_mr_source_branch() {
+        use crate::gitlab::{GitlabMergeRequest, GitlabPipeline, GitlabPipelineJob};
+
+        let mut mock_gl = MockGitlabClient::new();
+
+        // 1 active MR on "feature/fix-engine"
+        mock_gl
+            .expect_list_active_merge_requests()
+            .returning(|_project| {
+                Ok(vec![GitlabMergeRequest {
+                    id: 501,
+                    iid: 42,
+                    title: "Fix Engine MR".to_string(),
+                    description: None,
+                    web_url: "https://gitlab.com/my-org/my-proj/-/merge_requests/42".to_string(),
+                    state: "opened".to_string(),
+                    updated_at: Some(Utc::now()),
+                    source_branch: Some("feature/fix-engine".to_string()),
+                    sha: Some("sha-engine".to_string()),
+                }])
+            });
+
+        // 2 failed pipelines: one on main (schedule), one on MR branch
+        mock_gl
+            .expect_list_failed_pipelines()
+            .returning(|_project, _since| {
+                Ok(vec![
+                    GitlabPipeline {
+                        id: 1001,
+                        status: "failed".to_string(),
+                        web_url: "https://gitlab.com/my-org/my-proj/-/pipelines/1001".to_string(),
+                        ref_: Some("main".to_string()),
+                        updated_at: Some(Utc::now()),
+                        sha: Some("sha-main".to_string()),
+                        source: Some("schedule".to_string()),
+                    },
+                    GitlabPipeline {
+                        id: 1002,
+                        status: "failed".to_string(),
+                        web_url: "https://gitlab.com/my-org/my-proj/-/pipelines/1002".to_string(),
+                        ref_: Some("feature/fix-engine".to_string()),
+                        updated_at: Some(Utc::now()),
+                        sha: Some("sha-engine".to_string()),
+                        source: Some("merge_request_event".to_string()),
+                    },
+                ])
+            });
+
+        // Only pipeline 1002 jobs & trace should be fetched
+        mock_gl
+            .expect_get_pipeline_jobs()
+            .times(1)
+            .returning(|_project, _pipeline_id| {
+                Ok(vec![GitlabPipelineJob {
+                    id: 77,
+                    name: "cargo-clippy".to_string(),
+                    status: "failed".to_string(),
+                    stage: "test".to_string(),
+                    web_url: "https://gitlab.com/my-org/my-proj/-/jobs/77".to_string(),
+                }])
+            });
+
+        mock_gl
+            .expect_get_job_trace()
+            .times(1)
+            .returning(|_project, _job_id| Ok("error: unused import".to_string()));
+
+        let cursor_store = Arc::new(InMemoryCursorStore::new());
+        let poller = GitPlatformPoller::new(None, Some(Arc::new(mock_gl)), cursor_store.clone());
+
+        let events = poller
+            .poll_gitlab_pipeline_runs("my-org/my-proj")
+            .await
+            .unwrap();
+
+        assert_eq!(
+            events.len(),
+            1,
+            "Only the active MR pipeline should be emitted"
+        );
+        let event = &events[0];
+        assert_eq!(event.run_id, 1002);
+        assert_eq!(event.pr_number, Some(42));
+        assert_eq!(event.head_branch.as_deref(), Some("feature/fix-engine"));
+        assert_eq!(event.head_sha.as_deref(), Some("sha-engine"));
+
+        // Verify non-MR pipeline 1001 was marked processed in cursor store
+        let is_1001_processed = cursor_store
+            .is_event_processed(
+                "gitlab:my-org/my-proj:pipelines",
+                "pipeline:my-org/my-proj:1001",
+            )
+            .await
+            .unwrap();
+        assert!(
+            is_1001_processed,
+            "Non-MR pipeline must be marked as processed"
         );
     }
 }

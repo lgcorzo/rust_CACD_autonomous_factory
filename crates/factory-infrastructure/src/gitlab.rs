@@ -21,6 +21,10 @@ pub struct GitlabMergeRequest {
     pub web_url: String,
     pub state: String,
     pub updated_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub source_branch: Option<String>,
+    #[serde(default)]
+    pub sha: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -72,6 +76,10 @@ pub struct GitlabPipeline {
     #[serde(rename = "ref")]
     pub ref_: Option<String>,
     pub updated_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub sha: Option<String>,
+    #[serde(default)]
+    pub source: Option<String>,
 }
 
 /// GitLab CI pipeline job within a pipeline.

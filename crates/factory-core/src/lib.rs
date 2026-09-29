@@ -371,6 +371,173 @@ pub struct PipelineFailureEvent {
     pub run_url: String,
     /// When the failure was detected
     pub detected_at: DateTime<Utc>,
+    /// Associated Pull Request or Merge Request number (None if unassociated)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pr_number: Option<u64>,
+    /// Offending head branch (e.g. "feat/new-api")
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub head_branch: Option<String>,
+    /// Git commit SHA of the failure
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub head_sha: Option<String>,
+}
+
+/// Scope decision for a candidate workflow run or CI pipeline.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum PipelineScopeVerdict {
+    /// Associated with an active PR/MR
+    Included {
+        pr_number: u64,
+        head_branch: String,
+        head_sha: Option<String>,
+    },
+    /// Run has no associated active PR
+    ExcludedNoActivePr,
+    /// Run branch or SHA does not match any active PR
+    ExcludedBranchMismatch { branch: Option<String> },
+    /// Non-PR event (e.g. push, schedule, workflow_dispatch on default branch)
+    ExcludedNonPrEvent { event_type: String },
+}
+
+impl PipelineScopeVerdict {
+    pub fn is_included(&self) -> bool {
+        matches!(self, PipelineScopeVerdict::Included { .. })
+    }
+
+    pub fn pr_number(&self) -> Option<u64> {
+        match self {
+            PipelineScopeVerdict::Included { pr_number, .. } => Some(*pr_number),
+            _ => None,
+        }
+    }
+}
+
+/// Utility for matching candidate CI pipeline runs against active PR/MR context.
+pub struct PipelineScopeFilter;
+
+impl PipelineScopeFilter {
+    /// Evaluates whether a GitHub workflow run is in scope based on active PRs.
+    ///
+    /// Parameters:
+    /// - `run_event`: GitHub run event type (e.g., "pull_request", "push", "schedule")
+    /// - `run_branch`: Head branch of the workflow run
+    /// - `run_sha`: Head SHA of the workflow run
+    /// - `run_pr_numbers`: Pull request numbers linked directly in the workflow run object
+    /// - `active_prs`: List of (pr_number, head_branch, head_sha) for currently open PRs
+    pub fn evaluate_github(
+        run_event: Option<&str>,
+        run_branch: Option<&str>,
+        run_sha: Option<&str>,
+        run_pr_numbers: &[u64],
+        active_prs: &[(u64, String, Option<String>)],
+    ) -> PipelineScopeVerdict {
+        if active_prs.is_empty() {
+            return PipelineScopeVerdict::ExcludedNoActivePr;
+        }
+
+        // 1. Direct PR linkage in run payload: match against open active PRs
+        for &pr_num in run_pr_numbers {
+            if let Some((_, pr_branch, pr_sha)) =
+                active_prs.iter().find(|(num, _, _)| *num == pr_num)
+            {
+                return PipelineScopeVerdict::Included {
+                    pr_number: pr_num,
+                    head_branch: run_branch
+                        .map(ToString::to_string)
+                        .unwrap_or_else(|| pr_branch.clone()),
+                    head_sha: run_sha.map(ToString::to_string).or_else(|| pr_sha.clone()),
+                };
+            }
+        }
+
+        // 2. Branch & SHA matching against active PRs
+        if let Some(branch) = run_branch {
+            let clean_branch = branch.strip_prefix("refs/heads/").unwrap_or(branch);
+            if let Some((pr_num, pr_branch, pr_sha)) = active_prs
+                .iter()
+                .find(|(_, b, _)| b == clean_branch || b == branch)
+            {
+                return PipelineScopeVerdict::Included {
+                    pr_number: *pr_num,
+                    head_branch: pr_branch.clone(),
+                    head_sha: run_sha.map(ToString::to_string).or_else(|| pr_sha.clone()),
+                };
+            }
+        }
+
+        // 3. Fallback: check if it's explicitly a non-PR event
+        if let Some(event) = run_event {
+            if event != "pull_request" && event != "pull_request_target" {
+                return PipelineScopeVerdict::ExcludedNonPrEvent {
+                    event_type: event.to_string(),
+                };
+            }
+        }
+
+        PipelineScopeVerdict::ExcludedBranchMismatch {
+            branch: run_branch.map(ToString::to_string),
+        }
+    }
+
+    /// Evaluates whether a GitLab pipeline is in scope based on active MRs.
+    ///
+    /// Parameters:
+    /// - `pipeline_ref`: Ref / branch name of the pipeline
+    /// - `pipeline_sha`: Commit SHA of the pipeline
+    /// - `pipeline_source`: Trigger source of the pipeline (e.g. "merge_request_event", "push")
+    /// - `active_mrs`: List of (mr_iid, source_branch, sha) for currently open MRs
+    pub fn evaluate_gitlab(
+        pipeline_ref: Option<&str>,
+        pipeline_sha: Option<&str>,
+        pipeline_source: Option<&str>,
+        active_mrs: &[(u64, String, Option<String>)],
+    ) -> PipelineScopeVerdict {
+        if active_mrs.is_empty() {
+            return PipelineScopeVerdict::ExcludedNoActivePr;
+        }
+
+        if let Some(ref_name) = pipeline_ref {
+            let clean_ref = ref_name.strip_prefix("refs/heads/").unwrap_or(ref_name);
+            if let Some((mr_iid, source_branch, mr_sha)) = active_mrs
+                .iter()
+                .find(|(_, b, _)| b == clean_ref || b == ref_name)
+            {
+                return PipelineScopeVerdict::Included {
+                    pr_number: *mr_iid,
+                    head_branch: source_branch.clone(),
+                    head_sha: pipeline_sha
+                        .map(ToString::to_string)
+                        .or_else(|| mr_sha.clone()),
+                };
+            }
+        }
+
+        // Also check by SHA if ref matching did not match
+        if let Some(sha) = pipeline_sha {
+            if let Some((mr_iid, source_branch, _)) = active_mrs
+                .iter()
+                .find(|(_, _, s)| s.as_deref() == Some(sha))
+            {
+                return PipelineScopeVerdict::Included {
+                    pr_number: *mr_iid,
+                    head_branch: source_branch.clone(),
+                    head_sha: Some(sha.to_string()),
+                };
+            }
+        }
+
+        if let Some(source) = pipeline_source {
+            if source != "merge_request_event" && source != "external_pull_request_event" {
+                return PipelineScopeVerdict::ExcludedNonPrEvent {
+                    event_type: source.to_string(),
+                };
+            }
+        }
+
+        PipelineScopeVerdict::ExcludedBranchMismatch {
+            branch: pipeline_ref.map(ToString::to_string),
+        }
+    }
 }
 
 /// Result of classifying a pipeline error log.
@@ -410,6 +577,8 @@ pub enum RemediationStatus {
     Failed,
     /// Escalated to human review (issue created)
     Escalated,
+    /// Skipped because the failure was ineligible (e.g. non-PR run)
+    Skipped,
 }
 
 /// Final result of a remediation attempt.
@@ -504,15 +673,139 @@ mod pipeline_tests {
             run_url: "https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/runs/12345"
                 .to_string(),
             detected_at: Utc::now(),
+            pr_number: Some(404),
+            head_branch: Some("006-pr-pipeline-scope-filter".to_string()),
+            head_sha: Some("abc1234".to_string()),
         };
 
         let json = serde_json::to_string(&event).unwrap();
         let deserialized: PipelineFailureEvent = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.run_id, 12345);
         assert_eq!(deserialized.source_platform, "github");
+        assert_eq!(deserialized.pr_number, Some(404));
+        assert_eq!(
+            deserialized.head_branch.as_deref(),
+            Some("006-pr-pipeline-scope-filter")
+        );
+        assert_eq!(deserialized.head_sha.as_deref(), Some("abc1234"));
         assert_eq!(
             deserialized.failing_step.as_deref(),
             Some("Lint with Clippy")
+        );
+    }
+
+    #[test]
+    fn test_pipeline_scope_filter_github_evaluation() {
+        let active_prs = vec![
+            (404, "feat/pr-scope".to_string(), Some("sha111".to_string())),
+            (405, "fix/bug".to_string(), None),
+        ];
+
+        // 1. Direct PR linkage in run
+        let verdict = PipelineScopeFilter::evaluate_github(
+            Some("pull_request"),
+            Some("feat/pr-scope"),
+            Some("sha111"),
+            &[404],
+            &active_prs,
+        );
+        assert_eq!(
+            verdict,
+            PipelineScopeVerdict::Included {
+                pr_number: 404,
+                head_branch: "feat/pr-scope".to_string(),
+                head_sha: Some("sha111".to_string()),
+            }
+        );
+
+        // 2. Branch matching without direct PR in run payload
+        let verdict = PipelineScopeFilter::evaluate_github(
+            Some("pull_request"),
+            Some("refs/heads/fix/bug"),
+            Some("sha222"),
+            &[],
+            &active_prs,
+        );
+        assert_eq!(
+            verdict,
+            PipelineScopeVerdict::Included {
+                pr_number: 405,
+                head_branch: "fix/bug".to_string(),
+                head_sha: Some("sha222".to_string()),
+            }
+        );
+
+        // 3. No active PRs -> ExcludedNoActivePr
+        let verdict = PipelineScopeFilter::evaluate_github(
+            Some("pull_request"),
+            Some("feat/pr-scope"),
+            Some("sha111"),
+            &[404],
+            &[],
+        );
+        assert_eq!(verdict, PipelineScopeVerdict::ExcludedNoActivePr);
+
+        // 4. Non-PR event on untracked branch (e.g. push on main)
+        let verdict = PipelineScopeFilter::evaluate_github(
+            Some("push"),
+            Some("main"),
+            Some("sha999"),
+            &[],
+            &active_prs,
+        );
+        assert_eq!(
+            verdict,
+            PipelineScopeVerdict::ExcludedNonPrEvent {
+                event_type: "push".to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn test_pipeline_scope_filter_gitlab_evaluation() {
+        let active_mrs = vec![(
+            12,
+            "feature/lince-cut".to_string(),
+            Some("gitsha123".to_string()),
+        )];
+
+        // 1. Branch match
+        let verdict = PipelineScopeFilter::evaluate_gitlab(
+            Some("feature/lince-cut"),
+            Some("gitsha123"),
+            Some("merge_request_event"),
+            &active_mrs,
+        );
+        assert_eq!(
+            verdict,
+            PipelineScopeVerdict::Included {
+                pr_number: 12,
+                head_branch: "feature/lince-cut".to_string(),
+                head_sha: Some("gitsha123".to_string()),
+            }
+        );
+
+        // 2. No active MRs -> ExcludedNoActivePr
+        let verdict = PipelineScopeFilter::evaluate_gitlab(
+            Some("feature/lince-cut"),
+            Some("gitsha123"),
+            Some("merge_request_event"),
+            &[],
+        );
+        assert_eq!(verdict, PipelineScopeVerdict::ExcludedNoActivePr);
+
+        // 3. Non-MR event (e.g. schedule on main)
+        let verdict = PipelineScopeFilter::evaluate_gitlab(
+            Some("main"),
+            Some("gitsha999"),
+            Some("schedule"),
+            &active_mrs,
+        );
+        assert_eq!(
+            verdict,
+            PipelineScopeVerdict::ExcludedNonPrEvent {
+                event_type: "schedule".to_string(),
+            }
         );
     }
 

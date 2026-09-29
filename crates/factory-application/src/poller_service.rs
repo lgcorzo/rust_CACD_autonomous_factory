@@ -115,12 +115,26 @@ impl PollerDaemonService {
                 match self.poller.poll_github_pipeline_runs(repo).await {
                     Ok(pipeline_events) => {
                         for event in pipeline_events {
+                            tracing::info!(
+                                repo,
+                                run_id = event.run_id,
+                                pr_number = ?event.pr_number,
+                                head_branch = ?event.head_branch,
+                                "Processing GitHub pipeline failure with PR context"
+                            );
                             match remediation.handle_pipeline_failure(&event).await {
                                 Ok(factory_core::RemediationStatus::Pending) => {
                                     stats.pipelines_remediated += 1;
                                 }
                                 Ok(factory_core::RemediationStatus::Escalated) => {
                                     stats.pipelines_escalated += 1;
+                                }
+                                Ok(factory_core::RemediationStatus::Skipped) => {
+                                    tracing::debug!(
+                                        repo,
+                                        run_id = event.run_id,
+                                        "Pipeline failure skipped (non-PR or missing context)"
+                                    );
                                 }
                                 Ok(_) => {}
                                 Err(e) => stats.errors.push(format!(
@@ -179,12 +193,26 @@ impl PollerDaemonService {
                 match self.poller.poll_gitlab_pipeline_runs(project).await {
                     Ok(pipeline_events) => {
                         for event in pipeline_events {
+                            tracing::info!(
+                                project,
+                                pipeline_id = event.run_id,
+                                pr_number = ?event.pr_number,
+                                head_branch = ?event.head_branch,
+                                "Processing GitLab pipeline failure with MR context"
+                            );
                             match remediation.handle_pipeline_failure(&event).await {
                                 Ok(factory_core::RemediationStatus::Pending) => {
                                     stats.pipelines_remediated += 1;
                                 }
                                 Ok(factory_core::RemediationStatus::Escalated) => {
                                     stats.pipelines_escalated += 1;
+                                }
+                                Ok(factory_core::RemediationStatus::Skipped) => {
+                                    tracing::debug!(
+                                        project,
+                                        pipeline_id = event.run_id,
+                                        "Pipeline failure skipped (non-MR or missing context)"
+                                    );
                                 }
                                 Ok(_) => {}
                                 Err(e) => stats.errors.push(format!(
@@ -329,6 +357,7 @@ mod tests {
                     html_url: "https://github.com/my-org/my-repo/pull/22".to_string(),
                     state: "open".to_string(),
                     updated_at: Some(Utc::now()),
+                    head: None,
                 }])
             });
 
