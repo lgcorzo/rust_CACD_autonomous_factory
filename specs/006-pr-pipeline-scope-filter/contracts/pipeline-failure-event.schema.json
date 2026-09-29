@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PipelineFailureEvent",
+  "description": "Schema for pipeline failure events scoped to active pull requests or merge requests",
+  "type": "object",
+  "properties": {
+    "source_platform": {
+      "type": "string",
+      "enum": ["github", "gitlab"]
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository identifier (e.g. lgcorzo/rust_CACD_autonomous_factory)"
+    },
+    "run_id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "workflow_name": {
+      "type": "string"
+    },
+    "pr_number": {
+      "type": ["integer", "null"],
+      "description": "Active Pull Request or Merge Request number associated with this failure",
+      "minimum": 1
+    },
+    "head_branch": {
+      "type": ["string", "null"],
+      "description": "Head branch of the PR/MR"
+    },
+    "head_sha": {
+      "type": ["string", "null"],
+      "description": "Head commit SHA of the PR/MR run"
+    },
+    "failing_job": {
+      "type": "string"
+    },
+    "failing_step": {
+      "type": ["string", "null"]
+    },
+    "error_log": {
+      "type": "string"
+    },
+    "run_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "source_platform",
+    "repository",
+    "run_id",
+    "workflow_name",
+    "failing_job",
+    "error_log",
+    "run_url",
+    "detected_at"
+  ]
+}
