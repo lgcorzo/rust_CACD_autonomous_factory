@@ -21,6 +21,8 @@ pub struct GithubPullRequest {
     pub html_url: String,
     pub state: String,
     pub updated_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub head: Option<GithubWorkflowBranchRef>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -48,6 +50,25 @@ pub struct GithubComment {
 // GitHub Actions Workflow Run API Types
 // ──────────────────────────────────────────────────────────────────────────────
 
+/// Git branch and commit reference in GitHub API payloads.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct GithubWorkflowBranchRef {
+    #[serde(rename = "ref")]
+    pub branch_ref: Option<String>,
+    pub sha: Option<String>,
+}
+
+/// Pull request linkage within a GitHub Actions workflow run payload.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct GithubWorkflowRunPr {
+    pub id: u64,
+    pub number: u64,
+    #[serde(default)]
+    pub head: Option<GithubWorkflowBranchRef>,
+    #[serde(default)]
+    pub base: Option<GithubWorkflowBranchRef>,
+}
+
 /// GitHub Actions workflow run.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GithubWorkflowRun {
@@ -57,6 +78,14 @@ pub struct GithubWorkflowRun {
     pub conclusion: Option<String>,
     pub html_url: String,
     pub updated_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub pull_requests: Vec<GithubWorkflowRunPr>,
+    #[serde(default)]
+    pub head_branch: Option<String>,
+    #[serde(default)]
+    pub head_sha: Option<String>,
+    #[serde(default)]
+    pub event: Option<String>,
 }
 
 /// GitHub Actions workflow job.

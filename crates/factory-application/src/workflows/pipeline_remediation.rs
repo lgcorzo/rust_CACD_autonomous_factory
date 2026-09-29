@@ -97,6 +97,16 @@ impl PipelineRemediationService {
         &self,
         event: &PipelineFailureEvent,
     ) -> anyhow::Result<RemediationStatus> {
+        // 0. Defense-in-depth: Require active PR linkage (T016)
+        if event.pr_number.is_none() {
+            tracing::warn!(
+                repository = %event.repository,
+                run_id = event.run_id,
+                "Pipeline failure event has no associated PR number; suppressing remediation and escalation"
+            );
+            return Ok(RemediationStatus::Skipped);
+        }
+
         // 1. Classify the error
         let classification = self.classifier.classify(&event.error_log);
 
@@ -308,6 +318,20 @@ impl PipelineRemediationService {
         match event.source_platform.as_str() {
             "github" => {
                 if let Some(gh) = &self.github_client {
+                    // For self-referential repo, format human escalations as PR comments on the offending PR (T017)
+                    if event.repository == SELF_REFERENTIAL_REPO
+                        && let Some(pr_num) = event.pr_number
+                    {
+                        tracing::info!(
+                            repository = %event.repository,
+                            pr_number = pr_num,
+                            "Posting human escalation comment on offending PR instead of creating repo issue"
+                        );
+                        gh.post_pull_request_comment(&event.repository, pr_num, &body)
+                            .await?;
+                        return Ok(());
+                    }
+
                     let existing = gh
                         .list_open_issues(&event.repository, Some(label.to_string()))
                         .await?;
@@ -330,6 +354,19 @@ impl PipelineRemediationService {
             }
             "gitlab" => {
                 if let Some(gl) = &self.gitlab_client {
+                    if event.repository == SELF_REFERENTIAL_REPO
+                        && let Some(mr_iid) = event.pr_number
+                    {
+                        tracing::info!(
+                            repository = %event.repository,
+                            mr_iid = mr_iid,
+                            "Posting human escalation note on offending MR instead of creating project issue"
+                        );
+                        gl.post_merge_request_note(&event.repository, mr_iid, &body)
+                            .await?;
+                        return Ok(());
+                    }
+
                     let existing = gl
                         .list_open_issues(&event.repository, Some(label.to_string()))
                         .await?;
@@ -445,7 +482,9 @@ impl PipelineRemediationService {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use factory_infrastructure::github::{GithubIssue, MockGithubClient};
+    use factory_infrastructure::github::{
+        GithubComment, GithubIssue, GithubUser, MockGithubClient,
+    };
     use factory_infrastructure::kafka::SimpleMockKafkaClient;
     use factory_infrastructure::pipeline_classifier::RegexPipelineClassifier;
 
@@ -460,24 +499,83 @@ mod tests {
             error_log: error_log.to_string(),
             run_url: format!("https://github.com/{}/actions/runs/12345", repo),
             detected_at: Utc::now(),
+            pr_number: Some(404),
+            head_branch: Some("feat/pr-scope".to_string()),
+            head_sha: Some("abc1234".to_string()),
         }
+    }
+
+    #[tokio::test]
+    async fn test_pipeline_remediation_skips_when_pr_number_is_none() {
+        let mut mock_gh = MockGithubClient::new();
+        mock_gh.expect_create_issue().never();
+        mock_gh.expect_post_pull_request_comment().never();
+
+        let kafka = Arc::new(SimpleMockKafkaClient::new("mock").unwrap());
+        let classifier = Arc::new(RegexPipelineClassifier::new());
+        let service =
+            PipelineRemediationService::new(kafka, Some(Arc::new(mock_gh)), None, classifier);
+
+        let mut event = make_event(
+            "lgcorzo/lince-rs",
+            "error[E0308]: mismatched types\n  --> src/lib.rs:15:5",
+        );
+        event.pr_number = None;
+
+        let result = service.handle_pipeline_failure(&event).await.unwrap();
+        assert_eq!(result, RemediationStatus::Skipped);
+    }
+
+    #[tokio::test]
+    async fn test_self_referential_posts_pr_comment_instead_of_issue() {
+        let mut mock_gh = MockGithubClient::new();
+        mock_gh.expect_create_issue().never();
+        mock_gh
+            .expect_post_pull_request_comment()
+            .times(1)
+            .returning(|repo, pr, body| {
+                assert_eq!(repo, SELF_REFERENTIAL_REPO);
+                assert_eq!(pr, 404);
+                assert!(body.contains("Pipeline Failure Detected"));
+                Ok(GithubComment {
+                    id: 888,
+                    body: body.to_string(),
+                    user: GithubUser {
+                        login: "bot".to_string(),
+                    },
+                    html_url: format!("https://github.com/{}/pull/{}/#comment-888", repo, pr),
+                    updated_at: Some(Utc::now()),
+                })
+            });
+
+        let kafka = Arc::new(SimpleMockKafkaClient::new("mock").unwrap());
+        let classifier = Arc::new(RegexPipelineClassifier::new());
+
+        let service =
+            PipelineRemediationService::new(kafka, Some(Arc::new(mock_gh)), None, classifier);
+
+        let event = make_event(
+            SELF_REFERENTIAL_REPO,
+            "warning: unused [clippy::dead_code]\n  --> src/main.rs:10:1",
+        );
+
+        let result = service.handle_pipeline_failure(&event).await.unwrap();
+        assert_eq!(result, RemediationStatus::Escalated);
     }
 
     #[tokio::test]
     async fn test_self_referential_safety_guard() {
         let mut mock_gh = MockGithubClient::new();
         mock_gh
-            .expect_list_open_issues()
-            .returning(|_repo, _labels| Ok(Vec::new()));
-        mock_gh
-            .expect_create_issue()
-            .returning(|_repo, _title, _body, _labels| {
-                Ok(GithubIssue {
-                    id: 999,
-                    number: 100,
-                    title: "test".to_string(),
-                    body: Some("test".to_string()),
-                    html_url: "https://github.com/test".to_string(),
+            .expect_post_pull_request_comment()
+            .returning(|repo, pr, body| {
+                Ok(GithubComment {
+                    id: 888,
+                    body: body.to_string(),
+                    user: GithubUser {
+                        login: "bot".to_string(),
+                    },
+                    html_url: format!("https://github.com/{}/pull/{}/#comment-888", repo, pr),
                     updated_at: Some(Utc::now()),
                 })
             });
