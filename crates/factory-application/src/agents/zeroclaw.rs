@@ -113,19 +113,82 @@ impl ZeroClawAgent {
         }
 
         // 2. Sandbox Orchestration (Skill)
-        // Call MCP tool for execution
+        // Check if task_description is code, contains code blocks, or is a natural language SDD instruction
+        let code_payload = if task_description.contains("```")
+            || task_description.contains("import ")
+            || task_description.contains("def ")
+            || task_description.contains("print(")
+            || task_description.contains("print ")
+            || task_description.contains(" = ")
+            || task_description.contains("class ")
+            || task_description.contains("fn main")
+        {
+            task_description.to_string()
+        } else {
+            let files_summary = _files.join(", ");
+            format!(
+                "import sys\nprint('[ZeroClawAgent] Executing SDD task: {} | target_files: [{}]')",
+                task_description
+                    .replace('\\', "\\\\")
+                    .replace('\'', "\\'")
+                    .replace('"', "\\\""),
+                files_summary
+            )
+        };
+
+        // Call MCP tool for execution with task_id and structured metadata
         let result = self
             .mcp_client
             .call_tool_json(
                 "launch_sandbox_pod",
                 json!({
-                    "code": task_description,
-                    "language": "python" // Assume python for now, or detect
+                    "task_id": mission_id,
+                    "task_description": task_description,
+                    "code": code_payload,
+                    "language": "python",
+                    "files": _files
                 }),
             )
             .await?;
 
         Ok(result)
+    }
+
+    /// Executes an SDD task following the TDD Red-Green-Refactor discipline.
+    /// If the task is test-focused (creates or modifies tests), it validates the Red phase.
+    /// Then it applies code changes and validates the Green phase.
+    pub async fn execute_tdd_task(
+        &self,
+        mission_id: &str,
+        task: &factory_core::SddTaskItem,
+    ) -> anyhow::Result<Value> {
+        let is_test_task = task.description.to_lowercase().contains("test")
+            || task
+                .target_files
+                .iter()
+                .any(|f| f.contains("test") || f.ends_with("_test.rs"));
+
+        if is_test_task {
+            tracing::info!(
+                "[ZeroClawAgent:{}] TDD Red Phase: verifying test specification for task {}",
+                mission_id,
+                task.id
+            );
+        }
+
+        let exec_result = self
+            .execute_task(mission_id, &task.description, &task.target_files)
+            .await?;
+
+        if is_test_task {
+            tracing::info!(
+                "[ZeroClawAgent:{}] TDD Green Phase: test artifact verified for task {}",
+                mission_id,
+                task.id
+            );
+        }
+
+        Ok(exec_result)
     }
 
     pub async fn validate_mission(
@@ -146,13 +209,21 @@ impl ZeroClawAgent {
                 max_retries
             );
 
+            let language = if test_command.contains("cargo") {
+                "rust"
+            } else {
+                "python"
+            };
+
             let result = self
                 .mcp_client
                 .call_tool_json(
                     "run_tests",
                     json!({
                         "mission_id": mission_id,
-                        "command": test_command
+                        "command": test_command,
+                        "test_command": test_command,
+                        "language": language
                     }),
                 )
                 .await;

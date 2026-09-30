@@ -400,9 +400,14 @@ pub fn create_mission_workflow_with_clients(
 
 
                 if sdd_tasks.is_empty() {
+                    let task_desc = if !input.goal.is_empty() {
+                        input.goal.clone()
+                    } else {
+                        "Execute primary mission objectives".to_string()
+                    };
                     sdd_tasks.push(SddTaskItem {
                         id: "T001".to_string(),
-                        description: "Execute primary mission objectives".to_string(),
+                        description: task_desc,
                         is_parallel: false,
                         dependencies: vec![],
                         target_files: vec![],
@@ -447,7 +452,7 @@ pub fn create_mission_workflow_with_clients(
                         .await?;
 
                     let _task_res = match zeroclaw
-                        .execute_task(&mission_id, &task.description, &task.target_files)
+                        .execute_tdd_task(&mission_id, task)
                         .await
                     {
                         Ok(res) => {
