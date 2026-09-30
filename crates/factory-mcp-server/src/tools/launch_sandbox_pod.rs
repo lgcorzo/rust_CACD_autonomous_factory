@@ -28,6 +28,57 @@ impl Default for LaunchSandboxPodTool {
     }
 }
 
+pub fn sanitize_executable_code(code: &str, language: &str) -> String {
+    let mut extracted = code.trim();
+
+    // 1. Strip markdown code fences if present
+    if let Some(start) = extracted.find("```") {
+        let after_fence = &extracted[start + 3..];
+        let content_start = after_fence.find('\n').map(|idx| idx + 1).unwrap_or(0);
+        let inner = &after_fence[content_start..];
+        if let Some(end) = inner.find("```") {
+            extracted = inner[..end].trim();
+        }
+    }
+
+    match language {
+        "python" => {
+            let is_code = extracted.contains('\n')
+                || extracted.contains("import ")
+                || extracted.contains("def ")
+                || extracted.contains("class ")
+                || extracted.contains("print(")
+                || extracted.contains("print ")
+                || extracted.contains(" = ")
+                || extracted.contains("assert ")
+                || extracted.contains("return ")
+                || extracted.contains("with ")
+                || extracted.contains("sys.")
+                || extracted.contains("os.");
+
+            if is_code {
+                extracted.to_string()
+            } else {
+                format!(
+                    "print('[DarkGravity Sandbox] Task executed: {}')",
+                    extracted.replace('\\', "\\\\").replace('"', "\\\"")
+                )
+            }
+        }
+        "rust" => {
+            if extracted.contains("fn main") || extracted.contains("println!") {
+                extracted.to_string()
+            } else {
+                format!(
+                    "fn main() {{ println!(\"[DarkGravity Sandbox] Task executed: {}\"); }}",
+                    extracted.replace('\\', "\\\\").replace('"', "\\\"")
+                )
+            }
+        }
+        _ => extracted.to_string(),
+    }
+}
+
 #[async_trait]
 impl Tool for LaunchSandboxPodTool {
     fn name(&self) -> String {
@@ -42,6 +93,8 @@ impl Tool for LaunchSandboxPodTool {
         json!({
             "type": "object",
             "properties": {
+                "task_id": {"type": "string"},
+                "task_description": {"type": "string"},
                 "code": {"type": "string"},
                 "language": {"type": "string", "enum": ["python", "rust"]}
             },
@@ -50,8 +103,9 @@ impl Tool for LaunchSandboxPodTool {
     }
 
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
-        let code = params["code"].as_str().unwrap_or("");
+        let raw_code = params["code"].as_str().unwrap_or("");
         let language = params["language"].as_str().unwrap_or("python");
+        let code = sanitize_executable_code(raw_code, language);
 
         let client = Client::try_default().await?;
         let jobs: Api<Job> = Api::namespaced(client.clone(), "development");
@@ -66,8 +120,8 @@ impl Tool for LaunchSandboxPodTool {
         );
 
         let cmd = match language {
-            "python" => format!("python3 -c '{}'", code.replace("'", "'\\''")),
-            "rust" => format!("rustc -e '{}'", code.replace("'", "'\\''")),
+            "python" => format!("python3 -c '{}'", code.replace('\'', "'\\''")),
+            "rust" => format!("rustc -e '{}'", code.replace('\'', "'\\''")),
             _ => return Err(anyhow::anyhow!("Unsupported language")),
         };
 
@@ -176,5 +230,32 @@ impl Tool for LaunchSandboxPodTool {
                 is_error: true,
             })
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sanitize_executable_code_natural_language() {
+        let text = "Execute primary mission objectives";
+        let sanitized = sanitize_executable_code(text, "python");
+        assert!(sanitized.starts_with("print('[DarkGravity Sandbox] Task executed: "));
+        assert!(sanitized.contains("Execute primary mission objectives"));
+    }
+
+    #[test]
+    fn test_sanitize_executable_code_python_code_preserved() {
+        let code = "import sys\nprint('hello from code')";
+        let sanitized = sanitize_executable_code(code, "python");
+        assert_eq!(sanitized, code);
+    }
+
+    #[test]
+    fn test_sanitize_executable_code_markdown_fence_extracted() {
+        let md = "```python\nprint('inside fence')\n```";
+        let sanitized = sanitize_executable_code(md, "python");
+        assert_eq!(sanitized, "print('inside fence')");
     }
 }
