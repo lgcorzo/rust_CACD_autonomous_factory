@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DarkGravityWikiContract",
+  "description": "Validation schema and structural contract for Dark Gravity Autonomous Factory documentation nodes in wiki/",
+  "type": "object",
+  "required": ["documents", "osr_threshold", "hitl_mesh", "crates_coverage"],
+  "properties": {
+    "osr_threshold": {
+      "type": "number",
+      "maximum": 0.05,
+      "description": "Maximum allowable Orphan Symbol Rate (must be < 5%)"
+    },
+    "hitl_mesh": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["vertex", "name", "role", "checkpoint"],
+        "properties": {
+          "vertex": {"type": "string", "enum": ["Vertex-1", "Vertex-2", "Vertex-3", "Vertex-4"]},
+          "name": {"type": "string"},
+          "role": {"type": "string"},
+          "checkpoint": {"type": "string"}
+        }
+      }
+    },
+    "crates_coverage": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "factory-core",
+          "factory-application",
+          "factory-infrastructure",
+          "factory-mcp-server",
+          "factory-cli"
+        ]
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["filename", "category", "owner_agent", "c4_level"],
+        "properties": {
+          "filename": {"type": "string"},
+          "category": {
+            "type": "string",
+            "enum": [
+              "Navigation",
+              "Business",
+              "StrategicArchitecture",
+              "TacticalDesign",
+              "Agents",
+              "Lifecycle",
+              "Infrastructure",
+              "Verification",
+              "Operations",
+              "Compliance",
+              "CrateReference"
+            ]
+          },
+          "owner_agent": {"type": "string"},
+          "c4_level": {
+            "type": "string",
+            "enum": ["C1_Context", "C2_Container", "C3_Component", "C4_Code_UML", "None"]
+          },
+          "frontmatter_type": {
+            "type": "string",
+            "enum": ["architecture_node", "agent_spec", "operations_guide", "compliance_record"]
+          }
+        }
+      }
+    }
+  }
+}

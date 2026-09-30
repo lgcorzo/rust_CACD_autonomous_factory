@@ -1,26 +1,40 @@
-# Navigation
+<!-- Dark Gravity Wiki Sidebar -->
 
-## [Home](Home)
+**[🏠 Home](Home.md)**
 
-### 🧭 Strategic Context
-* [0. Glossary](GLOSSARY)
-* [1. Business Context](BUSINESS-CONTEXT)
+---
 
-### 🏗 Architecture
-* [2. Strategic Design](STRATEGIC-DESIGN)
-* [3. Tactical Design](TACTICAL-DESIGN)
+**Strategic**
+- [📋 Business Context](BUSINESS-CONTEXT.md)
+- [🏗️ Strategic Design](STRATEGIC-DESIGN.md)
+- [📚 Glossary](GLOSSARY.md)
 
-### 🤖 Workforce
-* [4. Agent Specs](AGENT-SPECIFICATIONS)
-* [5. Experiment Lifecycle](EXPERIMENT-LIFECYCLE)
+**Tactical**
+- [⚙️ Tactical Design](TACTICAL-DESIGN.md)
+- [🤖 Agent Specifications](AGENT-SPECIFICATIONS.md)
+- [🔄 Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md)
 
-### 🔌 Operations
-* [6. Adapters](INFRASTRUCTURE-ADAPTERS)
-* [7. Verification Triad](VERIFICATION-TRIAD)
-* [8. Production Ops](PRODUCTION-OPERATIONS)
+**Infrastructure**
+- [🔌 Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)
+- [✅ Verification Triad](VERIFICATION-TRIAD.md)
 
-### 📋 Project
-* [Mission History](EXPERIMENT-LOGS)
-* [README](README)
-* [User Manual](USER-MANUAL)
-* [Test Plan Report](Test_Plan_Report)
+**Operations**
+- [🚀 Production Operations](PRODUCTION-OPERATIONS.md)
+- [📖 User Manual](USER-MANUAL.md)
+- [🧪 Test Plan](Test_Plan_Report.md)
+
+**Security & Governance**
+- [🔒 Security Architecture](SECURITY-ARCHITECTURE.md)
+- [🏛️ HITL Governance](HITL-GOVERNANCE.md)
+- [📜 Compliance & Audit](COMPLIANCE-AUDIT.md)
+
+**Crate References**
+- [factory-core](crates_factory-core_src_lib.md)
+- [factory-application](crates_factory-application_src_lib.md)
+- [factory-infrastructure](crates_factory-infrastructure_src_lib.md)
+- [factory-mcp-server](crates_factory-mcp-server_src_lib.md)
+- [factory-cli](crates_factory-cli_src_main.md)
+
+---
+
+**[📑 Master Index](index.md)** · [README](README.md)
