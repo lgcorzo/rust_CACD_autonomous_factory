@@ -7,6 +7,18 @@
 
 ---
 
+## Clarifications
+
+### Session 2026-09-30
+
+- Q: What structural standard and organization model should the wiki adopt? → A: Option A (Unified Canonical + OKF Hierarchy per NotebookLM standard 07_Wiki_Structure_Plan.md, combining high-level strategic/lifecycle docs with modular OKF crate references, unified under Home.md and _Sidebar.md).
+- Q: What OSR threshold and quality enforcement standard should apply? → A: Option A (Strict OSR < 5% Quality Gate per NotebookLM standard, verifying that all compiled Rust public AST symbols across the 5 workspace crates are documented in the wiki).
+- Q: How should Human-in-the-Loop (HITL) governance and documentation synchronization be modeled? → A: Option A (4-Vertex HITL Mesh per NotebookLM standard: Strategic Injection, Sprint Mobilization, Exception Override, and Categorical Scrutiny/Merge, documented alongside the automated docs-to-wiki.yml sync workflow).
+- Q: How should R&D grant and regulatory compliance be documented? → A: Option A (Formal R&D & Regulatory Compliance Specifications per NotebookLM standard: document automated telemetry packager for Hazitek 2026 / EU AI Act covering AST code deltas, compute hours, FinOps logs, and Ed25519 cryptographic identity claims).
+- Q: What level of diagram depth should be used for execution flows and agent state machines? → A: Option A (Comprehensive State Machines & Sequence Flows per NotebookLM standard: render dedicated Mermaid diagrams for Hatchet 6-phase DAG, Aethelgard Circuit Breaker / retry limits, Outbound Poller ingestion, and ZeroClaw TDD task loops).
+
+---
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Comprehensive Architectural & Business System Overview (Priority: P1)
@@ -80,16 +92,18 @@ As a security auditor or DevSecOps lead, I want comprehensive documentation deta
 
 ### Functional Requirements
 
-- **FR-001**: System documentation MUST provide a structured `wiki/` directory organized hierarchically into Strategic Architecture, Tactical Design, Agent Specifications, Operations & Use Cases, Security & Non-Human Identity, and Crate References.
+- **FR-001**: System documentation MUST provide a structured `wiki/` directory organized hierarchically into Strategic Architecture, Tactical Design, Agent Specifications, Operations & Use Cases, Security & Non-Human Identity, and Crate References, following the canonical Dark Gravity hierarchy from NotebookLM (`07_Wiki_Structure_Plan.md`) unified under `Home.md` and `_Sidebar.md` with Open Knowledge Format (OKF) frontmatter.
 - **FR-002**: Documentation MUST include C4 Architecture diagrams at Context (C1), Container (C2), and Component (C3) levels using Mermaid.js syntax.
 - **FR-003**: Documentation MUST provide UML 2.0 class diagrams for every crate (`factory-core`, `factory-application`, `factory-infrastructure`, `factory-mcp-server`, `factory-cli`), detailing structs, enums, traits, and implementations.
-- **FR-004**: Documentation MUST include execution flow and sequence diagrams for all primary asynchronous runtime workflows (Issue Polling, Autonomous Mission DAG, PR Interactive Directives, CI Pipeline Remediation, and TDD Red-Green-Refactor task loops).
+- **FR-004**: Documentation MUST include comprehensive Mermaid execution flow and state machine diagrams for all primary asynchronous runtime loops (Issue Polling Ingestion, Hatchet 6-Phase Mission DAG, PR Interactive Directives, Aethelgard Circuit Breaker with 3-retry deadlocks, and ZeroClaw Red-Green-Refactor TDD sandbox execution).
 - **FR-005**: Documentation MUST provide an exhaustive Business & Domain section defining the CA/CD vision, Hazitek 2026 innovation objectives, Return on Investment (ROI), and core domain vocabulary (Glossary).
 - **FR-006**: Documentation MUST detail step-by-step User Manuals and Runbooks covering CLI usage, environment configuration, Kubernetes manifests, model switching via LiteLLM, and troubleshooting guides.
 - **FR-007**: Documentation MUST describe the complete Autonomous Mission Lifecycle through all six formal phases (`Ingestion`, `Plan`, `Code`, `Validation`, `Review`, `Delivery`), identifying the responsible agent and output artifacts for each phase.
 - **FR-008**: Documentation MUST detail the Zero Trust Security Architecture, including OpenZiti overlay networking, Ed25519 cryptographic Non-Human Identity (NHI) issuance/verification, sandbox containment, Semgrep SAST gates, and Circuit Breaker anti-deadlock safeguards.
 - **FR-009**: Documentation MUST include an intuitive, modern navigation system (`Home.md`, `README.md`, `_Sidebar.md`, `index.md`) with validated internal markdown links using standard GitHub/GitLab markdown conventions.
 - **FR-010**: Documentation MUST follow the Open Knowledge Format (OKF) / OpenWiki standard with YAML frontmatter where applicable, indicating source path references, functional summaries, and architectural tags.
+- **FR-011**: Documentation MUST formally specify the 4 Human-in-the-Loop (HITL) governance vertices (Strategic Injection, Sprint Mobilization, Exception Override, Categorical Scrutiny) and detail the `.github/workflows/docs-to-wiki.yml` pipeline that synchronizes `wiki/` markdown directly to the repository wiki.
+- **FR-012**: Documentation MUST detail the R&D and regulatory compliance framework (Hazitek 2026 / SPRI / EU AI Act Art. 12 & 14), including AST code mutation tracking, sandbox compute core-hours, FinOps token consumption logs via virtual tags, and Ed25519 Non-Human Identity cryptographic verification.
 
 ### Key Entities
 
@@ -111,6 +125,7 @@ As a security auditor or DevSecOps lead, I want comprehensive documentation deta
 - **SC-004**: Complete C4 model coverage across Context (C1), Container (C2), and Component (C3) levels with zero syntax errors in Mermaid blocks.
 - **SC-005**: 100% of wiki internal cross-references and links resolve to valid, existing wiki files without broken links.
 - **SC-006**: Both technical developers and non-technical stakeholders can navigate from the root index to any subsystem or runbook in 3 clicks or fewer.
+- **SC-007**: Orphan Symbol Rate (OSR) must remain strictly OSR < 5% across the wiki documentation, verifying that all compiled Rust public AST symbols from the 5 workspace crates are accurately represented.
 
 ---
 
