@@ -1,27 +1,12 @@
----
-type: module
-title: "poller_service.rs"
-source_path: "crates/factory-application/src/poller_service.rs"
-description: "Documentation for crates/factory-application/src/poller_service.rs"
-tags: [rust, module]
-last_verified_commit: "a591f336"
+# factory-application::poller_service — Outbound Poller
+
+> **Source**: `crates/factory-application/src/poller_service.rs`
+> **Layer**: Application
+
 ---
 
-# poller_service.rs
+PollerDaemonService: polls GitHub/GitLab/Jira for new issues, PR comments, and pipeline failures.
 
-Source File: `crates/factory-application/src/poller_service.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class PollerCycleStats
-    class PollerDaemonService
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-application_src_lib.md) · [Agent Specifications](AGENT-SPECIFICATIONS.md)*

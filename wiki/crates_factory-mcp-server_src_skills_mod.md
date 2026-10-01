@@ -1,26 +1,12 @@
----
-type: module
-title: "mod.rs"
-source_path: "crates/factory-mcp-server/src/skills/mod.rs"
-description: "Documentation for crates/factory-mcp-server/src/skills/mod.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::skills — Skill Registry
+
+> **Source**: `crates/factory-mcp-server/src/skills/mod.rs`
+> **Layer**: Interface
+
 ---
 
-# mod.rs
+Skills module overview: registers available agent skills and maps them to MCP tool invocations.
 
-Source File: `crates/factory-mcp-server/src/skills/mod.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class Empty
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

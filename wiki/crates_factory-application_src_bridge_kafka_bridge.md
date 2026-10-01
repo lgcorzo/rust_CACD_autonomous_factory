@@ -1,26 +1,12 @@
----
-type: module
-title: "kafka_bridge.rs"
-source_path: "crates/factory-application/src/bridge/kafka_bridge.rs"
-description: "Documentation for crates/factory-application/src/bridge/kafka_bridge.rs"
-tags: [rust, module]
-last_verified_commit: "3341ecf4"
+# factory-application::bridge::kafka_bridge — Kafka Event Bridge
+
+> **Source**: `crates/factory-application/src/bridge/kafka_bridge.rs`
+> **Layer**: Application
+
 ---
 
-# kafka_bridge.rs
+Kafka event bridge for inter-service communication and event-driven workflows.
 
-Source File: `crates/factory-application/src/bridge/kafka_bridge.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class KafkaBridge
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-application_src_lib.md) · [Agent Specifications](AGENT-SPECIFICATIONS.md)*

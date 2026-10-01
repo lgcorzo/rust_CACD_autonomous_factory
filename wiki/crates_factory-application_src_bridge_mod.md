@@ -1,26 +1,12 @@
----
-type: module
-title: "mod.rs"
-source_path: "crates/factory-application/src/bridge/mod.rs"
-description: "Documentation for crates/factory-application/src/bridge/mod.rs"
-tags: [rust, module]
-last_verified_commit: "3341ecf4"
+# factory-application::bridge — Bridge Module
+
+> **Source**: `crates/factory-application/src/bridge/mod.rs`
+> **Layer**: Application
+
 ---
 
-# mod.rs
+Bridge module overview and adapter registry.
 
-Source File: `crates/factory-application/src/bridge/mod.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class Empty
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-application_src_lib.md) · [Agent Specifications](AGENT-SPECIFICATIONS.md)*

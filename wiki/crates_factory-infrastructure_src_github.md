@@ -1,39 +1,12 @@
----
-type: module
-title: "github.rs"
-source_path: "crates/factory-infrastructure/src/github.rs"
-description: "Documentation for crates/factory-infrastructure/src/github.rs"
-tags: [rust, module]
-last_verified_commit: "a591f336"
+# factory-infrastructure::github — GitHub Adapter
+
+> **Source**: `crates/factory-infrastructure/src/github.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# github.rs
+GitHub REST API adapter for issue polling, PR creation, file operations, and webhook handling. Implements repository CRUD, branch management, and comment threading.
 
-Source File: `crates/factory-infrastructure/src/github.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class GithubIssue
-    class GithubPullRequest
-    class GithubUser
-    class GithubReaction
-    class GithubComment
-    class GithubWorkflowRun
-    class GithubWorkflowJob
-    class GithubWorkflowStep
-    class GithubWorkflowRunsResponse
-    class GithubWorkflowJobsResponse
-    class GithubClient {
-        <<trait>>
-    }
-    class HttpGithubClient
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*

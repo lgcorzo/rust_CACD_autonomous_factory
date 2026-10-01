@@ -1,30 +1,12 @@
----
-type: module
-title: "security_validator.rs"
-source_path: "crates/factory-infrastructure/src/security_validator.rs"
-description: "Documentation for crates/factory-infrastructure/src/security_validator.rs"
-tags: [rust, module]
-last_verified_commit: "3341ecf4"
+# factory-infrastructure::security_validator — Ed25519 Validator
+
+> **Source**: `crates/factory-infrastructure/src/security_validator.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# security_validator.rs
+Concrete implementation of the SecurityValidator trait using ed25519-dalek for NHI credential signature verification and content audit.
 
-Source File: `crates/factory-infrastructure/src/security_validator.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class Ed25519Validator
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> validate_signature
-    validate_signature --> audit_content
-    audit_content --> test_ed25519_signature_validation
-    test_ed25519_signature_validation --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*

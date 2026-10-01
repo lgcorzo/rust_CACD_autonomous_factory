@@ -1,33 +1,12 @@
----
-type: module
-title: "protocol.rs"
-source_path: "crates/factory-mcp-server/src/protocol.rs"
-description: "Documentation for crates/factory-mcp-server/src/protocol.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::protocol — JSON-RPC Protocol
+
+> **Source**: `crates/factory-mcp-server/src/protocol.rs`
+> **Layer**: Interface
+
 ---
 
-# protocol.rs
+MCP JSON-RPC 2.0 protocol implementation handling tools/call, tools/list, and error response formatting.
 
-Source File: `crates/factory-mcp-server/src/protocol.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class JsonRpcRequest
-    class JsonRpcResponse
-    class JsonRpcError
-    class McpTool
-    class CallToolResult
-    class McpContent {
-        <<enumeration>>
-    }
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

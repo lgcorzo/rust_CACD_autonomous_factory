@@ -1,32 +1,12 @@
----
-type: module
-title: "index_code.rs"
-source_path: "crates/factory-mcp-server/src/tools/index_code.rs"
-description: "Documentation for crates/factory-mcp-server/src/tools/index_code.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::tools::index_code — R2R Ingestion
+
+> **Source**: `crates/factory-mcp-server/src/tools/index_code.rs`
+> **Layer**: Interface
+
 ---
 
-# index_code.rs
+Code indexing tool: ingests source files into R2R GraphRAG for vector embedding and knowledge retrieval during mission planning.
 
-Source File: `crates/factory-mcp-server/src/tools/index_code.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class IndexCodeTool
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> name
-    name --> description
-    description --> input_schema
-    input_schema --> call
-    call --> test_index_code_tool_missing_content
-    test_index_code_tool_missing_content --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

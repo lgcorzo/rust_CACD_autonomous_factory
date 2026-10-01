@@ -1,31 +1,12 @@
----
-type: module
-title: "run_tests.rs"
-source_path: "crates/factory-mcp-server/src/tools/run_tests.rs"
-description: "Documentation for crates/factory-mcp-server/src/tools/run_tests.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::tools::run_tests — Test Runner
+
+> **Source**: `crates/factory-mcp-server/src/tools/run_tests.rs`
+> **Layer**: Interface
+
 ---
 
-# run_tests.rs
+Test runner tool: executes test suites within the sandbox pod and parses results for pass/fail determination.
 
-Source File: `crates/factory-mcp-server/src/tools/run_tests.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class RunTestsTool
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> name
-    name --> description
-    description --> input_schema
-    input_schema --> call
-    call --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

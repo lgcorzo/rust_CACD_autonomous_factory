@@ -1,181 +1,58 @@
-# INFRASTRUCTURE-ADAPTERS: Dark Gravity Connectors
+# Infrastructure Adapters — Dark Gravity Factory
 
-This document details the **Adapters** that connect the autonomous factory to external ecosystems and internal infrastructure.
+> **Purpose**: Comprehensive documentation of all infrastructure adapters with UML diagrams.
 
 ---
 
-## Physical Topology (Deployment)
+## Adapter Overview
 
 ```mermaid
-C4Deployment
-    title Dark Gravity Physical Topology
+graph TB
+    subgraph "Event Bus"
+        KAFKA["Kafka KRaft<br/>Event streaming"]
+    end
+    subgraph "Knowledge"
+        R2R["R2R GraphRAG<br/>Code retrieval"]
+    end
+    subgraph "Networking"
+        ZITI["OpenZiti<br/>Zero Trust overlay"]
+    end
+    subgraph "Secrets"
+        VAULT["HashiCorp Vault<br/>Key management"]
+    end
+    subgraph "Observability"
+        SENTRY["Sentry<br/>Error tracking"]
+        S3["MinIO/S3<br/>Artifact storage"]
+    end
 
-    Deployment_Node(k8s, "Kubernetes Cluster", "Target Environment") {
-        Deployment_Node(factory_pod, "Factory Pod", "Controller") {
-            Container(app, "Dark Gravity Application", "Rust", "Hatchet workers & Agents")
-            Container(mcp, "MCP Server", "Rust/Axum", "Runs tools via HTTP/SSE")
-        }
-        Deployment_Node(sandbox_pod, "Sandbox Node", "Zero Trust Executor") {
-            Container(firecracker, "Firecracker Micro-VM", "KVM", "Executes isolated code")
-        }
-    }
+    style KAFKA fill:#2196F3,stroke:#1565C0,color:#fff
+    style ZITI fill:#4CAF50,stroke:#2E7D32,color:#fff
+    style VAULT fill:#FF9800,stroke:#E65100,color:#fff
+```
 
-    Deployment_Node(hatchet_node, "Hatchet Cloud", "Orchestration") {
-        System_Ext(hatchet, "Hatchet Engine")
-    }
+## Kafka KRaft Architecture
 
-    Deployment_Node(ziti_node, "OpenZiti Edge", "mTLS Network") {
-        System_Ext(ziti, "Ziti Controller/Router")
-    }
-    
-    Rel(app, mcp, "API Calls", "SSE/HTTP")
-    Rel(mcp, firecracker, "Spawns & Execs", "AF_VSOCK/Local")
-    Rel(app, hatchet, "Syncs workflows", "gRPC / HTTP")
-    Rel(app, ziti, "Secure Tunnel", "mTLS 1.3")
+| Topic | Producer | Consumer | Purpose |
+|:---|:---|:---|:---|
+| `mission-events` | PollerDaemonService | Hatchet | Mission ingestion |
+| `budget-exceeded` | FinOpsAgent | Ops alerts | Budget hardstop |
+| `compliance-audit` | Telemetry export | S3 archiver | Audit trail |
+
+## R2R GraphRAG Knowledge Retrieval
+
+```mermaid
+sequenceDiagram
+    participant Agent as RustantAgent
+    participant R2R as R2R GraphRAG
+    participant VDB as Vector Database
+
+    Agent->>R2R: retrieve_context(query)
+    R2R->>VDB: Semantic search (768-dim embeddings)
+    VDB-->>R2R: Top-k code chunks
+    R2R->>R2R: Graph-augmented reasoning
+    R2R-->>Agent: Contextual code + docs
 ```
 
 ---
 
-## Messaging & Telemetry (The Nervous System)
-
-### Kafka Event Bus
-- **Client**: `RdKafkaClient` (production) and `SimpleMockKafkaClient` (testing) in `factory-infrastructure/src/kafka.rs` — publishes `publish_thought` events.
-- **Topics**: `mission-input`, `agent-thought`, `mission-artifact`
-- **Serialization**: JSON (via `serde_json`)
-- **Telemetry Exporter**: `TelemetryExporter` asynchronously consumes `agent-thought` events and pushes them to OpenWebUI.
-
----
-
-## Authentication & Identity (Zero Trust)
-
-### Security Validator
-- **Mechanism**: `SecurityValidator` trait in `factory-core/src/security.rs` implemented by `Ed25519Validator` in `factory-infrastructure/src/security_validator.rs`.
-- **Implementation**: Uses `ed25519-dalek` v2 to cryptographically verify 64-byte signatures.
-- **Audit Results**: `AuditResult` struct with `is_safe` boolean and `findings` vector.
-
-### Security Bounds
-- **Mechanism**: `SecurityBounds` trait in `factory-core/src/security.rs` implemented by `VaultSecurityBounds` in `factory-infrastructure/src/vault.rs`.
-- **Implementation**: Uses `reqwest` to issue and validate JIT tokens against HashiCorp Vault's Token API.
-
-### OpenZiti Dark-Network Overlay
-- **Mesh**: All inter-service communication via OpenZiti mTLS tunnels.
-- **Integration**: `factory-infrastructure/src/ziti.rs` — `OpenZitiIdentity` struct uses `ziti-sdk` to dynamically initialize real contexts and retrieve mTLS tokens.
-- **Mocking**: `MockZitiIdentity` available for testing.
-
----
-
-## Vector Store & Corporate Memory
-
-### R2R GraphRAG
-- **Client**: `HttpR2rClient` in `factory-infrastructure/src/r2r.rs`:
-  - Authenticates via `get_token()` (login endpoint)
-  - Searches via `search()` (retrieval endpoint)
-- **Mocking**: `ManualMockR2rClient` in `factory-mcp-server/src/tools/retrieve_context.rs`
-
----
-
-## MCP Tools (The Interface)
-
-All tools are provided by the Axum-based MCP server in `factory-mcp-server`:
-
-| Tool | Module | Transport |
-| :--- | :--- | :--- |
-| `plan_mission` | `tools/plan_mission.rs` | JSON-RPC over SSE |
-| `execute_code` | `tools/execute_code.rs` | JSON-RPC over SSE |
-| `run_tests` | `tools/run_tests.rs` | JSON-RPC over SSE |
-| `retrieve_context` | `tools/retrieve_context.rs` | JSON-RPC over SSE |
-| `index_code` | `tools/index_code.rs` | JSON-RPC over SSE |
-| `security_review` | `tools/security_review.rs` | JSON-RPC over SSE |
-| `search_jira` | `tools/search_jira.rs` | JSON-RPC over SSE |
-| `update_mission_status` | `tools/update_mission_status.rs` | JSON-RPC over SSE |
-
-### MCP Client Infrastructure
-
-- **McpHttpClient**: Direct HTTP calls to MCP endpoint
-- **McpSseClient**: SSE handshake + session-based communication
-- Both implement the `McpClient` trait in `factory-infrastructure/src/mcp_client.rs`
-
----
-
-## Execution Sandbox
-
-| Driver | Isolation | Communication |
-| :--- | :--- | :--- |
-| `SubprocessDriver` | Local subprocess (`python`, `rust`, `go`, `typescript`) | tokio stdin/stdout |
-| `GvisorK8sDriver` | Kubernetes gVisor runsc | K8s API Job execution |
-
-Both implement the `SandboxDriver` trait in `factory-mcp-server/src/sandbox.rs`.
-
----
-
-## External Service Clients
-
-```mermaid
-C4Container
-    title Dark Gravity Infrastructure Adapters
-
-    Container_Boundary(factory, "Dark Gravity Autonomous Factory") {
-        Component(clients, "External Clients", "Rust", "Adapters for external communication")
-        Component(mcp, "MCP Server", "Rust/Axum", "Tools API")
-    }
-
-    System_Ext(jira, "Atlassian Jira", "Backlog & Bug tracking")
-    System_Ext(r2r, "R2R GraphRAG", "Vector Store & Semantic Memory")
-    System_Ext(kafka, "Confluent Kafka", "Event Bus for telemetry")
-    System_Ext(s3, "AWS S3", "Object Storage for artifacts")
-    System_Ext(ziti, "OpenZiti", "mTLS Zero Trust Network")
-    System_Ext(vault, "HashiCorp Vault", "JIT Tokens & Security Bounds")
-    System_Ext(sentry, "Sentry", "Error tracking & Polling")
-
-    Rel(clients, jira, "Fetches issues & updates status", "HTTPS")
-    Rel(clients, r2r, "Queries context & updates knowledge", "HTTPS/JWT")
-    Rel(clients, kafka, "Publishes events & telemetry", "TCP")
-    Rel(clients, s3, "Puts/Gets objects", "HTTPS")
-    Rel(clients, ziti, "Retrieves mTLS tokens", "OpenZiti SDK")
-    Rel(clients, vault, "Validates JIT tokens", "HTTPS")
-    Rel(clients, sentry, "Polls for crashes", "HTTPS")
-    
-    Rel(mcp, clients, "Uses adapters to perform tool logic", "In-Process")
-```
-
-| Client | File | Key Methods |
-| :--- | :--- | :--- |
-| `HttpJiraClient` / `JiraClient` | `jira.rs` | `search_issues(query)` |
-| `HttpR2rClient` / `R2rClient` | `r2r.rs` | `search(query, limit)` |
-| `RdKafkaClient` / `KafkaClient` | `kafka.rs` | `publish(topic, payload)` |
-| `McpHttpClient` / `McpSseClient` | `mcp_client.rs` | `call_tool_json(name, args)` |
-| `AwsS3Storage` / `S3Storage` | `s3.rs` | `put_object(key, data)`, `get_object(key)` |
-| `OpenZitiIdentity` / `ZitiIdentity` | `ziti.rs` | `get_token()`, `service_name()` |
-| `VaultSecurityBounds` / `SecurityBounds` | `vault.rs` | `issue_jit_token()`, `validate_token()` |
-| `Ed25519Validator` / `SecurityValidator` | `security_validator.rs` | `validate_signature()`, `audit_content()` |
-
----
-
-## Environment Configuration
-
-| Variable | Description | Source |
-| :--- | :--- | :--- |
-| `HATCHET_CLIENT_TOKEN` | Auth for Hatchet engine | Environment |
-| `LITELLM_API_BASE` | Internal gateway to LLM models | Environment |
-| `ZITI_IDENTITY_FILE` | OpenZiti network identity profile | Environment |
-| `OPENAI_API_KEY` | API key for LLM gateway | Environment |
-| `KAFKA_BOOTSTRAP_SERVERS` | Kafka broker address | Environment |
-
----
-
-## CRG-Verified Dependencies
-
-Based on `code-review-graph` analysis, the infrastructure layer has the following dependency graph:
-
-- **Jira Client** → `wiremock` for HTTP mocking, `serde_json` for parsing
-- **R2R Client** → JWT auth flow (login → token → search), `wiremock` for testing
-- **Kafka Client** → Published via `publish_thought` to agent-thought topic
-- **MCP Client** → SSE handshake (`get_session_url`) + HTTP calls (`call_tool_json`)
-- **S3 Storage** → `put_object` / `get_object` with configurable bucket
-- **Ziti Identity** → mTLS token retrieval using `ziti-sdk` and dynamic JWT parsing
-- **Vault Security** → Standard HTTP calls via `reqwest` to Vault API endpoints
-- **Ed25519 Validator** → Uses `ed25519-dalek` v2 and `hex` for cryptographic verification
-
----
-
-*Last updated: 2026-07-08 — Verified against actual codebase via CRG analysis*
+> *Related: [Tactical Design](TACTICAL-DESIGN.md) · [Production Operations](PRODUCTION-OPERATIONS.md)*

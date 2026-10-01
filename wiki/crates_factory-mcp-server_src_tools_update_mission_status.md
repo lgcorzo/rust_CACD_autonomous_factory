@@ -1,31 +1,12 @@
----
-type: module
-title: "update_mission_status.rs"
-source_path: "crates/factory-mcp-server/src/tools/update_mission_status.rs"
-description: "Documentation for crates/factory-mcp-server/src/tools/update_mission_status.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::tools::update_mission_status — Status Tracking
+
+> **Source**: `crates/factory-mcp-server/src/tools/update_mission_status.rs`
+> **Layer**: Interface
+
 ---
 
-# update_mission_status.rs
+Mission status update tool: records mission phase transitions, timestamps, and outcome metrics for telemetry and compliance.
 
-Source File: `crates/factory-mcp-server/src/tools/update_mission_status.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class UpdateMissionStatusTool
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> name
-    name --> description
-    description --> input_schema
-    input_schema --> call
-    call --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

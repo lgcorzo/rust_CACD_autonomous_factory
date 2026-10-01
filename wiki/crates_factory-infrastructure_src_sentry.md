@@ -1,36 +1,12 @@
----
-type: module
-title: "sentry.rs"
-source_path: "crates/factory-infrastructure/src/sentry.rs"
-description: "Documentation for crates/factory-infrastructure/src/sentry.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-infrastructure::sentry — Error Tracking
+
+> **Source**: `crates/factory-infrastructure/src/sentry.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# sentry.rs
+Sentry error tracking adapter for capturing and reporting unhandled exceptions, panics, and agent errors with contextual breadcrumbs.
 
-Source File: `crates/factory-infrastructure/src/sentry.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class CrashEvent
-    class SentryClient {
-        <<trait>>
-    }
-    class HttpSentryClient
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> fetch_recent_crashes
-    fetch_recent_crashes --> new
-    new --> fetch_recent_crashes
-    fetch_recent_crashes --> test_sentry_fetch_success
-    test_sentry_fetch_success --> test_sentry_fetch_unauthorized
-    test_sentry_fetch_unauthorized --> test_sentry_fetch_prepends_org_slug
-    test_sentry_fetch_prepends_org_slug --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*

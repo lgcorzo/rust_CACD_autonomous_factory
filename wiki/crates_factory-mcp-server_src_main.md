@@ -1,27 +1,12 @@
----
-type: module
-title: "main.rs"
-source_path: "crates/factory-mcp-server/src/main.rs"
-description: "Documentation for crates/factory-mcp-server/src/main.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::main — HTTP Server Entry
+
+> **Source**: `crates/factory-mcp-server/src/main.rs`
+> **Layer**: Interface
+
 ---
 
-# main.rs
+Axum HTTP server startup with route registration, TLS configuration, and graceful shutdown handling.
 
-Source File: `crates/factory-mcp-server/src/main.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class Empty
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> main
-    main --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

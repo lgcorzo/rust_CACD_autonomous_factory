@@ -1,34 +1,41 @@
----
-type: module
-title: "auditor.rs"
-source_path: "crates/factory-application/src/agents/auditor.rs"
-description: "Documentation for crates/factory-application/src/agents/auditor.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-application::agents::auditor — AuditorAgent
+
+> **Source**: `crates/factory-application/src/agents/auditor.rs`
+> **Layer**: Application
+
 ---
 
-# auditor.rs
-
-Source File: `crates/factory-application/src/agents/auditor.rs`
-
-## Component Architecture
+## Security Review Flow
 
 ```mermaid
-classDiagram
-    class AuditorAgent
+sequenceDiagram
+    participant AUD as AuditorAgent
+    participant Hatchet as Hatchet API
+    participant LLM as LiteLLM
+    participant Agent as Target Agent
+
+    AUD->>Hatchet: GET /api/v1/workflows/{id}/runs
+    Hatchet-->>AUD: Failed DAG run logs
+    AUD->>AUD: Filter status == "FAILED"
+    AUD->>LLM: Analyze failures + recommend fixes
+    LLM-->>AUD: JSON array of recommendations
+    Note right of AUD: type: prompt_adjustment | tool_modification<br/>target_agent / target_tool<br/>recommendation text
+    AUD->>AUD: evaluate_prompts(targets, recommendations)
+    AUD->>LLM: Propose optimized system prompt
+    LLM-->>AUD: New system prompt string
+    AUD-->>Agent: Apply prompt adjustment
 ```
 
-## Execution Flow
+## SAST Gate Integration
 
-```mermaid
-flowchart TD
-    Start --> default
-    default --> new
-    new --> analyze_dag_logs
-    analyze_dag_logs --> audit_mission
-    audit_mission --> evaluate_prompts
-    evaluate_prompts --> name
-    name --> execute
-    execute --> test_auditor_agent
-    test_auditor_agent --> End
-```
+The AuditorAgent coordinates with `SastScanResult` to enforce the security gate:
+
+| Check | Gate Threshold |
+|:---|:---|
+| SAST Score | >= 8.0 / 10.0 |
+| Critical Vulnerabilities | Must be 0 |
+| Hardcoded Secrets | Must be 0 |
+
+---
+
+> *Related: [FinOpsAgent](crates_factory-application_src_agents_finops.md) · [Security Architecture](SECURITY-ARCHITECTURE.md)*

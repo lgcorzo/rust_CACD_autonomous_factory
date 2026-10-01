@@ -1,33 +1,12 @@
----
-type: module
-title: "launch_sandbox_pod.rs"
-source_path: "crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
-description: "Documentation for crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::tools::launch_sandbox_pod — K8s Job Creation
+
+> **Source**: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs`
+> **Layer**: Interface
+
 ---
 
-# launch_sandbox_pod.rs
+Sandbox pod launch tool: creates gVisor-sandboxed K8s Jobs with resource constraints (30 MiB/0.25 CPU app, 20 MiB/0.10 CPU sidecar, no egress).
 
-Source File: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class SandboxJobSpec
-    class LaunchSandboxPodTool
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> default
-    default --> name
-    name --> description
-    description --> input_schema
-    input_schema --> call
-    call --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

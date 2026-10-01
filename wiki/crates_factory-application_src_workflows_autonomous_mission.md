@@ -1,30 +1,45 @@
----
-type: module
-title: "autonomous_mission.rs"
-source_path: "crates/factory-application/src/workflows/autonomous_mission.rs"
-description: "Documentation for crates/factory-application/src/workflows/autonomous_mission.rs"
-tags: [rust, module]
-last_verified_commit: "3341ecf4"
+# factory-application::workflows::autonomous_mission — 6-Phase Hatchet DAG
+
+> **Source**: `crates/factory-application/src/workflows/autonomous_mission.rs`
+> **Layer**: Application
+
 ---
 
-# autonomous_mission.rs
-
-Source File: `crates/factory-application/src/workflows/autonomous_mission.rs`
-
-## Component Architecture
+## 6-Phase DAG Sequence Diagram
 
 ```mermaid
-classDiagram
-    class MissionInput
-    class MissionOutput
+sequenceDiagram
+    participant Poller as PollerDaemonService
+    participant Hatchet as Hatchet Orchestrator
+    participant Rustant as RustantAgent
+    participant ZeroClaw as ZeroClawAgent
+    participant Auditor as AuditorAgent
+
+    Note over Poller,Auditor: Phase 1: Ingestion
+    Poller->>Hatchet: PolledIssueEvent / PRCommentEvent
+
+    Note over Poller,Auditor: Phase 2: Plan
+    Hatchet->>Rustant: plan_mission(goal, context)
+    Rustant-->>Hatchet: SddMissionPlan
+
+    Note over Poller,Auditor: Phase 3: Code
+    Hatchet->>ZeroClaw: execute_tdd_task(task_items)
+    ZeroClaw-->>Hatchet: Code patches
+
+    Note over Poller,Auditor: Phase 4: Validation
+    Hatchet->>ZeroClaw: validate_mission(test_command)
+    Hatchet->>Auditor: security_review(diff)
+    ZeroClaw-->>Hatchet: Test results
+    Auditor-->>Hatchet: SAST results
+
+    Note over Poller,Auditor: Phase 5: Review
+    Hatchet->>Rustant: review_mission(results)
+    Rustant-->>Hatchet: Review decision
+
+    Note over Poller,Auditor: Phase 6: Delivery
+    Hatchet->>Poller: Create PR/MR (awaits HITL V4)
 ```
 
-## Execution Flow
+---
 
-```mermaid
-flowchart TD
-    Start --> from_protobuf
-    from_protobuf --> create_mission_workflow
-    create_mission_workflow --> test_mission_input_from_protobuf
-    test_mission_input_from_protobuf --> End
-```
+> *Related: [circuit_breaker.rs](crates_factory-application_src_workflows_circuit_breaker.md) · [Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md)*

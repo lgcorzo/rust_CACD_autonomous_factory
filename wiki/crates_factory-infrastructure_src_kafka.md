@@ -1,36 +1,12 @@
----
-type: module
-title: "kafka.rs"
-source_path: "crates/factory-infrastructure/src/kafka.rs"
-description: "Documentation for crates/factory-infrastructure/src/kafka.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-infrastructure::kafka — Kafka Client
+
+> **Source**: `crates/factory-infrastructure/src/kafka.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# kafka.rs
+KRaft-based Kafka producer/consumer with topic management, message serialization, and the KafkaClient trait for dependency injection in tests. Includes SimpleMockKafkaClient for unit testing.
 
-Source File: `crates/factory-infrastructure/src/kafka.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class KafkaClient {
-        <<trait>>
-    }
-    class RdKafkaClient
-    class SimpleMockKafkaClient
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> publish
-    publish --> publish_thought
-    publish_thought --> new
-    new --> publish
-    publish --> new
-    new --> publish
-    publish --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*

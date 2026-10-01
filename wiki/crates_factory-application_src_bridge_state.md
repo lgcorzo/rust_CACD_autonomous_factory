@@ -1,34 +1,12 @@
----
-type: module
-title: "state.rs"
-source_path: "crates/factory-application/src/bridge/state.rs"
-description: "Documentation for crates/factory-application/src/bridge/state.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-application::bridge::state — Checkpoint State
+
+> **Source**: `crates/factory-application/src/bridge/state.rs`
+> **Layer**: Application
+
 ---
 
-# state.rs
+State management for mission checkpoints, enabling resume-from-failure.
 
-Source File: `crates/factory-application/src/bridge/state.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class BridgeStatus {
-        <<enumeration>>
-    }
-    class StepCheckpoint
-    class BridgeState
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> get_checkpoint_key
-    get_checkpoint_key --> load_checkpoint
-    load_checkpoint --> save_checkpoint
-    save_checkpoint --> End
-```
+> *Related: [lib.rs](crates_factory-application_src_lib.md) · [Agent Specifications](AGENT-SPECIFICATIONS.md)*

@@ -1,26 +1,12 @@
----
-type: module
-title: "git_poller.rs"
-source_path: "crates/factory-infrastructure/src/git_poller.rs"
-description: "Documentation for crates/factory-infrastructure/src/git_poller.rs"
-tags: [rust, module]
-last_verified_commit: "a591f336"
+# factory-infrastructure::git_poller — Repository Change Detection
+
+> **Source**: `crates/factory-infrastructure/src/git_poller.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# git_poller.rs
+Git poller for detecting new commits, branch changes, and tag updates across monitored repositories. Feeds the PollerDaemonService with change events.
 
-Source File: `crates/factory-infrastructure/src/git_poller.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class GitPlatformPoller
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*

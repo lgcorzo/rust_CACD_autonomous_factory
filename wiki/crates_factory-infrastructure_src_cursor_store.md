@@ -1,30 +1,12 @@
----
-type: module
-title: "cursor_store.rs"
-source_path: "crates/factory-infrastructure/src/cursor_store.rs"
-description: "Documentation for crates/factory-infrastructure/src/cursor_store.rs"
-tags: [rust, module]
-last_verified_commit: "a591f336"
+# factory-infrastructure::cursor_store — Polling State
+
+> **Source**: `crates/factory-infrastructure/src/cursor_store.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# cursor_store.rs
+Cursor store for persisting poller state across restarts. Tracks the last processed issue/PR/pipeline event ID per repository to avoid re-processing.
 
-Source File: `crates/factory-infrastructure/src/cursor_store.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class CursorStore {
-        <<trait>>
-    }
-    class InMemoryCursorStore
-    class PostgresCursorStore
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*

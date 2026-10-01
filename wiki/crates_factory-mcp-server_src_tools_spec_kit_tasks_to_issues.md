@@ -1,31 +1,12 @@
----
-type: module
-title: "spec_kit_tasks_to_issues.rs"
-source_path: "crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs"
-description: "Documentation for crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::tools::spec_kit_tasks_to_issues — GitHub Issue Creator
+
+> **Source**: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs`
+> **Layer**: Interface
+
 ---
 
-# spec_kit_tasks_to_issues.rs
+Tasks-to-issues tool: converts tasks.md entries into GitHub issues with labels, assignees, and dependency references.
 
-Source File: `crates/factory-mcp-server/src/tools/spec_kit_tasks_to_issues.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class SpecKitTasksToIssuesTool
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> name
-    name --> description
-    description --> input_schema
-    input_schema --> call
-    call --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

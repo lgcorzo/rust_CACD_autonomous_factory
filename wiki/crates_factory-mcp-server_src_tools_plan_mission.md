@@ -1,31 +1,12 @@
----
-type: module
-title: "plan_mission.rs"
-source_path: "crates/factory-mcp-server/src/tools/plan_mission.rs"
-description: "Documentation for crates/factory-mcp-server/src/tools/plan_mission.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::tools::plan_mission — Mission Planning
+
+> **Source**: `crates/factory-mcp-server/src/tools/plan_mission.rs`
+> **Layer**: Interface
+
 ---
 
-# plan_mission.rs
+Mission planning tool: invokes RustantAgent's Spec-Kit SDD sequence to generate structured mission plans from high-level goals.
 
-Source File: `crates/factory-mcp-server/src/tools/plan_mission.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class PlanMissionTool
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> name
-    name --> description
-    description --> input_schema
-    input_schema --> call
-    call --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

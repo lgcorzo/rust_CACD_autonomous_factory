@@ -1,27 +1,12 @@
----
-type: module
-title: "scratch.rs"
-source_path: "crates/factory-mcp-server/src/scratch.rs"
-description: "Documentation for crates/factory-mcp-server/src/scratch.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::scratch — Temporary Workspace
+
+> **Source**: `crates/factory-mcp-server/src/scratch.rs`
+> **Layer**: Interface
+
 ---
 
-# scratch.rs
+Scratch workspace management for sandbox code staging, temporary file operations, and inter-tool data sharing within a single mission execution.
 
-Source File: `crates/factory-mcp-server/src/scratch.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class Empty
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> main
-    main --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

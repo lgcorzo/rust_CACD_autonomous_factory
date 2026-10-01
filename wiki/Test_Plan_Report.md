@@ -1,54 +1,93 @@
-# Documentation Test Plan & Report: Dark Gravity Rust Workspace
+# Test Plan & Quality Report — Dark Gravity CA/CD Factory
 
-## 1. Introduction
-
-### 1.1 Purpose
-
-This report details the verification steps taken using **CRG (code-review-graph)** and **Graphify** to ensure the wiki documentation is accurate, well-structured, and correctly reflects the actual project state.
-
-## 2. Testing Frameworks
-
-- **CRG Semantic Analysis**: Automated code graph analysis to verify documentation claims against actual source code.
-- **Graphify Structure Extraction**: Community detection and dependency mapping for structural accuracy.
-- **Code Comparison**: Cross-referencing wiki claims against actual source code in `crates/`.
-
-## 3. CRG-Verified Test Cases
-
-| ID | Test Case | CRG Check | Result |
-| :--- | :--- | :--- | :--- |
-| TC-01 | Workspace crate structure | CRG communities: 9, Files: 35, Nodes: 254 | PASS |
-| TC-02 | Agent implementations | Rustant (15 nodes) + ZeroClaw (89-98) verified | PASS |
-| TC-03 | Hatchet DAG phases | `create_mission_workflow` (6-phase) + `create_develop_task_workflow` | PASS |
-| TC-04 | MCP tool inventory | 8 tools verified across 68 tool nodes | PASS |
-| TC-05 | Infrastructure adapters | 6 clients (Jira, R2R, Kafka, MCP, S3, Ziti) - 42 nodes | PASS |
-| TC-06 | Domain models | Mission, Task, SecurityValidator, FactoryError - 12 nodes | PASS |
-| TC-07 | Sandbox architecture | SubprocessDriver + SandboxDriver trait | PASS |
-| TC-08 | Protocol definitions | JSON-RPC over SSE/HTTP verified | PASS |
-
-## 4. CRG Analysis Results
-
-- **Total Communities**: 9 (agents, workflows, tools, clients, mission, CLI, tests, skills, src)
-- **Total Edges**: 1,522
-- **Total Nodes**: 254
-- **Embedded Nodes**: 195 (semantic search active)
-- **Languages**: Rust
-
-## 5. Issues Found & Fixed
-
-During this documentation refactoring, CRG analysis identified several inaccuracies that were corrected:
-
-| Issue | File | Correction |
-| :--- | :--- | :--- |
-| `zeroize` crate referenced but not in code | README.md, factory-core/README.md | Removed |
-| `Ed25519 VC` referenced but only `SecurityValidator` trait exists | README.md, factory-core/README.md | Corrected |
-| `Spec-Kit` referenced but not implemented | README.md, multiple wiki files | Corrected to R2rClient |
-| `push_osr_metric` referenced but not implemented | README.md, factory-infrastructure/README.md | Removed |
-| `gVisor` referenced but only Firecracker exists | VERIFICATION-TRIAD.md | Corrected |
-
-## 6. Conclusion
-
-The wiki documentation has been updated to reflect the current state of the **Dark Gravity** Rust project, indicating that all planned features are now fully implemented. All documentation has been verified against the actual codebase using CRG + Graphify analysis.
+> **Purpose**: Formal test plan, test suite catalog, integration matrix, benchmark documentation, and SAST security gate report following ISO 25010 and ISO 29119 software quality assurance standards.
 
 ---
 
-*Last updated: 2026-06-23 — Verified by CRG + Graphify*
+## 1. Test Pyramid & Quality Strategy
+
+```mermaid
+graph TB
+    E2E["E2E & Functional Suites<br/>run_functional_suite, gitlab_live_e2e"]
+    INT["Integration Test Suites<br/>Kafka, gVisor, GitLab, Bridge, R2R"]
+    SAST["SAST Security Gates<br/>AuditorAgent, Zeroize, Semgrep"]
+    BENCH["Performance Benchmarks<br/>Criterion: Crypto & Zeroize"]
+    UNIT["Unit Tests<br/>Per-crate #[test] modules"]
+
+    E2E --> INT
+    INT --> SAST
+    SAST --> BENCH
+    BENCH --> UNIT
+
+    style E2E fill:#9C27B0,stroke:#6A1B9A,color:#fff
+    style INT fill:#2196F3,stroke:#1565C0,color:#fff
+    style SAST fill:#f44336,stroke:#c62828,color:#fff
+    style BENCH fill:#FF9800,stroke:#E65100,color:#fff
+    style UNIT fill:#4CAF50,stroke:#2E7D32,color:#fff
+```
+
+---
+
+## 2. Integration Test Suites Catalog
+
+The workspace contains dedicated integration tests validating end-to-end multi-agent orchestration, network boundary security, and third-party integrations:
+
+| Crate | Test Suite File | Coverage Target | Key Scenarios Tested |
+|:---|:---|:---|:---|
+| `factory-application` | `tests/functional_e2e_test.rs` | Full Factory Pipeline | End-to-end issue ingestion, task decomposition, and PR generation |
+| `factory-application` | `tests/hatchet_sdd_task_orchestration_test.rs` | Hatchet DAG Engine | Multi-step task dependency execution and state handoffs |
+| `factory-application` | `tests/bridge_test.rs` | ADK & Bridge State | Bidirectional event translation between ADK and Kafka |
+| `factory-application` | `tests/gitlab_e2e_integration_test.rs` | GitLab CI / Webhooks | MR creation, webhook parsing, pipeline verification |
+| `factory-application` | `tests/gitlab_live_e2e.rs` | Live GitLab API | Real API handshake, project permissions, and commit statuses |
+| `factory-application` | `tests/mr_command_dispatch_tests.rs` | Directives Engine | `@darkgravity /spec`, `/refine`, `/status`, `/validate` |
+| `factory-application` | `tests/mr_comment_conversation_tests.rs` | Conversational Threads | Multi-turn feedback loops on active MR discussions |
+| `factory-application` | `tests/workflow_tests.rs` | Workflows | Circuit breaker trips, remediation cascades |
+| `factory-application` | `tests/zeroclaw_sast_integration.rs` | Dev Agent SAST | Pre-commit security audits within the sandbox execution loop |
+| `factory-core` | `tests/security_tests.rs` | NHI Primitives | Ed25519 signature issuance, tampering detection, replay rejection |
+| `factory-core` | `tests/pr_directive_tests.rs` | Directive Parsing | Regex extraction and AST tokenization of comment directives |
+| `factory-infrastructure` | `tests/kafka_integration.rs` | KRaft Messaging | High-throughput partition consumer group failover |
+| `factory-infrastructure` | `tests/git_poller_reaction_tests.rs` | Poller Daemon | Issue label triggers (`autonomous-mission`, `dark-gravity`) |
+| `factory-infrastructure` | `tests/mr_reaction_tests.rs` | Merge Request Poller | Unhandled comment detection and state cursor updates |
+| `factory-mcp-server` | `tests/gvisor_integration.rs` | Sandbox Isolation | `runsc` syscall filtration and container security boundaries |
+| `factory-mcp-server` | `tests/security_tests.rs` | MCP Server Endpoints | HMAC-SHA256 webhook authentication and Ziti zero-trust |
+
+---
+
+## 3. Performance Benchmarks
+
+Criterion benchmark suites in `factory-core/benches`:
+
+1. **`crypto_benchmark.rs`**:
+   - Evaluates Ed25519 signing and verification throughput for Non-Human Identity (NHI) credentials.
+   - Target: `< 150 µs` per credential verification under heavy load.
+2. **`zeroize_benchmark.rs`**:
+   - Assesses memory scrubbing speed for cryptographic secrets and sensitive tokens.
+   - Ensures zeroization does not cause pipeline latency bottlenecks.
+
+```bash
+# Execute Criterion benchmarks
+cargo bench --package factory-core
+```
+
+---
+
+## 4. Quality Gates & Test Execution
+
+```bash
+# 1. Run all unit and integration tests across the workspace
+cargo test --workspace --all-targets
+
+# 2. Run functional E2E test suite specifically
+cargo run --bin run_functional_suite
+
+# 3. Code coverage generation with llvm-cov
+cargo llvm-cov --workspace --html --output-dir target/coverage
+
+# 4. SAST and Lint verification
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --all -- --check
+```
+
+---
+
+> *Related: [VERIFICATION-TRIAD.md](VERIFICATION-TRIAD.md) · [QAObserverAgent](crates_factory-application_src_agents_qa_observer.md) · [HITL Governance](HITL-GOVERNANCE.md)*

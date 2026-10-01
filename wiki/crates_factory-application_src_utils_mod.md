@@ -1,26 +1,12 @@
----
-type: module
-title: "mod.rs"
-source_path: "crates/factory-application/src/utils/mod.rs"
-description: "Documentation for crates/factory-application/src/utils/mod.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-application::utils — Utility Functions
+
+> **Source**: `crates/factory-application/src/utils/mod.rs`
+> **Layer**: Application
+
 ---
 
-# mod.rs
+Utility module containing OSR calculator and shared helpers.
 
-Source File: `crates/factory-application/src/utils/mod.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class Empty
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> End
-```
+> *Related: [lib.rs](crates_factory-application_src_lib.md) · [Agent Specifications](AGENT-SPECIFICATIONS.md)*

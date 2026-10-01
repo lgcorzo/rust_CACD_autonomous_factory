@@ -1,28 +1,12 @@
----
-type: module
-title: "adk_driver.rs"
-source_path: "crates/factory-application/src/bridge/adk_driver.rs"
-description: "Documentation for crates/factory-application/src/bridge/adk_driver.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-application::bridge::adk_driver — ADK Integration
+
+> **Source**: `crates/factory-application/src/bridge/adk_driver.rs`
+> **Layer**: Application
+
 ---
 
-# adk_driver.rs
+Google ADK (Agent Development Kit) driver for LLM routing and tool dispatch.
 
-Source File: `crates/factory-application/src/bridge/adk_driver.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class NativeADKDriver
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> apply_patch
-    apply_patch --> verify_syntax
-    verify_syntax --> End
-```
+> *Related: [lib.rs](crates_factory-application_src_lib.md) · [Agent Specifications](AGENT-SPECIFICATIONS.md)*

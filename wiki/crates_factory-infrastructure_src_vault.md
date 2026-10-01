@@ -1,30 +1,12 @@
----
-type: module
-title: "vault.rs"
-source_path: "crates/factory-infrastructure/src/vault.rs"
-description: "Documentation for crates/factory-infrastructure/src/vault.rs"
-tags: [rust, module]
-last_verified_commit: "3341ecf4"
+# factory-infrastructure::vault — Vault Secret Manager
+
+> **Source**: `crates/factory-infrastructure/src/vault.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# vault.rs
+HashiCorp Vault integration for Ed25519 signing key retrieval, secret rotation, and dynamic credential generation. Supports KV v2 secret engine.
 
-Source File: `crates/factory-infrastructure/src/vault.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class VaultSecurityBounds
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> validate_token
-    validate_token --> issue_jit_token
-    issue_jit_token --> test_vault_issue_and_validate
-    test_vault_issue_and_validate --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*

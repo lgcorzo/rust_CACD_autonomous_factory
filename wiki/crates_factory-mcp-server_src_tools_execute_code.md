@@ -1,31 +1,12 @@
----
-type: module
-title: "execute_code.rs"
-source_path: "crates/factory-mcp-server/src/tools/execute_code.rs"
-description: "Documentation for crates/factory-mcp-server/src/tools/execute_code.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::tools::execute_code — Code Execution
+
+> **Source**: `crates/factory-mcp-server/src/tools/execute_code.rs`
+> **Layer**: Interface
+
 ---
 
-# execute_code.rs
+Code execution tool: writes code to sandbox workspace, compiles, and returns compilation/runtime output within gVisor constraints.
 
-Source File: `crates/factory-mcp-server/src/tools/execute_code.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class ExecuteCodeTool
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> name
-    name --> description
-    description --> input_schema
-    input_schema --> call
-    call --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

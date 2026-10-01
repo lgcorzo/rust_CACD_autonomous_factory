@@ -1,182 +1,242 @@
-# STRATEGIC-DESIGN: Dark Gravity Architecture
+# Strategic Design — Dark Gravity CA/CD Autonomous Factory
 
-This document defines the **Strategic Design** of the Dark Gravity autonomous factory, focusing on **Bounded Contexts**, **Context Maps**, and the **Onion Architecture** layers.
+> **Purpose**: Present the top-down architectural view using C4 model levels 1–2, Onion Architecture layering, and Bounded Context mapping.
 
 ---
 
-## Bounded Contexts
+## 1. C4 Level 1: System Context Diagram
+
+The System Context diagram shows the Dark Gravity Factory as a single system interacting with human actors and external systems.
 
 ```mermaid
 C4Context
-    title Dark Gravity Autonomous Factory - System Context
+    title Dark Gravity Factory — System Context (C1)
 
-    Person(user, "Developer / User", "Initiates missions or interacts via Jira")
-    
-    System(factory, "Dark Gravity CA/CD", "Autonomous Agent Factory executing development missions")
-    
-    System_Ext(jira, "Atlassian Jira", "Mission ingestion and backlog tracking")
-    System_Ext(github, "GitHub / Gitlab", "VCS, Code hosting, PR delivery")
-    System_Ext(k8s, "Kubernetes Cluster", "Target environment for deployments")
-    System_Ext(llm, "LiteLLM Gateway", "AI Model routing for Agents")
-    System_Ext(hatchet, "Hatchet", "Durable Workflows Orchestration")
-    
-    Rel(user, jira, "Creates tickets")
-    Rel(factory, jira, "Polls for new missions")
-    Rel(factory, llm, "Requests reasoning & planning")
-    Rel(factory, github, "Commits code & creates PRs")
-    Rel(factory, k8s, "Deploys code (ZeroClaw sandbox execution)")
-    Rel(factory, hatchet, "Syncs mission state")
+    Person(po, "Product Owner", "Creates Epics tagged autonomous-plan")
+    Person(techlead, "Tech Lead", "Approves Spec-Kit task decomposition")
+    Person(architect, "Architect", "Resolves Agent-Stuck deadlocks via HITL Vertex 3")
+    Person(reviewer, "Senior Reviewer", "Reviews design and merges PR/MR - HITL Vertex 4")
+    Person(devops, "DevOps Engineer", "Monitors cluster health, troubleshoots deployments")
+
+    System(factory, "Dark Gravity Factory", "CA/CD Autonomous Agent Platform: Ingests issues, plans via SDD, codes in sandboxes, validates with TDD+SAST, delivers PR/MR")
+
+    System_Ext(github, "GitHub", "Source repos, PRs, Actions CI, Webhooks")
+    System_Ext(gitlab, "GitLab", "MRs, CI Pipelines, Webhooks")
+    System_Ext(jira, "Jira Cloud", "Issue tracking, Sprint boards, JQL search")
+    System_Ext(fluxcd, "FluxCD", "GitOps Kubernetes reconciliation")
+    System_Ext(hatchet, "Hatchet", "DAG workflow orchestration engine")
+    System_Ext(kafka, "Kafka KRaft", "Event streaming bus, mission topics")
+    System_Ext(litellm, "LiteLLM Proxy", "Multi-provider LLM routing: Azure OpenAI, Ollama")
+    System_Ext(ziti, "OpenZiti", "Zero Trust overlay network")
+    System_Ext(vault, "HashiCorp Vault", "Secret management, credential rotation")
+    System_Ext(r2r, "R2R GraphRAG", "Context-aware code knowledge retrieval")
+    System_Ext(sentry, "Sentry", "Error tracking and crash reporting")
+
+    Rel(po, factory, "Creates autonomous missions via labeled issues")
+    Rel(techlead, factory, "Approves decomposed task plans")
+    Rel(architect, factory, "Overrides stuck agents, tunes parameters")
+    Rel(reviewer, factory, "Reviews and merges PRs - human gate")
+    Rel(devops, factory, "Configures K8s, monitors health")
+
+    Rel(factory, github, "Polls issues/PRs, pushes code, reads CI status")
+    Rel(factory, gitlab, "Polls MRs, pushes fixes, reads pipelines")
+    Rel(factory, jira, "Searches issues, syncs SDD tasks")
+    Rel(factory, hatchet, "Dispatches 6-phase mission DAGs")
+    Rel(factory, kafka, "Publishes/consumes mission and telemetry events")
+    Rel(factory, litellm, "Routes LLM inference with FinOps tagging")
+    Rel(factory, ziti, "Encrypted agent-to-service tunnels")
+    Rel(factory, vault, "Retrieves secrets, rotates credentials")
+    Rel(factory, r2r, "Retrieves contextual code knowledge")
+    Rel(factory, sentry, "Reports errors and crash telemetry")
+    Rel(fluxcd, factory, "Deploys factory manifests to K8s cluster")
 ```
 
-### C4 Container Diagram
+---
+
+## 2. C4 Level 2: Container Diagram
+
+The Container diagram decomposes the factory into its 5 Rust crates (deployable containers) and their Kubernetes namespace topology.
 
 ```mermaid
 C4Container
-    title Dark Gravity Autonomous Factory - Containers
+    title Dark Gravity Factory — Container Diagram (C2)
 
-    System_Ext(jira, "Atlassian Jira")
-    System_Ext(github, "GitHub / Gitlab")
-    System_Ext(hatchet, "Hatchet")
-    System_Ext(llm, "LiteLLM Gateway")
-    System_Ext(k8s, "Kubernetes Cluster")
+    Person(human, "Human Operator", "HITL governance vertices 1-4")
 
-    Container_Boundary(factory, "Dark Gravity CA/CD") {
-        Container(cli, "CLI / Worker", "Rust (factory-cli)", "Hatchet worker entry point")
-        Container(app, "Application / Agents", "Rust (factory-application)", "Agent logic (Rustant, ZeroClaw) & Workflows")
-        Container(mcp, "MCP Server", "Rust (factory-mcp-server)", "Axum SSE/HTTP, 8 Tools, Sandboxes")
-        Container(infra, "Infrastructure Adapters", "Rust (factory-infrastructure)", "Kafka, R2R, Jira, S3, Vault clients")
-        Container(core, "Core Domain", "Rust (factory-core)", "Entities: Mission, Task, Models")
+    System_Boundary(factory, "Dark Gravity Factory") {
+        Container(core, "factory-core", "Rust Crate", "Domain layer: Mission, Task, Error, Security, NHI, PRDirective, Pipeline entities")
+        Container(app, "factory-application", "Rust Crate", "Application layer: 6 Agents, Workflows, Poller, Bridge, Telemetry")
+        Container(infra, "factory-infrastructure", "Rust Crate", "Infrastructure layer: GitHub/GitLab/Jira clients, Kafka, Ziti, Vault, R2R, Sentry adapters")
+        Container(mcp, "factory-mcp-server", "Rust Crate + Axum", "Interface layer: MCP JSON-RPC server, 15+ tools, sandbox orchestration, feedback routes")
+        Container(cli, "factory-cli", "Rust Binary", "CLI layer: trigger_mission, run_functional_suite, trigger_deep_search")
     }
 
-    Rel(cli, app, "Executes workflows", "Rust function call")
-    Rel(app, mcp, "Calls tools via MCP", "HTTP/SSE")
-    Rel(app, core, "Uses domain logic", "Rust uses")
-    Rel(mcp, infra, "Leverages adapters", "Rust uses")
-    Rel(infra, core, "Maps external data to domain", "Rust uses")
-    
-    Rel(cli, hatchet, "Registers worker")
-    Rel(app, llm, "Reasoning & generation", "HTTP via Gateway")
-    Rel(infra, jira, "Fetches tasks", "REST API")
-    Rel(mcp, k8s, "Executes sandboxed code", "gVisor / K8s API")
+    System_Ext(github, "GitHub")
+    System_Ext(gitlab, "GitLab")
+    System_Ext(hatchet, "Hatchet")
+    System_Ext(kafka, "Kafka KRaft")
+    System_Ext(litellm, "LiteLLM")
+    System_Ext(ziti, "OpenZiti")
+
+    Rel(human, cli, "Triggers missions via CLI")
+    Rel(human, mcp, "Interacts via MCP protocol")
+    Rel(cli, app, "Invokes application workflows")
+    Rel(mcp, app, "Exposes agent capabilities as MCP tools")
+    Rel(app, core, "Uses domain entities and traits")
+    Rel(app, infra, "Calls infrastructure adapters")
+    Rel(infra, github, "REST API: issues, PRs, Actions")
+    Rel(infra, gitlab, "REST API: MRs, pipelines")
+    Rel(infra, kafka, "Produces/consumes mission events")
+    Rel(infra, ziti, "Zero Trust tunnels")
+    Rel(app, hatchet, "Dispatches DAG workflows")
+    Rel(app, litellm, "LLM inference with FinOps tags")
 ```
 
-The system is partitioned into four bounded contexts to ensure isolation and clear ownership of logic.
-
-| Context | Responsibility | Key Entities | Agent |
-| :--- | :--- | :--- | :--- |
-| **Intelligence** | Strategic mission planning via R2R context retrieval. | `Mission`, `Goal`, `Context`, `Plan` | Rustant (Planner Agent) |
-| **Execution** | Code implementation and sandbox validation. | `Task`, `TestResult`, `Artifact` | ZeroClaw (Executor Agent) |
-| **Remediation** | Detecting and reacting to CI/CD or production failures. | `Alert`, `Symptom`, `Fix` | DevOps Agent (Auto-Remediation) |
-| **Infrastructure** | Adapters for external services and secured connectivity. | `Client`, `Credential`, `Stream` | Documentation Agent |
-
----
-
-## Onion Architecture
-
-The project follows a strict **Onion Architecture** within each crate to maintain testability and framework independence.
+### Kubernetes Namespace Topology
 
 ```mermaid
-graph TD
-    subgraph "Core Package"
-        D["Domain Layer"]
-    end
-    subgraph "Logic Package"
-        A["Application Layer"]
-    end
-    subgraph "Adapter Package"
-        I["Infrastructure Layer"]
-        F["Interface Layer"]
+graph TB
+    subgraph "K8s Cluster"
+        subgraph "ns: agents"
+            MCP["factory-mcp-server Pod"]
+            CLI["factory-cli Jobs"]
+            Sandbox["gVisor Sandbox Pods"]
+        end
+        subgraph "ns: orchestrators"
+            Hatchet["Hatchet Engine"]
+            Poller["Poller Daemon"]
+        end
+        subgraph "ns: llm-apps"
+            LiteLLM["LiteLLM Proxy"]
+            R2R["R2R GraphRAG"]
+        end
+        subgraph "ns: confluent"
+            Kafka["Kafka KRaft Broker"]
+        end
+        subgraph "ns: networking"
+            Ziti["OpenZiti Controller + Router"]
+        end
+        subgraph "ns: secrets"
+            Vault["HashiCorp Vault"]
+            SealedSecrets["Bitnami Sealed Secrets"]
+        end
     end
 
-    F --> A
-    I --> A
-    A --> D
+    MCP --> Hatchet
+    MCP --> Sandbox
+    Poller --> Kafka
+    Hatchet --> Kafka
+    MCP --> LiteLLM
+    MCP --> R2R
+    MCP --> Ziti
+    MCP --> Vault
 ```
 
-### DDD Layer Mapping
+---
 
-| Layer | Crate / Responsibility | Focus |
-| :--- | :--- | :--- |
-| **Domain** | `factory-core` | Business entities, aggregate roots, and domain logic. `Mission`, `Task`, `MissionStatus`, `SecurityValidator` trait, `SecurityBounds` trait, `FactoryError`. |
-| **Application** | `factory-application` | Orchestrates use cases. Hatchet Workflows (6-phase DAG), Rustant & ZeroClaw agent logic. |
-| **Infrastructure** | `factory-infrastructure` | External adapters (Kafka, R2R GraphRAG, Jira, S3, OpenZiti, Vault, MCP client). |
-| **Interface** | `factory-mcp-server` / `factory-cli` | External entry points (Axum MCP server with SSE/HTTP, CLI Hatchet worker). |
+## 3. Onion Architecture Layer Model
+
+The factory follows a strict **Onion Architecture** where dependencies point inward. No inner layer references an outer layer.
+
+```mermaid
+graph TB
+    subgraph "Layer 4: Interface"
+        CLI_L["factory-cli"]
+        MCP_L["factory-mcp-server"]
+    end
+    subgraph "Layer 3: Infrastructure"
+        INFRA_L["factory-infrastructure"]
+    end
+    subgraph "Layer 2: Application"
+        APP_L["factory-application"]
+    end
+    subgraph "Layer 1: Domain - Core"
+        CORE_L["factory-core"]
+    end
+
+    CLI_L --> APP_L
+    MCP_L --> APP_L
+    APP_L --> CORE_L
+    APP_L --> INFRA_L
+    INFRA_L --> CORE_L
+
+    style CORE_L fill:#4CAF50,stroke:#2E7D32,color:#fff
+    style APP_L fill:#2196F3,stroke:#1565C0,color:#fff
+    style INFRA_L fill:#FF9800,stroke:#E65100,color:#fff
+    style CLI_L fill:#9C27B0,stroke:#6A1B9A,color:#fff
+    style MCP_L fill:#9C27B0,stroke:#6A1B9A,color:#fff
+```
+
+| Layer | Crate | Responsibility | Dependencies |
+|:---|:---|:---|:---|
+| **Domain (Core)** | `factory-core` | Entities (`Mission`, `Task`, `PRDirective`), Error types, Security traits, NHI credentials | `serde`, `chrono`, `uuid`, `thiserror`, `ed25519-dalek`, `zeroize` |
+| **Application** | `factory-application` | Agents (`Rustant`, `ZeroClaw`, etc.), Workflows, Poller, Bridge, Telemetry | `factory-core`, `factory-infrastructure`, `async-trait`, `regex` |
+| **Infrastructure** | `factory-infrastructure` | Platform adapters: GitHub, GitLab, Jira, Kafka, Ziti, Vault, R2R, Sentry, MCP Client | `factory-core`, `reqwest`, `rdkafka`, `kube`, `k8s-openapi` |
+| **Interface (MCP)** | `factory-mcp-server` | MCP JSON-RPC server, tool registration, sandbox pod management, feedback routes | `factory-core`, `factory-application`, `factory-infrastructure`, `axum`, `tower` |
+| **Interface (CLI)** | `factory-cli` | Binary entry points: `trigger_mission`, `run_functional_suite`, `trigger_deep_search` | `factory-core`, `factory-application`, `clap`, `tokio` |
 
 ---
 
-## Zero Trust & Sovereignty
+## 4. Bounded Context Map
 
-Security is baked into the strategic design of every context:
+The factory decomposes into 4 strategic bounded contexts with explicit integration patterns:
 
-- **Identity-First**: `SecurityValidator` trait for content auditing and Ed25519 signature verification.
-- **Dark Network**: All inter-service communication routed through **OpenZiti** mTLS 1.3 tunnels — zero publicly routable ports.
-- **Dynamic Access**: Short-lived JIT tokens provisioned dynamically via **Vault** (`SecurityBounds`).
-- **Sandbox Execution**: Untrusted code executes in **gVisor** containers (via `GvisorK8sDriver`) or via a `SubprocessDriver` for isolated sandboxing.
-- **Credential Management**: API keys and tokens loaded via environment variables, never hardcoded.
+```mermaid
+graph LR
+    subgraph "BC1: Agent Execution"
+        Rustant["RustantAgent"]
+        ZeroClaw["ZeroClawAgent"]
+        Auditor["AuditorAgent"]
+        FinOps["FinOpsAgent"]
+        QAObs["QAObserverAgent"]
+        DocAgent["DocumentationAgent"]
+    end
 
----
+    subgraph "BC2: Mission Orchestration"
+        Poller["PollerDaemonService"]
+        DAG["Hatchet 6-Phase DAG"]
+        CB["Aethelgard Circuit Breaker"]
+        SDD["Spec-Kit SDD Pipeline"]
+    end
 
-## Autonomous Workforce
+    subgraph "BC3: Infrastructure Integration"
+        GH["GitHub Adapter"]
+        GL["GitLab Adapter"]
+        JR["Jira Adapter"]
+        KF["Kafka Producer/Consumer"]
+        MCPClient["MCP Client"]
+    end
 
-| Agent | Context | Primary Tools | DAG Step |
-| :--- | :--- | :--- | :--- |
-| **Rustant** (Planner Agent) | Intelligence | R2rClient for semantic context search, `plan_mission` MCP tool | Planning, Review |
-| **ZeroClaw** (Executor Agent) | Execution | `execute_code` MCP tool, `run_tests` MCP tool, `CodeSurgeryExecutor`, gVisor sandbox | Code, Validate |
-| **DevOps Agent** | Remediation | Auto-Remediation Loop, Sentry integration | CI/CD Healing |
-| **Documentation Agent** | Infrastructure | Superpowers skills (`writing-plans`, `subagent-driven-development`) | Wiki Sync |
+    subgraph "BC4: Security and Identity"
+        NHI["Ed25519 NHI Issuer"]
+        SAST["SAST Scanner"]
+        Sandbox["gVisor Sandbox"]
+        Validator["SecurityValidator"]
+        JIT["JitToken Manager"]
+    end
 
----
+    BC1_note["Anti-Corruption Layer"] --> BC3
+    Rustant --> DAG
+    ZeroClaw --> Sandbox
+    ZeroClaw --> SAST
+    Poller --> GH
+    Poller --> GL
+    Poller --> JR
+    DAG --> KF
+    NHI --> Validator
 
-## Agentic Pipeline
+    style BC1_note fill:#fff,stroke:#999
+```
 
-The system orchestrates missions through a durable **6-phase Hatchet DAG**:
+### Context Integration Patterns
 
-1. **Ingestion** → Parse Jira requirements into structured tasks
-2. **Plan (Rustant)** → Use R2rClient for semantic context retrieval and mission planning
-3. **Code (ZeroClaw)** → Generate and execute code in sandboxed environment (or natively via `CodeSurgeryExecutor`)
-4. **Validation (ZeroClaw)** → Run tests and validate outputs
-5. **Review (Rustant)** → Review results and provide feedback
-6. **Delivery (GitOps)** → Commit and push changes
-
-State is managed via `StepCheckpoint`s persisted to Hatchet's PostgreSQL backend, enabling crash-resilient mission execution.
-
----
-
-## CRG-Verified Structure
-
-Based on `code-review-graph` analysis, the actual codebase structure is:
-
-### Workspace Crates
-
-| Crate | Nodes | Edges | Role |
-|-------|-------|-------|------|
-| `factory-core` | 12 | — | Domain models (`Mission`, `Task`, `SecurityValidator`, `SecurityBounds`) |
-| `factory-application` | 21 | — | Agents (Rustant, ZeroClaw) + Workflows |
-| `factory-mcp-server` | 101 | — | MCP server, tools (8 tools), sandbox drivers |
-| `factory-infrastructure` | 42 | — | Service clients (Jira, R2R, Kafka, MCP, S3, Ziti, Vault, Ed25519) |
-| `factory-cli` | 3 | — | CLI entry point |
-
-### Agent Relationships (CRG Edge Graph)
-
-- **Rustant** → calls `r2r_client.search()` + `mcp_client.call_tool_json()`
-- **ZeroClaw** → calls `mcp_client.call_tool_json()` for code execution + validation
-- **Mission Workflow** → orchestrates Rustant (plan) → ZeroClaw (code) → Rustant (review)
-- **Task Workflow** → handles individual task execution with checkpointing
-
----
-
-## ADR Index
-
-| ADR | Title | Status |
-| :--- | :--- | :--- |
-| ADR-001 | Hardware-Virtualized Sandboxing (Firecracker) | Implemented |
-| ADR-002 | Durable Orchestration via Hatchet DAG | Implemented |
-| ADR-003 | Semantic Memory via R2R GraphRAG | Implemented |
-| ADR-004 | Agent-Driven Development (Rustant + ZeroClaw) | Implemented |
-| ADR-005 | Superpowers Framework for Agent Skills | Implemented |
-| ADR-006 | Zero Trust Network with OpenZiti Dark Overlay | Implemented |
-| ADR-007 | LiteLLM Gateway for Model Routing | Implemented |
+| Source BC | Target BC | Pattern | Mechanism |
+|:---|:---|:---|:---|
+| Agent Execution → Infrastructure | Anti-Corruption Layer | Agents call infrastructure adapters via trait abstractions (`McpClient`, `R2rClient`, `AethalgardClient`) |
+| Mission Orchestration → Agent Execution | Published Events | Hatchet DAG dispatches task events consumed by agents |
+| Mission Orchestration → Infrastructure | Shared Kernel | `PolledIssueEvent`, `PRCommentEvent` domain entities shared between poller and adapters |
+| Security/Identity → All | Conformist | All contexts conform to `SecurityValidator` trait and `SandboxConstraint` policies |
 
 ---
 
-*Last updated: 2026-07-08 — Verified against actual codebase via CRG analysis*
+> *Related: [Business Context](BUSINESS-CONTEXT.md) · [Tactical Design](TACTICAL-DESIGN.md) · [Agent Specifications](AGENT-SPECIFICATIONS.md)*

@@ -1,32 +1,12 @@
----
-type: module
-title: "security_review.rs"
-source_path: "crates/factory-mcp-server/src/tools/security_review.rs"
-description: "Documentation for crates/factory-mcp-server/src/tools/security_review.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::tools::security_review — SAST Gate
+
+> **Source**: `crates/factory-mcp-server/src/tools/security_review.rs`
+> **Layer**: Interface
+
 ---
 
-# security_review.rs
+Security review tool: runs Semgrep SAST scan on code diffs and evaluates against the score >= 8.0 gate.
 
-Source File: `crates/factory-mcp-server/src/tools/security_review.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class SecurityReviewTool
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> new
-    new --> default
-    default --> name
-    name --> description
-    description --> input_schema
-    input_schema --> call
-    call --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

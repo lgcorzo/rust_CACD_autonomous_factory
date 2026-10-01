@@ -1,27 +1,21 @@
----
-type: module
-title: "trigger_mission.rs"
-source_path: "crates/factory-cli/src/bin/trigger_mission.rs"
-description: "Documentation for crates/factory-cli/src/bin/trigger_mission.rs"
-tags: [rust, module]
-last_verified_commit: "3341ecf4"
+# factory-cli::trigger_mission — Manual Mission Trigger
+
+> **Source**: `crates/factory-cli/src/bin/trigger_mission.rs`
+> **Layer**: Interface
+
 ---
 
-# trigger_mission.rs
+Manually triggers an autonomous mission by creating a `PolledIssueEvent` and dispatching it to the Hatchet DAG, bypassing the poller. Useful for development and testing.
 
-Source File: `crates/factory-cli/src/bin/trigger_mission.rs`
+## Usage
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class Empty
+```bash
+factory-cli trigger-mission \
+  --repo "lgcorzo/rust_CACD_autonomous_factory" \
+  --title "Fix compilation error in config.rs" \
+  --labels "autonomous-mission,dark-gravity"
 ```
 
-## Execution Flow
+---
 
-```mermaid
-flowchart TD
-    Start --> main
-    main --> End
-```
+> *Related: [CLI main.rs](crates_factory-cli_src_main.md) · [autonomous_mission.rs](crates_factory-application_src_workflows_autonomous_mission.md)*

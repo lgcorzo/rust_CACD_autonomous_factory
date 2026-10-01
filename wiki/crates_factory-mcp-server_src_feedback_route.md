@@ -1,27 +1,12 @@
----
-type: module
-title: "feedback_route.rs"
-source_path: "crates/factory-mcp-server/src/feedback_route.rs"
-description: "Documentation for crates/factory-mcp-server/src/feedback_route.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-mcp-server::feedback_route — Webhook Handler
+
+> **Source**: `crates/factory-mcp-server/src/feedback_route.rs`
+> **Layer**: Interface
+
 ---
 
-# feedback_route.rs
+Feedback route handler for receiving external webhook events (FluxCD alerts, custom callbacks) and routing them to the event processing pipeline.
 
-Source File: `crates/factory-mcp-server/src/feedback_route.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class Empty
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> handle_feedback
-    handle_feedback --> End
-```
+> *Related: [lib.rs](crates_factory-mcp-server_src_lib.md) · [Tactical Design](TACTICAL-DESIGN.md)*

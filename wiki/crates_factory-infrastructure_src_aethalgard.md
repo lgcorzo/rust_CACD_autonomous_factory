@@ -1,32 +1,12 @@
----
-type: module
-title: "aethalgard.rs"
-source_path: "crates/factory-infrastructure/src/aethalgard.rs"
-description: "Documentation for crates/factory-infrastructure/src/aethalgard.rs"
-tags: [rust, module]
-last_verified_commit: "beeed91"
+# factory-infrastructure::aethalgard — Circuit Breaker Adapter
+
+> **Source**: `crates/factory-infrastructure/src/aethalgard.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# aethalgard.rs
+Aethelgard circuit breaker infrastructure adapter implementing the anti-deadlock mechanism with diff hash tracking and retry state management.
 
-Source File: `crates/factory-infrastructure/src/aethalgard.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class AethalgardClient {
-        <<trait>>
-    }
-    class HttpAethalgardClient
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> notify_remediation
-    notify_remediation --> new
-    new --> notify_remediation
-    notify_remediation --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*

@@ -1,84 +1,116 @@
-# PRODUCTION-OPERATIONS: Deployment & Scaling
+# Production Operations — Dark Gravity CA/CD Autonomous Factory
 
-This document details the **GitOps** and **Kubernetes** operations for the **Dark Gravity** autonomous factory.
-
----
-
-## GitOps Delivery Model
-
-The factory is deployed using a GitOps controller (FluxCD) to ensure the cluster state matches the git repository.
+> **Purpose**: FluxCD deployment topology, K8s namespace layout, LiteLLM routing, and troubleshooting runbook.
 
 ---
 
-## Kubernetes Components
+## 1. FluxCD GitOps Deployment Topology
 
-| Component | Resource | Port | Namespace |
-| :--- | :--- | :--- | :--- |
-| **MCP Server** | `factory-mcp-server` (Deployment + Service) | 8100 | `factory` |
-| **Hatchet Engine** | Hatchet server | 7077 | `orchestrators` |
-| **LiteLLM Gateway** | LiteLLM service | — | `llm-apps` |
-| **R2R GraphRAG** | R2R service | — | `llm-apps` |
-| **Confluent Kafka** | Kafka cluster | 9092 | `confluent` |
-| **CloudNativePG** | PostgreSQL 16 | 5432 | `storage` |
-| **OpenZiti** | Edge Router | — | `ziti` |
+```mermaid
+graph TB
+    subgraph "Git Repository"
+        FLUX["FluxCD Sources"]
+        KUST["Kustomizations"]
+        HELM["HelmReleases"]
+    end
+    subgraph "Kubernetes Cluster"
+        subgraph "dark-gravity NS"
+            MCP["factory-mcp-server"]
+            POLLER["poller-daemon"]
+            CLI["factory-cli"]
+        end
+        subgraph "orchestrators NS"
+            HATCHET["Hatchet Engine"]
+            KAFKA["Kafka (KRaft)"]
+        end
+        subgraph "llm-apps NS"
+            LITELLM["LiteLLM Proxy"]
+            R2R["R2R GraphRAG"]
+        end
+        subgraph "sandbox-exec NS"
+            GVISOR["gVisor Agent Pods"]
+        end
+        subgraph "observability NS"
+            SENTRY["Sentry"]
+            GRAFANA["Grafana"]
+        end
+    end
 
----
+    FLUX --> MCP
+    FLUX --> HATCHET
+    FLUX --> LITELLM
+    MCP --> GVISOR
 
-## Autoscaling (KEDA)
-
-We use **KEDA** (Kubernetes Event-Driven Autoscaling) to scale the workforce based on mission volume.
-
-### ScaledObject Configuration
-- **Trigger**: Kafka (lag in `mission-input` topic)
-- **Min Replicas**: 0 (Scale to zero when idle)
-- **Max Replicas**: 10
-
----
-
-## CI/CD Pipeline
-
-The GitHub Actions pipeline (`.github/workflows/pipeline.yml`) runs on push/PR to `main`:
-
-| Step | Command |
-| :--- | :--- |
-| Format Check | `cargo fmt --all -- --check` |
-| Lint | `cargo clippy --workspace -- -D warnings` |
-| Test | `cargo test --workspace -- --skip smoke` |
-| Docker Build & Push | Pushes `lgcorzo/dark-gravity-factory` on main/release |
-
----
-
-## Wiki Sync
-
-The `wiki/` folder is synced to the GitHub Wiki via `.github/workflows/docs-to-wiki.yml`. Documentation is maintained using CRG (code-review-graph) and Graphify for accuracy verification.
+    style FLUX fill:#2196F3,stroke:#1565C0,color:#fff
+```
 
 ---
 
-## Monitoring & Observability
+## 2. Kubernetes Namespace Layout
 
-| Component | Focus | Tooling |
-| :--- | :--- | :--- |
-| **System Health** | CPU, Memory, Pod Status | Prometheus / Grafana |
-| **Agent Thought** | Reasoning & Strategies | Kafka (`agent-thought` stream) |
-| **Error Tracking** | Production Exception Capturing | Sentry |
-| **Documentation Quality** | Code Structure & Accuracy | CRG + Graphify |
-
----
-
-## CRG + Graphify Integration
-
-The project uses two complementary tools for code intelligence and documentation:
-
-### code-review-graph (CRG)
-- **Purpose**: Semantic code search, dependency analysis, community detection
-- **Output**: `.code-review-graph/` directory with graph DB, wiki pages, and visualizations
-- **Status**: Nodes: 254, Edges: 1,522, Embeddings: 195 (using `lite_embedding`)
-
-### Graphify
-- **Purpose**: Code structure extraction, community detection, wiki report generation
-- **Output**: `graphify-out/` directory with `GRAPH_REPORT.md`, `graph.json`, `graph.html`
-- **Status**: Nodes: 611, Edges: 965, Communities: 53
+| Namespace | Purpose | Key Workloads | Node Affinity |
+|:---|:---|:---|:---|
+| `dark-gravity` | Core factory services | MCP server, Poller, CLI | `factory-core` nodes |
+| `orchestrators` | Workflow orchestration | Hatchet, Kafka | `orchestrator` nodes |
+| `llm-apps` | AI/ML inference | LiteLLM, R2R | GPU-capable nodes |
+| `sandbox-exec` | Isolated agent execution | gVisor pods | `sandbox` nodes (tainted) |
+| `observability` | Monitoring & alerting | Sentry, Grafana, Prometheus | `monitoring` nodes |
 
 ---
 
-*Last updated: 2026-06-23 — Verified against actual codebase via CRG analysis*
+## 3. LiteLLM Routing Configuration
+
+```yaml
+# LiteLLM config.yaml
+model_list:
+  - model_name: ollama/qwen2.5:7b
+    litellm_params:
+      model: ollama/qwen2.5:7b
+      api_base: http://ollama.llm-apps:11434
+  - model_name: gpt-oss-120b
+    litellm_params:
+      model: azure/gpt-oss-120b
+      api_base: ${AZURE_OPENAI_ENDPOINT}
+      api_key: ${AZURE_OPENAI_KEY}
+
+general_settings:
+  virtual_key_management: true  # FinOps virtual tags
+```
+
+---
+
+## 4. Troubleshooting Runbook
+
+### Pod Crash Loops
+
+| Symptom | Cause | Resolution |
+|:---|:---|:---|
+| MCP server CrashLoopBackOff | Missing env vars | Check `LITELLM_API_BASE`, `HATCHET_API_URL` |
+| Poller CrashLoopBackOff | GitHub token expired | Rotate `GITHUB_TOKEN` in sealed-secrets |
+| Sandbox pod OOMKilled | Memory limit exceeded | Verify `SandboxConstraint.max_memory_mb <= 30` |
+
+### Kafka Lag
+
+| Symptom | Cause | Resolution |
+|:---|:---|:---|
+| Consumer lag > 1000 | Slow consumer | Scale consumer replicas |
+| Topic not found | Topic not created | Run `kafka-topics --create` |
+
+### Ziti Tunnel Drops
+
+| Symptom | Cause | Resolution |
+|:---|:---|:---|
+| Connection refused on ziti endpoint | Tunnel pod restart | Check `ziti-tunnel` sidecar logs |
+| Certificate expired | PKI rotation needed | Renew OpenZiti identity |
+
+### Hatchet DAG Failures
+
+| Symptom | Cause | Resolution |
+|:---|:---|:---|
+| Phase 2 timeout | LLM model too slow | Switch to faster model via `LITELLM_PLANNER_MODEL` |
+| Phase 3 circuit breaker | Stagnant diff hash | HITL Vertex 3 override required |
+| Phase 4 SAST gate fail | Score < 8.0 | Review generated code for security issues |
+
+---
+
+> *Related: [User Manual](USER-MANUAL.md) · [Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md)*

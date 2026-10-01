@@ -1,54 +1,37 @@
----
-type: module
-title: "spec_kit_tool"
-source_path: "crates/factory-mcp-server/src/tools/spec_kit_tool.rs"
-description: "MCP tool implementation for invoking Spec-Kit CLI commands, with a dynamic SpecProvider for CLI or Mock execution."
-tags: [tool, mcp, spec-kit, rust]
-last_verified_commit: "eeb9c38"
+# Spec Kit MCP Tool — Comprehensive Documentation
+
+> **Purpose**: Bridges MCP protocol to Spec-Kit SDD workflow for autonomous mission planning and execution.
+
 ---
 
-Source File: `crates/factory-mcp-server/src/tools/spec_kit_tool.rs`
+## Tool Interface
 
-# spec_kit_tool
+| Field | Value |
+|:---|:---|
+| **MCP Tool Name** | `spec_kit_tool` |
+| **Category** | Planning |
+| **Authorized Agents** | RustantAgent |
+| **Input** | Goal description + codebase context |
+| **Output** | SDD artifacts (spec.md, plan.md, tasks.md) |
 
-## Component Overview
-The `spec_kit_tool` module implements an MCP `Tool` trait that enables the agent to invoke the `specify` CLI. It defines a `SpecProvider` trait to allow dynamic switching between executing the real CLI (`CliSpecProvider`) and generating mock outputs (`MockSpecProvider`). This robust design ensures the tool falls back gracefully in environments where the CLI is unavailable.
-
-## UML Diagram
-
-```mermaid
-classDiagram
-    class SpecProvider {
-        <<Interface>>
-        +invoke(command: SpecKitCommand, args: Vec~String~) Result~String~
-    }
-    class MockSpecProvider {
-        +specs_dir: PathBuf
-        +new(specs_dir: PathBuf) MockSpecProvider
-    }
-    class CliSpecProvider {
-        +cli_path: String
-        +fallback: MockSpecProvider
-        +new(cli_path: String) CliSpecProvider
-    }
-    class SpecKitTool {
-        -provider: Arc~dyn SpecProvider~
-        +new(specify_cli_path: String) SpecKitTool
-        +with_provider(provider: Arc~dyn SpecProvider~) SpecKitTool
-        +invoke_spec_kit(command: SpecKitCommand, args: Vec~String~) Result~String~
-    }
-    SpecProvider <|-- MockSpecProvider
-    SpecProvider <|-- CliSpecProvider
-```
-
-## Execution Flow
+## SDD Workflow Bridge
 
 ```mermaid
-flowchart TD
-    A[SpecKitTool::call] --> B{Parse Command & Args}
-    B -- Valid --> C[invoke_spec_kit]
-    B -- Invalid --> D[Return Error]
-    C --> E[provider.invoke]
-    E -- Success --> F[Return CallToolResult Output]
-    E -- Failure --> G[Return Error Output]
+sequenceDiagram
+    participant Agent as RustantAgent
+    participant MCP as spec_kit_tool
+    participant SpecKit as Spec Kit CLI
+
+    Agent->>MCP: invoke("spec_kit_tool", {goal, context})
+    MCP->>SpecKit: speckit init
+    MCP->>SpecKit: speckit specify --goal "{goal}"
+    MCP->>SpecKit: speckit plan
+    MCP->>SpecKit: speckit tasks
+    SpecKit-->>MCP: tasks.md content
+    MCP->>MCP: parse_sdd_tasks(content)
+    MCP-->>Agent: SddMissionPlan with SddTaskItems
 ```
+
+---
+
+> *Related: [RustantAgent](crates_factory-application_src_agents_rustant.md) · [Tactical Design](TACTICAL-DESIGN.md)*

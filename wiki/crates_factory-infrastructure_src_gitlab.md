@@ -1,43 +1,12 @@
----
-type: module
-title: "gitlab.rs"
-source_path: "crates/factory-infrastructure/src/gitlab.rs"
-description: "Documentation for crates/factory-infrastructure/src/gitlab.rs"
-tags: [rust, module]
-last_verified_commit: "a591f336"
+# factory-infrastructure::gitlab — GitLab Adapter
+
+> **Source**: `crates/factory-infrastructure/src/gitlab.rs`
+> **Layer**: Infrastructure
+
 ---
 
-# gitlab.rs
+GitLab REST API adapter for MR creation, pipeline status queries, and CI/CD webhook processing. Supports both GitLab.com and self-hosted instances.
 
-Source File: `crates/factory-infrastructure/src/gitlab.rs`
+---
 
-## Component Architecture
-
-```mermaid
-classDiagram
-    class GitlabIssue
-    class GitlabMergeRequest
-    class GitlabAuthor
-    class GitlabNote
-    class GitlabCommitAction
-    class GitlabAwardEmoji
-    class GitDeliveryResult
-    class GitlabPipeline
-    class GitlabPipelineJob
-    class GitlabClient {
-        <<trait>>
-    }
-    class HttpGitlabClient
-```
-
-## Execution Flow
-
-```mermaid
-flowchart TD
-    Start --> create_issue
-    create_issue --> new
-    new --> create_issue
-    create_issue --> test_gitlab_create_issue_success
-    test_gitlab_create_issue_success --> test_gitlab_create_issue_unauthorized
-    test_gitlab_create_issue_unauthorized --> End
-```
+> *Related: [lib.rs](crates_factory-infrastructure_src_lib.md) · [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md)*
