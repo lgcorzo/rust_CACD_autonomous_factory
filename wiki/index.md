@@ -1,133 +1,165 @@
-# Wiki Index — Dark Gravity CA/CD Autonomous Factory
+---
+iso_doc_type: "Description"
+iso_viewpoint: "ArchitectureDescription"
+type: "architecture"
+title: "Master Wiki Index — ISO Architecture Description"
+description: "Master index of the Dark Gravity CA/CD Autonomous Factory documentation under ISO/IEC/IEEE 42010 and 15289 standards."
+tags: ["iso42010", "iso15289", "index", "architecture_description"]
+timestamp: "2026-10-01T14:00:00Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "fbdc5848"
+---
 
-> **Purpose**: Master index linking all 100+ wiki pages organized by category.
+# Master Documentation Index — Dark Gravity CA/CD Autonomous Factory
+
+> **Standards Compliance**: [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74428.html) (Architecture Descriptions) & [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/72242.html) (Life Cycle Information Items).
 
 ---
 
-## Navigation
+## Navigation & Entry Points
 
-- [Home](Home.md) · [Sidebar](_Sidebar.md) · [Glossary](GLOSSARY.md)
+- [Home](Home.md) · [Glossary](GLOSSARY.md) · [Sidebar](_Sidebar.md)
 
 ---
 
-## Business & Strategy
+## 1. Architecture Viewpoints (ISO 42010)
 
-- [Business Context](BUSINESS-CONTEXT.md) — Vision, ROI, KPIs
-- [Strategic Design](STRATEGIC-DESIGN.md) — C4 Level 1-2, Onion Architecture, Bounded Contexts
-- [Tactical Design](TACTICAL-DESIGN.md) — C4 Level 3, DAG mapping, MCP tool registry
+| Viewpoint | Document | Description |
+|:---|:---|:---|
+| **ContextView** | [Business Context](architecture/business_context.md) | Problem statement, ROI, KPIs, autonomous paradigm |
+| **ContextView** | [Strategic Design](architecture/strategic_design.md) | C4 Level 1-2, Onion Architecture, Bounded Contexts |
+| **ComponentView** | [Tactical Design](architecture/tactical_design.md) | C4 Level 3, Hatchet DAG mapping, tool registry |
+| **ComponentView** | [Agent Specifications](architecture/agent_specifications.md) | Specification of all 6 agents, shared trait, tool matrix |
+| **SequenceView** | [Runtime Sequences](architecture/runtime_sequences.md) | 6-Phase Hatchet DAG execution, agent thought streaming |
+| **ComponentView** | [Infrastructure Adapters](architecture/infrastructure_adapters.md) | Kafka, R2R GraphRAG, OpenZiti, Vault, Sentry, S3, Semantica |
+| **ComponentView** | [Mission Data Model](architecture/mission_data_model.md) | Event schemas, protobufs, JSON data contracts |
 
-## Architecture & Agents
+---
 
-- [Agent Specifications](AGENT-SPECIFICATIONS.md) — All 6 agents with UML, tool matrix, behavioral specs
-- [Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md) — 6-Phase Hatchet DAG sequence
-- [Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md) — Kafka, R2R, Ziti, Vault, Sentry, S3, Semantica
+## 2. Security & Governance (ISO 42010 SecurityView & Policy)
 
-## Security & Governance
+| Topic | Document | Description |
+|:---|:---|:---|
+| **SecurityView** | [Security Architecture](security/security_architecture.md) | Zero Trust, NHI Ed25519, gVisor isolation, STRIDE threat model |
+| **Policy** | [HITL Governance](security/hitl_governance.md) | 4-Vertex Human-in-the-Loop governance mesh & enforcement |
+| **Policy** | [Verification Triad](security/verification_triad.md) | Logical, Architectural, and Security quality gates |
+| **Report** | [Compliance & Audit](security/compliance_audit.md) | Hazitek 2026, EU AI Act conformity assessment |
 
-- [Security Architecture](SECURITY-ARCHITECTURE.md) — Zero Trust, NHI, gVisor, SAST, STRIDE
-- [HITL Governance](HITL-GOVERNANCE.md) — 4-Vertex governance mesh
-- [Verification Triad](VERIFICATION-TRIAD.md) — Logical, Architectural, Security gates
-- [Compliance & Audit](COMPLIANCE-AUDIT.md) — Hazitek 2026, EU AI Act
+---
 
-## Operations & Quality
+## 3. Operations & Deployment (ISO 42010 DeploymentView & Procedures)
 
-- [User Manual](USER-MANUAL.md) — Step-by-step guides
-- [Production Operations](PRODUCTION-OPERATIONS.md) — FluxCD, K8s, LiteLLM, troubleshooting
-- [Experiment Logs](EXPERIMENT-LOGS.md) — Telemetry schema
-- [Test Plan Report](Test_Plan_Report.md) — Test strategy & suite catalog
-- [Mission Data Model](src-mission.md) — Event-driven architecture
+| Topic | Document | Description |
+|:---|:---|:---|
+| **Procedure** | [User Manual](operations/user_manual.md) | Step-by-step guides for mission creation, PR directives, CLI |
+| **DeploymentView** | [Production Operations](operations/production_operations.md) | FluxCD GitOps, K8s namespace topology, LiteLLM proxy, runbook |
+| **Report** | [Experiment Logs](operations/experiment_logs.md) | Telemetry schema, Kafka event topics, Prometheus metrics |
 
-## Crate Reference: factory-core (Domain)
+---
 
-- [lib.rs](crates_factory-core_src_lib.md) — Domain entities, module tree
-- [config.rs](crates_factory-core_src_config.md) — Agent model configuration
-- [error.rs](crates_factory-core_src_error.md) — FactoryError enum
-- [executor.rs](crates_factory-core_src_executor.md) — CodeSurgeryExecutor trait
-- [security.rs](crates_factory-core_src_security.md) — Security primitives
-- [security/nhi.rs](crates_factory-core_src_security_nhi.md) — Ed25519 NHI credentials
+## 4. Software Quality & Testing (ISO 25010 & ISO 29119)
 
-## Crate Reference: factory-application (Application)
+| Topic | Document | Description |
+|:---|:---|:---|
+| **QualityView** | [Test Plan & Report](quality/test_plan_report.md) | Test pyramid, 18 integration suites, Criterion benchmarks |
 
-- [lib.rs](crates_factory-application_src_lib.md) — Application overview
-- [agents/mod.rs](crates_factory-application_src_agents_mod.md) — Agent registry
-- [agents/rustant.rs](crates_factory-application_src_agents_rustant.md) — RustantAgent
-- [agents/zeroclaw.rs](crates_factory-application_src_agents_zeroclaw.md) — ZeroClawAgent
-- [agents/auditor.rs](crates_factory-application_src_agents_auditor.md) — AuditorAgent
-- [agents/finops.rs](crates_factory-application_src_agents_finops.md) — FinOpsAgent
-- [agents/qa_observer.rs](crates_factory-application_src_agents_qa_observer.md) — QAObserverAgent
-- [agents/doc_agent.rs](crates_factory-application_src_agents_doc_agent.md) — DocumentationAgent
-- [gitlab_verifier.rs](crates_factory-application_src_gitlab_verifier.md) — GitLab connectivity verifier
-- [workflows/mod.rs](crates_factory-application_src_workflows_mod.md) — Workflow registry
-- [workflows/autonomous_mission.rs](crates_factory-application_src_workflows_autonomous_mission.md) — 6-Phase DAG
-- [workflows/circuit_breaker.rs](crates_factory-application_src_workflows_circuit_breaker.md) — Aethelgard
-- [workflows/comment_control.rs](crates_factory-application_src_workflows_comment_control.md) — PR comment control
-- [workflows/deep_research.rs](crates_factory-application_src_workflows_deep_research.md) — Deep research DAG
-- [workflows/develop_task.rs](crates_factory-application_src_workflows_develop_task.md) — TDD execution
-- [workflows/pipeline_remediation.rs](crates_factory-application_src_workflows_pipeline_remediation.md) — CI fix
-- [bridge/mod.rs](crates_factory-application_src_bridge_mod.md) — Bridge module
-- [bridge/adk_driver.rs](crates_factory-application_src_bridge_adk_driver.md) — ADK integration
-- [bridge/kafka_bridge.rs](crates_factory-application_src_bridge_kafka_bridge.md) — Kafka bridge
-- [bridge/semantica_bridge.rs](crates_factory-application_src_bridge_semantica_bridge.md) — Semantica bridge
-- [bridge/state.rs](crates_factory-application_src_bridge_state.md) — Checkpoint state
-- [poller_service.rs](crates_factory-application_src_poller_service.md) — Outbound poller
-- [telemetry_export.rs](crates_factory-application_src_telemetry_export.md) — Metrics export
-- [utils/mod.rs](crates_factory-application_src_utils_mod.md) — Utilities
-- [utils/osr.rs](crates_factory-application_src_utils_osr.md) — OSR calculator
+---
 
-## Crate Reference: factory-infrastructure (Infrastructure)
+## 5. Module Architecture & Codebase Mirror (ISO 42010 ComponentView)
 
-- [lib.rs](crates_factory-infrastructure_src_lib.md) — Adapter registry
-- [github.rs](crates_factory-infrastructure_src_github.md) — GitHub adapter
-- [gitlab.rs](crates_factory-infrastructure_src_gitlab.md) — GitLab adapter
-- [jira.rs](crates_factory-infrastructure_src_jira.md) — Jira adapter
-- [kafka.rs](crates_factory-infrastructure_src_kafka.md) — Kafka client
-- [ziti.rs](crates_factory-infrastructure_src_ziti.md) — OpenZiti client
-- [vault.rs](crates_factory-infrastructure_src_vault.md) — Vault secret manager
-- [r2r.rs](crates_factory-infrastructure_src_r2r.md) — R2R GraphRAG
-- [aethalgard.rs](crates_factory-infrastructure_src_aethalgard.md) — Circuit breaker
-- [mcp_client.rs](crates_factory-infrastructure_src_mcp_client.md) — MCP client
-- [pipeline_classifier.rs](crates_factory-infrastructure_src_pipeline_classifier.md) — Error taxonomy
-- [s3.rs](crates_factory-infrastructure_src_s3.md) — S3 storage
-- [semantica.rs](crates_factory-infrastructure_src_semantica.md) — Semantica decision client
-- [sentry.rs](crates_factory-infrastructure_src_sentry.md) — Error tracking
-- [security_validator.rs](crates_factory-infrastructure_src_security_validator.md) — Ed25519 validator
-- [cursor_store.rs](crates_factory-infrastructure_src_cursor_store.md) — Polling state
-- [git_poller.rs](crates_factory-infrastructure_src_git_poller.md) — Change detection
+### factory-core (Domain Layer)
+- [lib.md](modules/core/lib.md) — Core domain entities, mission & task models
+- [config.md](modules/core/config.md) — Model configuration & LiteLLM resolution
+- [error.md](modules/core/error.md) — `FactoryError` enum variants
+- [executor.md](modules/core/executor.md) — `CodeSurgeryExecutor` trait
+- [security.md](modules/core/security.md) — Security primitives & sandbox constraints
+- [security_nhi.md](modules/core/security_nhi.md) — Ed25519 Non-Human Identity credentials
 
-## Crate Reference: factory-mcp-server (Interface)
+### factory-application (Application Layer)
+- [lib.md](modules/application/lib.md) — Application crate overview & `Agent` trait
+- [gitlab_verifier.md](modules/application/gitlab_verifier.md) — GitLab connectivity & token verifier
+- [poller_service.md](modules/application/poller_service.md) — Outbound GitHub/GitLab poller daemon
+- [telemetry_export.md](modules/application/telemetry_export.md) — Metrics & telemetry exporter
+- **Agents** (`modules/application/agents/`):
+  - [mod.md](modules/application/agents/mod.md) — Agent dispatch registry
+  - [rustant.md](modules/application/agents/rustant.md) — Product Owner & Planner agent
+  - [zeroclaw.md](modules/application/agents/zeroclaw.md) — Developer & Code Surgery agent
+  - [auditor.md](modules/application/agents/auditor.md) — Security Auditor agent
+  - [finops.md](modules/application/agents/finops.md) — Budget & Token Cost agent
+  - [qa_observer.md](modules/application/agents/qa_observer.md) — Quality Gate & Coverage agent
+  - [doc_agent.md](modules/application/agents/doc_agent.md) — Documentation & OSR agent
+- **Workflows** (`modules/application/workflows/`):
+  - [mod.md](modules/application/workflows/mod.md) — Workflow registry
+  - [autonomous_mission.md](modules/application/workflows/autonomous_mission.md) — 6-Phase Hatchet DAG
+  - [circuit_breaker.md](modules/application/workflows/circuit_breaker.md) — Aethelgard loop breaker
+  - [comment_control.md](modules/application/workflows/comment_control.md) — PR/MR directive handler
+  - [deep_research.md](modules/application/workflows/deep_research.md) — Multi-step research DAG
+  - [develop_task.md](modules/application/workflows/develop_task.md) — ZeroClaw TDD execution
+  - [pipeline_remediation.md](modules/application/workflows/pipeline_remediation.md) — CI failure healer
+- **Bridge** (`modules/application/bridge/`):
+  - [mod.md](modules/application/bridge/mod.md) — Bridge abstractions
+  - [adk_driver.md](modules/application/bridge/adk_driver.md) — Agent Development Kit bridge
+  - [kafka_bridge.md](modules/application/bridge/kafka_bridge.md) — Kafka bidirectional bridge
+  - [semantica_bridge.md](modules/application/bridge/semantica_bridge.md) — Semantica decision recorder
+  - [state.md](modules/application/bridge/state.md) — Checkpoint state tracking
+- **Utils** (`modules/application/utils/`):
+  - [mod.md](modules/application/utils/mod.md) — Application utilities
+  - [osr.md](modules/application/utils/osr.md) — Out-of-Sync Rate calculator
 
-- [lib.rs](crates_factory-mcp-server_src_lib.md) — MCP server overview
-- [main.rs](crates_factory-mcp-server_src_main.md) — HTTP server entry
-- [protocol.rs](crates_factory-mcp-server_src_protocol.md) — JSON-RPC protocol
-- [sandbox.rs](crates_factory-mcp-server_src_sandbox.md) — gVisor lifecycle
-- [feedback_route.rs](crates_factory-mcp-server_src_feedback_route.md) — Webhook handler
-- [github_webhook.rs](crates_factory-mcp-server_src_github_webhook.md) — GitHub webhook handler
-- [scratch.rs](crates_factory-mcp-server_src_scratch.md) — Temp workspace
-- [skills/context.rs](crates_factory-mcp-server_src_skills_context.md) — Spec-Kit context
-- [skills/mod.rs](crates_factory-mcp-server_src_skills_mod.md) — Skill registry
-- [tools/mod.rs](crates_factory-mcp-server_src_tools_mod.md) — Tool dispatch
-- [tools/bridge.rs](crates_factory-mcp-server_src_tools_bridge.md) — State bridge
-- [tools/deep_research_tool.rs](crates_factory-mcp-server_src_tools_deep_research_tool.md) — Deep research
-- [tools/execute_code.rs](crates_factory-mcp-server_src_tools_execute_code.md) — Code execution
-- [tools/get_factory_status.rs](crates_factory-mcp-server_src_tools_get_factory_status.md) — Factory status
-- [tools/index_code.rs](crates_factory-mcp-server_src_tools_index_code.md) — R2R ingestion
-- [tools/inspect_kafka_topic.rs](crates_factory-mcp-server_src_tools_inspect_kafka_topic.md) — Kafka inspector
-- [tools/launch_sandbox_pod.rs](crates_factory-mcp-server_src_tools_launch_sandbox_pod.md) — K8s Job
-- [tools/list_minio_buckets.rs](crates_factory-mcp-server_src_tools_list_minio_buckets.md) — MinIO buckets
-- [tools/list_minio_objects.rs](crates_factory-mcp-server_src_tools_list_minio_objects.md) — MinIO objects
-- [tools/plan_mission.rs](crates_factory-mcp-server_src_tools_plan_mission.md) — Mission planning
-- [tools/retrieve_context.rs](crates_factory-mcp-server_src_tools_retrieve_context.md) — GraphRAG query
-- [tools/run_tests.rs](crates_factory-mcp-server_src_tools_run_tests.md) — Test runner
-- [tools/search_jira.rs](crates_factory-mcp-server_src_tools_search_jira.md) — Jira search
-- [tools/security_review.rs](crates_factory-mcp-server_src_tools_security_review.md) — SAST gate
-- [tools/spec_kit_tool.rs](crates_factory-mcp-server_src_tools_spec_kit_tool.md) — SDD bridge
-- [tools/spec_kit_tasks_to_issues.rs](crates_factory-mcp-server_src_tools_spec_kit_tasks_to_issues.md) — Issue creator
-- [tools/update_mission_status.rs](crates_factory-mcp-server_src_tools_update_mission_status.md) — Status tracking
-- [Spec Kit Tool](spec_kit_tool.md) — Comprehensive tool docs
+### factory-infrastructure (Infrastructure Layer)
+- [lib.md](modules/infrastructure/lib.md) — Adapter registry & traits
+- [github.md](modules/infrastructure/github.md) — GitHub REST API adapter
+- [gitlab.md](modules/infrastructure/gitlab.md) — GitLab API adapter
+- [jira.md](modules/infrastructure/jira.md) — Atlassian Jira Cloud adapter
+- [kafka.md](modules/infrastructure/kafka.md) — KRaft Kafka producer/consumer
+- [ziti.md](modules/infrastructure/ziti.md) — OpenZiti zero-trust overlay
+- [vault.md](modules/infrastructure/vault.md) — HashiCorp Vault secrets adapter
+- [r2r.md](modules/infrastructure/r2r.md) — R2R GraphRAG vector client
+- [semantica.md](modules/infrastructure/semantica.md) — Semantica decision & conflict client
+- [aethalgard.md](modules/infrastructure/aethalgard.md) — Circuit breaker adapter
+- [mcp_client.md](modules/infrastructure/mcp_client.md) — Model Context Protocol client
+- [pipeline_classifier.md](modules/infrastructure/pipeline_classifier.md) — CI/CD error taxonomy
+- [s3.md](modules/infrastructure/s3.md) — MinIO / S3 artifact storage
+- [sentry.md](modules/infrastructure/sentry.md) — Error tracking & diagnostics
+- [security_validator.md](modules/infrastructure/security_validator.md) — Ed25519 signature validator
+- [cursor_store.md](modules/infrastructure/cursor_store.md) — Event cursor store (In-memory & Postgres)
+- [git_poller.md](modules/infrastructure/git_poller.md) — Change detection daemon
 
-## Crate Reference: factory-cli (Interface)
+### factory-mcp-server (Interface Layer)
+- [lib.md](modules/mcp_server/lib.md) — Axum MCP server core
+- [main.md](modules/mcp_server/main.md) — Server entry point & CLI flags
+- [protocol.md](modules/mcp_server/protocol.md) — JSON-RPC 2.0 framing & SSE
+- [sandbox.md](modules/mcp_server/sandbox.md) — gVisor K8s Job sandbox lifecycle
+- [scratch.md](modules/mcp_server/scratch.md) — Scratchpad filesystem manager
+- [feedback_route.md](modules/mcp_server/feedback_route.md) — External webhook ingress
+- [github_webhook.md](modules/mcp_server/github_webhook.md) — HMAC-SHA256 GitHub event listener
+- **Skills** (`modules/mcp_server/skills/`):
+  - [mod.md](modules/mcp_server/skills/mod.md) — Skill registry
+  - [context.md](modules/mcp_server/skills/context.md) — Spec-Kit execution context
+  - [spec_kit_tool.md](modules/mcp_server/skills/spec_kit_tool.md) — SDD Spec-Kit bridge
+- **Tools** (`modules/mcp_server/tools/`):
+  - [mod.md](modules/mcp_server/tools/mod.md) — Tool registry (17 tools)
+  - [bridge.md](modules/mcp_server/tools/bridge.md) — Bridge communication tool
+  - [deep_research_tool.md](modules/mcp_server/tools/deep_research_tool.md) — Deep research tool
+  - [execute_code.md](modules/mcp_server/tools/execute_code.md) — Code surgery tool
+  - [get_factory_status.md](modules/mcp_server/tools/get_factory_status.md) — Factory status tool
+  - [index_code.md](modules/mcp_server/tools/index_code.md) — Code indexing tool
+  - [inspect_kafka_topic.md](modules/mcp_server/tools/inspect_kafka_topic.md) — Kafka inspector tool
+  - [launch_sandbox_pod.md](modules/mcp_server/tools/launch_sandbox_pod.md) — Sandbox launcher tool
+  - [list_minio_buckets.md](modules/mcp_server/tools/list_minio_buckets.md) — Bucket discovery tool
+  - [list_minio_objects.md](modules/mcp_server/tools/list_minio_objects.md) — Object listing tool
+  - [plan_mission.md](modules/mcp_server/tools/plan_mission.md) — Mission planner tool
+  - [retrieve_context.md](modules/mcp_server/tools/retrieve_context.md) — R2R context retrieval tool
+  - [run_tests.md](modules/mcp_server/tools/run_tests.md) — Test runner tool
+  - [search_jira.md](modules/mcp_server/tools/search_jira.md) — Jira query tool
+  - [security_review.md](modules/mcp_server/tools/security_review.md) — SAST security gate tool
+  - [spec_kit_tasks_to_issues.md](modules/mcp_server/tools/spec_kit_tasks_to_issues.md) — Task-to-issue tool
+  - [spec_kit_tool.md](modules/mcp_server/tools/spec_kit_tool.md) — Spec Kit CLI tool
+  - [update_mission_status.md](modules/mcp_server/tools/update_mission_status.md) — Mission status updater
 
-- [main.rs](crates_factory-cli_src_main.md) — CLI entry point & subcommands
-- [bin/trigger_mission.rs](crates_factory-cli_src_bin_trigger_mission.md) — Manual trigger
-- [bin/run_functional_suite.rs](crates_factory-cli_src_bin_run_functional_suite.md) — E2E tests
-- [bin/trigger_deep_search.rs](crates_factory-cli_src_bin_trigger_deep_search.md) — Deep search trigger
+### factory-cli (Interface Layer)
+- [main.md](modules/cli/main.md) — CLI entry point & subcommands (`worker`, `poller`, `gitlab-verify`, `verify-osr`)
+- [trigger_mission.md](modules/cli/trigger_mission.md) — Manual mission trigger binary
+- [run_functional_suite.md](modules/cli/run_functional_suite.md) — Functional E2E test runner binary
+- [trigger_deep_search.md](modules/cli/trigger_deep_search.md) — Deep research trigger binary

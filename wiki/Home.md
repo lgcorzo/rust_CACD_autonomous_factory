@@ -1,3 +1,16 @@
+---
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
+title: "Dark Gravity CA/CD Autonomous Factory — Wiki"
+description: "ISO 42010 ComponentView / ISO 15289 Description documentation for Dark Gravity CA/CD Autonomous Factory — Wiki."
+tags: ['iso42010', 'okf']
+timestamp: "2026-10-01T14:00:00Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "fbdc5848"
+---
+
 # Dark Gravity CA/CD Autonomous Factory — Wiki
 
 [![docs-to-wiki](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml)
@@ -10,18 +23,18 @@ Welcome to the **Dark Gravity Autonomous Factory** professional enterprise wiki.
 
 | Section | Description |
 |:---|:---|
-| [📋 Business Context](BUSINESS-CONTEXT.md) | CA/CD vision, Hazitek 2026, ROI, KPIs |
-| [🏗️ Strategic Design](STRATEGIC-DESIGN.md) | C4 Context & Container diagrams, Bounded Contexts, Onion Architecture |
-| [⚙️ Tactical Design](TACTICAL-DESIGN.md) | C4 Component diagrams, 5-crate mapping, DAG phases |
-| [🤖 Agent Specifications](AGENT-SPECIFICATIONS.md) | Rustant, ZeroClaw, Auditor, FinOps, QAObserver, DocAgent |
-| [🔄 Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md) | 6-phase Hatchet DAG, Spec-Kit SDD workflows |
-| [🔌 Infrastructure Adapters](INFRASTRUCTURE-ADAPTERS.md) | Kafka, R2R GraphRAG, OpenZiti, Vault, Sentry |
-| [✅ Verification Triad](VERIFICATION-TRIAD.md) | Logical, Architectural, Security gates |
-| [🚀 Production Operations](PRODUCTION-OPERATIONS.md) | FluxCD GitOps, K8s topology, LiteLLM, troubleshooting |
-| [📖 User Manual](USER-MANUAL.md) | CLI usage, environment config, interactive directives |
-| [🔒 Security Architecture](SECURITY-ARCHITECTURE.md) | Zero Trust, Ed25519 NHI, gVisor sandbox isolation |
-| [🏛️ HITL Governance](HITL-GOVERNANCE.md) | 4-Vertex governance mesh, human oversight model |
-| [📜 Compliance & Audit](COMPLIANCE-AUDIT.md) | Hazitek 2026, EU AI Act, R&D telemetry packaging |
+| [📋 Business Context](architecture/business_context.md) | CA/CD vision, Hazitek 2026, ROI, KPIs |
+| [🏗️ Strategic Design](architecture/strategic_design.md) | C4 Context & Container diagrams, Bounded Contexts, Onion Architecture |
+| [⚙️ Tactical Design](architecture/tactical_design.md) | C4 Component diagrams, 5-crate mapping, DAG phases |
+| [🤖 Agent Specifications](architecture/agent_specifications.md) | Rustant, ZeroClaw, Auditor, FinOps, QAObserver, DocAgent |
+| [🔄 Experiment Lifecycle](architecture/runtime_sequences.md) | 6-phase Hatchet DAG, Spec-Kit SDD workflows |
+| [🔌 Infrastructure Adapters](architecture/infrastructure_adapters.md) | Kafka, R2R GraphRAG, OpenZiti, Vault, Sentry |
+| [✅ Verification Triad](security/verification_triad.md) | Logical, Architectural, Security gates |
+| [🚀 Production Operations](operations/production_operations.md) | FluxCD GitOps, K8s topology, LiteLLM, troubleshooting |
+| [📖 User Manual](operations/user_manual.md) | CLI usage, environment config, interactive directives |
+| [🔒 Security Architecture](security/security_architecture.md) | Zero Trust, Ed25519 NHI, gVisor sandbox isolation |
+| [🏛️ HITL Governance](security/hitl_governance.md) | 4-Vertex governance mesh, human oversight model |
+| [📜 Compliance & Audit](security/compliance_audit.md) | Hazitek 2026, EU AI Act, R&D telemetry packaging |
 | [📚 Glossary](GLOSSARY.md) | DDD ubiquitous language, acronyms, domain terms |
 | [📑 Master Index](index.md) | Complete file listing with categories |
 
@@ -33,11 +46,11 @@ Each crate in the workspace has per-module OKF documentation pages:
 
 | Crate | Layer | Pages |
 |:---|:---|:---:|
-| [`factory-core`](crates_factory-core_src_lib.md) | Domain | 5 |
-| [`factory-application`](crates_factory-application_src_lib.md) | Application | 20+ |
-| [`factory-infrastructure`](crates_factory-infrastructure_src_lib.md) | Infrastructure | 15+ |
-| [`factory-mcp-server`](crates_factory-mcp-server_src_lib.md) | Interface (MCP) | 20+ |
-| [`factory-cli`](crates_factory-cli_src_main.md) | CLI | 3 |
+| [`factory-core`](modules/core/lib.md) | Domain | 5 |
+| [`factory-application`](modules/application/lib.md) | Application | 20+ |
+| [`factory-infrastructure`](modules/infrastructure/lib.md) | Infrastructure | 15+ |
+| [`factory-mcp-server`](modules/mcp_server/lib.md) | Interface (MCP) | 20+ |
+| [`factory-cli`](modules/cli/main.md) | CLI | 3 |
 
 ---
 
