@@ -1,89 +1,51 @@
-# VERIFICATION-TRIAD: Quality Assurance
+# Verification Triad — Dark Gravity Factory
 
-This document defines the **Verification Triad** standard for the **Dark Gravity** autonomous factory: Logical, Architectural, and Security verification.
-
----
-
-## The Hierarchy of Truth
-
-Our strategy ensures artifact quality through three simultaneous validation pillars.
-
-| Pillar | Focus | Key Tooling |
-| :--- | :--- | :--- |
-| **Logical** | Functional correctness of the code. | `cargo test`, Sandbox (Firecracker/Subprocess) |
-| **Architectural** | Alignment with DDD patterns and Bounded Contexts. | Rustant, `clippy`, domain models |
-| **Security** | Vulnerability detection and compliance. | `security_review` (LLM-as-a-Judge), `cargo clippy` |
+> **Purpose**: Three-gate verification pipeline ensuring code quality before delivery.
 
 ---
 
-## 1. Logical Verification (The Executor)
+## Triad Gate Pipeline
 
-We ensure mission reliability via **Sandbox Execution**.
+```mermaid
+flowchart LR
+    CODE["Code Changes"] --> LOGICAL["Gate 1: Logical<br/>Unit + Integration Tests"]
+    LOGICAL --> ARCH["Gate 2: Architectural<br/>Clippy + Dependency Audit"]
+    ARCH --> SEC["Gate 3: Security<br/>SAST + NHI Verification"]
+    SEC --> DELIVER["✅ Ready for Delivery"]
 
-- **Environment**: 
-  - **SubprocessDriver**: `tokio::process::Command` for local execution
-  - **FirecrackerDriver**: Micro-VM via KVM
-- **Workflow**:
-  1. ZeroClaw generates code + unit tests.
-  2. Runs tests via `run_tests` MCP tool inside the isolated Sandbox.
-  3. Feedback (stdout/stderr) is streamed back for self-correction (max 3 retries).
-- **Requirement**: ALL delivery-phase artifacts MUST pass their generated test suite.
-
----
-
-## 2. Architectural Verification (The Planner)
-
-Automated linting ensures the code remains maintainable and true to the **Strategic Design**.
-
-- **Standard Linters**: `clippy` for Rust. Enforced in CI pipeline (`cargo clippy --workspace -- -D warnings`).
-- **Domain Compliance**: Rustant validates generated code against core domain models, `SecurityValidator`, and `SecurityBounds` constraints.
-
----
-
-## 3. Security Verification (The Guardrails)
-
-The final gate before delivery.
-
-- **Automated Scanning**:
-  - `security_review` MCP tool: LLM-as-a-Judge analysis of code diffs
-  - `SecurityValidator` cryptographic verification: Using `Ed25519Validator` to strictly check Ed25519 signatures
-- **Dependency Checking**: `cargo deny` / `cargo audit`
-- **Sandbox Isolation**: Code executes in isolated Firecracker micro-VMs
-
----
-
-## How to Validate Locally
-
-### 1. Internal Units
-```bash
-cargo test
+    style LOGICAL fill:#4CAF50,stroke:#2E7D32,color:#fff
+    style ARCH fill:#2196F3,stroke:#1565C0,color:#fff
+    style SEC fill:#f44336,stroke:#c62828,color:#fff
+    style DELIVER fill:#9C27B0,stroke:#6A1B9A,color:#fff
 ```
 
-### 2. Integration Mocks
-```bash
-cargo test -p factory-infrastructure
-```
+## Gate Specifications
 
-### 3. CI Pipeline
-```bash
-cargo fmt --all -- --check
-cargo clippy --workspace -- -D warnings
-cargo test --workspace -- --skip smoke
-```
+### Gate 1: Logical Verification
+
+| Check | Tool | Threshold |
+|:---|:---|:---|
+| Unit tests | `cargo test` | 100% pass |
+| Integration tests | `cargo test --test` | 100% pass |
+| Coverage | `cargo llvm-cov` | > 80% |
+
+### Gate 2: Architectural Verification
+
+| Check | Tool | Threshold |
+|:---|:---|:---|
+| Linting | `cargo clippy` | 0 warnings |
+| Formatting | `cargo fmt --check` | 0 diffs |
+| Dependency audit | `cargo audit` | 0 critical |
+
+### Gate 3: Security Verification
+
+| Check | Tool | Threshold |
+|:---|:---|:---|
+| SAST score | `SastScanResult::inspect_diff` | >= 8.0 / 10.0 |
+| Critical vulnerabilities | SAST scanner | 0 critical |
+| NHI credential | Ed25519 verification | Valid signature |
+| Sandbox constraints | `validate_sandbox_constraints` | Within bounds |
 
 ---
 
-## CRG-Verified Test Structure
-
-Based on `code-review-graph` analysis, the test structure across the codebase includes:
-
-| Crate | Test Configuration | Nodes |
-|-------|-------------------|-------|
-| `factory-mcp-server` | Unit + integration tests for 8 tools | 68 tool nodes, 68 test edges |
-| `factory-infrastructure` | Mock-based tests (`wiremock`) | 42 client nodes, 15 test assertions |
-| `factory-core` | Pure domain logic tests | 12 domain model nodes |
-| `integration tests` | E2E security tests in `/tests/` | 4 security test nodes |
-
----
-
-*Last updated: 2026-07-02 — Verified against actual codebase via CRG analysis*
+> *Related: [Security Architecture](SECURITY-ARCHITECTURE.md) · [Test Plan](Test_Plan_Report.md)*

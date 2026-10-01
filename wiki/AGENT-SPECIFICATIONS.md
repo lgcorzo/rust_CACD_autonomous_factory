@@ -1,291 +1,182 @@
-# AGENT-SPECIFICATIONS: Autonomous Workforce
+# Agent Specifications — Dark Gravity CA/CD Autonomous Factory
 
-This document specifies the roles, responsibilities, and tooling for the **Dark Gravity** autonomous agents.
-
----
-
-## Rustant (Planner Agent)
-
-The "Captain" of the mission. Governs the **Intelligence Context**.
-
-### Responsibilities
-- **Context-Driven Planning**: Queries R2R GraphRAG via `R2rClient` for semantic context retrieval, then calls `plan_mission` via MCP to plan the mission.
-- **Security Review**: Audits code via `security_review` MCP tool using LLM-as-a-Judge.
-- **Review**: Reviews execution results and provides feedback for iteration.
-
-### Implementation
-- **File**: `crates/factory-application/src/agents/rustant.rs` (lines 12-78)
-- **Key Methods**: `new()`, `plan_mission()`, `review_mission()`
-- **Dependencies**: `McpClient`, `R2rClient`
-- **Agent trait**: Implements `Agent` (`name`, `execute`)
-
-#### Rustant Mission Planning Sequence
-```mermaid
-sequenceDiagram
-    participant Hatchet as Workflow Engine
-    participant RU as RustantAgent
-    participant R2R as R2rClient
-    participant LLM as LiteLLM Gateway
-    participant MCP as McpServer
-
-    Hatchet->>RU: execute(task_description)
-    activate RU
-    RU->>R2R: search("Context for task...")
-    R2R-->>RU: GraphRAG nodes & edges
-    RU->>MCP: call_tool("plan_mission", payload)
-    MCP->>LLM: generate_text()
-    LLM-->>MCP: execution plan JSON
-    MCP-->>RU: Result
-    RU-->>Hatchet: MissionPlan
-    deactivate RU
-```
+> **Purpose**: Consolidated specification of all 6 factory agents with shared trait interface, behavioral descriptions, tool authorization, and comparative analysis.
 
 ---
 
-## ZeroClaw (Executor Agent)
+## 1. Agent Trait Interface
 
-The "Muscle" of the system. Operates within the **Execution Context**.
-
-### Responsibilities
-- **Code Implementation**: Translates tasks into source code via `execute_code` MCP tool.
-- **Verification**: Runs test suites via `run_tests` inside isolated sandbox.
-- **Self-Correction**: Iterates on code based on test failure feedback.
-
-### Implementation
-- **File**: `crates/factory-application/src/agents/zeroclaw.rs` (lines 11-98)
-- **Key Methods**: `new()`, `execute_task()`, `validate_mission()`, `introspect_k8s()`
-- **Dependencies**: `McpClient`
-- **Sandbox Drivers**: `SubprocessDriver` (local)
-- **Agent trait**: Implements `Agent` (`name`, `execute`)
-
-#### ZeroClaw Execution Sequence
-```mermaid
-sequenceDiagram
-    participant Hatchet as Workflow Engine
-    participant ZC as ZeroClawAgent
-    participant MCP as McpServer
-    participant Sandbox as SandboxDriver
-    
-    Hatchet->>ZC: execute(task_description)
-    activate ZC
-    loop Iterative Execution
-        ZC->>MCP: call_tool("execute_code", source)
-        MCP->>Sandbox: execute(language, source)
-        Sandbox-->>MCP: stdout, stderr
-        MCP-->>ZC: Result
-        
-        ZC->>MCP: call_tool("run_tests", config)
-        MCP->>Sandbox: execute("cargo test")
-        Sandbox-->>MCP: Test pass/fail
-        MCP-->>ZC: Result
-    end
-    ZC-->>Hatchet: Execution Result
-    deactivate ZC
-```
-
----
-
-## Auditor Agent
-
-> **Status: Active**
-
-The "Quality Control". Governs the **Verification Context**.
-
-### Responsibilities
-- **Log Analysis**: Queries Hatchet API for recent failed mission DAGs to identify failure patterns.
-- **Root Cause Analysis**: Uses LiteLLM to process failures and output actionable recommendations (prompt adjustments, tool modifications).
-- **Prompt Engineering**: Automatically evaluates and proposes new optimized system prompts based on target ground truths and failure logs.
-
-### Implementation
-- **File**: `crates/factory-application/src/agents/auditor.rs`
-- **Key Methods**: `new()`, `analyze_dag_logs()`, `audit_mission()`, `evaluate_prompts()`
-- **Agent trait**: Implements `Agent` (`name`, `execute`)
-
----
-
-## QAObserver Agent
-
-> **Status: Active**
-
-The "Observer". Operates within the **Observability Context**.
-
-### Responsibilities
-- **Crash Monitoring**: Polls Sentry for recent crashes in the designated project every 15 minutes.
-- **Issue Tracking**: Automatically creates GitLab issues for detected crashes, detailing the event and culprit.
-- **Auto-Remediation Trigger**: Triggers an AutonomousMission via Hatchet to hotfix the detected crash automatically.
-
-### Implementation
-- **File**: `crates/factory-application/src/agents/qa_observer.rs`
-- **Key Methods**: `new()`, `monitor_crashes()`
-- **Agent trait**: Implements `Agent` (`name`, `execute`)
-
----
-
-## FinOps Agent
-
-> **Status: Active**
-
-The "Treasurer". Governs the **Cost Context**.
-
-### Responsibilities
-- **Budget Monitoring**: Polls the LiteLLM API to track token spend for specific epics and teams.
-- **Anomaly Detection**: Monitors spend velocity and triggers alerts if limits are exceeded.
-- **Resilience**: Implements circuit breaker patterns and exponential backoff to handle API outages gracefully.
-
-### Implementation
-- **File**: `crates/factory-application/src/agents/finops.rs`
-- **Key Methods**: `new()`, `monitor_budget()`
-- **Agent trait**: Implements `Agent` (`name`, `execute`)
-
----
-
-## DevOps Agent (Aethelgard Loop)
-
-> **Status: Active**
-
-The "Immune System". Governs the **Remediation Context**.
-
-### Responsibilities
-- **CI/CD Auto-Remediation**: Parses pipeline failures, queries R2R GraphRAG for historical fixes, directs Developer Agent to apply patches.
-- **Circuit Breaker**: Maximum 3 consecutive auto-remediation attempts before escalating.
-- **Backlog Automation**: Auto-grades severity and creates backlog issues.
-
----
-
-## Documentation Agent (Superpowers)
-
-> **Status: Active (Partially implemented)**
-
-The "Memory Keeper". Manages the **Infrastructure Context** for documentation.
-
-### Responsibilities
-- **CRG Wiki Generation**: Uses `code-review-graph wiki` to generate auto-documented wiki pages from AST analysis.
-- **Graphify Integration**: Maintains `graphify-out/` with code structure graphs and reports.
-- **Wiki Refinement**: Uses Superpowers skills to keep documentation accurate.
-
-### Superpowers Skills Loaded
-| Skill | Purpose |
-| :--- | :--- |
-| `writing-plans` | Decompose documentation into atomic tasks |
-| `subagent-driven-development` | Execute each subagent with focused context |
-| `verification-before-completion` | Verify before marking tasks complete |
-
----
-
-## Agent Interface
-
-All agents implement the `Agent` trait in `crates/factory-application/src/agents/`:
+All agents implement the shared `Agent` trait defined in `factory-application/src/lib.rs`:
 
 ```mermaid
 classDiagram
     class Agent {
         <<trait>>
         +name() String
-        +execute(task_description: String) Value
+        +execute(task_description) Result~Value~
     }
-    class DocumentationAgent {
-        <<active>>
-        +run_post_merge_pipeline()
-        +extract_code_deltas()
-        +generate_hazitek_report()
-    }
-    class RustantAgent {
-        <<active>>
-        +plan_mission()
-        +review_mission()
-    }
-    class ZeroClawAgent {
-        <<active>>
-        +execute_task()
-        +validate_mission()
-    }
-    class AuditorAgent {
-        <<active>>
-        +audit_mission_logs()
-        +evaluate_prompts()
-    }
-    class QAObserverAgent {
-        <<active>>
-        +monitor_crashes()
-    }
-    class FinOpsAgent {
-        <<active>>
-        +monitor_budget()
-    }
-    class DevOpsAgent {
-        <<active>>
-        +remediate_ci_failure()
-    }
-    
-    Agent <|-- DocumentationAgent
-    Agent <|-- RustantAgent
-    Agent <|-- ZeroClawAgent
-    Agent <|-- AuditorAgent
-    Agent <|-- QAObserverAgent
-    Agent <|-- FinOpsAgent
-    Agent <|-- DevOpsAgent
-```
 
-```rust
-#[async_trait]
-pub trait Agent: Send + Sync {
-    fn name(&self) -> String;
-    async fn execute(&self, task_description: &str) -> anyhow::Result<Value>;
-}
+    class RustantAgent {
+        -Arc~McpClient~ mcp_client
+        -Arc~R2rClient~ r2r_client
+        +plan_mission(mission_id, goal) Result~Value~
+        +review_mission(mission_id, results) Result~Value~
+        +parse_sdd_tasks(content)$ Vec~SddTaskItem~
+    }
+
+    class ZeroClawAgent {
+        -Arc~McpClient~ mcp_client
+        -Arc~AethalgardClient~ aethalgard_client
+        +execute_task(mission_id, description, files) Result~Value~
+        +execute_tdd_task(mission_id, task) Result~Value~
+        +validate_mission(mission_id, test_command) Result~Value~
+        +introspect_k8s(mission_id) Result~Value~
+        +validate_sandbox_constraints(app, sidecar)$ Result
+    }
+
+    class AuditorAgent {
+        +analyze_dag_logs(mission_id) Result~Vec~Value~~
+        +audit_mission(mission_id, failures) Result~Value~
+        +evaluate_prompts(mission_id, targets, recs) Result~String~
+    }
+
+    class FinOpsAgent {
+        -String litellm_base_url
+        -String api_key
+        -Client client
+        -FinOpsTag tag
+        +inject_vtags(request) RequestBuilder
+        +evaluate_spend_delta(current, previous, max) BudgetEvaluation
+        +dispatch_budget_exceeded_event(kafka, mission, spend, max) Result
+        +monitor_budget() Result
+    }
+
+    class QAObserverAgent {
+        +observe_quality(mission_id) Result~Value~
+    }
+
+    class DocumentationAgent {
+        +generate_wiki(mission_id) Result~Value~
+        +calculate_osr(mission_id) Result~OsrMetric~
+    }
+
+    Agent <|.. RustantAgent
+    Agent <|.. ZeroClawAgent
+    Agent <|.. AuditorAgent
+    Agent <|.. FinOpsAgent
+    Agent <|.. QAObserverAgent
+    Agent <|.. DocumentationAgent
 ```
 
 ---
 
-## Agentic Interaction Flow
+## 2. Agent Behavioral Specifications
+
+### RustantAgent — Strategic Planner
+
+| Attribute | Value |
+|:---|:---|
+| **Role** | Mission planner: decomposes goals into Spec-Kit SDD task sequences |
+| **DAG Phase** | Phase 2 (Plan) + Phase 5 (Review) |
+| **Dependencies** | `McpClient` (MCP tools), `R2rClient` (GraphRAG context) |
+| **Key Flow** | R2R context retrieval → 6-phase Spec-Kit sequence → Parse `tasks.md` → Emit `SddMissionPlan` |
+| **SDD Phases** | `init` → `specify` → `plan` → `execute` → `verify` → `git-commit` |
+
+### ZeroClawAgent — TDD Developer
+
+| Attribute | Value |
+|:---|:---|
+| **Role** | Code developer: executes tasks in gVisor sandboxes with TDD discipline |
+| **DAG Phase** | Phase 3 (Code) + Phase 4 (Validation) |
+| **Dependencies** | `McpClient` (sandbox tools), `AethalgardClient` (circuit breaker) |
+| **Key Flow** | Load checkpoint → SAST pre-scan → Sandbox execution → TDD Red/Green → Validation |
+| **Circuit Breaker** | 3 retries max; escalates to Aethalgard on stagnant diff hash |
+
+### AuditorAgent — Security & Quality Auditor
+
+| Attribute | Value |
+|:---|:---|
+| **Role** | Audits DAG failures, generates recommendations, optimizes agent prompts |
+| **DAG Phase** | Phase 5 (Review) |
+| **Dependencies** | Hatchet API (failure logs), LiteLLM (analysis), `async-openai` |
+| **Key Flow** | Fetch failed DAG logs → LLM analysis → Generate recommendations → Prompt engineering loop |
+| **FinOps Tags** | `x-vtags-team: dark-gravity-ops`, `x-vtags-epic: E6.3` |
+
+### FinOpsAgent — Financial Operations
+
+| Attribute | Value |
+|:---|:---|
+| **Role** | Monitors LLM token spend, enforces budget limits, detects anomalies |
+| **DAG Phase** | Cross-cutting (runs continuously) |
+| **Dependencies** | LiteLLM spend API, `KafkaClient` (budget events) |
+| **Key Flow** | Poll LiteLLM `/spend/logs` → Evaluate spend delta → Alert/Hardstop |
+| **Thresholds** | Velocity: > $1.00/min → Alert; 90% of daily budget → Hardstop |
+
+### QAObserverAgent — Quality Assurance
+
+| Attribute | Value |
+|:---|:---|
+| **Role** | Monitors test coverage, enforces quality gates |
+| **DAG Phase** | Phase 4 (Validation) |
+
+### DocumentationAgent — Wiki Generator
+
+| Attribute | Value |
+|:---|:---|
+| **Role** | Generates wiki content, calculates OSR, triggers doc-sync |
+| **DAG Phase** | Phase 6 (Delivery) |
+| **Quality Gate** | OSR < 5% (all public AST symbols documented) |
+
+---
+
+## 3. Tool Authorization Matrix
+
+| Tool | Rustant | ZeroClaw | Auditor | FinOps | QA | Doc |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| `plan_mission` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `invoke_spec_kit` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `security_review` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| `launch_sandbox_pod` | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| `execute_code` | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| `run_tests` | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| `sync_bridge_state` | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| `introspect_k8s` | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| `retrieve_context` | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| `search_jira` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+---
+
+## 4. Comparative Behavioral Matrix
 
 ```mermaid
-sequenceDiagram
-    participant Hatchet as Hatchet DAG
-    participant RU as Rustant
-    participant ZC as ZeroClaw
-    participant MCP as Factory MCP Server
-    
-    Hatchet->>RU: Trigger Mission Planning
-    RU->>MCP: retrieve_context & plan_mission
-    MCP-->>RU: Plan Context
-    RU-->>Hatchet: Mission Plan
-    
-    Hatchet->>ZC: Trigger Execution
-    ZC->>MCP: execute_code (Sandbox)
-    MCP-->>ZC: Code Diff
-    ZC->>MCP: run_tests
-    MCP-->>ZC: Test Results
-    ZC-->>Hatchet: Implementation artifacts
-    
-    Hatchet->>RU: Trigger Review
-    RU->>MCP: security_review
-    MCP-->>RU: Audit Result
-    RU-->>Hatchet: Final Status
+graph TB
+    subgraph "Planning Agents"
+        RUST["RustantAgent<br/>SDD Planner"]
+    end
+    subgraph "Execution Agents"
+        ZC["ZeroClawAgent<br/>TDD Developer"]
+    end
+    subgraph "Verification Agents"
+        AUD["AuditorAgent<br/>Security Review"]
+        QA["QAObserverAgent<br/>Quality Gates"]
+    end
+    subgraph "Cross-Cutting Agents"
+        FIN["FinOpsAgent<br/>Budget Control"]
+        DOC["DocumentationAgent<br/>Wiki Sync"]
+    end
+
+    RUST -->|"SddMissionPlan"| ZC
+    ZC -->|"Code Changes"| AUD
+    ZC -->|"Test Results"| QA
+    FIN -.->|"Budget Check"| ZC
+    DOC -.->|"OSR Check"| RUST
+
+    style RUST fill:#2196F3,stroke:#1565C0,color:#fff
+    style ZC fill:#FF9800,stroke:#E65100,color:#fff
+    style AUD fill:#f44336,stroke:#c62828,color:#fff
+    style FIN fill:#4CAF50,stroke:#2E7D32,color:#fff
 ```
 
 ---
 
-## LLM Configuration
-
-All agents route through the **LiteLLM Gateway**:
-
-| Model | Provider | Tool Calling |
-| :--- | :--- | :--- |
-| `gemma4:12b` | LiteLLM (OpenAI-compatible) | Yes |
-| `ollama/qwen2.5-coder:7b` | LiteLLM (Ollama) | Yes |
-| `ollama/qwen2.5:7b` | LiteLLM (Ollama) | No |
-
----
-
-## CRG-Verified Agent Dependencies
-
-Based on `code-review-graph` edge analysis:
-
-- **Rustant** → Outgoing edges: `r2r_client.search()`, `mcp_client.call_tool_json()`, `tracing::info`
-- **ZeroClaw** → Outgoing edges: `mcp_client.call_tool_json()`, `tracing::info`
-- **Mission Workflow** → Orchestrates: Rustant (plan) → ZeroClaw (code) → Rustant (review) → Delivery
-- **Task Workflow** → Individual task execution with `StepCheckpoint` recovery
-
----
-
-*Last updated: 2026-07-10 — Verified against actual codebase via CRG analysis*
+> *Related: [Tactical Design](TACTICAL-DESIGN.md) · [Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md)*

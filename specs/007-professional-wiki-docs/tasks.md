@@ -72,89 +72,89 @@
 
 #### factory-core Crate Documentation
 
-- [ ] T016 [P] [US2] Rewrite wiki/crates_factory-core_src_lib.md with full crate overview, module tree, and re-export map
-- [ ] T017 [P] [US2] Rewrite wiki/crates_factory-core_src_error.md with UML class diagram for FactoryError enum variants and thiserror derivations
-- [ ] T018 [P] [US2] Rewrite wiki/crates_factory-core_src_executor.md with UML class diagram for TaskExecutor trait and Mermaid sequence diagram for task dispatch flow
-- [ ] T019 [P] [US2] Rewrite wiki/crates_factory-core_src_security.md with UML class diagram for security primitives and trust boundary model
-- [ ] T020 [P] [US2] Rewrite wiki/crates_factory-core_src_security_nhi.md with Ed25519 NHI credential issuance/verification sequence diagram
+- [X] T016 [P] [US2] Rewrite wiki/crates_factory-core_src_lib.md with full crate overview, module tree, and re-export map
+- [X] T017 [P] [US2] Rewrite wiki/crates_factory-core_src_error.md with UML class diagram for FactoryError enum variants and thiserror derivations
+- [X] T018 [P] [US2] Rewrite wiki/crates_factory-core_src_executor.md with UML class diagram for TaskExecutor trait and Mermaid sequence diagram for task dispatch flow
+- [X] T019 [P] [US2] Rewrite wiki/crates_factory-core_src_security.md with UML class diagram for security primitives and trust boundary model
+- [X] T020 [P] [US2] Rewrite wiki/crates_factory-core_src_security_nhi.md with Ed25519 NHI credential issuance/verification sequence diagram
 
 #### factory-application Crate Documentation
 
-- [ ] T021 [P] [US2] Rewrite wiki/crates_factory-application_src_lib.md with crate overview and module dependency graph
-- [ ] T022 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_mod.md with UML class diagram showing all 6 agent trait implementations and shared interface
-- [ ] T023 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_rustant.md with RustantAgent behavioral specification, tool authorization table, and planning sequence diagram
-- [ ] T024 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_zeroclaw.md with ZeroClawAgent TDD loop state machine (Red → Green → Refactor) and sandbox execution sequence
-- [ ] T025 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_auditor.md with AuditorAgent security review flow and SAST gate integration
-- [ ] T026 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_finops.md with FinOpsAgent token tracking, budget enforcement, and hardstop sequence diagram
-- [ ] T027 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_qa_observer.md with QAObserverAgent test coverage analysis and quality gate enforcement
-- [ ] T028 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_doc_agent.md with DocAgent wiki generation, OSR calculation, and doc-sync trigger flow
-- [ ] T029 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_mod.md with workflow module overview and inter-workflow dependency map
-- [ ] T030 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_autonomous_mission.md with 6-phase Hatchet DAG sequence diagram (Ingestion → Plan → Code → Validation → Review → Delivery)
-- [ ] T031 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_circuit_breaker.md with Aethelgard circuit breaker state machine (Active → Retry → Deadlock → Stuck → Override)
-- [ ] T032 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_develop_task.md with TDD task development sequence and sandbox lifecycle
-- [ ] T033 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_pipeline_remediation.md with CI/CD pipeline auto-remediation flow diagram
-- [ ] T034 [P] [US2] Rewrite wiki/crates_factory-application_src_bridge_mod.md with bridge module overview
-- [ ] T035 [P] [US2] Rewrite wiki/crates_factory-application_src_bridge_adk_driver.md with ADK driver UML and integration sequence
-- [ ] T036 [P] [US2] Rewrite wiki/crates_factory-application_src_bridge_kafka_bridge.md with Kafka bridge UML and message flow
-- [ ] T037 [P] [US2] Rewrite wiki/crates_factory-application_src_bridge_state.md with state management UML class diagram
-- [ ] T038 [P] [US2] Rewrite wiki/crates_factory-application_src_poller_service.md with outbound poller ingestion sequence diagram and GitHub/GitLab/Jira polling flow
-- [ ] T039 [P] [US2] Rewrite wiki/crates_factory-application_src_telemetry_export.md with telemetry export UML and data pipeline diagram
-- [ ] T040 [P] [US2] Rewrite wiki/crates_factory-application_src_utils_mod.md with utils module overview
-- [ ] T041 [P] [US2] Rewrite wiki/crates_factory-application_src_utils_osr.md with OSR calculator class diagram and verification algorithm flow
+- [X] T021 [P] [US2] Rewrite wiki/crates_factory-application_src_lib.md with crate overview and module dependency graph
+- [X] T022 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_mod.md with UML class diagram showing all 6 agent trait implementations and shared interface
+- [X] T023 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_rustant.md with RustantAgent behavioral specification, tool authorization table, and planning sequence diagram
+- [X] T024 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_zeroclaw.md with ZeroClawAgent TDD loop state machine (Red → Green → Refactor) and sandbox execution sequence
+- [X] T025 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_auditor.md with AuditorAgent security review flow and SAST gate integration
+- [X] T026 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_finops.md with FinOpsAgent token tracking, budget enforcement, and hardstop sequence diagram
+- [X] T027 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_qa_observer.md with QAObserverAgent test coverage analysis and quality gate enforcement
+- [X] T028 [P] [US2] Rewrite wiki/crates_factory-application_src_agents_doc_agent.md with DocAgent wiki generation, OSR calculation, and doc-sync trigger flow
+- [X] T029 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_mod.md with workflow module overview and inter-workflow dependency map
+- [X] T030 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_autonomous_mission.md with 6-phase Hatchet DAG sequence diagram (Ingestion → Plan → Code → Validation → Review → Delivery)
+- [X] T031 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_circuit_breaker.md with Aethelgard circuit breaker state machine (Active → Retry → Deadlock → Stuck → Override)
+- [X] T032 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_develop_task.md with TDD task development sequence and sandbox lifecycle
+- [X] T033 [P] [US2] Rewrite wiki/crates_factory-application_src_workflows_pipeline_remediation.md with CI/CD pipeline auto-remediation flow diagram
+- [X] T034 [P] [US2] Rewrite wiki/crates_factory-application_src_bridge_mod.md with bridge module overview
+- [X] T035 [P] [US2] Rewrite wiki/crates_factory-application_src_bridge_adk_driver.md with ADK driver UML and integration sequence
+- [X] T036 [P] [US2] Rewrite wiki/crates_factory-application_src_bridge_kafka_bridge.md with Kafka bridge UML and message flow
+- [X] T037 [P] [US2] Rewrite wiki/crates_factory-application_src_bridge_state.md with state management UML class diagram
+- [X] T038 [P] [US2] Rewrite wiki/crates_factory-application_src_poller_service.md with outbound poller ingestion sequence diagram and GitHub/GitLab/Jira polling flow
+- [X] T039 [P] [US2] Rewrite wiki/crates_factory-application_src_telemetry_export.md with telemetry export UML and data pipeline diagram
+- [X] T040 [P] [US2] Rewrite wiki/crates_factory-application_src_utils_mod.md with utils module overview
+- [X] T041 [P] [US2] Rewrite wiki/crates_factory-application_src_utils_osr.md with OSR calculator class diagram and verification algorithm flow
 
 #### factory-infrastructure Crate Documentation
 
-- [ ] T042 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_lib.md with crate overview and adapter registry
-- [ ] T043 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_github.md with GitHub adapter UML class diagram and API sequence flows
-- [ ] T044 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_gitlab.md with GitLab adapter UML class diagram and MR/pipeline interaction
-- [ ] T045 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_jira.md with Jira adapter UML and issue lifecycle sequence
-- [ ] T046 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_kafka.md with Kafka producer/consumer UML and KRaft topic architecture
-- [ ] T047 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_ziti.md with OpenZiti zero-trust overlay UML and network path diagram
-- [ ] T048 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_vault.md with Vault secret management UML and credential rotation flow
-- [ ] T049 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_r2r.md with R2R GraphRAG adapter UML and knowledge retrieval sequence
-- [ ] T050 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_aethalgard.md with Aethelgard circuit breaker infrastructure adapter UML
-- [ ] T051 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_mcp_client.md with MCP client adapter UML class diagram and tool invocation protocol
-- [ ] T052 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_pipeline_classifier.md with pipeline classifier UML and CI error taxonomy
-- [ ] T053 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_s3.md with S3 storage adapter UML
-- [ ] T054 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_sentry.md with Sentry error tracking adapter UML
-- [ ] T055 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_security_validator.md with security validation UML and Ed25519 verification sequence
-- [ ] T056 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_cursor_store.md with cursor store UML for polling state persistence
-- [ ] T057 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_git_poller.md with git poller UML and repository change detection flow
+- [X] T042 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_lib.md with crate overview and adapter registry
+- [X] T043 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_github.md with GitHub adapter UML class diagram and API sequence flows
+- [X] T044 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_gitlab.md with GitLab adapter UML class diagram and MR/pipeline interaction
+- [X] T045 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_jira.md with Jira adapter UML and issue lifecycle sequence
+- [X] T046 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_kafka.md with Kafka producer/consumer UML and KRaft topic architecture
+- [X] T047 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_ziti.md with OpenZiti zero-trust overlay UML and network path diagram
+- [X] T048 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_vault.md with Vault secret management UML and credential rotation flow
+- [X] T049 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_r2r.md with R2R GraphRAG adapter UML and knowledge retrieval sequence
+- [X] T050 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_aethalgard.md with Aethelgard circuit breaker infrastructure adapter UML
+- [X] T051 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_mcp_client.md with MCP client adapter UML class diagram and tool invocation protocol
+- [X] T052 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_pipeline_classifier.md with pipeline classifier UML and CI error taxonomy
+- [X] T053 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_s3.md with S3 storage adapter UML
+- [X] T054 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_sentry.md with Sentry error tracking adapter UML
+- [X] T055 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_security_validator.md with security validation UML and Ed25519 verification sequence
+- [X] T056 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_cursor_store.md with cursor store UML for polling state persistence
+- [X] T057 [P] [US2] Rewrite wiki/crates_factory-infrastructure_src_git_poller.md with git poller UML and repository change detection flow
 
 #### factory-mcp-server Crate Documentation
 
-- [ ] T058 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_lib.md with MCP server overview, tool registry, and protocol UML
-- [ ] T059 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_main.md with server startup sequence and configuration
-- [ ] T060 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_protocol.md with MCP protocol UML class diagram and JSON-RPC sequence
-- [ ] T061 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_sandbox.md with sandbox pod lifecycle UML and gVisor isolation architecture
-- [ ] T062 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_feedback_route.md with feedback route handler UML
-- [ ] T063 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_scratch.md with scratch workspace UML
-- [ ] T064 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_skills_context.md with skills context manager UML and Spec Kit integration
-- [ ] T065 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_skills_mod.md with skills module overview
-- [ ] T066 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_mod.md with tool registration UML and dynamic dispatch flow
-- [ ] T067 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_bridge.md with bridge tool UML
-- [ ] T068 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_execute_code.md with code execution tool UML and sandbox invocation sequence
-- [ ] T069 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_index_code.md with code indexing tool UML and R2R ingestion flow
-- [ ] T070 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_launch_sandbox_pod.md with sandbox pod launch tool UML and K8s Job/Pod lifecycle
-- [ ] T071 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_plan_mission.md with mission planning tool UML
-- [ ] T072 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_retrieve_context.md with context retrieval tool UML and GraphRAG query sequence
-- [ ] T073 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_run_tests.md with test runner tool UML and result parsing flow
-- [ ] T074 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_search_jira.md with Jira search tool UML
-- [ ] T075 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_security_review.md with security review tool UML and Semgrep SAST integration
-- [ ] T076 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_spec_kit_tool.md with Spec Kit tool UML and SDD workflow bridge
-- [ ] T077 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_spec_kit_tasks_to_issues.md with tasks-to-issues tool UML and GitHub issue creation sequence
-- [ ] T078 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_update_mission_status.md with mission status update tool UML
-- [ ] T079 [P] [US2] Rewrite wiki/spec_kit_tool.md with comprehensive Spec Kit MCP tool documentation
+- [X] T058 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_lib.md with MCP server overview, tool registry, and protocol UML
+- [X] T059 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_main.md with server startup sequence and configuration
+- [X] T060 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_protocol.md with MCP protocol UML class diagram and JSON-RPC sequence
+- [X] T061 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_sandbox.md with sandbox pod lifecycle UML and gVisor isolation architecture
+- [X] T062 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_feedback_route.md with feedback route handler UML
+- [X] T063 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_scratch.md with scratch workspace UML
+- [X] T064 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_skills_context.md with skills context manager UML and Spec Kit integration
+- [X] T065 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_skills_mod.md with skills module overview
+- [X] T066 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_mod.md with tool registration UML and dynamic dispatch flow
+- [X] T067 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_bridge.md with bridge tool UML
+- [X] T068 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_execute_code.md with code execution tool UML and sandbox invocation sequence
+- [X] T069 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_index_code.md with code indexing tool UML and R2R ingestion flow
+- [X] T070 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_launch_sandbox_pod.md with sandbox pod launch tool UML and K8s Job/Pod lifecycle
+- [X] T071 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_plan_mission.md with mission planning tool UML
+- [X] T072 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_retrieve_context.md with context retrieval tool UML and GraphRAG query sequence
+- [X] T073 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_run_tests.md with test runner tool UML and result parsing flow
+- [X] T074 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_search_jira.md with Jira search tool UML
+- [X] T075 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_security_review.md with security review tool UML and Semgrep SAST integration
+- [X] T076 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_spec_kit_tool.md with Spec Kit tool UML and SDD workflow bridge
+- [X] T077 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_spec_kit_tasks_to_issues.md with tasks-to-issues tool UML and GitHub issue creation sequence
+- [X] T078 [P] [US2] Rewrite wiki/crates_factory-mcp-server_src_tools_update_mission_status.md with mission status update tool UML
+- [X] T079 [P] [US2] Rewrite wiki/spec_kit_tool.md with comprehensive Spec Kit MCP tool documentation
 
 #### factory-cli Crate Documentation
 
-- [ ] T080 [P] [US2] Rewrite wiki/crates_factory-cli_src_main.md with CLI entry point UML and argument parsing flow
-- [ ] T081 [P] [US2] Rewrite wiki/crates_factory-cli_src_bin_trigger_mission.md with trigger_mission binary documentation and usage examples
-- [ ] T082 [P] [US2] Rewrite wiki/crates_factory-cli_src_bin_run_functional_suite.md with functional test suite binary documentation
+- [X] T080 [P] [US2] Rewrite wiki/crates_factory-cli_src_main.md with CLI entry point UML and argument parsing flow
+- [X] T081 [P] [US2] Rewrite wiki/crates_factory-cli_src_bin_trigger_mission.md with trigger_mission binary documentation and usage examples
+- [X] T082 [P] [US2] Rewrite wiki/crates_factory-cli_src_bin_run_functional_suite.md with functional test suite binary documentation
 
 #### Cross-Crate Agent Specification Page
 
-- [ ] T083 [US2] Rewrite wiki/AGENT-SPECIFICATIONS.md with consolidated UML class diagram for all 6 agents showing shared AgentTrait interface, tool authorization tables, and comparative behavioral matrix
+- [X] T083 [US2] Rewrite wiki/AGENT-SPECIFICATIONS.md with consolidated UML class diagram for all 6 agents showing shared AgentTrait interface, tool authorization tables, and comparative behavioral matrix
 
 **Checkpoint**: Every crate module has a dedicated OKF source map with UML class/sequence diagrams; AGENT-SPECIFICATIONS.md provides a unified cross-crate agent view
 
@@ -168,12 +168,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T084 [US3] Rewrite wiki/USER-MANUAL.md with comprehensive step-by-step guides for: (a) issue-triggered autonomous missions with label/resource-limit syntax, (b) PR interactive directive commands with examples, (c) CLI trigger_mission usage, (d) environment configuration with LiteLLM model switching, (e) Kubernetes manifest setup
-- [ ] T085 [US3] Rewrite wiki/PRODUCTION-OPERATIONS.md with: (a) FluxCD GitOps deployment topology, (b) Kubernetes namespace layout with node affinity/taints, (c) LiteLLM routing configuration, (d) troubleshooting runbook for common failure modes (pod crash loops, Kafka lag, Ziti tunnel drops, Hatchet DAG failures)
-- [ ] T086 [US3] Rewrite wiki/EXPERIMENT-LIFECYCLE.md with comprehensive 6-phase Hatchet DAG documentation: phase-by-phase breakdown with responsible agent, input/output artifacts, success/failure transitions, and Mermaid sequence diagram
-- [ ] T087 [P] [US3] Rewrite wiki/EXPERIMENT-LOGS.md with experiment log format documentation, telemetry schema, and dashboard integration guide
-- [ ] T088 [P] [US3] Rewrite wiki/Test_Plan_Report.md with test strategy documentation covering unit, integration, functional, and SAST security testing across all crates
-- [ ] T089 [P] [US3] Rewrite wiki/src-mission.md with mission data model documentation and event-driven architecture flow
+- [X] T084 [US3] Rewrite wiki/USER-MANUAL.md with comprehensive step-by-step guides for: (a) issue-triggered autonomous missions with label/resource-limit syntax, (b) PR interactive directive commands with examples, (c) CLI trigger_mission usage, (d) environment configuration with LiteLLM model switching, (e) Kubernetes manifest setup
+- [X] T085 [US3] Rewrite wiki/PRODUCTION-OPERATIONS.md with: (a) FluxCD GitOps deployment topology, (b) Kubernetes namespace layout with node affinity/taints, (c) LiteLLM routing configuration, (d) troubleshooting runbook for common failure modes (pod crash loops, Kafka lag, Ziti tunnel drops, Hatchet DAG failures)
+- [X] T086 [US3] Rewrite wiki/EXPERIMENT-LIFECYCLE.md with comprehensive 6-phase Hatchet DAG documentation: phase-by-phase breakdown with responsible agent, input/output artifacts, success/failure transitions, and Mermaid sequence diagram
+- [X] T087 [P] [US3] Rewrite wiki/EXPERIMENT-LOGS.md with experiment log format documentation, telemetry schema, and dashboard integration guide
+- [X] T088 [P] [US3] Rewrite wiki/Test_Plan_Report.md with test strategy documentation covering unit, integration, functional, and SAST security testing across all crates
+- [X] T089 [P] [US3] Rewrite wiki/src-mission.md with mission data model documentation and event-driven architecture flow
 
 **Checkpoint**: An operator with zero prior context can deploy, configure, trigger, and troubleshoot autonomous missions using only wiki documentation
 
@@ -190,8 +190,8 @@
 - [X] T090 [US4] Create new wiki/SECURITY-ARCHITECTURE.md with: (a) Zero Trust security model overview, (b) OpenZiti overlay networking architecture with Mermaid diagram, (c) Ed25519 NHI credential issuance/verification lifecycle sequence diagram, (d) sandbox containment architecture (gVisor, resource quotas, network isolation), (e) Semgrep SAST gate integration, (f) circuit breaker anti-deadlock safeguards, (g) STRIDE threat model mapping
 - [X] T091 [US4] Create new wiki/HITL-GOVERNANCE.md with: (a) 4-vertex governance mesh specification (Strategic Injection, Sprint Mobilization, Exception Override, Categorical Scrutiny), (b) human roles and responsibilities matrix, (c) trigger conditions and enforcement mechanisms, (d) docs-to-wiki.yml sync pipeline documentation, (e) governance Mermaid state diagram
 - [X] T092 [US4] Create new wiki/COMPLIANCE-AUDIT.md with: (a) Hazitek 2026 / SPRI / EU AI Act Art. 12 & 14 compliance framework, (b) automated telemetry packager specification (AST deltas, compute core-hours, FinOps token logs), (c) Ed25519 cryptographic NHI claims and verifiable credentials, (d) audit trail data model and export format
-- [ ] T093 [US4] Rewrite wiki/VERIFICATION-TRIAD.md with: (a) Logical verification gate (unit/integration tests), (b) Architectural verification gate (linting, dependency analysis), (c) Security verification gate (SAST, NHI credential checks), (d) Mermaid diagram showing triad gate pipeline
-- [ ] T094 [US4] Rewrite wiki/INFRASTRUCTURE-ADAPTERS.md with: (a) Kafka KRaft event bus architecture, (b) R2R GraphRAG knowledge retrieval, (c) OpenZiti zero-trust networking, (d) Vault secret management, (e) Sentry error tracking, (f) S3 artifact storage — each with UML class diagrams and integration sequence diagrams
+- [X] T093 [US4] Rewrite wiki/VERIFICATION-TRIAD.md with: (a) Logical verification gate (unit/integration tests), (b) Architectural verification gate (linting, dependency analysis), (c) Security verification gate (SAST, NHI credential checks), (d) Mermaid diagram showing triad gate pipeline
+- [X] T094 [US4] Rewrite wiki/INFRASTRUCTURE-ADAPTERS.md with: (a) Kafka KRaft event bus architecture, (b) R2R GraphRAG knowledge retrieval, (c) OpenZiti zero-trust networking, (d) Vault secret management, (e) Sentry error tracking, (f) S3 artifact storage — each with UML class diagrams and integration sequence diagrams
 
 **Checkpoint**: Security auditor can trace the complete trust chain; compliance officer can extract R&D evidence; all 4 HITL vertices are formally modeled
 
@@ -201,14 +201,14 @@
 
 **Purpose**: Final quality assurance, link validation, navigation coherence, and OSR quality gate
 
-- [ ] T095 Update wiki/index.md with comprehensive master index linking all 84+ wiki files organized by category (Navigation, Business, Architecture, Agents, Lifecycle, Operations, Security, Compliance, Crate References)
-- [ ] T096 Update wiki/Home.md with final navigation links reflecting all new pages (SECURITY-ARCHITECTURE.md, HITL-GOVERNANCE.md, COMPLIANCE-AUDIT.md)
-- [ ] T097 Update wiki/_Sidebar.md with final hierarchical sidebar navigation including all pages and sections
-- [ ] T098 [P] Validate all internal markdown cross-references — zero broken links across all wiki/ files
-- [ ] T099 [P] Validate all Mermaid diagram blocks for syntax correctness — zero rendering errors
-- [ ] T100 [P] Verify OKF frontmatter completeness on all applicable wiki pages
-- [ ] T101 Run quickstart.md validation scenarios (7 scenarios + OSR gate) per specs/007-professional-wiki-docs/quickstart.md
-- [ ] T102 Final review: Verify wiki contract compliance against specs/007-professional-wiki-docs/contracts/wiki-contract.json
+- [X] T095 Update wiki/index.md with comprehensive master index linking all 84+ wiki files organized by category (Navigation, Business, Architecture, Agents, Lifecycle, Operations, Security, Compliance, Crate References)
+- [X] T096 Update wiki/Home.md with final navigation links reflecting all new pages (SECURITY-ARCHITECTURE.md, HITL-GOVERNANCE.md, COMPLIANCE-AUDIT.md)
+- [X] T097 Update wiki/_Sidebar.md with final hierarchical sidebar navigation including all pages and sections
+- [X] T098 [P] Validate all internal markdown cross-references — zero broken links across all wiki/ files
+- [X] T099 [P] Validate all Mermaid diagram blocks for syntax correctness — zero rendering errors
+- [X] T100 [P] Verify OKF frontmatter completeness on all applicable wiki pages
+- [X] T101 Run quickstart.md validation scenarios (7 scenarios + OSR gate) per specs/007-professional-wiki-docs/quickstart.md
+- [X] T102 Final review: Verify wiki contract compliance against specs/007-professional-wiki-docs/contracts/wiki-contract.json
 
 ---
 

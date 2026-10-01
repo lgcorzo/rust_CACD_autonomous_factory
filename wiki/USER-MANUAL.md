@@ -1,205 +1,136 @@
-# 🏭 Dark Gravity — User Manual
+# User Manual — Dark Gravity CA/CD Autonomous Factory
 
-Welcome to the **Dark Gravity Autonomous CA/CD Multi-Agent Software Factory**. Dark Gravity is a high-performance, long-term agentic system built in Rust and designed for Continuous Agentic / Continuous Deployment (CA/CD). It operates within a Zero Trust Kubernetes cluster, where multiple AI agents ingest, plan, code, validate, and document software autonomously.
-
-This manual will guide you through the initial setup, operational workflows, agent usage, and the tools necessary to interact with the factory.
+> **Purpose**: Comprehensive step-by-step guides for all operational scenarios.
 
 ---
 
-## 1. System Overview
+## 1. Issue-Triggered Autonomous Missions
 
-The factory runs a durable multi-agent orchestrator backed by **Hatchet** workflows. It divides labor among four primary agent profiles:
+### Step 1: Create a GitHub Issue
 
-1. **PO Agent (Product Owner):** Uses the Spec-Kit pipeline to write technical specifications, clarify requirements, and define atomic tasks based on the project constitution.
-2. **Developer Agent:** Consumes tasks from the PO Agent, writing and refactoring code using Aider CLI within sandboxed Micro-VMs (Firecracker / gVisor).
-3. **DevOps Agent:** Triggers the Aethelgard Auto-Remediation loop, catching test and build failures and feeding them back for a max of 3 retries.
-4. **Documentation Agent:** Triggered upon merge, using the Superpowers framework to update Git Wiki and C4 models based on real compiled source analysis.
+Create an issue in the monitored repository with the required labels:
+
+```markdown
+Title: Fix compilation error in config.rs module
+
+Labels: autonomous-mission, dark-gravity
+
+Body:
+This issue requests an autonomous fix for the compilation error
+in the `config.rs` module caused by a missing `Default` implementation.
+
+Resource limits: CPU: 500m, RAM: 512Mi, Timeout: 300s
+```
+
+**Required labels** (at least one): `autonomous-mission`, `dark-gravity`
+
+### Step 2: Resource Limits Syntax
+
+Include resource limits in the issue body:
+
+```
+Resource limits: CPU: <millicores>, RAM: <memory>, Timeout: <seconds>
+```
+
+### Step 3: Monitor Progress
+
+The factory will:
+1. **Ingest** the issue via PollerDaemonService
+2. **Plan** the mission via RustantAgent
+3. **Code** the fix via ZeroClawAgent in a gVisor sandbox
+4. **Validate** tests and SAST gate
+5. **Review** the changes
+6. **Deliver** a PR for human review (HITL Vertex 4)
 
 ---
 
-## 2. Prerequisites & Setup
+## 2. PR Interactive Directive Commands
 
-### Environment Requirements
-- **Rust Toolchain:** Version 1.75+
-- **Python:** Version 3.11+
-- **Hatchet Server:** For durable DAG workflow orchestration.
-- **Kafka:** (Confluent Cloud or local) for telemetry.
-- **Docker/Kubernetes:** For deploying agent environments.
+Tag the bot in any PR comment:
 
-### Component Installation
+| Command | Example | Description |
+|:---|:---|:---|
+| `/status` | `@darkgravity /status` | Query factory health and DAG state |
+| `/interact` | `@darkgravity /interact How does the config module work?` | Natural-language query |
+| `/refine` | `@darkgravity /refine Fix the off-by-one error in line 42` | Request code edits |
+| `/validate` | `@darkgravity /validate` | Run full test + SAST verification |
 
-The factory's intelligence is primarily driven from the `rust_CACD_autonomous_factory` codebase. To get started:
+Also accepts `@dark-gravity` prefix.
+
+---
+
+## 3. CLI trigger_mission Usage
 
 ```bash
-# Clone the Rust Factory Repo
-git clone https://github.com/lgcorzo/rust_CACD_autonomous_factory
-cd rust_CACD_autonomous_factory
+# Manual mission trigger
+factory-cli trigger-mission \
+  --repo "lgcorzo/rust_CACD_autonomous_factory" \
+  --title "Fix compilation error in config.rs" \
+  --labels "autonomous-mission,dark-gravity"
 
-# Build the workspace
-cargo build --release
-```
+# Run functional test suite
+factory-cli run-functional-suite
 
-Ensure your `.env` is configured correctly for telemetry:
-```env
-KAFKA_BROKERS=my-kafka-cluster-bootstrap.confluent.svc.cluster.local:9092
+# Trigger deep knowledge search
+factory-cli trigger-deep-search --query "circuit breaker patterns"
 ```
 
 ---
 
-## 3. Running the Factory Worker
+## 4. Environment Configuration
 
-The central nervous system of Dark Gravity is the Rust worker. This worker listens to Hatchet events and processes agent missions across the 6-phase DAG (`Ingestion` → `Plan` → `Code` → `Validation` → `Review` → `Delivery`).
-
-To start the factory worker:
-```bash
-# Point to your MCP gateway URL
-cargo run -p factory-cli -- worker --mcp-url http://localhost:8100
-```
-*Note: All communications run over mTLS 1.3 using the OpenZiti Dark Mesh overlay for Zero Trust security.*
-
----
-
-## 4. Workflows & Usage Guide
-
-### 4.1. Spec-Driven Development (UC-1)
-The **PO Agent** handles specification and task creation using the **Spec-Kit** pipeline. Before writing any code, the factory generates strict plans.
-
-1. **Install Spec-Kit & SuperSpec Bridge:**
-   Spec-Kit se conecta con Superpowers mediante **SuperSpec** ([WangX0111/superspec](https://github.com/WangX0111/superspec)), el puente comunitario que inyecta directrices de alta calidad en la carpeta `.specify/extensions/superspec/`.
-
-   ```bash
-   # 1. Instalar Spec-Kit CLI
-   uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
-   specify init autonomous_factory
-
-   # 2. Instalar el puente SuperSpec (Spec-Kit + Superpowers)
-   mkdir -p .specify/extensions/superspec
-   curl -L https://github.com/WangX0111/superspec/archive/refs/heads/main.zip -o superspec.zip
-   unzip -o superspec.zip -d /tmp/superspec_temp
-   cp -r /tmp/superspec_temp/superspec-main/* .specify/extensions/superspec/
-   rm -rf superspec.zip /tmp/superspec_temp
-   ```
-
-2. **Core Pipeline Commands:**
-   - `/speckit.constitution`: Applies global constraints (e.g., RAM limits, Zero Trust).
-   - `/speckit.specify`: Defines what & why.
-   - `/speckit.plan`: Outputs the architectural blueprint (`plan.md`).
-   - `/speckit.tasks`: Outputs parallelized developer tasks (`tasks.md`).
-   - `/speckit.taskstoissues`: Pushes atomic tasks to GitLab Issues.
-
-### 4.2. Tooling: Graphify & Code Review Graph
-Agents need profound context. The factory utilizes **Graphify** to construct a navigable AST-based knowledge graph of your project.
-
-**Installation:**
-```bash
-uv tool install graphifyy
-uv tool install code-review-graph
-graphify install
-code-review-graph install -y --platform antigravity
-```
-
-**Usage Commands:**
-- **Refresh the Graph (Fast, No API Calls):**
-  ```bash
-  graphify update .
-  ```
-- **Ask the Graph:**
-  ```bash
-  graphify query "Explain the architecture of the Rustant planner"
-  ```
-- **Code Review Context:**
-  ```bash
-  code-review-graph detect-changes
-  code-review-graph embed
-  ```
-
-*(Ensure `.env` contains the required `OPENAI_API_KEY` or LiteLLM gateway endpoints for embeddings).*
-
-### 4.3. Documentation Generation (UC-4)
-Once code is merged, the **Documentation Agent** executes automatically. It uses **Superpowers** to prevent hallucinatory documentation. 
-
-To manually manage these capabilities or add custom skills:
-- Look inside `.agents/skills/`.
-- Skills like `updating-c4-models` and `writing-wiki-markdown` enforce formatting.
-- The factory uses an **Orphan Symbol Rate (OSR)** check. If the agent writes documentation for a variable/class that doesn't actually exist in the code, the pipeline is automatically halted and regenerated.
-
----
-
-## 5. Standard Operating Procedures (Human-in-the-Loop)
-
-While the factory is highly autonomous, the **Anthropic Institute** guidelines strictly define human interaction at 4 specific vertices:
-
-1. **Epic Creation:** You define the high-level *WHAT*. The PO Agent defines the *HOW*.
-2. **Sprint Approval:** The Tech Lead reviews and approves the issues generated by Spec-Kit.
-3. **Exception Override:** If an agent gets stuck past its 3-retry auto-remediation limit, a human steps in to unblock.
-4. **Merge Approval:** Senior Developers review final Merge Requests strictly for architectural patterns and business logic validation.
-
----
-
-## 6. Development & Contributing
-
-When making changes to the factory's Rust core (`rust_CACD_autonomous_factory`), enforce standards via:
+### LiteLLM Model Switching
 
 ```bash
-# Check formatting
-cargo fmt --all -- --check
+# Default agent model
+export LITELLM_MODEL="ollama/qwen2.5:7b"
 
-# Strict Linting
-cargo clippy --workspace -- -D warnings
+# Planner model (higher capability)
+export LITELLM_PLANNER_MODEL="gpt-oss-120b"
 
-# Execute test suite
-cargo test --workspace
+# LiteLLM API endpoint
+export LITELLM_API_BASE="http://litellm.llm-apps.svc.cluster.local:4000/v1"
+
+# FinOps configuration
+export FINOPS_MAX_DAILY_BUDGET="50"
+export FINOPS_TEAM="dark-gravity-ops"
+export FINOPS_EPIC="HAZITEK-2026"
+```
+
+### Key Environment Variables
+
+| Variable | Default | Purpose |
+|:---|:---|:---|
+| `LITELLM_MODEL` | `ollama/qwen2.5:7b` | Default LLM for agents |
+| `LITELLM_PLANNER_MODEL` | `gpt-oss-120b` | High-capability planner LLM |
+| `LITELLM_API_BASE` | `http://litellm:4000/v1` | LiteLLM proxy endpoint |
+| `HATCHET_API_URL` | `http://hatchet:8080` | Hatchet orchestrator |
+| `FINOPS_MAX_DAILY_BUDGET` | `50` | Daily spend limit (USD) |
+| `FACTORY_MODELS_CONFIG` | — | Custom model config path |
+
+---
+
+## 5. Kubernetes Manifest Setup
+
+Deploy via FluxCD GitOps:
+
+```yaml
+# K8s namespace layout
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dark-gravity
+  labels:
+    app.kubernetes.io/part-of: dark-gravity
+---
+# Core namespaces:
+# - dark-gravity: Factory services
+# - orchestrators: Hatchet, Kafka
+# - llm-apps: LiteLLM, R2R
+# - sandbox-exec: gVisor agent pods
+# - observability: Sentry, Grafana
 ```
 
 ---
 
-## 7. Connecting a New Project for Autonomous Development
-
-To create a new project in GitLab, connect it to Antigravity (the factory), and start developing autonomously, follow this step-by-step procedure:
-
-### 7.1. Create the Project in GitLab
-1. Log in to your GitLab instance.
-2. Click **New project/repository** -> **Create blank project**.
-3. Provide a project name, set the appropriate visibility level, and initialize it with a README.
-
-### 7.2. Configure Factory Webhooks and Access
-To allow Antigravity to listen to events and commit code to your repository:
-1. **API Tokens**: Go to **Settings > Access Tokens**. Create a Project Access Token with `api`, `read_repository`, and `write_repository` scopes. Add this token and your GitLab Project ID to the factory worker's `.env` file (`GITLAB_API_TOKEN` and `GITLAB_PROJECT`).
-2. **Webhook Setup**: Go to **Settings > Webhooks**. Add a webhook pointing to the factory's internal `n8n` event router URL. Check the box for **Epic events** to trigger the pipeline.
-3. **Labels**: Create a project label named `autonomous-plan`.
-
-### 7.3. Initialize the Agent Environment
-Clone your new repository locally and prepare the factory's tools:
-```bash
-# Initialize Spec-Kit for the PO Agent
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
-specify init your_project_name
-
-# Build the initial AST Knowledge Graph
-graphify install
-graphify update .
-code-review-graph embed
-```
-Push the `.specify` configuration and `.graphifyignore` files to your `main` branch.
-
-### 7.4. Start Autonomous Development
-The factory is strictly event-driven. To command Antigravity to write code:
-1. In GitLab, navigate to **Plan > Epics**.
-2. Create a new Epic detailing the high-level business goal or feature you want built (e.g., "Implement a secure REST API for user management").
-3. Assign the label `autonomous-plan` to the Epic.
-4. **Execution**: The webhook will fire. The PO Agent will ingest the Epic, decompose it into technical `tasks.md`, convert those tasks into GitLab Issues, and the Developer Agent will automatically check out branches and begin writing code inside a secure sandbox.
-
-### 7.5. Connecting Sentry for Incident Auto-Remediation
-To close the feedback loop between production failures and development, the factory integrates a **QA Observer Agent** that connects to your project's Sentry instance.
-
-1. **API Tokens**: Generate a Sentry Auth Token with `event:read` and `project:read` permissions.
-2. **Environment Variables**: Add the following Sentry credentials to the factory worker's `.env` file:
-   ```env
-   SENTRY_URL=https://sentry.io          # Or your self-hosted Sentry instance
-   SENTRY_API_TOKEN=your-sentry-token
-   SENTRY_PROJECT=your-project-slug
-   ```
-3. **Execution Flow**: Once configured, the QA Observer Agent polls Sentry every 15 minutes. When a new exception or user bug report is detected:
-   - The agent extracts the stack trace and telemetry data.
-   - It queries the R2R GraphRAG to map the error to the responsible code module or microservice.
-   - It automatically generates a prioritized **GitLab Issue** and labels it `autonomous-plan`, seamlessly triggering the PO Agent to plan a fix and the Developer Agent to implement it.
+> *Related: [Production Operations](PRODUCTION-OPERATIONS.md) · [HITL Governance](HITL-GOVERNANCE.md)*

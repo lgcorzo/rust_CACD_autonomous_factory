@@ -1,21 +1,38 @@
-# EXPERIMENT-LOGS: Historical Audit
+# Experiment Logs — Telemetry Schema
 
-This document is a formal audit trail of all factory activities. It records every mission's outcome.
-
----
-
-## Mission History
-
-| Mission ID | Goal | Status | Summary | Artifacts |
-| :--- | :--- | :--- | :--- | :--- |
-| *(No missions executed yet)* | | | | |
+> **Purpose**: Experiment log format, telemetry schema, and dashboard integration.
 
 ---
 
-## Aggregated Insights
+## Log Format
 
-- **Total Missions**: 0
-- **Average Success Rate**: N/A
-- **Mean Latency**: N/A
+```json
+{
+  "mission_id": "uuid",
+  "phase": "Plan|Code|Validation|Review|Delivery",
+  "agent": "RustantAgent|ZeroClawAgent|AuditorAgent",
+  "timestamp": "2026-10-01T12:00:00Z",
+  "duration_ms": 1500,
+  "status": "success|failure|timeout",
+  "metrics": {
+    "tokens_used": 5420,
+    "files_modified": 3,
+    "tests_passed": 12,
+    "tests_failed": 0,
+    "sast_score": 9.5
+  }
+}
+```
 
-> This log will be populated as missions are executed by the factory. Each mission creates a GitHub PR upon successful delivery.
+## Dashboard Integration
+
+| Metric | Source | Dashboard |
+|:---|:---|:---|
+| Mission throughput | Hatchet API | Grafana: Missions/hour |
+| Token spend | LiteLLM /spend/logs | Grafana: FinOps panel |
+| SAST gate pass rate | AuditorAgent | Grafana: Security panel |
+| Circuit breaker trips | Aethelgard | Grafana: Reliability panel |
+
+---
+
+> *Related: [Experiment Lifecycle](EXPERIMENT-LIFECYCLE.md) · [Compliance & Audit](COMPLIANCE-AUDIT.md)*
