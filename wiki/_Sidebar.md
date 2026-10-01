@@ -39,6 +39,7 @@
 
 ### factory-core
 - [lib.rs](crates_factory-core_src_lib)
+- [config.rs](crates_factory-core_src_config)
 - [error.rs](crates_factory-core_src_error)
 - [executor.rs](crates_factory-core_src_executor)
 - [security.rs](crates_factory-core_src_security)
@@ -58,13 +59,17 @@
   - [mod.rs](crates_factory-application_src_workflows_mod)
   - [autonomous_mission.rs](crates_factory-application_src_workflows_autonomous_mission)
   - [circuit_breaker.rs](crates_factory-application_src_workflows_circuit_breaker)
+  - [comment_control.rs](crates_factory-application_src_workflows_comment_control)
+  - [deep_research.rs](crates_factory-application_src_workflows_deep_research)
   - [develop_task.rs](crates_factory-application_src_workflows_develop_task)
   - [pipeline_remediation.rs](crates_factory-application_src_workflows_pipeline_remediation)
 - **Bridge**
   - [mod.rs](crates_factory-application_src_bridge_mod)
   - [adk_driver.rs](crates_factory-application_src_bridge_adk_driver)
   - [kafka_bridge.rs](crates_factory-application_src_bridge_kafka_bridge)
+  - [semantica_bridge.rs](crates_factory-application_src_bridge_semantica_bridge)
   - [state.rs](crates_factory-application_src_bridge_state)
+- [gitlab_verifier.rs](crates_factory-application_src_gitlab_verifier)
 - [poller_service.rs](crates_factory-application_src_poller_service)
 - [telemetry_export.rs](crates_factory-application_src_telemetry_export)
 - [utils/osr.rs](crates_factory-application_src_utils_osr)
@@ -78,6 +83,7 @@
 - [ziti.rs](crates_factory-infrastructure_src_ziti)
 - [vault.rs](crates_factory-infrastructure_src_vault)
 - [r2r.rs](crates_factory-infrastructure_src_r2r)
+- [semantica.rs](crates_factory-infrastructure_src_semantica)
 - [aethalgard.rs](crates_factory-infrastructure_src_aethalgard)
 - [mcp_client.rs](crates_factory-infrastructure_src_mcp_client)
 - [pipeline_classifier.rs](crates_factory-infrastructure_src_pipeline_classifier)
@@ -90,6 +96,7 @@
 - [main.rs](crates_factory-mcp-server_src_main)
 - [protocol.rs](crates_factory-mcp-server_src_protocol)
 - [sandbox.rs](crates_factory-mcp-server_src_sandbox)
+- [github_webhook.rs](crates_factory-mcp-server_src_github_webhook)
 - **Tools**
   - [execute_code.rs](crates_factory-mcp-server_src_tools_execute_code)
   - [launch_sandbox_pod.rs](crates_factory-mcp-server_src_tools_launch_sandbox_pod)
@@ -98,8 +105,14 @@
   - [spec_kit_tool.rs](crates_factory-mcp-server_src_tools_spec_kit_tool)
   - [plan_mission.rs](crates_factory-mcp-server_src_tools_plan_mission)
   - [retrieve_context.rs](crates_factory-mcp-server_src_tools_retrieve_context)
+  - [deep_research_tool.rs](crates_factory-mcp-server_src_tools_deep_research_tool)
+  - [get_factory_status.rs](crates_factory-mcp-server_src_tools_get_factory_status)
+  - [inspect_kafka_topic.rs](crates_factory-mcp-server_src_tools_inspect_kafka_topic)
+  - [list_minio_buckets.rs](crates_factory-mcp-server_src_tools_list_minio_buckets)
+  - [list_minio_objects.rs](crates_factory-mcp-server_src_tools_list_minio_objects)
 
 ### factory-cli
 - [main.rs](crates_factory-cli_src_main)
 - [trigger_mission.rs](crates_factory-cli_src_bin_trigger_mission)
 - [run_functional_suite.rs](crates_factory-cli_src_bin_run_functional_suite)
+- [trigger_deep_search.rs](crates_factory-cli_src_bin_trigger_deep_search)
