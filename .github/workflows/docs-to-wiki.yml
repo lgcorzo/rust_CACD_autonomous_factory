@@ -39,8 +39,8 @@ jobs:
           # 3. Clean all files in wiki_temp (except .git)
           find wiki_temp -mindepth 1 -maxdepth 1 -not -name ".git" -exec rm -rf {} +
           
-          # 4. Copy everything from 'wiki/' folder to wiki_temp root
-          cp -r wiki/* wiki_temp/
+          # 4. Transform modular wiki docs to flat GitHub Wiki export with resolved links
+          python3 scripts/prepare_wiki_for_github.py --source wiki --dest wiki_temp
           
           # 5. Commit and push changes
           cd wiki_temp
@@ -91,10 +91,8 @@ jobs:
           SYNC_BRANCH="wiki-sync-$(date +%s)"
           git checkout -b "$SYNC_BRANCH"
           
-          # 4. Sync contents from wiki_temp to the local wiki/ folder
-          rm -rf wiki/*
-          cp -r wiki_temp/* wiki/
-          rm -rf wiki/.git
+          # 4. Sync contents from wiki_temp to the local hierarchical wiki/ folder
+          python3 scripts/prepare_wiki_for_github.py --reverse --source wiki_temp --dest wiki
           
           # 5. Cleanup wiki_temp and Push the new branch
           rm -rf wiki_temp
