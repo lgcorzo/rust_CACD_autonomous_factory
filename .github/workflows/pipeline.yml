@@ -46,6 +46,9 @@ jobs:
           fi
           echo "Spec artifacts verified."
 
+      - name: Verify Wiki Flat Export Integrity
+        run: python3 scripts/test_prepare_wiki_for_github.py
+
       - name: Install System Dependencies
         run: |
           sudo sed -i 's/azure\.archive\.ubuntu\.com/archive\.ubuntu\.com/g' /etc/apt/apt-mirrors.txt /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
