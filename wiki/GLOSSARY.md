@@ -1,3 +1,16 @@
+---
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
+title: "Glossary — Dark Gravity CA/CD Autonomous Factory"
+description: "ISO 42010 ComponentView / ISO 15289 Description documentation for Glossary — Dark Gravity CA/CD Autonomous Factory."
+tags: ['iso42010', 'okf']
+timestamp: "2026-10-01T14:00:00Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "fbdc5848"
+---
+
 # Glossary — Dark Gravity CA/CD Autonomous Factory
 
 > **Purpose**: Ubiquitous language dictionary for the Dark Gravity project. Defines all domain terms, agent names, protocol acronyms, and architectural concepts used throughout this wiki.

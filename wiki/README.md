@@ -1,3 +1,16 @@
+---
+iso_doc_type: "Description"
+iso_viewpoint: "ComponentView"
+type: "module"
+title: "Dark Gravity — Autonomous Agent Factory (CA/CD)"
+description: "ISO 42010 ComponentView / ISO 15289 Description documentation for Dark Gravity — Autonomous Agent Factory (CA/CD)."
+tags: ['iso42010', 'okf']
+timestamp: "2026-10-01T14:00:00Z"
+generated: "agent:okf-professional-documenter"
+verified: "true"
+last_verified_commit: "fbdc5848"
+---
+
 # Dark Gravity — Autonomous Agent Factory (CA/CD)
 
 Welcome to the official documentation for the **Dark Gravity Autonomous Agent Factory**. This project implements a **Continuous Agentic / Continuous Deployment (CA/CD)** pipeline following **Domain-Driven Design (DDD)** and **Onion Architecture** standards.
@@ -8,14 +21,14 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 
 | Section | Description | Key Topics |
 | :--- | :--- | :--- |
-| [**Business Understanding**](BUSINESS-CONTEXT) | The "Why" and "What" | ROI, KPIs, Workforce, Mission Lifecycle. |
-| [**Architecture**](STRATEGIC-DESIGN) | Technical Blueprint | DDD Layers, ADRs, Bounded Contexts, Zero Trust. |
-| [**Execution Flows**](EXPERIMENT-LIFECYCLE) | How it Works | 6-Phase DAG, Agent Orchestration, Mission Lifecycle. |
-| [**Agent Specifications**](AGENT-SPECIFICATIONS) | Specialized Workers | **Rustant** (Planner), **ZeroClaw** (Executor), **DevOps**, **Documentation**. |
-| [**Testing Strategy**](VERIFICATION-TRIAD) | Quality Assurance | Logical, Architectural, Security Validation. |
-| [**Integrations**](INFRASTRUCTURE-ADAPTERS) | External Connectivity | **Kafka**, **R2R GraphRAG**, **OpenZiti**, **Jira**, **S3**, **Sentry**. |
-| [**Deployment Guide**](PRODUCTION-OPERATIONS) | Operations & Scaling | GitOps, K8s Manifests, KEDA, Sealed Secrets. |
-| [**User Manual**](USER-MANUAL) | User Guides | Project onboarding, setup, and usage. |
+| [**Business Understanding**](architecture/business_context.md) | The "Why" and "What" | ROI, KPIs, Workforce, Mission Lifecycle. |
+| [**Architecture**](architecture/strategic_design.md) | Technical Blueprint | DDD Layers, ADRs, Bounded Contexts, Zero Trust. |
+| [**Execution Flows**](architecture/runtime_sequences.md) | How it Works | 6-Phase DAG, Agent Orchestration, Mission Lifecycle. |
+| [**Agent Specifications**](architecture/agent_specifications.md) | Specialized Workers | **Rustant** (Planner), **ZeroClaw** (Executor), **DevOps**, **Documentation**. |
+| [**Testing Strategy**](security/verification_triad.md) | Quality Assurance | Logical, Architectural, Security Validation. |
+| [**Integrations**](architecture/infrastructure_adapters.md) | External Connectivity | **Kafka**, **R2R GraphRAG**, **OpenZiti**, **Jira**, **S3**, **Sentry**. |
+| [**Deployment Guide**](operations/production_operations.md) | Operations & Scaling | GitOps, K8s Manifests, KEDA, Sealed Secrets. |
+| [**User Manual**](operations/user_manual.md) | User Guides | Project onboarding, setup, and usage. |
 
 ---
 
