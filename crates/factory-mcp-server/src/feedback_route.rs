@@ -8,11 +8,27 @@ use factory_core::UserFeedbackPayload;
 use factory_infrastructure::HttpGitlabClient;
 use std::sync::Arc;
 
+// Security Control: Sanitize user input fields to prevent Markdown injection, backtick code escape, and CRLF injection.
+pub fn sanitize_feedback_single_line(s: &str) -> String {
+    s.replace('\r', "").replace('\n', " ").replace('`', "'")
+}
+
+pub fn sanitize_feedback_multiline(s: &str) -> String {
+    s.replace('\r', "").replace('`', "'")
+}
+
 pub async fn handle_feedback(
     State(_server): State<Arc<McpServer>>,
     Json(payload): Json<UserFeedbackPayload>,
 ) -> impl IntoResponse {
-    tracing::info!("Received feedback payload from user {}", payload.user_id);
+    let clean_user_id = sanitize_feedback_single_line(&payload.user_id);
+    let clean_sentiment = sanitize_feedback_single_line(&payload.sentiment);
+    let clean_session_id = sanitize_feedback_single_line(
+        &payload.session_id.unwrap_or_else(|| "Unknown".to_string()),
+    );
+    let clean_feedback_text = sanitize_feedback_multiline(&payload.feedback_text);
+
+    tracing::info!("Received feedback payload from user {}", clean_user_id);
 
     let gitlab_url =
         std::env::var("GITLAB_URL").unwrap_or_else(|_| "https://gitlab.com".to_string());
@@ -26,11 +42,11 @@ pub async fn handle_feedback(
 
     let gitlab_client = Arc::new(HttpGitlabClient::new(gitlab_url, gitlab_token));
 
-    if payload.sentiment.to_lowercase() == "bug" || payload.sentiment.to_lowercase() == "negative" {
+    if clean_sentiment.to_lowercase() == "bug" || clean_sentiment.to_lowercase() == "negative" {
         let title = format!(
             "[Feedback] {} from {}",
-            payload.sentiment.to_uppercase(),
-            payload.user_id
+            clean_sentiment.to_uppercase(),
+            clean_user_id
         );
 
         let description = format!(
@@ -43,10 +59,10 @@ pub async fn handle_feedback(
              ### Instructions for Agent\n\
              Please review this user feedback and address any underlying issues.\n\n\
              [RESOURCE_LIMIT: RAM <= 30Mi]",
-            payload.user_id,
-            payload.session_id.unwrap_or_else(|| "Unknown".to_string()),
-            payload.sentiment,
-            payload.feedback_text
+            clean_user_id,
+            clean_session_id,
+            clean_sentiment,
+            clean_feedback_text
         );
 
         use factory_infrastructure::GitlabClient;
@@ -76,5 +92,24 @@ pub async fn handle_feedback(
             payload.sentiment
         );
         (StatusCode::OK, "Feedback processed").into_response()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sanitize_feedback_single_line() {
+        let input = "user_123`\r\nwith_newline`and_backticks";
+        let sanitized = sanitize_feedback_single_line(input);
+        assert_eq!(sanitized, "user_123' with_newline'and_backticks");
+    }
+
+    #[test]
+    fn test_sanitize_feedback_multiline() {
+        let input = "Line 1`\r\nLine 2`\nLine 3";
+        let sanitized = sanitize_feedback_multiline(input);
+        assert_eq!(sanitized, "Line 1'\nLine 2'\nLine 3");
     }
 }
