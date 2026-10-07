@@ -23,9 +23,8 @@ pub async fn handle_feedback(
 ) -> impl IntoResponse {
     let clean_user_id = sanitize_feedback_single_line(&payload.user_id);
     let clean_sentiment = sanitize_feedback_single_line(&payload.sentiment);
-    let clean_session_id = sanitize_feedback_single_line(
-        &payload.session_id.unwrap_or_else(|| "Unknown".to_string()),
-    );
+    let clean_session_id =
+        sanitize_feedback_single_line(&payload.session_id.unwrap_or_else(|| "Unknown".to_string()));
     let clean_feedback_text = sanitize_feedback_multiline(&payload.feedback_text);
 
     tracing::info!("Received feedback payload from user {}", clean_user_id);
@@ -59,10 +58,7 @@ pub async fn handle_feedback(
              ### Instructions for Agent\n\
              Please review this user feedback and address any underlying issues.\n\n\
              [RESOURCE_LIMIT: RAM <= 30Mi]",
-            clean_user_id,
-            clean_session_id,
-            clean_sentiment,
-            clean_feedback_text
+            clean_user_id, clean_session_id, clean_sentiment, clean_feedback_text
         );
 
         use factory_infrastructure::GitlabClient;
