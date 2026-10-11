@@ -24,7 +24,7 @@ impl AuditorAgent {
 
         let client = reqwest::Client::new();
         let hatchet_url = std::env::var("HATCHET_API_URL")
-            .unwrap_or_else(|_| "http://hatchet.orchestrators.svc.cluster.local:8080".to_string());
+            .unwrap_or_else(|_| "https://hatchet.orchestrators.svc.cluster.local:8080".to_string());
 
         let url = format!("{}/api/v1/workflows/{}/runs", hatchet_url, mission_id);
 
