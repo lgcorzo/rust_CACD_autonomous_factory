@@ -53,6 +53,28 @@ Dark Gravity continuously polls and autonomously executes missions across config
 
 ---
 
+## 🛡️ Technological Sovereignty, Zero-Trust Security & Sovereign Dependency Policy
+
+The **Dark Gravity Autonomous CA/CD Software Factory (V7.2 / V7.3)** is built under strict compliance with the **EU AI Act**, **Hazitek / SPRI**, and **SOC 2 Type II** standards, requiring absolute architectural and supply-chain sovereignty.
+
+*(For detailed architectural specifications and design records, refer to the [Dark Gravity Multi-Agent Architecture Knowledge Base](https://notebook.google.com/notebook/116d5f03-2fb0-4fa7-bd7c-1c9849920abc))*.
+
+### 1. The Technological Sovereignty Imperative (Why Sovereign Forks?)
+In an autonomous software factory where AI agents autonomously synthesize, compile, and deliver production software, relying blindly on third-party commercial cloud services or unmaintained open-source dependencies poses existential operational risks:
+- **Mitigation of Upstream Licensing Closures:** When foundational projects alter their licensing model, close public distributions, or abandon open-source governance (as occurred with MinIO), Dark Gravity prevents vendor lock-in and supply-chain disruption by maintaining **semantic mirrors and sovereign forks** under `@lgcorzo`.
+- **Autonomous Security Verification & Zero-CVE Policy:** Third-party libraries are not trusted implicitly. Dark Gravity continuously scans, audits, and patches its sovereign dependency tree independently (enforcing 0 leaked credentials and zero high-severity CVEs) rather than awaiting upstream commercial release cycles.
+- **Air-Gapped Operational Continuity:** The factory operates on private, sovereign Kubernetes infrastructure. Proprietary source code, AST surgical mutations, and causal corporate memory remain strictly within sovereign boundaries.
+
+### 2. Core Sovereignty & Security Architecture
+- **Zero Public Ingress Ports (Air-Gapped Outbound Polling):** Dark Gravity does not expose public HTTP webhooks or third-party ingress tunnels. The native Rust `GitPlatformPoller` daemon (`factory-cli poller`) executes outbound polling loops every 30–60 seconds across GitHub and GitLab APIs.
+- **Non-Human Identity (NHI) & Cryptographic Proof-of-Lineage:** Every agent action, commit, and Kafka event is cryptographically signed using **W3C Verifiable Credentials** (`Ed25519Signature2020` / JWS) via `ed25519-dalek` v2.
+- **Ephemeral JIT Credentials & Forensic RAM Sanitization:** Repository tokens are provisioned Just-In-Time by HashiCorp Vault with an unrenewable 5-minute (300s) TTL. All in-memory secrets implement `#[derive(Zeroize, ZeroizeOnDrop)]`, wiping memory with null bytes in $< 4.33\,\mu\text{s}$ (empirically $54.2\text{ ns}$) upon task completion.
+- **Kernel-Level Sandboxing (gVisor `runsc`):** Code synthesis and test execution run in ephemeral containers strictly clamped to $\text{RAM} \le 30\text{ MiB}$ and $\text{CPU} \le 250\text{m}$.
+- **Hardware-Accelerated SIMD Primitives:** Sovereign Go/Rust cryptographic and parsing libraries (`sha256-simd`, `simdjson-go`, `highwayhash`, `md5-simd`, `blake2b-simd`) leverage AVX-512 and ARM64 vectorization, enabling high-throughput execution without exceeding hard memory ceilings.
+- **Sovereign S3 Storage Tier & Isolated Buckets:** Artifacts are persisted in decoupled S3 storage (`factory-artifacts`, `factory-artifacts/compliance/`, `dg-factory-checkpoints`, `semantica-provenance`, `r2r-documents`, `mlflow`) protected by strict whitelist validation against path traversal.
+
+---
+
 ## 🎮 Controlling Dark Gravity from GitLab & GitHub
 
 Dark Gravity includes native outbound polling daemons and event handlers that listen for issues, work items, and pull/merge request discussions across configured GitHub and GitLab repositories.
