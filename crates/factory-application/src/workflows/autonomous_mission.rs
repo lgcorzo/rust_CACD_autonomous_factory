@@ -268,7 +268,7 @@ pub fn create_mission_workflow_with_clients(
 
     let mcp_client: Arc<dyn McpClient> = Arc::new(McpHttpClient::new(mcp_url));
     let r2r_user =
-        std::env::var("R2R_SUPERUSER_EMAIL").unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
+        std::env::var("R2R_SUPERUSER_EMAIL").unwrap_or_else(|_| "admin@example.com".to_string());
     let r2r_pwd = std::env::var("R2R_SUPERUSER_PASSWORD").unwrap_or_else(|_| "admin".to_string());
 
     let r2r_client: Arc<dyn R2rClient> = Arc::new(HttpR2rClient::new(r2r_url, r2r_user, r2r_pwd));
