@@ -43,8 +43,7 @@ impl QAObserverAgent {
     ) -> Self {
         let r2r_url = std::env::var("R2R_BASE_URL")
             .unwrap_or_else(|_| "http://r2r.llm-apps.svc.cluster.local:7272".to_string());
-        let r2r_user =
-            std::env::var("R2R_USER").unwrap_or_else(|_| "lgcorzo@gmail.com".to_string());
+        let r2r_user = std::env::var("R2R_USER").unwrap_or_else(|_| "admin".to_string());
         let r2r_pwd = std::env::var("R2R_PWD").unwrap_or_else(|_| "admin".to_string());
 
         let r2r_client: Option<Arc<dyn factory_infrastructure::R2rClient>> = Some(Arc::new(

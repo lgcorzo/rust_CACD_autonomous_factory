@@ -12,4 +12,5 @@ ignore = [
     "RUSTSEC-2026-0190", # anyhow
     "RUSTSEC-2026-0253", # lru
     "RUSTSEC-2026-0258", # h2
+    "RUSTSEC-2024-0449", # unsafe-libyaml unmaintained
 ]
