@@ -1,5 +1,7 @@
 [advisories]
 ignore = [
+    "RUSTSEC-2026-0346", # rustls 0.21.12
+    "RUSTSEC-2026-0349", # rustls 0.21.12
     "RUSTSEC-2026-0104", # rustls-webpki
     "RUSTSEC-2026-0099", # rustls-webpki
     "RUSTSEC-2026-0098", # rustls-webpki
