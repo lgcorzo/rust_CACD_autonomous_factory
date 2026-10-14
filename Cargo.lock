@@ -328,7 +328,7 @@ dependencies = [
  "derive_builder",
  "eventsource-stream",
  "futures",
- "rand 0.8.7",
+ "rand 0.8.6",
  "reqwest 0.12.28",
  "reqwest-eventsource",
  "secrecy 0.8.0",
@@ -978,7 +978,7 @@ dependencies = [
  "getrandom 0.2.17",
  "instant",
  "pin-project-lite",
- "rand 0.8.7",
+ "rand 0.8.6",
  "tokio",
 ]
 
@@ -1902,7 +1902,7 @@ dependencies = [
  "hatchet-sdk",
  "mockall",
  "prost 0.13.5",
- "rand 0.8.7",
+ "rand 0.8.6",
  "rdkafka",
  "regex",
  "reqwest 0.12.28",
@@ -1950,7 +1950,7 @@ dependencies = [
  "hex",
  "prost 0.13.5",
  "prost-build 0.13.5",
- "rand 0.8.7",
+ "rand 0.8.6",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -1978,7 +1978,7 @@ dependencies = [
  "hex",
  "mockall",
  "openssl",
- "rand 0.8.7",
+ "rand 0.8.6",
  "rdkafka",
  "regex",
  "reqwest 0.11.27",
@@ -4329,9 +4329,9 @@ dependencies = [
 
 [[package]]
 name = "rand"
-version = "0.8.7"
+version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22f6172bdec972074665ed81ed53b71da00bfc44b65a753cfde883ec4c702a1a"
+checksum = "5ca0ecfa931c29007047d1bc58e623ab12e5590e8c7cc53200d5202b69266d8a"
 dependencies = [
  "libc",
  "rand_chacha 0.3.1",
@@ -4776,7 +4776,7 @@ dependencies = [
  "once_cell",
  "ring",
  "rustls-pki-types",
- "rustls-webpki 0.103.14",
+ "rustls-webpki 0.103.15",
  "subtle",
  "zeroize",
 ]
@@ -4835,7 +4835,7 @@ dependencies = [
  "rustls 0.23.45",
  "rustls-native-certs",
  "rustls-platform-verifier-android",
- "rustls-webpki 0.103.14",
+ "rustls-webpki 0.103.15",
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
@@ -4860,9 +4860,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-webpki"
-version = "0.103.14"
+version = "0.103.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0527518605e68109d875e248ea259b6758801cf165e4b2c2733ae3b51f12535a"
+checksum = "f3c3cf1d8b1e7d4927e2d154c3fcb02979afb9939629c62cd9048d4f07b60ac2"
 dependencies = [
  "aws-lc-rs",
  "ring",
