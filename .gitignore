@@ -37,6 +37,8 @@ target/
 
 # Wiki Sync
 /wiki_temp/
+/openwiki/
+openwiki
 
 # Graphify
 graphify-out/
