@@ -1,0 +1,93 @@
+{
+  "$schema": "https://raw.githubusercontent.com/lgcorzo/rust_CACD_autonomous_factory/main/specs/schemas/mission-report.v1.json",
+  "schema_version": "mission-report.v1.json",
+  "mission_id": "mission-001",
+  "repository": "lgcorzo/rust_CACD_autonomous_factory",
+  "issue_number": 1,
+  "status": "completed",
+  "start_time": "2026-10-15T10:00:00Z",
+  "end_time": "2026-10-15T10:14:35Z",
+  "duration_seconds": 875,
+  "stages": [
+    {
+      "name": "ingestion",
+      "agent": "PollerDaemonService",
+      "status": "completed",
+      "start_time": "2026-10-15T10:00:00Z",
+      "end_time": "2026-10-15T10:00:12Z",
+      "duration_seconds": 12,
+      "exit_code": 0
+    },
+    {
+      "name": "plan",
+      "agent": "RustantAgent",
+      "status": "completed",
+      "start_time": "2026-10-15T10:00:12Z",
+      "end_time": "2026-10-15T10:00:57Z",
+      "duration_seconds": 45,
+      "exit_code": 0
+    },
+    {
+      "name": "code_sandbox",
+      "agent": "ZeroClawAgent",
+      "status": "completed",
+      "start_time": "2026-10-15T10:00:57Z",
+      "end_time": "2026-10-15T10:07:17Z",
+      "duration_seconds": 380,
+      "exit_code": 0
+    },
+    {
+      "name": "test_validation",
+      "agent": "ZeroClawAgent",
+      "status": "completed",
+      "start_time": "2026-10-15T10:07:17Z",
+      "end_time": "2026-10-15T10:10:47Z",
+      "duration_seconds": 210,
+      "exit_code": 0
+    },
+    {
+      "name": "sast_security",
+      "agent": "AuditorAgent",
+      "status": "completed",
+      "start_time": "2026-10-15T10:10:47Z",
+      "end_time": "2026-10-15T10:12:55Z",
+      "duration_seconds": 128,
+      "exit_code": 0
+    },
+    {
+      "name": "review",
+      "agent": "RustantAgent",
+      "status": "completed",
+      "start_time": "2026-10-15T10:12:55Z",
+      "end_time": "2026-10-15T10:14:35Z",
+      "duration_seconds": 100,
+      "exit_code": 0
+    }
+  ],
+  "telemetry": {
+    "tokens": {
+      "prompt_tokens": 42150,
+      "completion_tokens": 18420,
+      "total_tokens": 60570
+    },
+    "cost_usd": {
+      "llm_cost": 0.4285,
+      "compute_cost": 0.0812,
+      "total_cost": 0.5097
+    },
+    "gvisor_sandbox_resources": {
+      "runtime_class": "gvisor-runsc",
+      "peak_cpu_cores": 1.85,
+      "peak_memory_mb": 512,
+      "cpu_core_hours": 0.243,
+      "ram_mb_hours": 3.75
+    }
+  },
+  "delivery": {
+    "branch_name": "mission-lgcorzo-rust_CACD_autonomous_factory-1",
+    "pr_url": "https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/1",
+    "merge_request_url": "https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/1",
+    "commit_sha": "a1b2c3d4e5f67890123456789abcdef012345678",
+    "exit_status": "success"
+  }
+}
