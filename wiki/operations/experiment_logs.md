@@ -51,6 +51,7 @@ last_verified_commit: "fbdc5848"
 ## Published Engineering Lab Notebooks
 
 - [EXP-2026-006: Interrupted Mission Recovery & Side-Effect Idempotency](lab_notebook_exp_2026_006.md)
+- [EXP-2026-007: Adversarial Security & Sandbox Isolation in gVisor](lab_notebook_exp_2026_007.md)
 
 ---
 
