@@ -15,6 +15,8 @@ last_verified_commit: "fbdc5848"
 
 Welcome to the official documentation for the **Dark Gravity Autonomous Agent Factory**. This project implements a **Continuous Agentic / Continuous Deployment (CA/CD)** pipeline following **Domain-Driven Design (DDD)** and **Onion Architecture** standards.
 
+> 🎬 **[Live Factory Demonstration Screencast Walkthrough](../docs/screencast_walkthrough.md)** (`docs/assets/screencast_dark_gravity_walkthrough.mp4`) — 5-minute HD technical demonstration video showcasing live cluster orchestration, gVisor sandboxing, PR directive interaction, and governance.
+
 ---
 
 ## Documentation Index
