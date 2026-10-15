@@ -46,3 +46,4 @@ graphify-out/
 # spec-kit
 .specify/
 .agents/openwiki/
+/openwiki/
