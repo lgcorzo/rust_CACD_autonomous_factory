@@ -48,4 +48,10 @@ last_verified_commit: "fbdc5848"
 
 ---
 
+## Published Engineering Lab Notebooks
+
+- [EXP-2026-006: Interrupted Mission Recovery & Side-Effect Idempotency](lab_notebook_exp_2026_006.md)
+
+---
+
 > *Related: [Experiment Lifecycle](../architecture/runtime_sequences.md) · [Compliance & Audit](../security/compliance_audit.md)*

@@ -55,6 +55,7 @@ last_verified_commit: "fbdc5848"
 | **Procedure** | [User Manual](operations/user_manual.md) | Step-by-step guides for mission creation, PR directives, CLI |
 | **DeploymentView** | [Production Operations](operations/production_operations.md) | FluxCD GitOps, K8s namespace topology, LiteLLM proxy, runbook |
 | **Report** | [Experiment Logs](operations/experiment_logs.md) | Telemetry schema, Kafka event topics, Prometheus metrics |
+| **Lab Notebook** | [EXP-2026-006 Recovery](operations/lab_notebook_exp_2026_006.md) | Interrupted mission recovery & side-effect idempotency validation |
 
 ---
 
