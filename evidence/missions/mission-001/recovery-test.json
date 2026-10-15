@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/lgcorzo/rust_CACD_autonomous_factory/main/specs/schemas/mission-report.v1.json",
+  "experiment_id": "EXP-2026-006",
+  "mission_id": "mission-001",
+  "title": "Interrupted Mission Recovery & Side-Effect Idempotency",
+  "timestamp": "2026-10-15T12:00:00Z",
+  "status": "passed",
+  "intent": "Prove failure recovery with strict side-effect idempotency.",
+  "configuration": {
+    "orchestrator": "Hatchet Durable Orchestrator",
+    "dag_pipeline": [
+      "ingestion",
+      "plan",
+      "code_sandbox",
+      "validation",
+      "delivery"
+    ],
+    "fault_injection": {
+      "target_stage": "code_sandbox",
+      "trigger_time_seconds": 120,
+      "mechanism": "Pod eviction / Chaos kill (SIGKILL)",
+      "target_worker": "zeroclaw-worker-1"
+    },
+    "idempotency": {
+      "header_name": "X-Idempotency-Key",
+      "key_formula": "sha256(mission_id + stage_name)"
+    }
+  },
+  "reality": {
+    "heartbeat_loss_detection_seconds": 15,
+    "state_restoration": {
+      "source": "PostgreSQL (hatchet_step_runs)",
+      "restored_stage": "plan (step 2)",
+      "reexecuted_llm_inferences": 0,
+      "resumed_worker": "zeroclaw-worker-2"
+    },
+    "external_side_effects": {
+      "github_api_behavior": "Updated existing branch and PR rather than creating duplicates",
+      "branch_name": "mission-lgcorzo-rust_CACD_autonomous_factory-1",
+      "pr_url": "https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/1",
+      "duplicate_commits": 0,
+      "duplicate_prs": 0,
+      "duplicate_webhooks": 0
+    }
+  },
+  "lessons": "Step checkpointing must be paired with deterministic idempotency keys in external API tooling wrappers.",
+  "industrial_transfer": "Critical for long-running CAD/CAM nesting pipelines (Lantek) where transient server failures must not restart expensive computations or duplicate MES orders."
+}
