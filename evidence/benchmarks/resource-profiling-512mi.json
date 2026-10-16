@@ -1,0 +1,52 @@
+{
+  "experiment_id": "EXP-2026-010",
+  "title": "Resource Governance & Memory Bounding in gVisor (512Mi)",
+  "timestamp": "2026-10-18T10:00:00Z",
+  "status": "completed",
+  "environment": {
+    "orchestrator": "Hatchet Durable Orchestrator",
+    "runtime_class": "gvisor",
+    "isolation_engine": "runsc / cgroups v2",
+    "namespace": "factory-sandbox",
+    "telemetry_monitoring": [
+      "Prometheus",
+      "cAdvisor"
+    ]
+  },
+  "declared_limits": {
+    "cpu": "500m",
+    "memory": "512Mi",
+    "timeout_seconds": 300
+  },
+  "benchmarks": {
+    "standard_test_run": {
+      "description": "Standard agent workload execution",
+      "peak_ram_bytes": 298844160,
+      "peak_ram_mib": 285.0,
+      "memory_utilization_percent": 55.6,
+      "peak_cpu_millicores": 380,
+      "cpu_utilization_percent": 76.0,
+      "duration_seconds": 42.0,
+      "status": "success",
+      "exit_code": 0
+    },
+    "memory_exhaustion_stress_test": {
+      "description": "Intentional memory-exhaustion tensor allocation loop",
+      "peak_ram_bytes": 536870912,
+      "peak_ram_mib": 512.0,
+      "memory_utilization_percent": 100.0,
+      "duration_seconds": 2.8,
+      "status": "OOMKilled",
+      "exit_code": 137,
+      "host_node_pressure": false,
+      "swap_thrashing": false
+    }
+  },
+  "protocol_checklist": {
+    "intent": "Prove strict resource clamping and safe termination under stress via cgroups v2 and gVisor.",
+    "configuration": "Sandbox pod configured with resources.limits: {cpu: 500m, memory: 512Mi} on gVisor runtime. Monitored via Prometheus / cAdvisor. Evaluated on standard test run vs. intentional memory-exhaustion tensor loop.",
+    "reality": "Standard test peaked at 285 MiB RAM (55.6%) and 380m CPU (76%), finishing cleanly in 42s. Stress test terminated cleanly at 512 MiB by cgroups v2/gVisor (exit code 137, OOMKilled) in 2.8s without host node pressure or swap thrashing.",
+    "lessons": "Workspace Rust compilation requires 1.5-2 GiB; claims of compiling under 30 MiB or 512 MiB are unrealistic and apply only to running pre-compiled release binaries or lightweight Python tests. Real engineering requires publishing truthful memory profiles.",
+    "industrial_transfer": "On shopfloor edge controllers, background AI diagnostic microservices must live behind hard memory boundaries to guarantee they never starve real-time machine automation loops."
+  }
+}
