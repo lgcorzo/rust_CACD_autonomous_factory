@@ -52,6 +52,7 @@ last_verified_commit: "fbdc5848"
 
 - [EXP-2026-006: Interrupted Mission Recovery & Side-Effect Idempotency](lab_notebook_exp_2026_006.md)
 - [EXP-2026-007: Adversarial Security & Sandbox Isolation in gVisor](lab_notebook_exp_2026_007.md)
+- [EXP-2026-009: AST Context Efficiency Benchmark (Graphify/R2R vs Grep)](lab_notebook_exp_2026_009.md)
 
 ---
 

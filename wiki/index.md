@@ -57,6 +57,7 @@ last_verified_commit: "fbdc5848"
 | **Report** | [Experiment Logs](operations/experiment_logs.md) | Telemetry schema, Kafka event topics, Prometheus metrics |
 | **Lab Notebook** | [EXP-2026-006 Recovery](operations/lab_notebook_exp_2026_006.md) | Interrupted mission recovery & side-effect idempotency validation |
 | **Lab Notebook** | [EXP-2026-007 Security](operations/lab_notebook_exp_2026_007.md) | Adversarial security & gVisor sandbox isolation validation |
+| **Lab Notebook** | [EXP-2026-009 AST Graph](operations/lab_notebook_exp_2026_009.md) | AST context efficiency benchmark (Graphify/R2R vs Grep) |
 
 ---
 

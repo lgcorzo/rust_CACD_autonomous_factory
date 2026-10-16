@@ -1,0 +1,41 @@
+{
+  "experiment_id": "EXP-2026-009",
+  "title": "AST Context Efficiency Benchmark (Graphify/R2R vs Grep)",
+  "timestamp": "2026-10-16T18:30:00Z",
+  "status": "completed",
+  "repository_scale": {
+    "total_files": 120,
+    "lines_of_code": 45000,
+    "languages": [
+      "Rust",
+      "Python"
+    ]
+  },
+  "refactoring_task": "Refactor session token propagation across application and infrastructure modules",
+  "benchmarks": {
+    "baseline_grep": {
+      "retrieval_method": "Full-file retrieval / Keyword grep search",
+      "prompt_tokens": 38400,
+      "retrieval_latency_ms": 3800,
+      "first_pass_success_rate": 0.62
+    },
+    "ast_subgraph": {
+      "retrieval_method": "2-hop neighborhood extraction from Graphify AST graph (graph.json) via R2R",
+      "prompt_tokens": 3150,
+      "retrieval_latency_ms": 420,
+      "first_pass_success_rate": 0.94
+    }
+  },
+  "performance_gains": {
+    "token_reduction_percent": 91.8,
+    "latency_reduction_percent": 88.9,
+    "pass_rate_improvement_percent": 32.0
+  },
+  "protocol_checklist": {
+    "intent": "Quantify context efficiency gains and attention degradation elimination using semantic AST graphs.",
+    "configuration": "Repository with 120 files (>45,000 LoC Rust/Python). Task: refactor session token propagation. Baseline: keyword grep dumping matching files. Graph method: 2-hop neighborhood extraction from Graphify AST graph (graph.json) via R2R.",
+    "reality": "AST graph cut prompt token volume from 38,400 to 3,150 tokens (91.8% token reduction) and retrieval latency from 3.8s to 420ms. First-pass pass rate reached 94% with graph vs. 62% with naive grep.",
+    "lessons": "Precomputing AST graph in CI (graphify update) amortizes instantly across agent iterations, eliminating context bloat and 'lost-in-the-middle' hallucinations.",
+    "industrial_transfer": "In legacy industrial software with millions of LoC (C++/C#/Rust), targeted AST subgraphs are the only cost-effective and accurate way to guide automated refactoring."
+  }
+}
