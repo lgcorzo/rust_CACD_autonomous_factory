@@ -19,7 +19,7 @@ last_verified_commit: "fbdc5848"
 
 ## Navigation & Entry Points
 
-- [Home](Home.md) · [Glossary](GLOSSARY.md) · [Sidebar](_Sidebar.md)
+- [Home](Home.md) · [Glossary](GLOSSARY.md) · [Sidebar](_Sidebar.md) · [🎬 Screencast Demonstration Walkthrough](../docs/screencast_walkthrough.md)
 
 ---
 

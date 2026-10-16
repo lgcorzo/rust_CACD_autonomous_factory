@@ -14,6 +14,7 @@ last_verified_commit: "fbdc5848"
 # User Manual — Dark Gravity CA/CD Autonomous Factory
 
 > **Purpose**: Comprehensive step-by-step guides for all operational scenarios.
+> 🎬 **[Watch the 5-Minute Technical Demonstration Screencast](../../docs/screencast_walkthrough.md)** (`docs/assets/screencast_dark_gravity_walkthrough.mp4`) for a visual step-by-step walkthrough of live factory execution and governance.
 
 ---
 
