@@ -21,13 +21,13 @@ polling:
   github_repositories:
     - "lgcorzo/rust_CACD_autonomous_factory"
     - "lgcorzo/mlops-python-package"
+    - "lgcorzo/fastapi-autogen-team"
 
   # GitLab projects to poll for failed pipeline jobs.
   # Environment variable: GITLAB_PROJECTS (comma-separated)
   gitlab_projects:
     - "lgcorzo/lince-rs"
     - "lgcorzo-lab/autonomous_factory"
-    - "lgcorzo/fastapi-autogen-team"
 
 # Safety & Governance
 safety:
