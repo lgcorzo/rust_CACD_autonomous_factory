@@ -31,22 +31,23 @@ def generate_ai_description(entity_name, file_name, entity_type, original_doc=""
 
 
 def parse_file(filepath):
+    scripts_dir = os.path.dirname(os.path.abspath(__file__))
     if filepath.endswith('.rs'):
-        cmd = ['python3', 'parse_rust.py', filepath]
+        cmd = ['python3', os.path.join(scripts_dir, 'parse_rust.py'), filepath]
     elif filepath.endswith('.py'):
-        cmd = ['python3', 'parse_python.py', filepath]
+        cmd = ['python3', os.path.join(scripts_dir, 'parse_python.py'), filepath]
     elif filepath.endswith(('.ts', '.tsx', '.js', '.jsx')):
-        cmd = ['python3', 'parse_ts.py', filepath]
+        cmd = ['python3', os.path.join(scripts_dir, 'parse_ts.py'), filepath]
     elif filepath.endswith('.java'):
-        cmd = ['python3', 'parse_java.py', filepath]
+        cmd = ['python3', os.path.join(scripts_dir, 'parse_java.py'), filepath]
     elif filepath.endswith('.cs'):
-        cmd = ['python3', 'parse_csharp.py', filepath]
+        cmd = ['python3', os.path.join(scripts_dir, 'parse_csharp.py'), filepath]
     elif filepath.endswith('.c'):
-        cmd = ['python3', 'parse_c.py', filepath]
+        cmd = ['python3', os.path.join(scripts_dir, 'parse_c.py'), filepath]
     elif filepath.endswith('.cpp'):
-        cmd = ['python3', 'parse_cpp.py', filepath]
+        cmd = ['python3', os.path.join(scripts_dir, 'parse_cpp.py'), filepath]
     elif filepath.endswith('.go'):
-        cmd = ['python3', 'parse_go.py', filepath]
+        cmd = ['python3', os.path.join(scripts_dir, 'parse_go.py'), filepath]
     else:
         return {"classes": [], "free_functions": [], "dependencies": []}
 
