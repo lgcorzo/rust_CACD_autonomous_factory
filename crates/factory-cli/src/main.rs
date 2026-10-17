@@ -114,7 +114,7 @@ enum Commands {
         #[arg(
             long,
             env = "GITHUB_REPOS",
-            default_value = "lgcorzo/rust_CACD_autonomous_factory,lgcorzo/mlops-python-package"
+            default_value = "lgcorzo/rust_CACD_autonomous_factory,lgcorzo/mlops-python-package,lgcorzo/fastapi-autogen-team"
         )]
         github_repos: String,
 
