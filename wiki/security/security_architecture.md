@@ -135,14 +135,14 @@ graph TB
 ```rust
 // From factory-core::security
 pub struct SandboxConstraint {
-    pub max_memory_mb: u32,      // Default: 30 MiB
+    pub max_memory_mib: u32,      // Default: 30 MiB
     pub max_cpu_cores: f32,       // Default: 0.25 cores
     pub network_egress_allowed: bool, // Default: false
 }
 
 // ZeroClawAgent validates before every execution:
-// - App container: max_memory_mb <= 30, max_cpu_cores <= 0.25
-// - Sidecar container: max_memory_mb <= 20, max_cpu_cores <= 0.10
+// - App container: max_memory_mib <= 30, max_cpu_cores <= 0.25
+// - Sidecar container: max_memory_mib <= 20, max_cpu_cores <= 0.10
 // - network_egress_allowed must be false for both
 ```
 

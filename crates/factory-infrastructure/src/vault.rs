@@ -52,9 +52,7 @@ impl VaultSecurityBounds {
                 if status.is_success() {
                     let body: serde_json::Value = response.json().await.unwrap_or_default();
                     if let Some(client_token) = body["auth"]["client_token"].as_str() {
-                        return Ok(JitToken {
-                            token: client_token.to_string(),
-                        });
+                        return Ok(JitToken::new(client_token));
                     }
                 }
                 Err(factory_core::error::FactoryError::Unexpected(
@@ -78,7 +76,7 @@ impl SecurityBounds for VaultSecurityBounds {
             .post(&url)
             .header("X-Vault-Token", &self.role_token)
             .json(&json!({
-                "token": token.token
+                "token": token.expose_token()
             }))
             .send()
             .await;
@@ -166,7 +164,7 @@ mod tests {
         let bounds = VaultSecurityBounds::new(mock_server.uri(), "root-token".to_string());
 
         let token = bounds.issue_jit_token("org/my-repo").await.unwrap();
-        assert_eq!(token.token, "s.testtoken123");
+        assert_eq!(token.expose_token(), "s.testtoken123");
 
         let is_valid = bounds.validate_token(&token).await.unwrap();
         assert!(is_valid);
@@ -190,9 +188,7 @@ mod tests {
             .await;
 
         let bounds = VaultSecurityBounds::new(mock_server.uri(), "root-token".to_string());
-        let expired_token = JitToken {
-            token: "s.expired_token".to_string(),
-        };
+        let expired_token = JitToken::new("s.expired_token");
 
         let is_valid = bounds.validate_token(&expired_token).await.unwrap();
         assert!(!is_valid);
@@ -216,9 +212,7 @@ mod tests {
             .await;
 
         let bounds = VaultSecurityBounds::new(mock_server.uri(), "root-token".to_string());
-        let renewable_token = JitToken {
-            token: "s.renewable_token".to_string(),
-        };
+        let renewable_token = JitToken::new("s.renewable_token");
 
         let is_valid = bounds.validate_token(&renewable_token).await.unwrap();
         assert!(!is_valid);

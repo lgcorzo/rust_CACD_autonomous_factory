@@ -62,7 +62,7 @@ The codebase is organized as a unified Rust workspace for maximum modularity and
 
 - **`factory-core`**: Innermost domain layer. Manages domain entities (`Mission`, `Task`), a `SecurityValidator` trait for agent output auditing, and unified error handling via `FactoryError`.
 - **`factory-application`**: Workflow orchestration layer. Leverages **Rustant** (Planner) and **ZeroClaw** (Executor) to process task workflows. Maintains durably checkpointed state via `StepCheckpoint`s using Hatchet's PostgreSQL backend.
-- **`factory-mcp-server`**: Presentation layer. Axum-based Model Context Protocol server exposing tools over Server-Sent Events (SSE) transport with isolated Firecracker execution interfaces.
+- **`factory-mcp-server`**: Presentation layer. Axum-based Model Context Protocol server exposing tools over Server-Sent Events (SSE) transport with isolated gVisor execution interfaces.
 - **`factory-infrastructure`**: Adapter layer. Concrete clients for Jira, R2R (RAG), MinIO/AWS S3, OpenZiti (Zero Trust overlay networks), and Confluent Cloud Kafka (via `rdkafka` client).
 - **`factory-cli`**: Interface entry point. Contains the Hatchet worker initializer and Kafka telemetry querying utilities.
 
@@ -82,16 +82,16 @@ To maintain absolute operational transparency, capabilities across Dark Gravity 
 | Component / Feature | Category | Status Tier | Source & Policy Reference | Operational Details & Evidence Link |
 | :--- | :--- | :--- | :--- | :--- |
 | **gVisor (`runsc`) Sandbox** | Infrastructure | **Verified** | `config/sandbox-gvisor-profile.yaml` | `RuntimeClass=gvisor-sandbox` active on `sandbox-exec` pods. [Evidence: `baseline.md`](evidence/baseline.md) |
-| **RAM Resource Clamping ($\le 30\text{ MiB}$)** | Kernel Isolation | **Verified** | `crates/factory-mcp-server/specs/spec.md` | OOM-Kill code 137 verified upon $>35\text{ MiB}$ allocation attempt. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
+| **RAM Resource Clamping** | Kernel Isolation | **Verified** | `config/sandbox-gvisor-profile.yaml` | Micro-sandbox clamped to $\le 30\text{ MiB}$ RAM / $250\text{m}$ CPU; worker compilation clamped to $512\text{ MiB}$ / $500\text{m}$ CPU. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
 | **OpenZiti mTLS Overlay** | Zero-Trust Network | **Verified** | `crates/factory-infrastructure/src/ziti.rs` | Sidecar active in agent pods; memory bounded $\le 20\text{ MiB}$. [Evidence: `baseline.md`](evidence/baseline.md) |
-| **Cilium Deny-All NetworkPolicy** | Security Policy | **Verified** | `config/deny-all-egress-networkpolicy.yaml` | Public IP egress (e.g. 1.1.1.1) blocked at kernel eBPF level. [Evidence: `security-tests.md`](evidence/security-tests.md) |
+| **Egress Deny-All NetworkPolicy** | Security Policy | **Verified** | `config/deny-all-egress-networkpolicy.yaml` | Dual-layer packet drop via native K8s NetworkPolicy and Cilium eBPF rules. [Evidence: `security-tests.md`](evidence/security-tests.md) |
 | **Hatchet 6-Phase DAG Engine** | Orchestration | **Verified** | `crates/factory-application/src/workflows/` | Engine active on port 8080/7077 with PostgreSQL checkpointing. [Evidence: `baseline.md`](evidence/baseline.md) |
 | **LiteLLM Proxy & FinOps Headers** | AI Inference | **Verified** | `config/litellm_proxy_config.yaml` | Running in `ml-apps` NS; injects `x-vtags-*` virtual headers. [Evidence: `baseline.md`](evidence/baseline.md) |
 | **CircuitBreakerGuard (Diff Hashing)** | Application Logic | **Implemented** | `crates/factory-application/src/workflows/circuit_breaker.rs` | Prevents infinite retry loops via SHA-256 diff hash matching. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
 | **Pipeline Error Classifier** | Application Logic | **Implemented** | `crates/factory-application/src/poller_service.rs` | Parses CI logs into 7 canonical error categories. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
 | **Vault JIT 5-Min Ephemeral Tokens** | Security Adapter | **Implemented** | `crates/factory-infrastructure/src/vault.rs` | Ephemeral repository tokens expire in 300s; zeroize on drop. [Evidence: `security-tests.md`](evidence/security-tests.md) |
-| **Ed25519 Verifiable Credentials** | Non-Human Identity | **Implemented** | `crates/factory-core/src/security_nhi.rs` | W3C compliant `did:factory` signatures attached to Kafka events. [Evidence: `threat-model.md`](evidence/security/threat-model.md) |
-| **FinOps 90% HardStop Cutoff** | Governance Gate | **Implemented** | `crates/factory-application/src/agents/finops.rs` | Generates 429 HTTP cutoff when monthly LLM budget is exhausted. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
+| **Ed25519 Verifiable Credentials** | Non-Human Identity | **Implemented** | `crates/factory-core/src/security/nhi.rs` | `did:factory` Ed25519 verifiable credentials attached to Kafka events (RFC 8785 JCS canonicalization in hardening). [Evidence: `threat-model.md`](evidence/security/threat-model.md) |
+| **FinOps 90% HardStop Cutoff** | Governance Gate | **Designed** | `crates/factory-application/src/agents/finops.rs` | Velocity anomaly detection and 90% daily budget warning latch; active scheduler halt gate in hardening. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
 | **Multi-Region GPU Failover** | Resiliency | **Designed** | `wiki/architecture/infrastructure_adapters.md` | Multi-region cluster failover spec defined for high availability. [Docs: `wiki/architecture/`](wiki/architecture/) |
 | **Autonomous Direct Main Merges** | Governance Policy | **Designed** | `AGENTS.md` & `wiki/security/hitl_governance.md` | Prohibited by policy; strict Human-in-the-Loop (HITL) gate required. [Docs: `hitl_governance.md`](wiki/security/hitl_governance.md) |
 
@@ -110,7 +110,7 @@ Dark Gravity continuously polls and autonomously executes missions across config
 ### 5. Integrated Intelligence & Security
 
 - **Rustant**: Leverages **R2rClient** for semantic code search and context retrieval to inform specification design and planning.
-- **ZeroClaw**: Compiles and executes code in secure **Firecracker micro-VMs** via a sandboxed executor driver.
+- **ZeroClaw**: Compiles and executes code in secure **gVisor (runsc) user-space sandboxes** via a sandboxed executor driver.
 - **Zero Trust Mesh**: Agent-to-agent communication is fully encrypted and bound to identity namespaces using **OpenZiti mTLS 1.3** overlays.
 - **Telemetry**: Reasoning logs are published to **Confluent Cloud Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`) for real-time observability.
 
@@ -132,7 +132,7 @@ In an autonomous software factory where AI agents autonomously synthesize, compi
 - **Zero Public Ingress Ports (Air-Gapped Outbound Polling):** Dark Gravity does not expose public HTTP webhooks or third-party ingress tunnels. The native Rust `GitPlatformPoller` daemon (`factory-cli poller`) executes outbound polling loops every 30–60 seconds across GitHub and GitLab APIs.
 - **Non-Human Identity (NHI) & Cryptographic Proof-of-Lineage:** Every agent action, commit, and Kafka event is cryptographically signed using **W3C Verifiable Credentials** (`Ed25519Signature2020` / JWS) via `ed25519-dalek` v2.
 - **Ephemeral JIT Credentials & Forensic RAM Sanitization:** Repository tokens are provisioned Just-In-Time by HashiCorp Vault with an unrenewable 5-minute (300s) TTL. All in-memory secrets implement `#[derive(Zeroize, ZeroizeOnDrop)]`, wiping memory with null bytes in $< 4.33\,\mu\text{s}$ (empirically $54.2\text{ ns}$) upon task completion.
-- **Kernel-Level Sandboxing (gVisor `runsc`):** Code synthesis and test execution run in ephemeral containers strictly clamped to $\text{RAM} \le 30\text{ MiB}$ and $\text{CPU} \le 250\text{m}$.
+- **Kernel-Level Sandboxing (gVisor `runsc`):** Code synthesis and surgical edits run in ephemeral containers strictly clamped to $\text{RAM} \le 30\text{ MiB}$ and $\text{CPU} \le 250\text{m}$ for micro-sandboxes, and up to $512\text{ MiB}$ RAM / $500\text{m}$ CPU for worker compilation workloads (see EXP-2026-010).
 - **Hardware-Accelerated SIMD Primitives:** Sovereign Go/Rust cryptographic and parsing libraries (`sha256-simd`, `simdjson-go`, `highwayhash`, `md5-simd`, `blake2b-simd`) leverage AVX-512 and ARM64 vectorization, enabling high-throughput execution without exceeding hard memory ceilings.
 - **Sovereign S3 Storage Tier & Isolated Buckets:** Artifacts are persisted in decoupled S3 storage (`factory-artifacts`, `factory-artifacts/compliance/`, `dg-factory-checkpoints`, `semantica-provenance`, `r2r-documents`, `mlflow`) protected by strict whitelist validation against path traversal.
 

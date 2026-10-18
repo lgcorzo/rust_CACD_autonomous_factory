@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-10-18T08:57:38Z",
+  "commit_sha": "93024823eaa7d8322e32aff177daa481ea49a17a",
+  "branch": "hardening/T5.1-jules-benchmark-protocol",
+  "environment": {
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "os": "Linux 6.17.0-14-generic x86_64 GNU/Linux"
+  },
+  "gates": {
+    "fmt": "PASSED",
+    "clippy": "PASSED",
+    "adversarial_corpus": "PASSED",
+    "workspace_tests": "PASSED"
+  },
+  "verified": true
+}

@@ -83,3 +83,14 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 - `cargo fmt --all -- --check`: Clean (0 diffs).
 - `cargo clippy --workspace --all-targets -- -D warnings`: Clean (0 warnings).
 - `cargo check --workspace`: Clean across all 5 crates.
+
+---
+
+## 4. Validity & Limitations
+
+- **Sample Size & Scope**: Verified across $n = 3$ multi-task DAG configurations in mock and integration test environments; end-to-end Kubernetes validation requires active Hatchet worker deployment and cluster ingress.
+- **Model Versions**: LLM parsing evaluated with Gemini 1.5 Pro and Claude 3.5 Sonnet baselines via LiteLLM gateway.
+- **Task Authors**: ZeroClaw (Developer agent), Rustant (Planner agent), Dark Gravity Core Team.
+- **Reproduction**: `cargo test -p factory-application --test hatchet_sdd_task_orchestration_test`
+- **Known Threats to Validity**: External git provider API rate limits (GitHub/GitLab), transient network partitions during Kafka event streaming, and unannounced upstream Hatchet SDK protobuf schema changes.
+

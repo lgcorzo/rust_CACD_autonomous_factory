@@ -48,7 +48,7 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 | **Vector Store** | R2R GraphRAG + pgvector |
 | **Event Bus** | Confluent Kafka (rdkafka) |
 | **Zero Trust** | OpenZiti (mTLS 1.3) |
-| **Sandbox** | Firecracker micro-VM |
+| **Sandbox** | gVisor (runsc) user-space sandbox |
 | **Container Orchestration** | Kubernetes + KEDA |
 | **Secrets** | Bitnami SealedSecrets |
 | **CI/CD** | GitHub Actions |

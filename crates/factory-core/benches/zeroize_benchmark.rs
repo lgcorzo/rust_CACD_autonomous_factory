@@ -5,14 +5,7 @@ use zeroize::Zeroize;
 fn bench_zeroize_token(c: &mut Criterion) {
     c.bench_function("zeroize_jit_token", |b| {
         b.iter_batched(
-            || {
-                let mut token = JitToken {
-                    token: String::from("abcdefghijklmnopqrstuvwxyz0123456789"),
-                };
-                // Ensure capacity is exactly what we need to avoid reallocation differences
-                token.token.shrink_to_fit();
-                token
-            },
+            || JitToken::new("abcdefghijklmnopqrstuvwxyz0123456789"),
             |mut token| {
                 token.zeroize();
                 black_box(token);

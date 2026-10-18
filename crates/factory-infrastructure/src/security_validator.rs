@@ -97,27 +97,40 @@ impl SecurityValidator for Ed25519Validator {
 
     async fn audit_content(&self, content: &str) -> factory_core::error::Result<AuditResult> {
         if let Some(mcp) = &self.mcp_client {
-            let _res = mcp
+            let res = mcp
                 .call_tool_json(
                     "security_review",
                     serde_json::json!({
                         "content": content
                     }),
                 )
-                .await;
+                .await
+                .map_err(|e| {
+                    factory_core::error::FactoryError::Security(format!(
+                        "MCP security review call failed: {}",
+                        e
+                    ))
+                })?;
 
-            Ok(AuditResult {
-                is_safe: true,
-                findings: vec![],
-            })
-        } else {
-            let is_safe = !content.contains("system(") && !content.contains("eval(");
-            let mut findings = vec![];
-            if !is_safe {
-                findings.push("Dangerous function calls detected (system/eval)".to_string());
-            }
+            let is_safe = res
+                .get("is_safe")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
+            let findings = res
+                .get("findings")
+                .and_then(|v| v.as_array())
+                .map(|arr| {
+                    arr.iter()
+                        .filter_map(|val| val.as_str().map(|s| s.to_string()))
+                        .collect()
+                })
+                .unwrap_or_default();
 
             Ok(AuditResult { is_safe, findings })
+        } else {
+            Err(factory_core::error::FactoryError::Security(
+                "Content auditor is unconfigured (MCP client is None); failing closed".to_string(),
+            ))
         }
     }
 }
@@ -182,5 +195,19 @@ mod tests {
         assert!(!validator
             .validate_git_commit_payload(tampered_payload, &hex_sig)
             .unwrap());
+    }
+
+    #[tokio::test]
+    async fn test_audit_content_fails_closed_without_mcp() {
+        let mut csprng = OsRng;
+        let signing_key: SigningKey = SigningKey::generate(&mut csprng);
+        let verifying_key = signing_key.verifying_key();
+        let validator = Ed25519Validator::new(verifying_key.as_bytes(), None).unwrap();
+
+        let res = validator.audit_content("let x = 1;").await;
+        assert!(
+            res.is_err(),
+            "audit_content without MCP client must fail closed with Err"
+        );
     }
 }
