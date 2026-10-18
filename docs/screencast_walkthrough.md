@@ -1,9 +1,11 @@
 # Dark Gravity: 5-Minute Technical Demonstration Screencast
 
+[![YouTube Demo](https://img.shields.io/badge/YouTube-Watch_Video-red.svg?style=for-the-badge&logo=youtube)](https://youtu.be/FASQOk8mg4M)
 [![Screencast Walkthrough](https://img.shields.io/badge/Demo_Video-1080p_%7C_60FPS-blueviolet.svg?style=for-the-badge&logo=youtube)](assets/screencast_dark_gravity_walkthrough.mp4)
 [![ISO 42010 Architecture](https://img.shields.io/badge/ISO%2042010-Architecture-blue.svg?style=for-the-badge)](../wiki/index.md)
 [![EU AI Act Compliant](https://img.shields.io/badge/EU_AI_Act-Conformity_Passed-success.svg?style=for-the-badge)](../evidence/missions/mission-001/report.json)
 
+> **YouTube Demonstration**: [https://youtu.be/FASQOk8mg4M](https://youtu.be/FASQOk8mg4M)
 > **Hosted Walkthrough Video**: [`docs/assets/screencast_dark_gravity_walkthrough.mp4`](assets/screencast_dark_gravity_walkthrough.mp4)
 > **Video Specifications**: 1080p High-Definition (1920x1080), 60 FPS, 300.0s (5:00) Total Duration, AAC Narration Audio + Synchronized Technical Subtitles.
 
