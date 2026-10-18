@@ -286,7 +286,7 @@ git commit -m "security: rewrite diff scanner to inspect added lines with regex 
 **Interfaces:**
 - Produces: `SandboxConstraint::validate_bounds(&self) -> bool` with constants, zero/negative guards, and egress enforcement.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 In `crates/factory-core/src/security.rs` tests module:
 ```rust
 #[test]
@@ -305,11 +305,11 @@ fn test_sandbox_constraint_strict_bounds() {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `cargo test -p factory-core test_sandbox_constraint_strict_bounds`
 Expected: FAIL (currently does not check `network_egress_allowed == false` or `max_memory_mb > 0`).
 
-- [ ] **Step 3: Enforce strict constraints**
+- [x] **Step 3: Enforce strict constraints**
 In `crates/factory-core/src/security.rs`:
 ```rust
 pub const MAX_SANDBOX_MEMORY_MIB: u32 = 30;
@@ -324,11 +324,11 @@ pub fn validate_bounds(&self) -> bool {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `cargo test -p factory-core test_sandbox_constraint_strict_bounds`
 Expected: PASS
 
-- [ ] **Step 5: Commit and branch PR**
+- [x] **Step 5: Commit and branch PR**
 ```bash
 git checkout -b hardening/T1.4-sandbox-bounds-validation
 git add crates/factory-core/

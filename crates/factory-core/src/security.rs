@@ -3,6 +3,11 @@ use async_trait::async_trait;
 
 pub mod nhi;
 
+pub const DEFAULT_MAX_MEMORY_MIB: u32 = 30;
+pub const DEFAULT_MAX_CPU_CORES: f32 = 0.25;
+pub const SIDECAR_MAX_MEMORY_MIB: u32 = 20;
+pub const SIDECAR_MAX_CPU_CORES: f32 = 0.10;
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct SandboxConstraint {
     #[serde(alias = "max_memory_mb")]
@@ -14,8 +19,8 @@ pub struct SandboxConstraint {
 impl Default for SandboxConstraint {
     fn default() -> Self {
         Self {
-            max_memory_mib: 30,
-            max_cpu_cores: 0.25,
+            max_memory_mib: DEFAULT_MAX_MEMORY_MIB,
+            max_cpu_cores: DEFAULT_MAX_CPU_CORES,
             network_egress_allowed: false,
         }
     }
@@ -28,14 +33,19 @@ impl SandboxConstraint {
 
     pub fn sidecar_default() -> Self {
         Self {
-            max_memory_mib: 20,
-            max_cpu_cores: 0.10,
+            max_memory_mib: SIDECAR_MAX_MEMORY_MIB,
+            max_cpu_cores: SIDECAR_MAX_CPU_CORES,
             network_egress_allowed: false,
         }
     }
 
     pub fn validate_bounds(&self) -> bool {
-        self.max_memory_mib <= 30 && self.max_cpu_cores <= 0.25
+        !self.network_egress_allowed
+            && self.max_memory_mib > 0
+            && self.max_memory_mib <= DEFAULT_MAX_MEMORY_MIB
+            && self.max_cpu_cores > 0.0
+            && self.max_cpu_cores <= DEFAULT_MAX_CPU_CORES
+            && !self.max_cpu_cores.is_nan()
     }
 }
 
@@ -322,5 +332,41 @@ mod tests {
             network_egress_allowed: true,
         };
         assert!(!over_limit.validate_bounds());
+
+        // Strict egress rejection
+        let mut egress_violation = SandboxConstraint::gvisor_default();
+        egress_violation.network_egress_allowed = true;
+        assert!(
+            !egress_violation.validate_bounds(),
+            "Egress allowed must fail bounds check"
+        );
+
+        // Zero or negative/NaN checks
+        let zero_mem = SandboxConstraint {
+            max_memory_mib: 0,
+            max_cpu_cores: 0.25,
+            network_egress_allowed: false,
+        };
+        assert!(
+            !zero_mem.validate_bounds(),
+            "0 MiB memory must fail bounds check"
+        );
+
+        let zero_cpu = SandboxConstraint {
+            max_memory_mib: 30,
+            max_cpu_cores: 0.0,
+            network_egress_allowed: false,
+        };
+        assert!(
+            !zero_cpu.validate_bounds(),
+            "0.0 CPU must fail bounds check"
+        );
+
+        let nan_cpu = SandboxConstraint {
+            max_memory_mib: 30,
+            max_cpu_cores: f32::NAN,
+            network_egress_allowed: false,
+        };
+        assert!(!nan_cpu.validate_bounds(), "NaN CPU must fail bounds check");
     }
 }
