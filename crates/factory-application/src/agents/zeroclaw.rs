@@ -281,10 +281,10 @@ impl ZeroClawAgent {
         app_constraint: &factory_core::security::SandboxConstraint,
         sidecar_constraint: &factory_core::security::SandboxConstraint,
     ) -> anyhow::Result<()> {
-        if app_constraint.max_memory_mb > 30 {
+        if app_constraint.max_memory_mib > 30 {
             anyhow::bail!(
                 "Application sandbox memory constraint breached: {} MiB exceeds limit of 30 MiB",
-                app_constraint.max_memory_mb
+                app_constraint.max_memory_mib
             );
         }
         if app_constraint.max_cpu_cores > 0.25 {
@@ -293,10 +293,10 @@ impl ZeroClawAgent {
                 app_constraint.max_cpu_cores
             );
         }
-        if sidecar_constraint.max_memory_mb > 20 {
+        if sidecar_constraint.max_memory_mib > 20 {
             anyhow::bail!(
                 "Sidecar sandbox memory constraint breached: {} MiB exceeds limit of 20 MiB",
-                sidecar_constraint.max_memory_mb
+                sidecar_constraint.max_memory_mib
             );
         }
         if sidecar_constraint.max_cpu_cores > 0.10 {
@@ -339,7 +339,7 @@ mod tests {
     #[test]
     fn test_validate_sandbox_constraints_exceeded_app_ram() {
         let mut app = SandboxConstraint::gvisor_default();
-        app.max_memory_mb = 35;
+        app.max_memory_mib = 35;
         let sidecar = SandboxConstraint::sidecar_default();
         let err = ZeroClawAgent::validate_sandbox_constraints(&app, &sidecar).unwrap_err();
         assert!(err.to_string().contains("35 MiB exceeds limit of 30 MiB"));
@@ -349,7 +349,7 @@ mod tests {
     fn test_validate_sandbox_constraints_exceeded_sidecar_ram() {
         let app = SandboxConstraint::gvisor_default();
         let mut sidecar = SandboxConstraint::sidecar_default();
-        sidecar.max_memory_mb = 25;
+        sidecar.max_memory_mib = 25;
         let err = ZeroClawAgent::validate_sandbox_constraints(&app, &sidecar).unwrap_err();
         assert!(err.to_string().contains("25 MiB exceeds limit of 20 MiB"));
     }

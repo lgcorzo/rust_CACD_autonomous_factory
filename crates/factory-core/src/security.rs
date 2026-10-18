@@ -5,7 +5,8 @@ pub mod nhi;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct SandboxConstraint {
-    pub max_memory_mb: u32,
+    #[serde(alias = "max_memory_mb")]
+    pub max_memory_mib: u32,
     pub max_cpu_cores: f32,
     pub network_egress_allowed: bool,
 }
@@ -13,7 +14,7 @@ pub struct SandboxConstraint {
 impl Default for SandboxConstraint {
     fn default() -> Self {
         Self {
-            max_memory_mb: 30,
+            max_memory_mib: 30,
             max_cpu_cores: 0.25,
             network_egress_allowed: false,
         }
@@ -27,14 +28,14 @@ impl SandboxConstraint {
 
     pub fn sidecar_default() -> Self {
         Self {
-            max_memory_mb: 20,
+            max_memory_mib: 20,
             max_cpu_cores: 0.10,
             network_egress_allowed: false,
         }
     }
 
     pub fn validate_bounds(&self) -> bool {
-        self.max_memory_mb <= 30 && self.max_cpu_cores <= 0.25
+        self.max_memory_mib <= 30 && self.max_cpu_cores <= 0.25
     }
 }
 
@@ -189,17 +190,17 @@ mod tests {
     #[test]
     fn test_sandbox_constraint_validation() {
         let default_constraint = SandboxConstraint::gvisor_default();
-        assert_eq!(default_constraint.max_memory_mb, 30);
+        assert_eq!(default_constraint.max_memory_mib, 30);
         assert!((default_constraint.max_cpu_cores - 0.25).abs() < f32::EPSILON);
         assert!(default_constraint.validate_bounds());
 
         let sidecar_constraint = SandboxConstraint::sidecar_default();
-        assert_eq!(sidecar_constraint.max_memory_mb, 20);
+        assert_eq!(sidecar_constraint.max_memory_mib, 20);
         assert!((sidecar_constraint.max_cpu_cores - 0.10).abs() < f32::EPSILON);
         assert!(sidecar_constraint.validate_bounds());
 
         let over_limit = SandboxConstraint {
-            max_memory_mb: 64,
+            max_memory_mib: 64,
             max_cpu_cores: 0.50,
             network_egress_allowed: true,
         };
