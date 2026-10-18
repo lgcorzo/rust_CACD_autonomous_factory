@@ -546,14 +546,14 @@ git commit -m "test: add adversarial corpus, prompt injection fixtures, and auto
 **Interfaces:**
 - Produces: Verification that worker killed at any intermediate step (pre-push, post-push, pre-PR) leaves zero duplicate PRs and zero orphan branches.
 
-- [ ] **Step 1: Write fault injection test using mock orchestrator**
+- [x] **Step 1: Write fault injection test using mock orchestrator**
 Simulate process termination during Hatchet workflow stages and verify idempotent recovery.
 
-- [ ] **Step 2: Run test and assert zero duplicate PRs created**
+- [x] **Step 2: Run test and assert zero duplicate PRs created**
 Run: `cargo test -p factory-application --test fault_injection_tests`
 Expected: PASS
 
-- [ ] **Step 3: Commit and branch PR**
+- [x] **Step 3: Commit and branch PR**
 ```bash
 git checkout -b hardening/T3.2-fault-injection-resilience
 git add crates/factory-application/tests/
