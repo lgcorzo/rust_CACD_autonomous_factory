@@ -46,11 +46,11 @@ evidence/
 ```
 
 #### Quick Direct Links to Key Artifacts
-- 📊 **[Verified Gate Status (`evidence/verified_status.json`)](evidence/verified_status.json)** — Machine-generated toolchain, clippy, and workspace test status.
-- 🛡️ **[Held-Out Security Evaluation (`evidence/security/heldout_results.json`)](evidence/security/heldout_results.json)** — Empirical adversarial detection metrics (TPR 57.5%, FPR 0.0%).
-- 📋 **[Empirical Verification Audit (`evidence/followup/verification_report.md`)](evidence/followup/verification_report.md)** — Rigorous ground-truth verification report of codebase claims.
+- 📊 **[Cluster & Zero-Trust Baseline Verification (`evidence/baseline.md`)](evidence/baseline.md)** — Detailed workload snapshot, KEDA parameters, CRD inventory, and zero-trust sign-off.
 - 🎯 **[Mission 001 Evidence Bundle (`evidence/missions/mission-001/`)](evidence/missions/mission-001/)** — Live mission execution report ([`report.json`](evidence/missions/mission-001/report.json)), event timeline ([`timeline.md`](evidence/missions/mission-001/timeline.md)), and SHA-256 checksums ([`checksums.txt`](evidence/missions/mission-001/checksums.txt)).
 - 🛡️ **[Security Threat Model & Audits (`evidence/security/threat-model.md`)](evidence/security/threat-model.md)** — Comprehensive ZTA security audit, threat vectors, and mitigation matrices.
+- 🧪 **[Security Test Suite (`evidence/security-tests.md`)](evidence/security-tests.md)** & **[Reliability Test Suite (`evidence/reliability-tests.md`)](evidence/reliability-tests.md)** — SAST/DAST and long-haul stress benchmark test evidence.
+- 🧩 **[Component Inventory Matrix (`evidence/architecture/component-inventory.md`)](evidence/architecture/component-inventory.md)** — Hardware, software, and agentic module component mapping.
 
 ---
 
@@ -65,7 +65,7 @@ The codebase is organized as a unified Rust workspace for maximum modularity and
 
 ### 1. Workspace Crate Map
 
-- **`factory-core`**: Innermost domain layer. Manages domain entities (`Mission`, `Task`), cryptographic credentials in [`crates/factory-core/src/security/nhi.rs`](crates/factory-core/src/security/nhi.rs), security validation traits, and unified error handling via `FactoryError`.
+- **`factory-core`**: Innermost domain layer. Manages domain entities (`Mission`, `Task`), a `SecurityValidator` trait for agent output auditing, and unified error handling via `FactoryError`.
 - **`factory-application`**: Workflow orchestration layer. Leverages **Rustant** (Planner) and **ZeroClaw** (Executor) to process task workflows. Maintains durably checkpointed state via `StepCheckpoint`s using Hatchet's PostgreSQL backend.
 - **`factory-mcp-server`**: Presentation layer. Axum-based Model Context Protocol server exposing tools over Server-Sent Events (SSE) transport with isolated gVisor execution interfaces.
 - **`factory-infrastructure`**: Adapter layer. Concrete clients for Jira, R2R (RAG), MinIO/AWS S3, OpenZiti (Zero Trust overlay networks), and Confluent Cloud Kafka (via `rdkafka` client).
@@ -107,7 +107,7 @@ Dark Gravity continuously polls and autonomously executes missions across config
 | Target Repository | Domain | Autonomous Workflow Focus |
 |:---|:---|:---|
 | [`lgcorzo/rust_CACD_autonomous_factory`](https://github.com/lgcorzo/rust_CACD_autonomous_factory) | Autonomous Multi-Agent Engine | Self-evolution, DAG workflows & MCP servers |
-| [`lgcorzo/lince-rs`](https://gitlab.com/lgcorzo/lince-rs) | Optimization process | Algorithmic optimization to control agents costs |
+| [`lgcorzo/lince-rs`](https://gitlab.com/lgcorzo/lince-rs) | Otimization process | Algorithmic optimization to control agents costs |
 | [`lgcorzo-lab/autonomous_factory`](https://gitlab.com/lgcorzo-lab/autonomous_factory) | Architecture & Knowledge Base | Spec-Kit SDD contracts, C4 diagrams, OSR audits |
 | [`lgcorzo/fastapi-autogen-team`](https://github.com/lgcorzo/fastapi-autogen-team) | Agentic Access Layer | R2R/Confluent document services |
 | [`lgcorzo/mlops-python-package`](https://github.com/lgcorzo/mlops-python-package) | MLOps & ML Pipelines | Automated testing, DVC/Poetry dependency validation, CI/CD error remediation & HITL governance ([`mlops-python-package/README.md`](mlops-python-package/README.md)) |
@@ -116,8 +116,8 @@ Dark Gravity continuously polls and autonomously executes missions across config
 
 - **Rustant**: Leverages **R2rClient** for semantic code search and context retrieval to inform specification design and planning.
 - **ZeroClaw**: Compiles and executes code in secure **gVisor (runsc) user-space sandboxes** via a sandboxed executor driver.
-- **Zero Trust Mesh**: Agent-to-agent communication is encrypted and bound to identity namespaces using **OpenZiti mTLS 1.3** overlays.
-- **Telemetry**: Reasoning logs are published to **Confluent Cloud Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`) for observability.
+- **Zero Trust Mesh**: Agent-to-agent communication is fully encrypted and bound to identity namespaces using **OpenZiti mTLS 1.3** overlays.
+- **Telemetry**: Reasoning logs are published to **Confluent Cloud Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`) for real-time observability.
 
 ---
 
@@ -127,7 +127,13 @@ The **Dark Gravity Autonomous CA/CD Software Factory (V7.2 / V7.3)** is built un
 
 *(For detailed architectural specifications and design records, refer to the [Dark Gravity Multi-Agent Architecture Knowledge Base](https://notebook.google.com/notebook/116d5f03-2fb0-4fa7-bd7c-1c9849920abc))*.
 
-### 1. Core Sovereignty & Security Architecture
+### 1. The Technological Sovereignty Imperative (Why Sovereign Forks?)
+In an autonomous software factory where AI agents autonomously synthesize, compile, and deliver production software, relying blindly on third-party commercial cloud services or unmaintained open-source dependencies poses existential operational risks:
+- **Mitigation of Upstream Licensing Closures:** When foundational projects alter their licensing model, close public distributions, or abandon open-source governance (as occurred with MinIO), Dark Gravity prevents vendor lock-in and supply-chain disruption by maintaining **semantic mirrors and sovereign forks** under `@lgcorzo`.
+- **Autonomous Security Verification & Zero-CVE Policy:** Third-party libraries are not trusted implicitly. Dark Gravity continuously scans, audits, and patches its sovereign dependency tree independently (enforcing 0 leaked credentials and zero high-severity CVEs) rather than awaiting upstream commercial release cycles.
+- **Air-Gapped Operational Continuity:** The factory operates on private, sovereign Kubernetes infrastructure. Proprietary source code, AST surgical mutations, and causal corporate memory remain strictly within sovereign boundaries.
+
+### 2. Core Sovereignty & Security Architecture
 - **Zero Public Ingress Ports (Air-Gapped Outbound Polling):** Dark Gravity does not expose public HTTP webhooks or third-party ingress tunnels. The native Rust `GitPlatformPoller` daemon (`factory-cli poller`) executes outbound polling loops every 30–60 seconds across GitHub and GitLab APIs.
 - **Non-Human Identity (NHI) & Cryptographic Proof-of-Lineage:** Every agent action, commit, and Kafka event is cryptographically signed using **JWS EdDSA over RFC 8785 JCS** in [`crates/factory-core/src/security/nhi.rs`](crates/factory-core/src/security/nhi.rs) via `ed25519-dalek` v2.
 - **Ephemeral JIT Credentials & Forensic RAM Sanitization:** Repository tokens are provisioned Just-In-Time by HashiCorp Vault with an unrenewable 5-minute (300s) TTL. All in-memory secrets implement `#[derive(Zeroize, ZeroizeOnDrop)]`, wiping memory with null bytes upon task completion (benchmarked via `cargo bench --bench zeroize_benchmark`).
@@ -156,13 +162,13 @@ To trigger an autonomous mission, create an issue or work item in any integrated
   ```
 - **Autonomous Ingestion & Zero-Trust Identity**:
   1. The poller extracts title, description, labels, and resource limits.
-  2. Generates an RFC 8785 JCS canonicalized, Ed25519-signed Verifiable Credential (VC) for Non-Human Identity (NHI) under `did:factory:dark-gravity-euskadi`.
+  2. Generates a cryptographic **Ed25519-signed Verifiable Credential (VC)** for Non-Human Identity (NHI) under `did:factory:dark-gravity-euskadi`.
   3. Publishes the mission specification to Kafka topic `mission-input`.
   4. Records the event in the `CursorStore` to ensure **idempotent, single-execution processing** across polling intervals.
 
 ### 2. Interactive Directives on PRs and MRs
 
-Dark Gravity actively listens to comments on active GitHub Pull Requests (PRs) and GitLab Merge Requests (MRs). Authorized repository collaborators may tag the bot with a directive:
+Dark Gravity actively listens to comments on active GitHub Pull Requests (PRs) and GitLab Merge Requests (MRs). When a developer or architect tags the bot with a directive:
 
 ```text
 @darkgravity /<command> [optional prompt/instruction]
@@ -176,14 +182,61 @@ Dark Gravity actively listens to comments on active GitHub Pull Requests (PRs) a
 | `@darkgravity /status` | Queries real-time factory health and DAG state. | Generates a markdown system report with repository, PR target, DAG health, sandbox status, and FinOps budget state. |
 | `@darkgravity /interact <prompt>` | Natural-language query or technical instruction. | Triggers Rustant (PO) to analyze the query with contextual knowledge and reply directly in the thread. |
 | `@darkgravity /spec <prompt>` | Requests a specification review or modification. | Triggers Rustant (PO) to re-evaluate `spec.md` against provided requirements and stage revisions. |
-| `@darkgravity /refine <instruction>` | Requests localized code edits or targeted bugfixes. | Triggers ZeroClaw (Dev) to apply surgical code mutations in the gVisor sandbox. |
-| `@darkgravity /validate` | Requests full test and security verification. | Executes automated test suites and heuristic diff gates within the sandbox, reporting pass/fail status. |
-| `@darkgravity /retry` | Forces a restart of the execution loop. | Restarts the verification loop and re-runs failed test suites. |
+| `@darkgravity /refine <instruction>` | Requests localized code edits or targeted bugfixes. | Triggers ZeroClaw (Dev) to apply surgical code mutations in the gVisor sandbox (≤30MiB RAM). |
+| `@darkgravity /validate` | Requests full test and security verification. | Executes automated test suites and SAST security gates within the sandbox, reporting CVE and pass/fail status. |
+| `@darkgravity /retry` | Forces a restart of the execution loop. | Restarts the Aethelgard verification loop and re-runs failed test suites. |
 
 > **Security & Governance Note on Directives:**
+> - **Authorized Operators:** Only repository collaborators and maintainers with write permissions may issue `@darkgravity` directives.
 > - **Input Isolation:** All user comments, issue descriptions, and CI error logs are treated as **untrusted data** and parsed strictly into structured event models.
 > - **Self-Targeting Guard:** When operating on `rust_CACD_autonomous_factory` itself, Dark Gravity is restricted from modifying `.github/workflows/`, `CODEOWNERS`, `AGENTS.md`, or security enforcement crates without explicit human sign-off.
 > - **Strict HITL Gate:** Even with interactive directives, Dark Gravity cannot merge pull requests. All merges into `main` require manual human review and execution.
+
+### 3. Immediate Feedback & Loop Prevention
+
+- **Instant Acknowledgement**: Upon receiving any valid directive, Dark Gravity immediately awards an **`👀` (eyes)** emoji reaction to the user's note/comment to signal receipt before processing begins.
+- **Contextual Thread Replies**: Once execution finishes, Dark Gravity replies directly to the originating discussion thread with structured markdown reports.
+- **Bot Loop Suppression**: Any notes authored by `DARK_GRAVITY_BOT_USERNAME` (default `darkgravity-bot`) are automatically ignored to prevent recursive comment loops.
+
+### 4. Live Health Probing CLI
+
+Operators can verify GitLab/GitHub connectivity, token scopes, and project accessibility using the native CLI:
+
+```bash
+# Verify live GitLab communication and project permissions
+cargo run --bin factory-cli -- gitlab-verify \
+  --gitlab-token "$GITLAB_API_TOKEN" \
+  --gitlab-projects "lgcorzo/lince-rs,lgcorzo/fastapi-autogen-team"
+
+# Output machine-readable JSON scorecard
+cargo run --bin factory-cli -- gitlab-verify --json
+```
+
+### 5. Branch & Pull Request Policy: Human-in-the-Loop (HITL)
+
+- Autonomous agents create isolated feature branches, commit code, and open Pull Requests (GitHub) or Merge Requests (GitLab).
+- **Strict Manual Merge Requirement**: Dark Gravity **never** automatically merges PRs or MRs into `main` or default production branches.
+- Once all automated CI/CD and CodeQL checks pass, the agent hands off the PR/MR link to the human developer for final manual review and merge.
+
+### 6. Autonomous Pipeline Error Remediation
+
+Dark Gravity continuously monitors CI/CD pipelines across GitHub and GitLab repositories to autonomously triage, remediate, or escalate errors:
+
+- **Detection**: The outbound poller queries GitHub Actions (`GET /repos/{repo}/actions/runs?status=failure`) and GitLab CI (`GET /projects/{id}/pipelines?status=failed`), extracting run IDs, failing jobs/steps, and error logs (truncated safely to 10KB).
+- **Classification**: Errors are parsed using an ordered regex classification engine into 7 canonical categories:
+  - `LintViolation`: `cargo clippy`, `eslint`, formatting warnings/errors.
+  - `CodeCompilation`: Rust compiler errors (`error[E0308]`), syntax or type errors.
+  - `TestFailure`: Unit, integration, or E2E assertion failures.
+  - `InfrastructureBuild`: Dockerfile build failures, apt-get, package installation failures.
+  - `InfrastructureTransient`: Network timeouts, rate limits, transient connection drops.
+  - `SecurityAudit`: Cargo audit / RUSTSEC advisory failures.
+  - `Unknown`: Unrecognized error patterns (always escalated to human review).
+- **Autonomous Mission Triggering**: Remediable failures construct a remediation mission payload signed with Ed25519 Non-Human Identity (NHI) credentials and publish to the `mission-input` Kafka topic.
+- **Safety Guards & Governance**:
+  - **Self-Referential Safety Guard**: Any failure originating from `lgcorzo/rust_CACD_autonomous_factory` is immediately escalated to a human engineer via a GitHub issue, strictly preventing recursion loops.
+  - **Concurrency Control**: Remediations are throttled by `MAX_CONCURRENT_REMEDIATIONS` (default: 3) via an async semaphore.
+  - **Recurring Failure Escalation**: Error fingerprints (SHA-256 hash of category + file + rule/test) are tracked in `CursorStore`. If the same error fingerprint recurs 3 times consecutively, it automatically escalates to human review.
+  - **Full Observability**: Error classifications and remediation outcomes are emitted to Kafka topics `agent-thought` and `mission-artifact`.
 
 ---
 
@@ -192,8 +245,6 @@ Dark Gravity actively listens to comments on active GitHub Pull Requests (PRs) a
 ### Prerequisites
 
 - [Rust Toolchain](https://rustup.rs/) (Stable 1.85+ / Edition 2024 compatible)
-- [Hatchet Server](https://github.com/hatchet-dev/hatchet)
-- [MCP Connection](https://modelcontextprotocol.io/)
 - [Hatchet Server](https://github.com/hatchet-dev/hatchet)
 - [MCP Connection](https://modelcontextprotocol.io/)
 
