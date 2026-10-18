@@ -121,7 +121,7 @@ git commit -m "docs: adjust capability status matrix to reflect verified automat
 - Consumes: `SecurityValidator::audit_content(&self, content: &str) -> Result<AuditResult>`
 - Produces: Fail-closed `Err(FactoryError::Security(...))` when auditor is unconfigured, preventing bypass.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 In `crates/factory-core/tests/security_tests.rs`:
 ```rust
 #[tokio::test]
@@ -135,11 +135,11 @@ async fn test_default_security_validator_fails_closed() {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `cargo test -p factory-core test_default_security_validator_fails_closed`
 Expected: FAIL (currently returns `Ok(AuditResult { is_safe: true, ... })`).
 
-- [ ] **Step 3: Implement fail-closed semantics**
+- [x] **Step 3: Implement fail-closed semantics**
 In `crates/factory-core/src/security.rs`:
 ```rust
 async fn audit_content(&self, _content: &str) -> Result<AuditResult> {
@@ -151,11 +151,11 @@ async fn audit_content(&self, _content: &str) -> Result<AuditResult> {
 In `crates/factory-infrastructure/src/security_validator.rs`:
 Parse MCP `security_review` response properly instead of ignoring `_res`, and return error if unconfigured.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `cargo test -p factory-core test_default_security_validator_fails_closed`
 Expected: PASS
 
-- [ ] **Step 5: Commit and branch PR**
+- [x] **Step 5: Commit and branch PR**
 ```bash
 git checkout -b hardening/T1.1-fail-closed-stubs
 git add crates/factory-core/ crates/factory-infrastructure/

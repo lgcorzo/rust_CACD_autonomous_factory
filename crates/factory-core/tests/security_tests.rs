@@ -32,3 +32,23 @@ fn test_manual_wipe_token() {
     let wiped_data = unsafe { std::slice::from_raw_parts(token_ptr, len) };
     assert!(wiped_data.iter().all(|&byte| byte == 0));
 }
+
+#[tokio::test]
+async fn test_default_security_validator_fails_closed() {
+    use ed25519_dalek::VerifyingKey;
+    use factory_core::security::{Ed25519SecurityValidator, SecurityValidator};
+
+    let raw_key = [1u8; 32];
+    let verifying_key = VerifyingKey::from_bytes(&raw_key).unwrap();
+    let validator = Ed25519SecurityValidator {
+        public_key: verifying_key,
+    };
+
+    let result = validator
+        .audit_content("fn malicious() { eval(\"bad\"); }")
+        .await;
+    assert!(
+        result.is_err(),
+        "Default unconfigured auditor must fail closed with an error"
+    );
+}

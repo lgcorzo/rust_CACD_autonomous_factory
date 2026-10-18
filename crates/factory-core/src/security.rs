@@ -144,11 +144,10 @@ impl SecurityValidator for Ed25519SecurityValidator {
     }
 
     async fn audit_content(&self, _content: &str) -> Result<AuditResult> {
-        // Mock audit for now, meant to be overridden or implemented by an LLM agent
-        Ok(AuditResult {
-            is_safe: true,
-            findings: vec![],
-        })
+        Err(crate::error::FactoryError::Security(
+            "Default audit_content is not implemented; security validators must fail closed"
+                .to_string(),
+        ))
     }
 }
 
