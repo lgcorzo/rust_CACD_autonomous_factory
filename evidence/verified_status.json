@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-10-18T08:51:49Z",
+  "commit_sha": "505bfafea2d017a8ad905b1fffc1cc160a607555",
+  "branch": "hardening/T4.1-scripted-evidence",
+  "environment": {
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "os": "Linux 6.17.0-14-generic x86_64 GNU/Linux"
+  },
+  "gates": {
+    "fmt": "PASSED",
+    "clippy": "PASSED",
+    "adversarial_corpus": "PASSED",
+    "workspace_tests": "PASSED"
+  },
+  "verified": true
+}

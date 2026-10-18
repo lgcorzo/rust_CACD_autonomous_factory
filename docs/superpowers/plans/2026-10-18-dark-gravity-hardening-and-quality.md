@@ -574,20 +574,20 @@ git commit -m "test: verify fault-injection recovery and zero-orphan PR resilien
 **Interfaces:**
 - Produces: Reproducible JSON evidence files embedded with commit SHA, timestamps, compiler versions, and pass/fail counts.
 
-- [ ] **Step 1: Write evidence collector script**
+- [x] **Step 1: Write evidence collector script**
 In `scripts/generate_evidence.sh`:
 - Execute cargo test suite with JSON output.
 - Run adversarial corpus and record detection rates.
 - Record git commit SHA, OS kernel, and toolchain metadata into `evidence/verified_status.json`.
 
-- [ ] **Step 2: Add `make evidence` target**
+- [x] **Step 2: Add `make evidence` target**
 Wire the script into `Makefile` and CI workflow.
 
-- [ ] **Step 3: Run `make evidence` and check generated artifacts**
+- [x] **Step 3: Run `make evidence` and check generated artifacts**
 Run: `make evidence`
 Expected: Validated, committed JSON artifacts in `evidence/`.
 
-- [ ] **Step 4: Commit and branch PR**
+- [x] **Step 4: Commit and branch PR**
 ```bash
 git checkout -b hardening/T4.1-scripted-evidence
 git add scripts/ Makefile .github/
