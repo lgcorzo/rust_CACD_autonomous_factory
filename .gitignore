@@ -22,6 +22,9 @@
 # Environs
 .env
 /.venv/
+.mcp.json
+.opencode.json
+.gemini/
 
 # Project
 /mlruns/*
