@@ -409,7 +409,7 @@ git commit -m "crypto: enforce W3C camelCase, RFC 8785 JCS canonicalization, and
   - First-cycle anomaly suppression (`previous_spend: Option<f64>`).
   - Explicit configuration error when required env vars are missing or unparseable.
 
-- [ ] **Step 1: Write failing mock test for FinOps enforcement**
+- [x] **Step 1: Write failing mock test for FinOps enforcement**
 Create `crates/factory-application/tests/finops_agent_tests.rs` with `wiremock`:
 ```rust
 #[tokio::test]
@@ -419,11 +419,11 @@ async fn test_finops_hardstop_halts_and_handles_http_errors() {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `cargo test -p factory-application --test finops_agent_tests`
 Expected: FAIL
 
-- [ ] **Step 3: Implement robust FinOps client and enforcement logic**
+- [x] **Step 3: Implement robust FinOps client and enforcement logic**
 In `crates/factory-application/src/agents/finops.rs`:
 - Configure `ClientBuilder::new().timeout(Duration::from_secs(10)).connect_timeout(Duration::from_secs(3))`.
 - Track `halted: Arc<AtomicBool>` latch.
@@ -431,11 +431,11 @@ In `crates/factory-application/src/agents/finops.rs`:
 - Handle HTTP errors with `res.error_for_status()`, increment `consecutive_failures`, and back off.
 - Parse spend with extracted helper `parse_spend(&Value) -> Option<f64>`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `cargo test -p factory-application --test finops_agent_tests`
 Expected: PASS
 
-- [ ] **Step 5: Commit and branch PR**
+- [x] **Step 5: Commit and branch PR**
 ```bash
 git checkout -b hardening/T2.1-finops-enforcement
 git add crates/factory-application/

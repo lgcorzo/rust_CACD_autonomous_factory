@@ -3,7 +3,9 @@ use async_trait::async_trait;
 use factory_core::FinOpsTag;
 use reqwest::Client;
 use serde_json::Value;
-use std::time::Duration;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::{Duration, Instant};
 
 /// Circuit breaker threshold: after this many consecutive failures,
 /// downgrade logging from ERROR to WARN and apply maximum backoff.
@@ -29,10 +31,11 @@ pub enum BudgetEvaluation {
 }
 
 pub struct FinOpsAgent {
-    litellm_base_url: String,
-    api_key: String,
-    client: Client,
-    tag: FinOpsTag,
+    pub litellm_base_url: String,
+    pub api_key: String,
+    pub client: Client,
+    pub tag: FinOpsTag,
+    pub halted: Arc<AtomicBool>,
 }
 
 impl Default for FinOpsAgent {
@@ -67,11 +70,47 @@ impl Default for FinOpsAgent {
 
 impl FinOpsAgent {
     pub fn new(litellm_base_url: String, api_key: String, tag: FinOpsTag) -> Self {
+        let client = Client::builder()
+            .timeout(Duration::from_secs(10))
+            .connect_timeout(Duration::from_secs(3))
+            .build()
+            .unwrap_or_else(|_| Client::new());
+
         Self {
             litellm_base_url,
             api_key,
-            client: Client::new(),
+            client,
             tag,
+            halted: Arc::new(AtomicBool::new(false)),
+        }
+    }
+
+    pub fn is_halted(&self) -> bool {
+        self.halted.load(Ordering::SeqCst)
+    }
+
+    pub fn set_halted(&self, val: bool) {
+        self.halted.store(val, Ordering::SeqCst);
+    }
+
+    pub fn halted_latch(&self) -> Arc<AtomicBool> {
+        Arc::clone(&self.halted)
+    }
+
+    /// Parses total spend from LiteLLM response (supporting both array and object representations).
+    pub fn parse_spend(json: &Value) -> Option<f64> {
+        if let Some(array) = json.as_array() {
+            let mut sum = 0.0;
+            for item in array {
+                if let Some(spend) = item.get("spend").and_then(|v| v.as_f64()) {
+                    sum += spend;
+                }
+            }
+            Some(sum)
+        } else {
+            json.get("total_spend")
+                .or_else(|| json.get("spend"))
+                .and_then(|v| v.as_f64())
         }
     }
 
@@ -83,14 +122,14 @@ impl FinOpsAgent {
         request
     }
 
-    /// Evaluates spend velocity (> +$1.00 / 60s) and 90% hardstop threshold ($45.00 of $50.00).
-    pub fn evaluate_spend_delta(
+    /// Normalized spend evaluation with first-cycle anomaly suppression and active halting latch.
+    pub fn evaluate_spend_delta_normalized(
         &self,
         current_spend: f64,
-        previous_spend: f64,
+        previous_spend: Option<f64>,
+        elapsed_minutes: f64,
         max_daily_budget: f64,
     ) -> BudgetEvaluation {
-        let velocity = current_spend - previous_spend;
         let hardstop_threshold = max_daily_budget * 0.90;
 
         if current_spend >= hardstop_threshold {
@@ -98,28 +137,66 @@ impl FinOpsAgent {
                 "HARDSTOP TRIGGERED! Spend ${:.2} reached 90% threshold of daily budget (${:.2}). Halting missions.",
                 current_spend, max_daily_budget
             );
+            self.set_halted(true);
             BudgetEvaluation::HardStop {
                 spend: current_spend,
-                velocity,
+                velocity: previous_spend
+                    .map(|prev| current_spend - prev)
+                    .unwrap_or(0.0),
                 max_budget: max_daily_budget,
                 alert,
             }
-        } else if velocity > 1.0 {
-            let alert = format!(
-                "ANOMALY DETECTED! High token spend velocity: +${:.2} in 60s! Total: ${:.2}",
-                velocity, current_spend
-            );
-            BudgetEvaluation::VelocityAnomaly {
-                spend: current_spend,
-                velocity,
-                alert,
-            }
         } else {
-            BudgetEvaluation::Healthy {
-                spend: current_spend,
-                velocity,
+            match previous_spend {
+                None => {
+                    // First cycle: anomaly suppression
+                    BudgetEvaluation::Healthy {
+                        spend: current_spend,
+                        velocity: 0.0,
+                    }
+                }
+                Some(prev) => {
+                    let raw_delta = current_spend - prev;
+                    let velocity = if elapsed_minutes > 0.0 {
+                        raw_delta / elapsed_minutes
+                    } else {
+                        raw_delta
+                    };
+
+                    if velocity > 1.0 {
+                        let alert = format!(
+                            "ANOMALY DETECTED! High token spend velocity: +${:.2}/min! Total: ${:.2}",
+                            velocity, current_spend
+                        );
+                        BudgetEvaluation::VelocityAnomaly {
+                            spend: current_spend,
+                            velocity,
+                            alert,
+                        }
+                    } else {
+                        BudgetEvaluation::Healthy {
+                            spend: current_spend,
+                            velocity,
+                        }
+                    }
+                }
             }
         }
+    }
+
+    /// Evaluates spend velocity (> +$1.00 / 60s) and 90% hardstop threshold ($45.00 of $50.00).
+    pub fn evaluate_spend_delta(
+        &self,
+        current_spend: f64,
+        previous_spend: f64,
+        max_daily_budget: f64,
+    ) -> BudgetEvaluation {
+        self.evaluate_spend_delta_normalized(
+            current_spend,
+            Some(previous_spend),
+            1.0,
+            max_daily_budget,
+        )
     }
 
     /// Dispatches budget-exceeded event to Kafka upon HardStop threshold breach.
@@ -154,6 +231,46 @@ impl FinOpsAgent {
             .await
     }
 
+    /// Single poll cycle to query spend logs and evaluate budget status with default 1.0 minute duration.
+    pub async fn poll_spend_and_evaluate(
+        &self,
+        max_daily_budget: f64,
+        previous_spend: Option<f64>,
+    ) -> anyhow::Result<BudgetEvaluation> {
+        self.poll_spend_and_evaluate_normalized(max_daily_budget, previous_spend, 1.0)
+            .await
+    }
+
+    /// Single poll cycle to query spend logs and evaluate budget status with normalized duration.
+    pub async fn poll_spend_and_evaluate_normalized(
+        &self,
+        max_daily_budget: f64,
+        previous_spend: Option<f64>,
+        elapsed_minutes: f64,
+    ) -> anyhow::Result<BudgetEvaluation> {
+        let url = format!("{}/spend/logs", self.litellm_base_url.trim_end_matches('/'));
+        let resp = self
+            .client
+            .get(&url)
+            .bearer_auth(&self.api_key)
+            .query(&[("epic", &self.tag.epic)])
+            .send()
+            .await?
+            .error_for_status()?;
+
+        let json: Value = resp.json().await?;
+        let spend = Self::parse_spend(&json).ok_or_else(|| {
+            anyhow::anyhow!("Could not parse spend from LiteLLM response: {:?}", json)
+        })?;
+
+        Ok(self.evaluate_spend_delta_normalized(
+            spend,
+            previous_spend,
+            elapsed_minutes,
+            max_daily_budget,
+        ))
+    }
+
     pub async fn monitor_budget(&self) -> anyhow::Result<()> {
         if self.litellm_base_url.is_empty() {
             tracing::warn!(
@@ -162,91 +279,72 @@ impl FinOpsAgent {
             return Ok(());
         }
 
-        let url = format!("{}/spend/logs", self.litellm_base_url.trim_end_matches('/'));
-
         let base_interval = Duration::from_secs(60);
         let max_interval = Duration::from_secs(15 * 60); // 15 minutes
         let mut current_interval = base_interval;
         let mut consecutive_failures: u32 = 0;
-        let mut previous_spend: f64 = 0.0;
+        let mut previous_spend: Option<f64> = None;
+        let mut last_poll_time: Option<Instant> = None;
 
         tracing::info!(
             "FinOpsAgent: Starting budget monitor for epic {} (url: {})",
             self.tag.epic,
-            url
+            self.litellm_base_url
         );
 
         loop {
             tracing::info!("FinOpsAgent: Checking spend for epic {}", self.tag.epic);
 
-            let response = self
-                .client
-                .get(&url)
-                .bearer_auth(&self.api_key)
-                .query(&[("epic", &self.tag.epic)])
-                .send()
-                .await;
+            let max_daily_budget = std::env::var("FINOPS_MAX_DAILY_BUDGET")
+                .ok()
+                .and_then(|v| v.parse::<f64>().ok())
+                .unwrap_or(50.0);
 
-            match response {
-                Ok(resp) => {
-                    if let Ok(json) = resp.json::<Value>().await {
-                        // Attempt to read total_spend from LiteLLM spend response
-                        let mut parsed_spend = None;
-                        if let Some(array) = json.as_array() {
-                            let mut sum = 0.0;
-                            for item in array {
-                                if let Some(spend) = item.get("spend").and_then(|v| v.as_f64()) {
-                                    sum += spend;
-                                }
-                            }
-                            parsed_spend = Some(sum);
-                        } else if let Some(spend) = json.get("total_spend").and_then(|v| v.as_f64())
-                        {
-                            parsed_spend = Some(spend);
+            let elapsed_minutes = last_poll_time
+                .map(|t| t.elapsed().as_secs_f64() / 60.0)
+                .unwrap_or(1.0);
+
+            match self
+                .poll_spend_and_evaluate_normalized(
+                    max_daily_budget,
+                    previous_spend,
+                    elapsed_minutes,
+                )
+                .await
+            {
+                Ok(evaluation) => {
+                    consecutive_failures = 0;
+                    current_interval = base_interval;
+                    last_poll_time = Some(Instant::now());
+
+                    match evaluation {
+                        BudgetEvaluation::HardStop { alert, spend, .. } => {
+                            tracing::error!("{}", alert);
+                            self.set_halted(true);
+                            previous_spend = Some(spend);
                         }
-
-                        if let Some(spend) = parsed_spend {
-                            // Reset backoff on successful data fetch
-                            consecutive_failures = 0;
-                            current_interval = base_interval;
-
-                            let max_daily_budget = std::env::var("FINOPS_MAX_DAILY_BUDGET")
-                                .ok()
-                                .and_then(|v| v.parse::<f64>().ok())
-                                .unwrap_or(50.0);
+                        BudgetEvaluation::VelocityAnomaly { alert, spend, .. } => {
+                            tracing::warn!("{}", alert);
+                            previous_spend = Some(spend);
+                        }
+                        BudgetEvaluation::Healthy {
+                            spend, velocity, ..
+                        } => {
                             let hardstop_threshold = max_daily_budget * 0.90;
-
-                            let evaluation =
-                                self.evaluate_spend_delta(spend, previous_spend, max_daily_budget);
-                            match evaluation {
-                                BudgetEvaluation::HardStop { alert, .. } => {
-                                    tracing::error!("{}", alert);
-                                }
-                                BudgetEvaluation::VelocityAnomaly { alert, .. } => {
-                                    tracing::warn!("{}", alert);
-                                }
-                                BudgetEvaluation::Healthy { velocity, .. } => {
-                                    tracing::info!(
-                                        "Current spend: ${:.2} / ${:.2} (Limit: ${:.2}). Velocity: +${:.2}/min. Budget is healthy.",
-                                        spend,
-                                        max_daily_budget,
-                                        hardstop_threshold,
-                                        velocity
-                                    );
-                                }
-                            }
-                            previous_spend = spend;
-                        } else {
-                            tracing::warn!(
-                                "FinOpsAgent: Could not parse total_spend from LiteLLM response."
+                            tracing::info!(
+                                "Current spend: ${:.2} / ${:.2} (Limit: ${:.2}). Velocity: +${:.2}/min. Budget is healthy.",
+                                spend,
+                                max_daily_budget,
+                                hardstop_threshold,
+                                velocity
                             );
+                            previous_spend = Some(spend);
                         }
                     }
                 }
                 Err(e) => {
                     consecutive_failures += 1;
                     if consecutive_failures >= CIRCUIT_BREAKER_THRESHOLD {
-                        // Circuit breaker open: downgrade to WARN to avoid log flooding
                         tracing::warn!(
                             "FinOpsAgent: LiteLLM unreachable ({} consecutive failures, backoff {}s): {}",
                             consecutive_failures,
@@ -259,7 +357,6 @@ impl FinOpsAgent {
                             e
                         );
                     }
-                    // Exponential backoff: double interval on each failure, capped at max
                     current_interval = (current_interval * 2).min(max_interval);
                 }
             }
@@ -303,10 +400,6 @@ mod tests {
             "key".to_string(),
             test_tag(),
         );
-        // The constructor doesn't strip — Default::default() does.
-        // But the URL construction in monitor_budget appends /spend/logs.
-        // So a raw URL with /v1 would become /v1/spend/logs.
-        // This test verifies the URL stored.
         assert_eq!(agent.litellm_base_url, "https://litellm.local:4000/v1");
     }
 
