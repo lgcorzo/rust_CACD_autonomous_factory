@@ -602,13 +602,13 @@ git commit -m "ci: automate evidence generation and artifact validation via make
 - Modify: `docs/` and lab notebook entries
 - Clean: Root directory of loose scratch scripts (`parse_*.py`, `test_ziti.rs`, etc.)
 
-- [ ] **Step 1: Clean root directory**
+- [x] **Step 1: Clean root directory**
 Move or remove obsolete experimental scripts from repository root into `scripts/` or archive.
 
-- [ ] **Step 2: Add "Validity & Limitations" section to experimental entries**
+- [x] **Step 2: Add "Validity & Limitations" section to experimental entries**
 Update lab notebook entries with: sample count $n$, model version, task authors, reproduction command, and known validity threats.
 
-- [ ] **Step 3: Commit and branch PR**
+- [x] **Step 3: Commit and branch PR**
 ```bash
 git checkout -b hardening/T4.2-lab-notebook-hygiene
 git add docs/ scripts/
