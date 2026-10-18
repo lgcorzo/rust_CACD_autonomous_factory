@@ -228,7 +228,7 @@ git commit -m "security: redact JitToken in Debug and eliminate unsafe test bloc
   - Uses word-boundary regexes instead of substring checks (`\b(eval|exec|system)\s*\(`).
   - Handles removed secrets gracefully without triggering false positives.
 
-- [ ] **Step 1: Write comprehensive table-driven failing tests**
+- [x] **Step 1: Write comprehensive table-driven failing tests**
 Create `crates/factory-core/tests/sast_scan_tests.rs`:
 ```rust
 use factory_core::security::SastScanResult;
@@ -253,22 +253,22 @@ fn test_sast_diff_scanner_added_lines_and_word_boundaries() {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `cargo test -p factory-core test_sast_diff_scanner_added_lines_and_word_boundaries`
 Expected: FAIL (current implementation flags `retrieval(` because it contains `eval(`).
 
-- [ ] **Step 3: Implement line filter and regex tripwire**
+- [x] **Step 3: Implement line filter and regex tripwire**
 In `crates/factory-core/src/security.rs`:
 - Filter diff lines: `diff.lines().filter(|line| line.starts_with('+') && !line.starts_with("+++"))`.
 - Implement `LazyLock<Regex>` for RCE patterns (`\b(eval|exec|system)\s*\(`), secrets, and SQL injections.
 - Add tripwires for: `Command::new("bash"|"sh"|"cmd")`, `reqwest::`, `TcpStream`, `remove_dir_all`.
 - Parameterize threshold via `ScanPolicy` (defaulting to 8.0).
 
-- [ ] **Step 4: Run tests to verify all pass**
+- [x] **Step 4: Run tests to verify all pass**
 Run: `cargo test -p factory-core --test sast_scan_tests`
 Expected: PASS
 
-- [ ] **Step 5: Commit and branch PR**
+- [x] **Step 5: Commit and branch PR**
 ```bash
 git checkout -b hardening/T1.3-sast-diff-scanner-regex
 git add crates/factory-core/

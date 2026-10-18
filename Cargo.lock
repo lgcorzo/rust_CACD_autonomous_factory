@@ -1797,6 +1797,7 @@ dependencies = [
  "prost 0.13.5",
  "prost-build 0.13.5",
  "rand 0.8.8",
+ "regex",
  "serde",
  "serde_json",
  "serde_yaml",

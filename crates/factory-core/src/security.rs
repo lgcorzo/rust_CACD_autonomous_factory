@@ -60,35 +60,107 @@ pub struct SastScanResult {
     pub critical_vulnerabilities_detected: bool,
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ScanPolicy {
+    pub min_safety_score: f32,
+    pub allow_network: bool,
+    pub allow_unsafe: bool,
+}
+
+impl Default for ScanPolicy {
+    fn default() -> Self {
+        Self {
+            min_safety_score: 8.0,
+            allow_network: false,
+            allow_unsafe: false,
+        }
+    }
+}
+
+static SECRET_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r#"(?i)\b(password|passwd|secret|api[_-]?key|private[_-]?key|token)\s*[:=]\s*["'][^"'\s]{6,}["']"#)
+        .expect("valid secret regex")
+});
+
+static RCE_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r#"\b(eval|exec|system)\s*\("#).expect("valid rce regex")
+});
+
+static CMD_INJECTION_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(
+        r#"(?i)(Command::new\s*\(\s*["'](sh|bash|cmd|powershell|zsh)["']|std::process::Command)"#,
+    )
+    .expect("valid cmd injection regex")
+});
+
+static NETWORK_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r#"\b(reqwest::|TcpStream::|curl\b|wget\b)"#).expect("valid network regex")
+});
+
+static SQLI_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r#"(?i)format!\s*\(\s*["']\s*(select|delete|update|insert)\b"#)
+        .expect("valid sqli regex")
+});
+
+static DESTRUCTIVE_FS_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r#"\b(remove_dir_all|fs::remove_file)\b"#)
+        .expect("valid destructive fs regex")
+});
+
+static UNSAFE_BLOCK_REGEX: std::sync::LazyLock<regex::Regex> =
+    std::sync::LazyLock::new(|| regex::Regex::new(r#"\bunsafe\s*\{"#).expect("valid unsafe regex"));
+
+/// Heuristic tripwire diff scanner.
+///
+/// Note: This is an automated heuristic tripwire designed to catch obvious command injections,
+/// hardcoded secrets, and destructive primitives in generated code diffs.
+/// The deterministic gating remains rustfmt, clippy, cargo-audit, and human review.
 impl SastScanResult {
     pub fn passes_gate(&self) -> bool {
-        self.is_safe && self.score >= 8.0 && !self.critical_vulnerabilities_detected
+        self.passes_gate_with(8.0)
+    }
+
+    pub fn passes_gate_with(&self, min_score: f32) -> bool {
+        self.is_safe && self.score >= min_score && !self.critical_vulnerabilities_detected
     }
 
     pub fn inspect_diff(diff: &str) -> Self {
+        Self::inspect_diff_with(diff, &ScanPolicy::default())
+    }
+
+    pub fn inspect_diff_with(diff: &str, policy: &ScanPolicy) -> Self {
         let mut findings = Vec::new();
         let mut critical = false;
         let mut score: f32 = 10.0;
 
-        let lower = diff.to_lowercase();
+        // Scan only added lines, ignoring diff header lines (+++)
+        let added_lines: Vec<&str> = diff
+            .lines()
+            .filter(|l| l.starts_with('+') && !l.starts_with("+++"))
+            .map(|l| &l[1..])
+            .collect();
+
+        if added_lines.is_empty() {
+            return Self {
+                is_safe: true,
+                score: 10.0,
+                findings,
+                critical_vulnerabilities_detected: false,
+            };
+        }
+
+        let combined_added = added_lines.join("\n");
 
         // 1. Hardcoded Secrets Check
-        if lower.contains("password = \"")
-            || lower.contains("api_key = \"")
-            || lower.contains("secret = \"")
-            || lower.contains("private_key = \"")
-        {
-            findings.push("Hardcoded secret or credential detected in diff".to_string());
+        if SECRET_REGEX.is_match(&combined_added) {
+            findings
+                .push("Hardcoded secret or credential detected in added diff lines".to_string());
             critical = true;
             score -= 4.0;
         }
 
-        // 2. Command Injection / RCE check
-        if lower.contains("system(")
-            || lower.contains("std::process::command::new(\"sh\")")
-            || lower.contains("exec(")
-            || lower.contains("eval(")
-        {
+        // 2. Command Injection / Arbitrary Code Execution
+        if RCE_REGEX.is_match(&combined_added) || CMD_INJECTION_REGEX.is_match(&combined_added) {
             findings.push(
                 "Potential Command Injection / Arbitrary Code Execution vector detected"
                     .to_string(),
@@ -97,21 +169,48 @@ impl SastScanResult {
             score -= 5.0;
         }
 
-        // 3. Raw SQL Injection check
-        if lower.contains("format!(\"select") || lower.contains("format!(\"delete") {
+        // 3. Outbound Network Calls
+        if !policy.allow_network && NETWORK_REGEX.is_match(&combined_added) {
+            findings.push("Outbound network primitive detected in generated code".to_string());
+            critical = true;
+            score -= 4.0;
+        }
+
+        // 4. Raw SQL Injection check
+        if SQLI_REGEX.is_match(&combined_added) {
             findings.push("Unparameterized SQL string formatting detected (SQLi risk)".to_string());
             critical = true;
             score -= 4.0;
         }
 
-        // 4. Unbounded recursion check
-        if lower.contains("loop {") && !lower.contains("break") && !lower.contains("return") {
-            findings.push("Potential unbounded loop without break condition detected".to_string());
-            score -= 2.5;
+        // 5. Destructive File System operations
+        if DESTRUCTIVE_FS_REGEX.is_match(&combined_added) {
+            findings.push("Destructive filesystem operation detected (remove_dir_all)".to_string());
+            critical = true;
+            score -= 4.0;
+        }
+
+        // 6. Unsafe blocks
+        if !policy.allow_unsafe && UNSAFE_BLOCK_REGEX.is_match(&combined_added) {
+            findings.push("Unsafe block introduced in generated code".to_string());
+            score -= 3.0;
+        }
+
+        // 7. Unbounded loop check
+        for line in &added_lines {
+            if line.contains("loop {")
+                && !combined_added.contains("break")
+                && !combined_added.contains("return")
+            {
+                findings
+                    .push("Potential unbounded loop without break condition detected".to_string());
+                score -= 2.5;
+                break;
+            }
         }
 
         let clamped_score = score.clamp(0.0, 10.0);
-        let is_safe = !critical && clamped_score >= 8.0;
+        let is_safe = !critical && clamped_score >= policy.min_safety_score;
 
         Self {
             is_safe,
