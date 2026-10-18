@@ -351,7 +351,7 @@ git commit -m "security: enforce strict bounds, egress denial, and non-zero sand
   - Expiry and replay verification (`verify_at(now: DateTime<Utc>) -> Result<VerificationOutcome>`).
   - Atomic batch signing.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 Create `crates/factory-core/tests/nhi_cryptographic_tests.rs`:
 ```rust
 #[test]
@@ -368,11 +368,11 @@ fn test_nhi_w3c_camel_case_and_expiry_rejection() {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `cargo test -p factory-core --test nhi_cryptographic_tests`
 Expected: FAIL
 
-- [ ] **Step 3: Implement W3C serde attributes, JCS canonicalization, and strict verification**
+- [x] **Step 3: Implement W3C serde attributes, JCS canonicalization, and strict verification**
 In `crates/factory-core/src/security/nhi.rs`:
 - Add `#[serde(rename_all = "camelCase")]` to `VerifiableCredential` and `CryptographicProof`.
 - Add `expiration_date: Option<DateTime<Utc>>` and `nonce: Option<String>`.
@@ -380,11 +380,11 @@ In `crates/factory-core/src/security/nhi.rs`:
 - Replace unstructured booleans with `enum VerificationOutcome { Valid, Expired, BadSignature, Malformed }`.
 - Make batch signing atomic: buffer signatures and assign only on full success.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `cargo test -p factory-core --test nhi_cryptographic_tests`
 Expected: PASS
 
-- [ ] **Step 5: Commit and branch PR**
+- [x] **Step 5: Commit and branch PR**
 ```bash
 git checkout -b hardening/T1.5-nhi-w3c-cryptography
 git add crates/factory-core/
