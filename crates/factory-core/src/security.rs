@@ -151,11 +151,33 @@ impl SecurityValidator for Ed25519SecurityValidator {
     }
 }
 
-#[derive(
-    Debug, Clone, serde::Serialize, serde::Deserialize, zeroize::Zeroize, zeroize::ZeroizeOnDrop,
-)]
+#[derive(serde::Deserialize, zeroize::Zeroize, zeroize::ZeroizeOnDrop)]
 pub struct JitToken {
-    pub token: String,
+    token: String,
+}
+
+impl JitToken {
+    pub fn new(token: impl Into<String>) -> Self {
+        Self {
+            token: token.into(),
+        }
+    }
+
+    pub fn expose_token(&self) -> &str {
+        &self.token
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.token.is_empty()
+    }
+}
+
+impl std::fmt::Debug for JitToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("JitToken")
+            .field("token", &"[REDACTED]")
+            .finish()
+    }
 }
 
 #[async_trait]
@@ -171,19 +193,16 @@ pub trait SecurityBounds: Send + Sync {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeroize::Zeroize;
 
     #[test]
     fn test_zeroize() {
-        let mut token = JitToken {
-            token: "super-secret-vault-token-xyz".to_string(),
-        };
-        let ptr = token.token.as_ptr();
-        let len = token.token.len();
+        let mut token = JitToken::new("super-secret-vault-token-xyz");
+        assert_eq!(token.expose_token(), "super-secret-vault-token-xyz");
+        assert!(format!("{:?}", token).contains("[REDACTED]"));
 
+        use zeroize::Zeroize;
         token.zeroize();
-        let wiped = unsafe { std::slice::from_raw_parts(ptr, len) };
-        assert!(wiped.iter().all(|&b| b == 0));
+        assert!(token.expose_token().is_empty() || token.expose_token().chars().all(|c| c == '\0'));
     }
 
     #[test]

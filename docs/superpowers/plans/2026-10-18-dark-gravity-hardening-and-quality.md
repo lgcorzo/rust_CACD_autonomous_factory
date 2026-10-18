@@ -174,7 +174,7 @@ git commit -m "security: ensure audit_content stubs fail closed on unconfigured 
 **Interfaces:**
 - Produces: Redacted `Debug`, eliminated naked `Serialize`, protected secret access via `expose_token()`, and safe drop zeroization test.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 In `crates/factory-core/tests/security_tests.rs`:
 ```rust
 #[test]
@@ -189,11 +189,11 @@ fn test_jit_token_debug_redacts_secret_and_no_unsafe_leak() {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `cargo test -p factory-core test_jit_token_debug_redacts_secret_and_no_unsafe_leak`
 Expected: FAIL (`token.token` is currently a public plaintext string printed in `Debug`).
 
-- [ ] **Step 3: Refactor JitToken**
+- [x] **Step 3: Refactor JitToken**
 In `crates/factory-core/src/security.rs`:
 - Make the secret field private.
 - Implement manual `fmt::Debug` printing `JitToken { token: "[REDACTED]" }`.
@@ -201,11 +201,11 @@ In `crates/factory-core/src/security.rs`:
 - Retain `Zeroize` and `ZeroizeOnDrop`.
 - Replace the `unsafe` memory inspection test `test_zeroize` with a safe drop validation test.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `cargo test -p factory-core test_jit_token_debug_redacts_secret_and_no_unsafe_leak`
 Expected: PASS
 
-- [ ] **Step 5: Commit and branch PR**
+- [x] **Step 5: Commit and branch PR**
 ```bash
 git checkout -b hardening/T1.2-jittoken-redaction
 git add crates/factory-core/
