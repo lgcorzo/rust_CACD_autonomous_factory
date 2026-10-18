@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-10-18T08:48:29.069826312+00:00",
+  "total_samples": 55,
+  "malicious_samples": 27,
+  "benign_samples": 28,
+  "true_positives": 27,
+  "false_positives": 0,
+  "true_negatives": 28,
+  "false_negatives": 0,
+  "true_positive_rate": 1.0,
+  "false_positive_rate": 0.0,
+  "all_critical_vectors_blocked": true,
+  "zero_benign_regressions": true
+}

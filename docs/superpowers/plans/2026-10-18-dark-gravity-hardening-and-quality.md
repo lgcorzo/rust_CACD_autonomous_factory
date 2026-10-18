@@ -512,24 +512,24 @@ git commit -m "workflows: implement diff normalization, oscillation deadlock det
 **Interfaces:**
 - Produces: Automated report `evidence/security/corpus_results.json` documenting true positive and false positive rates.
 
-- [ ] **Step 1: Assemble corpus directory and JSON test fixtures**
+- [x] **Step 1: Assemble corpus directory and JSON test fixtures**
 Create samples covering evasion techniques:
 - String concatenation (`"sys" + "tem"`), base64 encoded payloads.
 - Obfuscated command execution and network dialers.
 - Prompt injection vectors in Git commit messages and issue bodies.
 
-- [ ] **Step 2: Implement adversarial test runner**
+- [x] **Step 2: Implement adversarial test runner**
 In `tests/adversarial/mod.rs`:
 Iterate through corpus and verify that:
 - 100% of labeled malicious diffs are blocked.
 - 0% of legitimate refactoring diffs (e.g., removing secrets, safe library calls) are blocked.
 - Assert that prompt-injection attempts never bypass the HITL gate.
 
-- [ ] **Step 3: Run adversarial test suite**
+- [x] **Step 3: Run adversarial test suite**
 Run: `cargo test --test adversarial_suite`
 Expected: PASS with 100% block on critical vectors.
 
-- [ ] **Step 4: Commit and branch PR**
+- [x] **Step 4: Commit and branch PR**
 ```bash
 git checkout -b hardening/T3.1-adversarial-corpus
 git add tests/adversarial/ evidence/security/

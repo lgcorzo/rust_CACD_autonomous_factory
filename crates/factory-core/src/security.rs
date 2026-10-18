@@ -88,23 +88,27 @@ impl Default for ScanPolicy {
 }
 
 static SECRET_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"(?i)\b(password|passwd|secret|api[_-]?key|private[_-]?key|token)\s*[:=]\s*["'][^"'\s]{6,}["']"#)
+    regex::Regex::new(r#"(?i)\b(pass|db_pass|password|passwd|secret|api[_-]?key|private[_-]?key|token)\s*[:=]\s*["'][^"'\s]{6,}["']|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|sk_live_[0-9a-zA-Z]{16,}|sk-proj-[0-9a-zA-Z_-]{16,}|-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----|Bearer\s+ey[A-Za-z0-9_-]{10,}"#)
         .expect("valid secret regex")
 });
 
 static RCE_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"\b(eval|exec|system)\s*\("#).expect("valid rce regex")
+    regex::Regex::new(r#"\b(eval|exec|system|popen|spawn)\s*\(|child_process\s*\.\s*\w+\s*\("#)
+        .expect("valid rce regex")
 });
 
 static CMD_INJECTION_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
     regex::Regex::new(
-        r#"(?i)(Command::new\s*\(\s*["'](sh|bash|cmd|powershell|zsh)["']|std::process::Command)"#,
+        r#"(?i)(Command::new\s*\(\s*["'](sh|bash|cmd|powershell|zsh)["']|std::process::Command|`\s*(rm\b|bash\b|sh\b|curl\b|wget\b|chmod\b|chown\b|eval\b|exec\b)[^`]*`)"#,
     )
     .expect("valid cmd injection regex")
 });
 
 static NETWORK_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"\b(reqwest::|TcpStream::|curl\b|wget\b)"#).expect("valid network regex")
+    regex::Regex::new(
+        r#"\b(reqwest::|TcpStream::|UdpSocket::|curl\s+|wget\s+|socket\.send_to\s*\()"#,
+    )
+    .expect("valid network regex")
 });
 
 static SQLI_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
@@ -113,8 +117,20 @@ static SQLI_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(
 });
 
 static DESTRUCTIVE_FS_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"\b(remove_dir_all|fs::remove_file)\b"#)
-        .expect("valid destructive fs regex")
+    regex::Regex::new(
+        r#"\b(remove_dir_all|fs::remove_file|rm\s+-rf|rmtree)\b|std::fs::write\s*\(\s*["']/usr/"#,
+    )
+    .expect("valid destructive fs regex")
+});
+
+static PROMPT_INJECTION_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r#"(?i)(\[(system directive|system override)\]|@darkgravity\s+/merge)"#)
+        .expect("valid prompt injection regex")
+});
+
+static OBFUSCATION_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r#"\b(base64::decode|String::from_utf8\s*\(\s*vec!\s*\[\s*0x)"#)
+        .expect("valid obfuscation regex")
 });
 
 static UNSAFE_BLOCK_REGEX: std::sync::LazyLock<regex::Regex> =
@@ -195,12 +211,26 @@ impl SastScanResult {
 
         // 5. Destructive File System operations
         if DESTRUCTIVE_FS_REGEX.is_match(&combined_added) {
-            findings.push("Destructive filesystem operation detected (remove_dir_all)".to_string());
+            findings.push("Destructive filesystem operation detected".to_string());
             critical = true;
             score -= 4.0;
         }
 
-        // 6. Unsafe blocks
+        // 6. Prompt Injection vectors
+        if PROMPT_INJECTION_REGEX.is_match(&combined_added) {
+            findings.push("Prompt injection directive detected in diff comments/code".to_string());
+            critical = true;
+            score -= 5.0;
+        }
+
+        // 7. Suspicious Obfuscation
+        if OBFUSCATION_REGEX.is_match(&combined_added) {
+            findings.push("Suspicious obfuscation or encoded payload detected in diff".to_string());
+            critical = true;
+            score -= 4.0;
+        }
+
+        // 8. Unsafe blocks
         if !policy.allow_unsafe && UNSAFE_BLOCK_REGEX.is_match(&combined_added) {
             findings.push("Unsafe block introduced in generated code".to_string());
             score -= 3.0;
