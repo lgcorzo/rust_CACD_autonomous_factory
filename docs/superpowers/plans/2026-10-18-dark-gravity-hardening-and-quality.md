@@ -457,7 +457,7 @@ git commit -m "finops: add client timeouts, error backoff, and active mission ha
   - Set-based history comparison detecting A-B-A-B oscillation deadlocks.
   - Scanner trait injection (`trait DiffScanner`) for decoupled testing.
 
-- [ ] **Step 1: Write failing test for oscillation and persistent trip**
+- [x] **Step 1: Write failing test for oscillation and persistent trip**
 In `crates/factory-application/tests/circuit_breaker_tests.rs`:
 ```rust
 #[test]
@@ -475,22 +475,22 @@ fn test_circuit_breaker_detects_abab_oscillation_and_persistent_trip() {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 Run: `cargo test -p factory-application --test circuit_breaker_tests`
 Expected: FAIL (current logic only compares with `.last()` diff hash).
 
-- [ ] **Step 3: Implement diff normalization and set-based history tracking**
+- [x] **Step 3: Implement diff normalization and set-based history tracking**
 In `crates/factory-application/src/workflows/circuit_breaker.rs`:
 - Add `tripped: bool` field and `pub fn reset(&mut self)`.
 - Normalize diffs before hashing.
 - Track recent hashes in `std::collections::HashSet` or bounded `VecDeque`.
 - Sanitize markdown formatting in alerts to prevent injection.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 Run: `cargo test -p factory-application --test circuit_breaker_tests`
 Expected: PASS
 
-- [ ] **Step 5: Commit and branch PR**
+- [x] **Step 5: Commit and branch PR**
 ```bash
 git checkout -b hardening/T2.2-circuit-breaker-deadlock
 git add crates/factory-application/
