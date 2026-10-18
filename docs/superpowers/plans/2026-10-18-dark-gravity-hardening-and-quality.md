@@ -628,13 +628,13 @@ git commit -m "docs: clean root directory scripts and standardize lab notebook v
 **Interfaces:**
 - Produces: Controlled, double-blind evaluation protocol between Dark Gravity and Jules across 25 independent benchmark tasks on frozen repositories.
 
-- [ ] **Step 1: Define evaluation protocol and scoring rubric**
+- [x] **Step 1: Define evaluation protocol and scoring rubric**
 Metrics: CI green on first attempt, iteration count, human interventions required, total token cost, wall-clock time, CodeQL/clippy findings, and governance compliance (HITL, sandbox containment, FinOps enforcement).
 
-- [ ] **Step 2: Author benchmark reproduction script**
+- [x] **Step 2: Author benchmark reproduction script**
 Automate task provisioning, commit freezes, and blind result recording.
 
-- [ ] **Step 3: Commit protocol**
+- [x] **Step 3: Commit protocol**
 ```bash
 git checkout -b hardening/T5.1-jules-benchmark-protocol
 git add docs/benchmarks/ scripts/
