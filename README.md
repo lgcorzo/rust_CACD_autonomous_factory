@@ -2,7 +2,7 @@
 
 [![CI/CD Pipeline](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/pipeline.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/pipeline.yml)
 [![Wiki Content Sync](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml)
-[![Screencast Walkthrough](https://img.shields.io/badge/Live_Demo-1080p_Video-blueviolet.svg)](docs/screencast_walkthrough.md)
+[![Screencast Walkthrough](https://img.shields.io/badge/Demo_Video-Script--Rendered-blueviolet.svg)](docs/screencast_walkthrough.md)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lgcorzo/dark-gravity-factory.svg)](https://hub.docker.com/r/lgcorzo/dark-gravity-factory)
 [![Empirical Evidence Tree](https://img.shields.io/badge/Evidence_Tree-Verified-emerald.svg)](evidence/baseline.md)
 [![Demo Video](https://img.shields.io/badge/Demo_Video-Watch_Now-blueviolet.svg)](#-demo-video--empirical-evidence)
@@ -11,7 +11,7 @@
 
 **Dark Gravity** is a high-performance, long-term agentic system serving as the core intelligence for the **CA/CD Autonomous Agent Factory**. Rebuilt from the ground up in **Rust**, it orchestrates complex multi-agent workflows with zero-trust security and durable task execution.
 
-> 🎬 **[Watch the 5-Minute Live Factory Execution Screencast Walkthrough](docs/screencast_walkthrough.md)** (`docs/assets/screencast_dark_gravity_walkthrough.mp4`) — Demonstrating outbound issue polling, Hatchet 6-phase DAG orchestration, gVisor container sandboxing (clamped up to 500m CPU / 512Mi RAM for worker compilation, ≤30MiB for micro-sandboxes), interactive PR directives (`@darkgravity /status`, `@darkgravity /refine`), and mandatory Human-in-the-Loop (HITL) merge blocking.
+> 🎬 **[Watch the 5-Minute Screencast Walkthrough](docs/screencast_walkthrough.md)** (`docs/assets/screencast_dark_gravity_walkthrough.mp4`) — *Technical demonstration renderizada programáticamente a partir de un guión de ejecución (`scripts/render_screencast.py`) basado en trazas de auditoría.* Demostrando outbound issue polling, Hatchet 6-phase DAG orchestration, gVisor container sandboxing (clamped up to 500m CPU / 512Mi RAM for worker compilation, ≤30MiB for micro-sandboxes), interactive PR directives (`@darkgravity /status`, `@darkgravity /refine`), y mandatory Human-in-the-Loop (HITL) merge blocking.
 
 ---
 
@@ -19,7 +19,7 @@
 
 ### 📹 Video Demo & Walkthrough
 Watch the end-to-end autonomous mission execution, Zero-Trust verification loop, and gVisor sandbox memory clamping in action:
-- 🎬 **[Dark Gravity V7 Autonomous Factory - End-to-End Mission Walkthrough](docs/screencast_walkthrough.md)** *(Local high-definition recording available at [`docs/assets/screencast_dark_gravity_walkthrough.mp4`](docs/assets/screencast_dark_gravity_walkthrough.mp4))*.
+- 🎬 **[Dark Gravity V7 Autonomous Factory - Mission Walkthrough](docs/screencast_walkthrough.md)** *(Demostración renderizada a partir de un guión programático disponible en [`docs/assets/screencast_dark_gravity_walkthrough.mp4`](docs/assets/screencast_dark_gravity_walkthrough.mp4))*.
 
 ### 🌳 Empirical Evidence Tree Navigation
 Every architectural claim and runtime isolation guarantee in Dark Gravity is backed by reproducible, empirical evidence artifacts stored in the repository:
@@ -89,7 +89,7 @@ To maintain absolute operational transparency, capabilities across Dark Gravity 
 | **gVisor (`runsc`) Sandbox** | Infrastructure | **Implemented** | `config/sandbox-gvisor-profile.yaml` | `RuntimeClass=gvisor-sandbox` configured for `sandbox-exec` pods. [Evidence: `baseline.md`](evidence/baseline.md) |
 | **RAM Resource Clamping** | Kernel Isolation | **Implemented** | `crates/factory-core/src/security.rs` | Micro-sandbox clamped to $\le 30\text{ MiB}$ RAM / $250\text{m}$ CPU; worker compilation clamped up to $512\text{ MiB}$ / $500\text{m}$ CPU. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
 | **OpenZiti mTLS Overlay** | Zero-Trust Network | **Implemented** | `crates/factory-infrastructure/src/ziti.rs` | Sidecar configured for agent pods; memory bounded $\le 20\text{ MiB}$. [Evidence: `baseline.md`](evidence/baseline.md) |
-| **Egress Deny-All NetworkPolicy** | Security Policy | **Designed** | `config/deny-all-egress-networkpolicy.yaml` | Egress restriction specification via Kubernetes NetworkPolicy and CNI rules. [Evidence: `security-tests.md`](evidence/security-tests.md) |
+| **Egress Deny-All NetworkPolicy** | Security Policy | **Designed** | `config/deny-all-egress-networkpolicy.yaml` | Egress restriction specification via Calico / Kubernetes NetworkPolicy rules. [Evidence: `security-tests.md`](evidence/security-tests.md) |
 | **Hatchet 6-Phase DAG Engine** | Orchestration | **Implemented** | `crates/factory-application/src/workflows/` | Engine configured on port 8080/7077 with PostgreSQL checkpointing. [Evidence: `baseline.md`](evidence/baseline.md) |
 | **LiteLLM Proxy & FinOps Headers** | AI Inference | **Implemented** | `config/litellm_proxy_config.yaml` | Configured in `ml-apps` NS; passes `x-vtags-*` virtual headers. [Evidence: `baseline.md`](evidence/baseline.md) |
 | **CircuitBreakerGuard (Diff Hashing)** | Application Logic | **Implemented** | `crates/factory-application/src/workflows/circuit_breaker.rs` | Prevents infinite retry loops via diff normalization and A-B-A-B oscillation tracking. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
@@ -123,14 +123,14 @@ Dark Gravity continuously polls and autonomously executes missions across config
 
 ## 🛡️ Technological Sovereignty, Zero-Trust Security & Sovereign Dependency Policy
 
-The **Dark Gravity Autonomous CA/CD Software Factory (V7.2 / V7.3)** is built under strict compliance with the **EU AI Act**, **Hazitek / SPRI**, and **SOC 2 Type II** standards, requiring absolute architectural and supply-chain sovereignty.
+The **Dark Gravity Autonomous CA/CD Software Factory (V7.2 / V7.3)** is designed for regulatory readiness (**EU AI Act** Articles 12 & 14 Human Oversight, **Hazitek / SPRI**, and **SOC 2 Type II** controls), requiring architectural and supply-chain sovereignty.
 
 *(For detailed architectural specifications and design records, refer to the [Dark Gravity Multi-Agent Architecture Knowledge Base](https://notebook.google.com/notebook/116d5f03-2fb0-4fa7-bd7c-1c9849920abc))*.
 
 ### 1. The Technological Sovereignty Imperative (Why Sovereign Forks?)
 In an autonomous software factory where AI agents autonomously synthesize, compile, and deliver production software, relying blindly on third-party commercial cloud services or unmaintained open-source dependencies poses existential operational risks:
 - **Mitigation of Upstream Licensing Closures:** When foundational projects alter their licensing model, close public distributions, or abandon open-source governance (as occurred with MinIO), Dark Gravity prevents vendor lock-in and supply-chain disruption by maintaining **semantic mirrors and sovereign forks** under `@lgcorzo`.
-- **Autonomous Security Verification & Zero-CVE Policy:** Third-party libraries are not trusted implicitly. Dark Gravity continuously scans, audits, and patches its sovereign dependency tree independently (enforcing 0 leaked credentials and zero high-severity CVEs) rather than awaiting upstream commercial release cycles.
+- **Autonomous Security Verification & Dependency Auditing:** Third-party libraries are not trusted implicitly. Dark Gravity continuously scans, audits, and patches its sovereign dependency tree independently via automated `cargo audit` and container vulnerability scanning rather than awaiting upstream commercial release cycles.
 - **Air-Gapped Operational Continuity:** The factory operates on private, sovereign Kubernetes infrastructure. Proprietary source code, AST surgical mutations, and causal corporate memory remain strictly within sovereign boundaries.
 
 ### 2. Core Sovereignty & Security Architecture
