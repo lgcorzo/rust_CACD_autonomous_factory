@@ -21,7 +21,7 @@ base64 = "0.22"
 hex = "0.4"
 rand = "0.8"
 regex = { workspace = true }
-serde_jcs = "0.1"
+serde_jcs = "0.2"
 
 [dev-dependencies]
 criterion = "0.5"
