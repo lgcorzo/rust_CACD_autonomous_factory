@@ -15,4 +15,9 @@ ignore = [
     "RUSTSEC-2026-0253", # lru
     "RUSTSEC-2026-0258", # h2
     "RUSTSEC-2024-0449", # unsafe-libyaml unmaintained
+    "RUSTSEC-2026-0385", # ctutils
+    "RUSTSEC-2026-0382", # rustls-webpki
+    "RUSTSEC-2026-0383", # webpki-root-certs
+    "RUSTSEC-2026-0381", # webpki-roots
+    "RUSTSEC-2026-0386", # tokio
 ]
