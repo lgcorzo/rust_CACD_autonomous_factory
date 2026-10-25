@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "code-review-graph": {
+      "command": "uvx",
+      "args": [
+        "code-review-graph",
+        "serve"
+      ],
+      "cwd": "${workspaceFolder}",
+      "type": "stdio",
+      "env": {
+        "CRG_OPENAI_BASE_URL": "https://litellm.ziti/v1",
+        "CRG_OPENAI_API_KEY": "${LITELLM_API_KEY}",
+        "CRG_OPENAI_MODEL": "lite_embedding",
+        "OPENAI_BASE_URL": "https://litellm.ziti/v1",
+        "OPENAI_API_KEY": "${LITELLM_API_KEY}"
+      }
+    }
+  }
+}
