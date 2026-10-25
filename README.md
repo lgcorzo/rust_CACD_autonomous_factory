@@ -301,17 +301,17 @@ code-review-graph install -y --platform antigravity
 For secure embeddings and semantic extraction, both tools route through OpenZiti to reach internal LiteLLM endpoints. Ensure your `.env` file is configured correctly:
 
 ```env
-# Graphify / Code Review Embeddings Config (LiteLLM via Ziti)
-OPENAI_BASE_URL=https://litellm.ziti/v1
-OPENAI_API_KEY=<insert-your-actual-litellm-api-key>
+# Graphify / Code Review Embeddings Config (LiteLLM / OpenAI Gateway)
+OPENAI_BASE_URL=https://<your-litellm-or-openai-gateway>/v1
+OPENAI_API_KEY=<insert-your-actual-api-key>
 OPENAI_MODEL=internal-gpt4_v0.1
 
 # Fallback for graphify extraction if not using LiteLLM:
 # GEMINI_API_KEY=<insert-your-gemini-api-key>
 # GOOGLE_API_KEY=<insert-your-google-api-key>
 
-CRG_OPENAI_BASE_URL=https://litellm.ziti/v1
-CRG_OPENAI_API_KEY=<insert-your-actual-litellm-api-key>
+CRG_OPENAI_BASE_URL=https://<your-litellm-or-openai-gateway>/v1
+CRG_OPENAI_API_KEY=<insert-your-actual-api-key>
 CRG_OPENAI_MODEL=lite_embedding
 ```
 
