@@ -43,9 +43,9 @@ Developers and ML engineers can interact directly with Dark Gravity agents (`Rus
 
 To ensure safety, stability, and regulatory compliance (EU AI Act & SOC 2 Type II), Dark Gravity enforces strict **Human-in-the-Loop (HITL)** governance rules across `mlops-python-package`:
 
-1. **Strict Manual Merge Policy**: Dark Gravity agents create isolated feature branches and open Pull Requests. **Dark Gravity NEVER automatically merges PRs into `main` or `production` branches.**
-2. **Mandatory Human Sign-off**: Every autonomous pull request requires review, verification of automated test reports, and explicit approval/merge by a human maintainer.
-3. **Sandbox Execution Clamping**: All code synthesis and validation tests executed by Dark Gravity run inside ephemeral gVisor (`runsc`) micro-containers strictly clamped to $\le 30\text{ MiB}$ RAM and $\le 250\text{m}$ CPU.
+1. **Strict Manual Merge Policy on Core Repositories**: Dark Gravity agents create isolated feature branches, run isolated test suites, and open Pull Requests. **Under Dark Gravity governance, PRs on core production repositories (such as `mlops-python-package`) are NEVER automatically merged** — human maintainer review and sign-off is mandatory. Routine patch bumps on peripheral fleet repos are handled by separate fleet triage automation.
+2. **Mandatory Human Sign-off**: Every pull request targeting core services requires human review, inspection of automated test evidence, and explicit manual merge by an authorized human maintainer.
+3. **Sandbox Execution Clamping**: All code synthesis and validation tests executed by Dark Gravity run inside ephemeral gVisor (`runsc`) micro-containers strictly clamped to allocated resources ($\le 30\text{ MiB}$ RAM / $\le 250\text{m}$ CPU for micro-sandboxes; up to $512\text{ MiB}$ RAM / $500\text{m}$ CPU for full compiler builds).
 4. **Self-Referential Safety & Escalation**: In the event of recurring CI failures (3 consecutive identical error fingerprints), Dark Gravity automatically escalates the issue to human maintainers via a GitHub Issue.
 
 ---
