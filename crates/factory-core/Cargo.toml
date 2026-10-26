@@ -17,7 +17,7 @@ async-trait = "0.1"
 prost = { workspace = true }
 zeroize = { version = "1.7", features = ["derive"] }
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
-base64 = "0.22"
+base64 = "0.23"
 hex = "0.4"
 rand = "0.8"
 regex = { workspace = true }
