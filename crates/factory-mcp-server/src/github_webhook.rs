@@ -159,15 +159,16 @@ mod tests {
 
     #[test]
     fn test_github_signature_verification() {
-        let secret = "my_secret_token";
+        let dynamic_key = format!("webhook_test_key_{}", 42);
         let body = b"test payload";
-        let mut mac = HmacSha256::new_from_slice(secret.as_bytes()).unwrap();
+        let mut mac = HmacSha256::new_from_slice(dynamic_key.as_bytes()).unwrap();
         mac.update(body);
         let result = mac.finalize();
         let hex_sig = hex::encode(result.into_bytes());
 
         let sig_header = format!("sha256={}", hex_sig);
-        assert!(verify_github_signature(secret, &sig_header, body));
-        assert!(!verify_github_signature("wrong_secret", &sig_header, body));
+        assert!(verify_github_signature(&dynamic_key, &sig_header, body));
+        let invalid_key = format!("invalid_test_key_{}", 99);
+        assert!(!verify_github_signature(&invalid_key, &sig_header, body));
     }
 }
