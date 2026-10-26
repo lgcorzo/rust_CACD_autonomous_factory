@@ -173,6 +173,10 @@ mod tests {
 
         let sig_header = format!("sha256={}", hex_sig);
         assert!(verify_github_signature(&primary_token, &sig_header, body));
-        assert!(!verify_github_signature(&secondary_token, &sig_header, body));
+        assert!(!verify_github_signature(
+            &secondary_token,
+            &sig_header,
+            body
+        ));
     }
 }
