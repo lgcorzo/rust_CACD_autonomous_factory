@@ -3,7 +3,7 @@ use crate::tools::Tool;
 use async_openai::config::OpenAIConfig;
 use async_openai::types::chat::{
     ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
-    ResponseFormat, CreateChatCompletionRequestArgs,
+    CreateChatCompletionRequestArgs, ResponseFormat,
 };
 use async_openai::Client;
 use async_trait::async_trait;
