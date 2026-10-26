@@ -18,7 +18,7 @@ async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 aws-config = { version = "1.0", default-features = false, features = ["behavior-version-latest", "rt-tokio", "client-hyper"] }
 aws-sdk-s3 = { version = "1.141.0", default-features = false, features = ["rt-tokio"] }
-reqwest = { version = "0.11", features = ["json", "stream"] }
+reqwest = { version = "0.13", features = ["json", "stream", "form"] }
 futures-util = "0.3"
 mockall = { workspace = true }
 tokio-test = { workspace = true }

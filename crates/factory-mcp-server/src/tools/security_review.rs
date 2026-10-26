@@ -1,10 +1,9 @@
 use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_openai::config::OpenAIConfig;
-use async_openai::types::{
+use async_openai::types::chat::{
     ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
-    ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
-    CreateChatCompletionRequestArgs,
+    CreateChatCompletionRequestArgs, ResponseFormat,
 };
 use async_openai::Client;
 use async_trait::async_trait;
@@ -119,9 +118,7 @@ impl Tool for SecurityReviewTool {
                     .build()?
                     .into(),
             ])
-            .response_format(ChatCompletionResponseFormat {
-                r#type: ChatCompletionResponseFormatType::JsonObject,
-            })
+            .response_format(ResponseFormat::JsonObject)
             .build()
         {
             if let Ok(response) = self.client.chat().create(request).await {

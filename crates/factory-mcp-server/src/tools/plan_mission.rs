@@ -1,10 +1,9 @@
 use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_openai::{
-    types::{
+    types::chat::{
         ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
-        ChatCompletionResponseFormat, ChatCompletionResponseFormatType,
-        CreateChatCompletionRequestArgs,
+        CreateChatCompletionRequestArgs, ResponseFormat,
     },
     Client,
 };
@@ -81,9 +80,7 @@ impl Tool for PlanMissionTool {
                     .build()?
                     .into(),
             ])
-            .response_format(ChatCompletionResponseFormat {
-                r#type: ChatCompletionResponseFormatType::JsonObject,
-            })
+            .response_format(ResponseFormat::JsonObject)
             .build()?;
 
         let response = self.client.chat().create(request).await?;

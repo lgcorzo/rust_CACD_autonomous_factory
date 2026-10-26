@@ -20,8 +20,8 @@ futures = "0.3"
 hatchet-sdk = { workspace = true }
 mockall = { workspace = true }
 prost = { workspace = true }
-reqwest = { version = "0.12", features = ["json", "stream", "multipart"] }
-async-openai = "0.23"
+reqwest = { version = "0.13", features = ["json", "stream", "multipart"] }
+async-openai = { version = "0.36.0", features = ["full"] }
 rdkafka = { workspace = true }
 zeroize = "1.8.1"
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
