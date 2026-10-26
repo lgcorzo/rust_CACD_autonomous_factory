@@ -34,7 +34,8 @@ pub fn compute_diff_hash(diff: &str) -> String {
     let normalized = normalize_diff(diff);
     let mut hasher = Sha256::new();
     hasher.update(normalized.as_bytes());
-    format!("{:x}", hasher.finalize())
+    let result = hasher.finalize();
+    result.iter().map(|b| format!("{:02x}", b)).collect()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
