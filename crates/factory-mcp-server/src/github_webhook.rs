@@ -159,15 +159,24 @@ mod tests {
 
     #[test]
     fn test_github_signature_verification() {
-        let secret = "my_secret_token";
+        let primary_bytes: Vec<u8> = (0..32).map(|i| (i * 7 + 13) as u8).collect();
+        let primary_token = hex::encode(primary_bytes);
+
+        let secondary_bytes: Vec<u8> = (0..32).map(|i| (i * 11 + 17) as u8).collect();
+        let secondary_token = hex::encode(secondary_bytes);
+
         let body = b"test payload";
-        let mut mac = HmacSha256::new_from_slice(secret.as_bytes()).unwrap();
+        let mut mac = HmacSha256::new_from_slice(primary_token.as_bytes()).unwrap();
         mac.update(body);
         let result = mac.finalize();
         let hex_sig = hex::encode(result.into_bytes());
 
         let sig_header = format!("sha256={}", hex_sig);
-        assert!(verify_github_signature(secret, &sig_header, body));
-        assert!(!verify_github_signature("wrong_secret", &sig_header, body));
+        assert!(verify_github_signature(&primary_token, &sig_header, body));
+        assert!(!verify_github_signature(
+            &secondary_token,
+            &sig_header,
+            body
+        ));
     }
 }
