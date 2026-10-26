@@ -117,18 +117,18 @@ impl AuditorAgent {
             .unwrap_or_default();
         let client = async_openai::Client::with_config(config).with_http_client(http_client);
 
-        let system_msg = async_openai::types::ChatCompletionRequestSystemMessageArgs::default()
+        let system_msg = async_openai::types::chat::ChatCompletionRequestSystemMessageArgs::default()
             .content("You are an Automation Auditor. Analyze the provided failure logs from Hatchet workflow runs. You must output ONLY a valid JSON array of objects. Each object must have a 'type' ('prompt_adjustment' or 'tool_modification'), a 'target_agent' or 'target_tool', and a 'recommendation' string.")
             .build()?;
 
-        let user_msg = async_openai::types::ChatCompletionRequestUserMessageArgs::default()
+        let user_msg = async_openai::types::chat::ChatCompletionRequestUserMessageArgs::default()
             .content(format!("Failure logs:\n{}", failures_json))
             .build()?;
 
         let model_cfg = factory_core::AgentModelConfig::load();
         let model = model_cfg.get_model("auditor");
 
-        let request = async_openai::types::CreateChatCompletionRequestArgs::default()
+        let request = async_openai::types::chat::CreateChatCompletionRequestArgs::default()
             .model(model)
             .messages([system_msg.into(), user_msg.into()])
             .build()?;
@@ -188,11 +188,11 @@ impl AuditorAgent {
 
         let client = async_openai::Client::with_config(config);
 
-        let system_msg = async_openai::types::ChatCompletionRequestSystemMessageArgs::default()
+        let system_msg = async_openai::types::chat::ChatCompletionRequestSystemMessageArgs::default()
             .content("You are an Automation Auditor prompt engineer. Given the Ground Truth Targets and recent Failure Recommendations, propose a single, optimized System Prompt string that would prevent these failures in the future. Output ONLY the raw prompt string.")
             .build()?;
 
-        let user_msg = async_openai::types::ChatCompletionRequestUserMessageArgs::default()
+        let user_msg = async_openai::types::chat::ChatCompletionRequestUserMessageArgs::default()
             .content(format!(
                 "Targets:\n{}\n\nRecommendations:\n{}",
                 targets_json, recs_json
@@ -202,7 +202,7 @@ impl AuditorAgent {
         let model_cfg = factory_core::AgentModelConfig::load();
         let model = model_cfg.get_model("auditor");
 
-        let request = async_openai::types::CreateChatCompletionRequestArgs::default()
+        let request = async_openai::types::chat::CreateChatCompletionRequestArgs::default()
             .model(model)
             .messages([system_msg.into(), user_msg.into()])
             .build()?;
