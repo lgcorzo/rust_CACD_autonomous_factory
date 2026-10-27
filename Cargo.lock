@@ -1758,7 +1758,7 @@ dependencies = [
  "serde_jcs",
  "serde_json",
  "serde_yaml",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "tokio",
  "tracing",
  "uuid",
