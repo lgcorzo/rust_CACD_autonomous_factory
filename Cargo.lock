@@ -1745,7 +1745,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "base64 0.22.1",
+ "base64 0.23.1",
  "chrono",
  "criterion",
  "ed25519-dalek",
@@ -1773,7 +1773,7 @@ dependencies = [
  "async-trait",
  "aws-config",
  "aws-sdk-s3",
- "base64 0.22.1",
+ "base64 0.23.1",
  "chrono",
  "ed25519-dalek",
  "factory-core",
