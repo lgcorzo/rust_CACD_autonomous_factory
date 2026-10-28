@@ -8,6 +8,7 @@ test-utils = []
 production = []
 
 [dependencies]
+rand_core = { workspace = true }
 factory-core = { path = "../factory-core" }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -36,6 +37,6 @@ sha2 = { workspace = true }
 
 [dev-dependencies]
 factory-infrastructure = { path = ".", features = ["test-utils"] }
-rand = "0.8"
+rand = "0.10"
 
 

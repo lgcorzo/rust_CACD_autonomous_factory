@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+rand_core = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
@@ -19,7 +20,7 @@ zeroize = { version = "1.7", features = ["derive"] }
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
 base64 = "0.23"
 hex = "0.4"
-rand = "0.8"
+rand = "0.10"
 regex = { workspace = true }
 serde_jcs = "0.2"
 

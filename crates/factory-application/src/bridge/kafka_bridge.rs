@@ -109,7 +109,7 @@ impl KafkaBridge {
 mod tests {
     use super::*;
     use factory_infrastructure::SimpleMockKafkaClient;
-    use rand::rngs::OsRng;
+    use rand_core::OsRng;
 
     #[tokio::test]
     async fn test_kafka_bridge_publish_signed_event() {

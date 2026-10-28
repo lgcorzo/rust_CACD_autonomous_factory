@@ -1,7 +1,7 @@
 use chrono::{Duration, Utc};
 use ed25519_dalek::SigningKey;
 use factory_core::security::nhi::{AgentSubject, VerifiableCredential, VerificationOutcome};
-use rand::rngs::OsRng;
+use rand_core::OsRng;
 
 #[test]
 fn test_nhi_w3c_camel_case_serialization() {

@@ -16,7 +16,7 @@ use factory_infrastructure::github::GithubClient;
 use factory_infrastructure::gitlab::GitlabClient;
 use factory_infrastructure::kafka::KafkaClient;
 use factory_infrastructure::pipeline_classifier::PipelineClassifier;
-use rand::rngs::OsRng;
+use rand_core::OsRng;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 #[allow(unused_imports)]
