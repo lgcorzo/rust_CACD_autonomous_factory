@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use ed25519_dalek::SigningKey;
 use factory_core::security::nhi::{AgentSubject, VerifiableCredential};
-use rand::rngs::OsRng;
+use rand_core::OsRng;
 
 fn bench_async_batch_signing(c: &mut Criterion) {
     let runtime = tokio::runtime::Builder::new_multi_thread()

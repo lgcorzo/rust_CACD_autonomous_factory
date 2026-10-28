@@ -6,7 +6,7 @@ use factory_core::{PRCommentEvent, PolledIssueEvent};
 use factory_infrastructure::git_poller::GitPlatformPoller;
 use factory_infrastructure::kafka::KafkaClient;
 use factory_infrastructure::semantica::SemanticaClient;
-use rand::rngs::OsRng;
+use rand_core::OsRng;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 

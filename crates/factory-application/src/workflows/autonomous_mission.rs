@@ -1100,7 +1100,7 @@ mod tests {
     #[test]
     fn test_mission_input_attach_nhi_and_jit() {
         use ed25519_dalek::SigningKey;
-        use rand::rngs::OsRng;
+        use rand_core::OsRng;
 
         let mut csprng = OsRng;
         let signing_key = SigningKey::generate(&mut csprng);

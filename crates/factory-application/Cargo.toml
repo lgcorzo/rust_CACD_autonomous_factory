@@ -7,6 +7,7 @@ edition = "2024"
 production = ["factory-infrastructure/production"]
 
 [dependencies]
+rand_core = { workspace = true }
 factory-core = { path = "../factory-core" }
 factory-infrastructure = { path = "../factory-infrastructure" }
 serde = { workspace = true }
@@ -25,7 +26,7 @@ async-openai = { version = "0.42.2", features = ["full"] }
 rdkafka = { workspace = true }
 zeroize = "1.8.1"
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
-rand = "0.8"
+rand = "0.10"
 sha2 = "0.11"
 
 tokio-test = { workspace = true }
