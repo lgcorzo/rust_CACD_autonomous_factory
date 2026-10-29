@@ -1,6 +1,7 @@
 use chrono::{Duration, Utc};
 use ed25519_dalek::SigningKey;
 use factory_core::security::nhi::{AgentSubject, VerifiableCredential, VerificationOutcome};
+use rand_core::OsRng;
 
 #[test]
 fn test_nhi_w3c_camel_case_serialization() {
@@ -66,7 +67,8 @@ fn test_nhi_w3c_camel_case_serialization() {
 
 #[tokio::test]
 async fn test_nhi_cryptographic_verification_outcomes() {
-    let signing_key = SigningKey::generate(&mut rand::rng());
+    let mut csprng = OsRng;
+    let signing_key = SigningKey::generate(&mut csprng);
     let verifying_key = signing_key.verifying_key();
 
     let subject = AgentSubject {
@@ -134,7 +136,8 @@ async fn test_nhi_cryptographic_verification_outcomes() {
 
 #[tokio::test]
 async fn test_nhi_batch_signing_atomic_behavior() {
-    let signing_key = SigningKey::generate(&mut rand::rng());
+    let mut csprng = OsRng;
+    let signing_key = SigningKey::generate(&mut csprng);
     let verifying_key = signing_key.verifying_key();
 
     let subject = AgentSubject {

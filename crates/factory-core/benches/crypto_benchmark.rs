@@ -1,6 +1,8 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use ed25519_dalek::SigningKey;
 use factory_core::security::nhi::{AgentSubject, VerifiableCredential};
+use rand_core::OsRng;
+use std::hint::black_box;
 
 fn bench_async_batch_signing(c: &mut Criterion) {
     let runtime = tokio::runtime::Builder::new_multi_thread()
@@ -8,7 +10,8 @@ fn bench_async_batch_signing(c: &mut Criterion) {
         .build()
         .unwrap();
 
-    let signing_key = SigningKey::generate(&mut rand::rng());
+    let mut csprng = OsRng;
+    let signing_key = SigningKey::generate(&mut csprng);
 
     let subject = AgentSubject {
         id: "agent-bench-01".to_string(),
