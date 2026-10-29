@@ -25,7 +25,7 @@ regex = { workspace = true }
 serde_jcs = "0.2"
 
 [dev-dependencies]
-criterion = "0.5"
+criterion = "0.8"
 
 [build-dependencies]
 prost-build = { workspace = true }

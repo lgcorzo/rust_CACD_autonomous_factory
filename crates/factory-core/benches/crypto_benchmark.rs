@@ -1,6 +1,7 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use ed25519_dalek::SigningKey;
 use factory_core::security::nhi::{AgentSubject, VerifiableCredential};
+use std::hint::black_box;
 
 fn bench_async_batch_signing(c: &mut Criterion) {
     let runtime = tokio::runtime::Builder::new_multi_thread()
