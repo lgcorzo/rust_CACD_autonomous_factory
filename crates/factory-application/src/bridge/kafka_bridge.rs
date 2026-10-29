@@ -109,9 +109,12 @@ impl KafkaBridge {
 mod tests {
     use super::*;
     use factory_infrastructure::SimpleMockKafkaClient;
+    use rand_core::OsRng;
+
     #[tokio::test]
     async fn test_kafka_bridge_publish_signed_event() {
-        let signing_key = SigningKey::generate(&mut rand::rng());
+        let mut csprng = OsRng;
+        let signing_key = SigningKey::generate(&mut csprng);
         let mock_kafka = Arc::new(SimpleMockKafkaClient::new("localhost:9092").unwrap());
 
         let bridge = KafkaBridge::new(
@@ -134,7 +137,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_kafka_bridge_publish_batch_signed_events() {
-        let signing_key = SigningKey::generate(&mut rand::rng());
+        let mut csprng = OsRng;
+        let signing_key = SigningKey::generate(&mut csprng);
         let mock_kafka = Arc::new(SimpleMockKafkaClient::new("localhost:9092").unwrap());
 
         let bridge = KafkaBridge::new(

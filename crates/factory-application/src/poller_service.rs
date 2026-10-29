@@ -6,6 +6,7 @@ use factory_core::{PRCommentEvent, PolledIssueEvent};
 use factory_infrastructure::git_poller::GitPlatformPoller;
 use factory_infrastructure::kafka::KafkaClient;
 use factory_infrastructure::semantica::SemanticaClient;
+use rand_core::OsRng;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -38,7 +39,8 @@ impl PollerDaemonService {
         semantica_client: Option<Arc<dyn SemanticaClient>>,
         comment_service: Arc<CommentControlService>,
     ) -> Self {
-        let signing_key = SigningKey::generate(&mut rand::rng());
+        let mut csprng = OsRng;
+        let signing_key = SigningKey::generate(&mut csprng);
 
         Self {
             poller,

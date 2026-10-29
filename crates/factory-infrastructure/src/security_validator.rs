@@ -139,9 +139,12 @@ impl SecurityValidator for Ed25519Validator {
 mod tests {
     use super::*;
     use ed25519_dalek::{Signer, SigningKey};
+    use rand_core::OsRng;
+
     #[tokio::test]
     async fn test_ed25519_signature_validation() {
-        let signing_key: SigningKey = SigningKey::generate(&mut rand::rng());
+        let mut csprng = OsRng;
+        let signing_key: SigningKey = SigningKey::generate(&mut csprng);
         let verifying_key = signing_key.verifying_key();
 
         let validator = Ed25519Validator::new(verifying_key.as_bytes(), None).unwrap();
@@ -166,7 +169,8 @@ mod tests {
 
     #[test]
     fn test_validate_git_commit_payload() {
-        let signing_key: SigningKey = SigningKey::generate(&mut rand::rng());
+        let mut csprng = OsRng;
+        let signing_key: SigningKey = SigningKey::generate(&mut csprng);
         let verifying_key = signing_key.verifying_key();
         let validator = Ed25519SecurityValidator::new(verifying_key.as_bytes(), None).unwrap();
 
@@ -195,7 +199,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_audit_content_fails_closed_without_mcp() {
-        let signing_key: SigningKey = SigningKey::generate(&mut rand::rng());
+        let mut csprng = OsRng;
+        let signing_key: SigningKey = SigningKey::generate(&mut csprng);
         let verifying_key = signing_key.verifying_key();
         let validator = Ed25519Validator::new(verifying_key.as_bytes(), None).unwrap();
 

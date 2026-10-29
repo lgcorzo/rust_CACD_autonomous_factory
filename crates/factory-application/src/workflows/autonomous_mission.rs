@@ -1100,7 +1100,10 @@ mod tests {
     #[test]
     fn test_mission_input_attach_nhi_and_jit() {
         use ed25519_dalek::SigningKey;
-        let signing_key = SigningKey::generate(&mut rand::rng());
+        use rand_core::OsRng;
+
+        let mut csprng = OsRng;
+        let signing_key = SigningKey::generate(&mut csprng);
 
         let mut input = MissionInput {
             mission_id: Some("mission-001".to_string()),

@@ -323,9 +323,12 @@ impl VerifiableCredential {
 pub mod tests {
     use super::*;
     use ed25519_dalek::SigningKey;
+    use rand_core::OsRng;
+
     #[tokio::test]
     async fn test_vc_async_signing_and_batch() {
-        let signing_key = SigningKey::generate(&mut rand::rng());
+        let mut csprng = OsRng;
+        let signing_key = SigningKey::generate(&mut csprng);
 
         let subject = AgentSubject {
             id: "agent-1".to_string(),
