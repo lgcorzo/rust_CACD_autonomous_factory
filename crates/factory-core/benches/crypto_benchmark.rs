@@ -1,5 +1,6 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use ed25519_dalek::SigningKey;
+use std::hint::black_box;
 use factory_core::security::nhi::{AgentSubject, VerifiableCredential};
 use rand_core::OsRng;
 
