@@ -16,7 +16,6 @@ use factory_infrastructure::github::GithubClient;
 use factory_infrastructure::gitlab::GitlabClient;
 use factory_infrastructure::kafka::KafkaClient;
 use factory_infrastructure::pipeline_classifier::PipelineClassifier;
-use rand_core::OsRng;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 #[allow(unused_imports)]
@@ -61,8 +60,7 @@ impl PipelineRemediationService {
             .and_then(|v| v.parse::<usize>().ok())
             .unwrap_or(DEFAULT_MAX_CONCURRENT_REMEDIATIONS);
 
-        let mut csprng = OsRng;
-        let signing_key = SigningKey::generate(&mut csprng);
+        let signing_key = SigningKey::generate(&mut rand::rng());
 
         Self {
             kafka_client,
