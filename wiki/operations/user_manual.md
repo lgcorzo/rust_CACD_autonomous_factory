@@ -100,7 +100,7 @@ factory-cli trigger-deep-search --query "circuit breaker patterns"
 export LITELLM_MODEL="ollama/qwen2.5:7b"
 
 # Planner model (higher capability)
-export LITELLM_PLANNER_MODEL="gpt-oss-120b"
+export LITELLM_PLANNER_MODEL="gemini-3.8-flash-low"
 
 # LiteLLM API endpoint
 export LITELLM_API_BASE="http://litellm.llm-apps.svc.cluster.local:4000/v1"
@@ -116,7 +116,7 @@ export FINOPS_EPIC="HAZITEK-2026"
 | Variable | Default | Purpose |
 |:---|:---|:---|
 | `LITELLM_MODEL` | `ollama/qwen2.5:7b` | Default LLM for agents |
-| `LITELLM_PLANNER_MODEL` | `gpt-oss-120b` | High-capability planner LLM |
+| `LITELLM_PLANNER_MODEL` | `gemini-3.8-flash-low` | High-capability planner LLM |
 | `LITELLM_API_BASE` | `http://litellm:4000/v1` | LiteLLM proxy endpoint |
 | `HATCHET_API_URL` | `http://hatchet:8080` | Hatchet orchestrator |
 | `FINOPS_MAX_DAILY_BUDGET` | `50` | Daily spend limit (USD) |

@@ -38,7 +38,7 @@ classDiagram
     class ModelDefaults {
         <<constants>>
         +DEFAULT_FACTORY_MODEL: "ollama/qwen2.5:7b"
-        +DEFAULT_PLANNER_MODEL: "gpt-oss-120b"
+        +DEFAULT_PLANNER_MODEL: "gemini-3.8-flash-low"
     }
 
     AgentModelConfig ..> ModelDefaults : fallbacks to
@@ -56,7 +56,7 @@ classDiagram
    - `../config/models.yaml`, `../../config/models.yaml`
 3. **Hardcoded Fallbacks**:
    - Default Factory Model: `ollama/qwen2.5:7b` (via LiteLLM proxy)
-   - Default Planner Model: `gpt-oss-120b`
+   - Default Planner / Plan Mission / ZeroClaw Model: `gemini-3.8-flash-low`
 
 ---
 
