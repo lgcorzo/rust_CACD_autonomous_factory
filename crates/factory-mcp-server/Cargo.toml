@@ -18,7 +18,7 @@ chrono = "0.4"
 async-trait = "0.1"
 reqwest = { version = "0.13", features = ["json"] }
 futures = { version = "0.3" }
-tower-http = { version = "0.5", features = ["cors"] }
+tower-http = { version = "0.6", features = ["cors"] }
 uuid = { workspace = true }
 dotenv = "0.15"
 async-openai = { version = "0.42.2", features = ["full"] }
