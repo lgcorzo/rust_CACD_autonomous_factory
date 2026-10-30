@@ -3,10 +3,22 @@
 
 model_list:
   # Primary code generation and planning models
+  - model_name: gemini-3.8-flash-low
+    litellm_params:
+      model: openai/gemini-3.8-flash-low
+      api_base: "http://antigravity-proxy.llm-apps.svc.cluster.local:8085/v1"
+      api_key: "antigravity-local"
+      stream: true
+      tags:
+        - "team:dark-gravity-ops"
+        - "epic:E6.3"
+        - "tier:planning"
+
   - model_name: gpt-oss-120b
     litellm_params:
-      model: openai/gpt-4o
-      api_key: "os.environ/OPENAI_API_KEY"
+      model: openai/@cf/openai/gpt-oss-120b
+      api_base: "os.environ/CLOUDFLARE_API_BASE"
+      api_key: "os.environ/CLOUDFLARE_API_TOKEN"
       tags:
         - "team:dark-gravity-ops"
         - "epic:E6.3"
@@ -14,8 +26,10 @@ model_list:
 
   - model_name: ollama/qwen2.5:7b
     litellm_params:
-      model: ollama/qwen2.5:7b
-      api_base: "http://ollama.factory-sandbox.svc.cluster.local:11434"
+      model: ollama_chat/qwen2.5:7b
+      api_base: "http://ollama-service.llm-apps.svc.cluster.local:11434"
+      api_key: "EMPTY"
+      num_ctx: 16384
       tags:
         - "team:dark-gravity-ops"
         - "epic:E6.3"
@@ -24,8 +38,10 @@ model_list:
   # Independent Frontier SAST Governance Review Model (Separated model family from worker/generator)
   - model_name: security_review
     litellm_params:
-      model: anthropic/claude-3-5-sonnet-20241022
-      api_key: "os.environ/ANTHROPIC_API_KEY"
+      model: openai/claude-sonnet-5-5-low
+      api_base: "http://antigravity-proxy.llm-apps.svc.cluster.local:8085/v1"
+      api_key: "antigravity-local"
+      stream: true
       tags:
         - "team:dark-gravity-ops"
         - "epic:E6.3"
@@ -37,8 +53,10 @@ model_list:
   # Fallback Independent Reviewer
   - model_name: security_review_fallback
     litellm_params:
-      model: deepseek/deepseek-reasoner
-      api_key: "os.environ/DEEPSEEK_API_KEY"
+      model: openai/gemini-4-argon-low
+      api_base: "http://antigravity-proxy.llm-apps.svc.cluster.local:8085/v1"
+      api_key: "antigravity-local"
+      stream: true
       tags:
         - "team:dark-gravity-ops"
         - "epic:E6.3"

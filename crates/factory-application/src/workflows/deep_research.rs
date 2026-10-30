@@ -95,7 +95,7 @@ pub fn create_deep_research_workflow(
             Box::pin(async move {
                 tracing::info!("DeepSearch Phase started for job {}", input.job_id);
 
-                // 1. Planning Phase (routes to planner model: gpt-oss-120b)
+                // 1. Planning Phase (routes to planner model: gemini-3.8-flash-low)
                 let request = CreateChatCompletionRequestArgs::default()
                     .model(&planner_model)
                     .messages([

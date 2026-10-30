@@ -4,7 +4,7 @@ use std::fs;
 use std::path::Path;
 
 pub const DEFAULT_FACTORY_MODEL: &str = "ollama/qwen2.5:7b";
-pub const DEFAULT_PLANNER_MODEL: &str = "gpt-oss-120b";
+pub const DEFAULT_PLANNER_MODEL: &str = "gemini-3.8-flash-low";
 
 /// Configuration mapping agents and tools to their respective LLM model endpoints.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -104,7 +104,7 @@ impl AgentModelConfig {
     }
 
     /// Retrieve model for a given agent or tool name.
-    /// If key is "planner" or "plan_mission", returns planner_model unless specifically overridden.
+    /// If key is "planner", "plan_mission", or "zeroclaw", returns planner_model unless specifically overridden.
     pub fn get_model(&self, agent_name: &str) -> &str {
         if let Some(model) = self.agents.get(agent_name) {
             return model.as_str();
@@ -112,6 +112,7 @@ impl AgentModelConfig {
 
         if agent_name.eq_ignore_ascii_case("planner")
             || agent_name.eq_ignore_ascii_case("plan_mission")
+            || agent_name.eq_ignore_ascii_case("zeroclaw")
         {
             return self.planner_model.as_str();
         }
@@ -141,9 +142,10 @@ mod tests {
             planner_model: DEFAULT_PLANNER_MODEL.to_string(),
             agents: HashMap::new(),
         };
-        assert_eq!(config.get_planner_model(), "gpt-oss-120b");
-        assert_eq!(config.get_model("planner"), "gpt-oss-120b");
-        assert_eq!(config.get_model("plan_mission"), "gpt-oss-120b");
+        assert_eq!(config.get_planner_model(), "gemini-3.8-flash-low");
+        assert_eq!(config.get_model("planner"), "gemini-3.8-flash-low");
+        assert_eq!(config.get_model("plan_mission"), "gemini-3.8-flash-low");
+        assert_eq!(config.get_model("zeroclaw"), "gemini-3.8-flash-low");
         assert_eq!(config.get_model("auditor"), "ollama/qwen2.5:7b");
         assert_eq!(config.get_model("security_review"), "ollama/qwen2.5:7b");
         assert_eq!(config.get_model("deep_research"), "ollama/qwen2.5:7b");
@@ -154,12 +156,12 @@ mod tests {
     fn test_yaml_parsing() {
         let yaml = r#"
 default_model: "ollama/qwen2.5:7b"
-planner_model: "gpt-oss-120b"
+planner_model: "gemini-3.8-flash-low"
 agents:
   custom_specialist: "specialist-v1"
 "#;
         let config: AgentModelConfig = serde_yaml::from_str(yaml).unwrap();
-        assert_eq!(config.get_planner_model(), "gpt-oss-120b");
+        assert_eq!(config.get_planner_model(), "gemini-3.8-flash-low");
         assert_eq!(config.get_model("custom_specialist"), "specialist-v1");
         assert_eq!(config.get_model("auditor"), "ollama/qwen2.5:7b");
     }
