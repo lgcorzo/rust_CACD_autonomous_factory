@@ -5,6 +5,8 @@ use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::Message;
 
+pub mod operator;
+
 #[global_allocator]
 static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 #[derive(Parser)]
@@ -109,7 +111,7 @@ enum Commands {
         #[arg(long, default_value = "admin")]
         r2r_pwd: String,
     },
-    /// Start the Outbound Poller daemon for GitHub/GitLab issues and PR comments
+    /// Run Outbound Poller daemon
     Poller {
         #[arg(
             long,
@@ -150,6 +152,17 @@ enum Commands {
             default_value = "darkgravity-bot"
         )]
         bot_username: String,
+    },
+    /// Start the Kubernetes AgentWorkspace Operator
+    Operator {
+        #[arg(long, env = "OPERATOR_NAMESPACE", default_value = "agents")]
+        namespace: String,
+
+        #[arg(long, default_value_t = true)]
+        leader_election: bool,
+
+        #[arg(long, default_value = "darkgravity-operator-lease")]
+        lease_name: String,
     },
     /// Verify GitLab connectivity, authentication, and communication channels
     GitlabVerify {
@@ -516,6 +529,19 @@ async fn main() -> anyhow::Result<()> {
             {
                 std::process::exit(1);
             }
+        }
+        Commands::Operator {
+            namespace,
+            leader_election,
+            lease_name,
+        } => {
+            let config = operator::OperatorConfig {
+                namespace,
+                leader_election,
+                lease_name,
+                ..Default::default()
+            };
+            operator::run_operator(config).await?;
         }
     }
 

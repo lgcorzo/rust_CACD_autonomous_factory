@@ -167,3 +167,5 @@ last_verified_commit: "fbdc5848"
 - [trigger_mission.md](modules/cli/trigger_mission.md) — Manual mission trigger binary
 - [run_functional_suite.md](modules/cli/run_functional_suite.md) — Functional E2E test runner binary
 - [trigger_deep_search.md](modules/cli/trigger_deep_search.md) — Deep research trigger binary
+* [[crates_factory-cli_src_operator_metrics]]
+* [[crates_factory-cli_src_operator_mod]]

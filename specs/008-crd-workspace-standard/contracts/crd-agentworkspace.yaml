@@ -1,0 +1,141 @@
+# Contract: AgentWorkspace CRD Specification
+
+**Version**: `v1alpha1`
+**Group**: `darkgravity.io`
+
+```yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentworkspaces.darkgravity.io
+spec:
+  group: darkgravity.io
+  names:
+    kind: AgentWorkspace
+    listKind: AgentWorkspaceList
+    plural: agentworkspaces
+    singular: agentworkspace
+    shortNames:
+      - agws
+      - aws
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Mission
+          type: string
+          jsonPath: .status.activeMissionRef
+        - name: Commit
+          type: string
+          jsonPath: .status.activeMissionCommit
+        - name: Accepted
+          type: string
+          jsonPath: .status.conditions[?(@.type=='MissionAccepted')].reason
+        - name: Synced
+          type: string
+          jsonPath: .status.conditions[?(@.type=='Synced')].status
+        - name: Run
+          type: string
+          jsonPath: .status.hatchetWorkflowRunId
+          priority: 1
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - repositoryUrl
+                - targetBranch
+                - constitutionRef
+                - resourceLimits
+              x-kubernetes-validations:
+                - rule: "self.repositoryUrl == oldSelf.repositoryUrl"
+                  message: "repositoryUrl is immutable (ADR-008 §9.1.5)"
+                - rule: "self.targetBranch == oldSelf.targetBranch"
+                  message: "targetBranch is immutable (ADR-008 §9.1.5)"
+              properties:
+                repositoryUrl:
+                  type: string
+                  maxLength: 512
+                targetBranch:
+                  type: string
+                  maxLength: 255
+                constitutionRef:
+                  type: string
+                  maxLength: 512
+                missionRef:
+                  type: string
+                  maxLength: 128
+                resourceLimits:
+                  type: object
+                  required:
+                    - maxRam
+                    - maxCpu
+                  properties:
+                    maxRam:
+                      type: string
+                      maxLength: 16
+                    maxCpu:
+                      type: string
+                      maxLength: 16
+                  x-kubernetes-validations:
+                    - rule: >-
+                        isQuantity(self.maxRam) &&
+                        quantity(self.maxRam).isGreaterThan(quantity('0')) &&
+                        quantity(self.maxRam).compareTo(quantity('30Mi')) <= 0
+                      message: "maxRam must be a quantity in (0, 30Mi]"
+                    - rule: >-
+                        isQuantity(self.maxCpu) &&
+                        quantity(self.maxCpu).isGreaterThan(quantity('0')) &&
+                        quantity(self.maxCpu).compareTo(quantity('250m')) <= 0
+                      message: "maxCpu must be a quantity in (0, 250m]"
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: [Pending, Initializing, Running, Paused, Completed, Failed]
+                activeMissionRef:
+                  type: string
+                activeMissionCommit:
+                  type: string
+                hatchetWorkflowRunId:
+                  type: string
+                observedGeneration:
+                  type: integer
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - status
+                      - reason
+                      - message
+                      - lastTransitionTime
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                        enum: ["True", "False", "Unknown"]
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+```
+

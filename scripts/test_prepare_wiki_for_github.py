@@ -136,13 +136,13 @@ class TestPrepareWikiForGithub(unittest.TestCase):
             self.skipTest("wiki/ directory not found relative to script")
 
         slug_map = build_slug_map(repo_wiki)
-        self.assertEqual(len(slug_map), 104, f"Expected 104 wiki files, found {len(slug_map)}")
+        self.assertEqual(len(slug_map), 107, f"Expected 107 wiki files, found {len(slug_map)}")
 
         export_dir = os.path.join(self.test_dir, "repo_export")
         export_wiki_forward(repo_wiki, export_dir)
 
         exported_files = [f for f in os.listdir(export_dir) if f.endswith(".md")]
-        self.assertEqual(len(exported_files), 104)
+        self.assertEqual(len(exported_files), 107)
 
         # Ensure _Sidebar.md exists and is populated
         sidebar_path = os.path.join(export_dir, "_Sidebar.md")
