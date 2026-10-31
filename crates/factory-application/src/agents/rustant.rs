@@ -24,8 +24,18 @@ impl RustantAgent {
             goal
         );
 
-        // 1. Context Pruning (R2R)
-        let context = self.r2r_client.search(goal).await?;
+        // 1. Context Pruning (R2R) - Gracefully fallback if R2R service is unreachable or unauthenticated
+        let context = match self.r2r_client.search(goal).await {
+            Ok(ctx) => ctx,
+            Err(e) => {
+                tracing::warn!(
+                    "[RustantAgent:{}] R2R knowledge search unavailable ({:?}). Proceeding with empty context fallback.",
+                    mission_id,
+                    e
+                );
+                String::new()
+            }
+        };
 
         // 2. 6-Phase Spec-Kit sequence via MCP
         let phases = vec!["init", "specify", "plan", "execute", "verify", "git-commit"];
