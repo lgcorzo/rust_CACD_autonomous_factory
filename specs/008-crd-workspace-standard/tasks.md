@@ -67,7 +67,7 @@ flowchart TD
 
 **Independent Test**: Apply an `AgentWorkspace` manifest with `missionRef`, verify single execution dispatch pinned to Git commit SHA, and inspect formatted columns using `kubectl get agws`.
 
-- [ ] T014 [US1] Implement Git commit resolver in `crates/factory-cli/src/operator/git_resolver.rs` to snapshot `targetBranch` to commit SHA and compute constitution hash
+- [x] T014 [US1] Implement Git commit resolver in `crates/factory-cli/src/operator/git_resolver.rs` to snapshot `targetBranch` to commit SHA and compute constitution hash
 - [ ] T015 [US1] Implement Hatchet workflow dispatcher with idempotency key `(workspace_uid, mission_ref)` and queueing concurrency in `crates/factory-cli/src/operator/hatchet_sync.rs`
 - [ ] T016 [US1] Implement throttled status projection engine in `crates/factory-cli/src/operator/controller.rs` emitting patches only on major phases (`Pending`, `Initializing`, `Running`, `Paused`, `Completed`, `Failed`)
 - [ ] T017 [US1] Implement `MissionAccepted` condition logic in `crates/factory-cli/src/operator/controller.rs` handling `Dispatched`, `MissionActive` (deferred), and `AlreadyExecuted`

@@ -25,6 +25,8 @@ reqwest = { version = "0.13", features = ["json"] }
 uuid = { version = "1.0", features = ["v4"] }
 chrono = { workspace = true }
 regex = { workspace = true }
+sha2 = { workspace = true }
+hex = "0.4"
 hostname = "0.4"
 kube = { workspace = true, features = ["runtime", "client", "derive"] }
 k8s-openapi = { workspace = true, features = ["schemars"] }
