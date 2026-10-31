@@ -15,6 +15,7 @@ pub mod poller_service;
 pub mod telemetry_export;
 pub mod utils;
 pub mod workflows;
+pub mod workspaces;
 
 pub use gitlab_verifier::{
     CheckStatus, GitlabCheckResult, GitlabVerificationReport, GitlabVerifier, VerificationStatus,
