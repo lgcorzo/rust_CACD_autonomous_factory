@@ -4,6 +4,7 @@ pub mod comment_control;
 pub mod deep_research;
 pub mod develop_task;
 pub mod pipeline_remediation;
+pub mod resilience;
 
 pub use autonomous_mission::{MissionInput, MissionOutput, create_mission_workflow};
 pub use circuit_breaker::{CircuitBreakerGuard, CircuitBreakerStatus};
