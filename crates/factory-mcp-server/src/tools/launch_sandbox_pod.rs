@@ -150,6 +150,10 @@ impl Tool for LaunchSandboxPodTool {
                             "command": ["/bin/sh", "-c"],
                             "args": [cmd],
                             "resources": {
+                                "requests": {
+                                    "memory": "16Mi",
+                                    "cpu": "50m"
+                                },
                                 "limits": {
                                     "memory": "30Mi",
                                     "cpu": "100m"
