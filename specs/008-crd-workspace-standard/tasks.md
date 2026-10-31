@@ -111,7 +111,7 @@ flowchart TD
 - [x] T030 [P] Implement Prometheus metrics exporter in `crates/factory-cli/src/operator/metrics.rs` tracking status write count per mission and active reconciliations
 - [x] T031 [P] Verify status patch write ratio ($\le 6$ patches per mission) across 5 full simulated mission lifecycles in `crates/factory-cli/tests/write_rate_test.rs`
 - [x] T032 Run OKF incremental documentation script `.agents/tools/okf_generator.py` to update architecture wiki with operator components per workspace rules
-- [ ] T033 Run `graphify update .` to keep knowledge graph synchronized with newly created operator modules
+- [x] T033 Run `graphify update .` to keep knowledge graph synchronized with newly created operator modules
 
 ---
 
