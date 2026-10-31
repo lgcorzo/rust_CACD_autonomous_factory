@@ -5,6 +5,7 @@ pub mod hatchet_sync;
 pub mod controller;
 pub mod finalizer;
 pub mod orphan_sweeper;
+pub mod metrics;
 
 use anyhow::Result;
 use k8s_openapi::api::coordination::v1::Lease;
