@@ -8,8 +8,32 @@ use std::path::PathBuf;
 pub struct BridgeTool;
 
 impl BridgeTool {
+    fn determine_writable_base_dir() -> PathBuf {
+        if let Ok(metadata) = fs::metadata(".") {
+            if !metadata.permissions().readonly() {
+                if let Ok(temp_test) = fs::OpenOptions::new()
+                    .create(true)
+                    .truncate(true)
+                    .write(true)
+                    .open(".test_write_perm_bridge")
+                {
+                    drop(temp_test);
+                    let _ = fs::remove_file(".test_write_perm_bridge");
+                    return PathBuf::from(".");
+                }
+            }
+        }
+        let tmp = PathBuf::from("/tmp");
+        if tmp.exists() {
+            tmp
+        } else {
+            std::env::temp_dir()
+        }
+    }
+
     fn get_checkpoint_path(mission_id: &str) -> PathBuf {
-        PathBuf::from(format!("./checkpoints/bridge_state_{}.json", mission_id))
+        let base = Self::determine_writable_base_dir();
+        base.join(format!("checkpoints/bridge_state_{}.json", mission_id))
     }
 
     pub fn load_state(mission_id: &str) -> anyhow::Result<Value> {
