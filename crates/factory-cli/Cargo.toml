@@ -24,5 +24,6 @@ jemallocator = "0.5.4"
 reqwest = { version = "0.13", features = ["json"] }
 uuid = { version = "1.0", features = ["v4"] }
 kube = { workspace = true, features = ["runtime", "client", "derive"] }
-k8s-openapi = { workspace = true }
-schemars = "0.8"
+k8s-openapi = { workspace = true, features = ["schemars"] }
+schemars = "1"
+serde_yaml = { workspace = true }
