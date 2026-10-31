@@ -26,13 +26,17 @@ RUN cargo build --release --workspace --features factory-cli/production,factory-
 # Stage 2: Final runtime image
 FROM debian:bookworm-slim
 
-
 WORKDIR /usr/local/bin
 
-# Install runtime dependencies
+# Install runtime dependencies and real specify-cli
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     libssl-dev \
+    python3 \
+    python3-pip \
+    git \
+    curl \
+    && pip install --break-system-packages specify-cli \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the binaries from the builder
