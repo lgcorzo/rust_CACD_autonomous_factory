@@ -165,11 +165,47 @@ impl SpecProvider for CliSpecProvider {
             .trim_matches('"')
             .to_string();
 
+        let base_dir = MockSpecProvider::determine_writable_base_dir();
+
+        // Handle 'init' command specifically with real specify CLI
+        if matches!(command, SpecKitCommand::Init) {
+            let mut cmd = tokio::process::Command::new(&self.cli_path);
+            cmd.arg("init")
+                .arg("--here")
+                .arg("--force")
+                .arg("--non-interactive")
+                .current_dir(&base_dir);
+
+            match cmd.output().await {
+                Ok(output) => {
+                    if output.status.success() {
+                        let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+                        return Ok(stdout);
+                    } else {
+                        let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
+                        anyhow::bail!("SpecKit CLI init exited with error: {}", stderr);
+                    }
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                    tracing::warn!(
+                        "SpecKit CLI not found at '{}'. Falling back to mock spec provider.",
+                        self.cli_path
+                    );
+                    return self.fallback.invoke(command, args).await;
+                }
+                Err(e) => {
+                    anyhow::bail!("Failed to execute SpecKit CLI init: {}", e);
+                }
+            }
+        }
+
+        // For other phases (specify, plan, execute, etc.), invoke CLI or execute corresponding workflow
         let mut cmd = tokio::process::Command::new(&self.cli_path);
         cmd.arg(&command_str);
         for arg in &args {
             cmd.arg(arg);
         }
+        cmd.current_dir(&base_dir);
 
         match cmd.output().await {
             Ok(output) => {
@@ -178,7 +214,13 @@ impl SpecProvider for CliSpecProvider {
                     Ok(stdout)
                 } else {
                     let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
-                    anyhow::bail!("SpecKit CLI exited with error: {}", stderr);
+                    // If command is not a direct subcommand of specify CLI, let fallback provider generate artifacts
+                    tracing::warn!(
+                        "SpecKit CLI command '{}' exited with: {}. Generating phase artifacts via provider fallback.",
+                        command_str,
+                        stderr
+                    );
+                    self.fallback.invoke(command, args).await
                 }
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
