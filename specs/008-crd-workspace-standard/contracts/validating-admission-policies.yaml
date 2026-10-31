@@ -1,0 +1,152 @@
+# Contract: ValidatingAdmissionPolicy Bounds (Pods & Jobs)
+
+```yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: dg-sandbox-bounds-pods
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  variables:
+    - name: s
+      expression: "object.spec"
+    - name: inits
+      expression: "has(variables.s.initContainers) ? variables.s.initContainers : []"
+    - name: sidecars
+      expression: "variables.inits.filter(c, has(c.restartPolicy) && c.restartPolicy == 'Always')"
+    - name: plainInits
+      expression: "variables.inits.filter(c, !has(c.restartPolicy) || c.restartPolicy != 'Always')"
+    - name: all
+      expression: "variables.s.containers + variables.inits"
+    - name: declared
+      expression: >-
+        variables.all.all(c, has(c.resources) &&
+          has(c.resources.requests) && has(c.resources.limits) &&
+          ['cpu', 'memory'].all(r, r in c.resources.requests && r in c.resources.limits))
+    - name: memApp
+      expression: "([0] + variables.s.containers.map(c, quantity(c.resources.limits['memory']).asInteger())).sum()"
+    - name: memSide
+      expression: "([0] + variables.sidecars.map(c, quantity(c.resources.limits['memory']).asInteger())).sum()"
+    - name: memInitMax
+      expression: "([0] + variables.plainInits.map(c, quantity(c.resources.limits['memory']).asInteger())).max()"
+    - name: cpuApp
+      expression: "([0] + variables.s.containers.map(c, int(quantity(c.resources.limits['cpu']).asApproximateFloat() * 1000.0 + 0.5))).sum()"
+    - name: cpuSide
+      expression: "([0] + variables.sidecars.map(c, int(quantity(c.resources.limits['cpu']).asApproximateFloat() * 1000.0 + 0.5))).sum()"
+    - name: cpuInitMax
+      expression: "([0] + variables.plainInits.map(c, int(quantity(c.resources.limits['cpu']).asApproximateFloat() * 1000.0 + 0.5))).max()"
+  validations:
+    - expression: "!has(variables.s.ephemeralContainers) || size(variables.s.ephemeralContainers) == 0"
+      message: "ephemeral containers are not allowed in sandbox namespaces (ADR-008 §9.2.2)"
+    - expression: "variables.declared"
+      message: "every container must declare cpu/memory requests and limits (ADR-008 §9.2.1)"
+    - expression: >-
+        !variables.declared || variables.all.all(c,
+          quantity(c.resources.limits['memory']).compareTo(quantity('30Mi')) <= 0 &&
+          quantity(c.resources.limits['cpu']).compareTo(quantity('250m')) <= 0 &&
+          quantity(c.resources.requests['memory']).compareTo(quantity(c.resources.limits['memory'])) <= 0 &&
+          quantity(c.resources.requests['cpu']).compareTo(quantity(c.resources.limits['cpu'])) <= 0)
+      message: "container limits must be <= 30Mi / 250m and requests <= limits (ADR-008 §9.2.1)"
+    - expression: >-
+        !variables.declared ||
+        (variables.memApp + variables.memSide <= 31457280 &&
+         variables.memInitMax + variables.memSide <= 31457280)
+      message: "pod workload memory (steady or init peak, upper bound) exceeds 30Mi (ADR-008 §9.2.4)"
+    - expression: >-
+        !variables.declared ||
+        (variables.cpuApp + variables.cpuSide <= 250 &&
+         variables.cpuInitMax + variables.cpuSide <= 250)
+      message: "pod workload cpu (steady or init peak, upper bound) exceeds 250m (ADR-008 §9.2.4)"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: dg-sandbox-bounds-pods
+spec:
+  policyName: dg-sandbox-bounds-pods
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: development
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: dg-sandbox-bounds-jobs
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs"]
+  variables:
+    - name: s
+      expression: "object.spec.template.spec"
+    - name: inits
+      expression: "has(variables.s.initContainers) ? variables.s.initContainers : []"
+    - name: sidecars
+      expression: "variables.inits.filter(c, has(c.restartPolicy) && c.restartPolicy == 'Always')"
+    - name: plainInits
+      expression: "variables.inits.filter(c, !has(c.restartPolicy) || c.restartPolicy != 'Always')"
+    - name: all
+      expression: "variables.s.containers + variables.inits"
+    - name: declared
+      expression: >-
+        variables.all.all(c, has(c.resources) &&
+          has(c.resources.requests) && has(c.resources.limits) &&
+          ['cpu', 'memory'].all(r, r in c.resources.requests && r in c.resources.limits))
+    - name: memApp
+      expression: "([0] + variables.s.containers.map(c, quantity(c.resources.limits['memory']).asInteger())).sum()"
+    - name: memSide
+      expression: "([0] + variables.sidecars.map(c, quantity(c.resources.limits['memory']).asInteger())).sum()"
+    - name: memInitMax
+      expression: "([0] + variables.plainInits.map(c, quantity(c.resources.limits['memory']).asInteger())).max()"
+    - name: cpuApp
+      expression: "([0] + variables.s.containers.map(c, int(quantity(c.resources.limits['cpu']).asApproximateFloat() * 1000.0 + 0.5))).sum()"
+    - name: cpuSide
+      expression: "([0] + variables.sidecars.map(c, int(quantity(c.resources.limits['cpu']).asApproximateFloat() * 1000.0 + 0.5))).sum()"
+    - name: cpuInitMax
+      expression: "([0] + variables.plainInits.map(c, int(quantity(c.resources.limits['cpu']).asApproximateFloat() * 1000.0 + 0.5))).max()"
+  validations:
+    - expression: "variables.declared"
+      message: "every container in job template must declare cpu/memory requests and limits (ADR-008 §9.2.1)"
+    - expression: >-
+        !variables.declared || variables.all.all(c,
+          quantity(c.resources.limits['memory']).compareTo(quantity('30Mi')) <= 0 &&
+          quantity(c.resources.limits['cpu']).compareTo(quantity('250m')) <= 0 &&
+          quantity(c.resources.requests['memory']).compareTo(quantity(c.resources.limits['memory'])) <= 0 &&
+          quantity(c.resources.requests['cpu']).compareTo(quantity(c.resources.limits['cpu'])) <= 0)
+      message: "container limits must be <= 30Mi / 250m and requests <= limits (ADR-008 §9.2.1)"
+    - expression: >-
+        !variables.declared ||
+        (variables.memApp + variables.memSide <= 31457280 &&
+         variables.memInitMax + variables.memSide <= 31457280)
+      message: "job template workload memory (steady or init peak, upper bound) exceeds 30Mi (ADR-008 §9.2.4)"
+    - expression: >-
+        !variables.declared ||
+        (variables.cpuApp + variables.cpuSide <= 250 &&
+         variables.cpuInitMax + variables.cpuSide <= 250)
+      message: "job template workload cpu (steady or init peak, upper bound) exceeds 250m (ADR-008 §9.2.4)"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: dg-sandbox-bounds-jobs
+spec:
+  policyName: dg-sandbox-bounds-jobs
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: development
+```
+
