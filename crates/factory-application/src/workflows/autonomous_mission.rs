@@ -341,6 +341,7 @@ pub fn create_mission_workflow_with_clients(
                 Ok(plan)
             })
         })
+        .execution_timeout(std::time::Duration::from_secs(1800))
         .build()
         .unwrap();
 
@@ -515,6 +516,7 @@ pub fn create_mission_workflow_with_clients(
                 }))
             })
         })
+        .execution_timeout(std::time::Duration::from_secs(1800))
         .build()
         .unwrap()
         .add_parent(&plan_task);
@@ -758,6 +760,7 @@ pub fn create_mission_workflow_with_clients(
                 Ok(review)
             })
         })
+        .execution_timeout(std::time::Duration::from_secs(1800))
         .build()
         .unwrap()
         .add_parent(&validation_task);
@@ -966,8 +969,10 @@ pub fn create_mission_workflow_with_clients(
                 }
             })
         })
+        .execution_timeout(std::time::Duration::from_secs(1800))
         .build()
-        .unwrap();
+        .unwrap()
+        .add_parent(&review_task);
 
     hatchet
         .workflow("darkgravitymission-dev-lgcorzo")
