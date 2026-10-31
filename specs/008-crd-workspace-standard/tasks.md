@@ -26,9 +26,9 @@ flowchart TD
 **Purpose**: Configure dependencies, deploy directory scaffolding, and register shared crates.
 
 - [x] T001 Add `k8s-openapi` (v1_30), `kube` (0.98 runtime/client/derive), and `schemars` dependencies to `crates/factory-cli/Cargo.toml`
-- [ ] T002 [P] Create GitOps deployment directory structure in `deploy/crds/` and `deploy/policies/`
-- [ ] T003 [P] Copy CRD manifest contract from `specs/008-crd-workspace-standard/contracts/crd-agentworkspace.yaml` to `deploy/crds/agentworkspaces.darkgravity.io.yaml`
-- [ ] T004 [P] Copy admission policy contracts from `specs/008-crd-workspace-standard/contracts/validating-admission-policies.yaml` to `deploy/policies/validating-admission-policies.yaml`
+- [x] T002 [P] Create GitOps deployment directory structure in `deploy/crds/` and `deploy/policies/`
+- [x] T003 [P] Copy CRD manifest contract from `specs/008-crd-workspace-standard/contracts/crd-agentworkspace.yaml` to `deploy/crds/agentworkspaces.darkgravity.io.yaml`
+- [x] T004 [P] Copy admission policy contracts from `specs/008-crd-workspace-standard/contracts/validating-admission-policies.yaml` to `deploy/policies/validating-admission-policies.yaml`
 
 ---
 
