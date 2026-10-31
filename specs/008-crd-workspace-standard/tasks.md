@@ -85,7 +85,7 @@ flowchart TD
 
 - [x] T021 [P] [US2] Implement checkpoint verification helper in `crates/factory-application/src/workspaces/checkpoints.rs` to validate `StepCheckpoint` state before resuming DAG step
 - [x] T022 [US2] Configure Hatchet DAG task step retry and pod failure handler with at-least-once idempotency semantics in `crates/factory-application/src/workflows/resilience.rs`
-- [ ] T023 [US2] Implement fault-injection crash recovery benchmark test in `crates/factory-cli/tests/crash_recovery_test.rs` verifying MTTR $< 45\text{ s}$
+- [x] T023 [US2] Implement fault-injection crash recovery benchmark test in `crates/factory-cli/tests/crash_recovery_test.rs` verifying MTTR $< 45\text{ s}$
 
 ---
 
