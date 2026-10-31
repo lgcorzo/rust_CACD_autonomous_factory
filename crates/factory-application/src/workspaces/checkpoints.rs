@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
@@ -73,11 +73,16 @@ mod tests {
         };
 
         assert!(CheckpointHelper::verify_checkpoint(&valid_chk, "step-1").unwrap());
-        assert!(!CheckpointHelper::verify_checkpoint(&StepCheckpoint {
-            status: "FAILED".to_string(),
-            ..valid_chk.clone()
-        }, "step-1").unwrap());
+        assert!(
+            !CheckpointHelper::verify_checkpoint(
+                &StepCheckpoint {
+                    status: "FAILED".to_string(),
+                    ..valid_chk.clone()
+                },
+                "step-1"
+            )
+            .unwrap()
+        );
         assert!(CheckpointHelper::verify_checkpoint(&valid_chk, "step-2").is_err());
     }
 }
-

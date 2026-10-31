@@ -46,12 +46,11 @@ impl GitResolver {
             }
             _ => {
                 // Fallback to local HEAD if available
-                let head = Command::new("git")
+                Command::new("git")
                     .args(["rev-parse", "HEAD"])
                     .output()
                     .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
-                    .unwrap_or_else(|_| "0000000000000000000000000000000000000000".to_string());
-                head
+                    .unwrap_or_else(|_| "0000000000000000000000000000000000000000".to_string())
             }
         };
 

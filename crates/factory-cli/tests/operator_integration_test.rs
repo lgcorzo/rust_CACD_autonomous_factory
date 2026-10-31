@@ -1,4 +1,7 @@
-use factory_cli::operator::crd::{AgentWorkspace, AgentWorkspaceSpec, AgentWorkspaceStatus, WorkspacePhase, WorkspaceResourceLimits};
+use factory_cli::operator::crd::{
+    AgentWorkspace, AgentWorkspaceSpec, AgentWorkspaceStatus, WorkspacePhase,
+    WorkspaceResourceLimits,
+};
 use k8s_openapi::apimachinery::pkg::apis::meta::v1::{Condition, ObjectMeta, Time};
 use k8s_openapi::jiff::Timestamp;
 
@@ -56,4 +59,3 @@ fn test_agent_workspace_serialization_and_columns() {
     assert_eq!(json_val["status"]["conditions"][0]["reason"], "Dispatched");
     assert_eq!(json_val["status"]["conditions"][1]["status"], "True");
 }
-

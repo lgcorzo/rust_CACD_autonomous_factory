@@ -31,7 +31,9 @@ impl QuantityValidator {
 
     fn parse_memory_bytes(val: &str) -> Result<i64> {
         let re = Regex::new(r"^(\d+)(Ki|Mi|Gi|m|k|M|G)?$")?;
-        let caps = re.captures(val).ok_or_else(|| anyhow::anyhow!("Invalid memory format"))?;
+        let caps = re
+            .captures(val)
+            .ok_or_else(|| anyhow::anyhow!("Invalid memory format"))?;
         let num: i64 = caps[1].parse()?;
         let unit = caps.get(2).map(|m| m.as_str()).unwrap_or("");
         let bytes = match unit {

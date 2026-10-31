@@ -1,5 +1,5 @@
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Clone, Default)]
 pub struct OperatorMetrics {
@@ -18,7 +18,8 @@ impl OperatorMetrics {
     }
 
     pub fn record_completed_mission(&self) {
-        self.completed_missions_total.fetch_add(1, Ordering::Relaxed);
+        self.completed_missions_total
+            .fetch_add(1, Ordering::Relaxed);
     }
 
     pub fn inc_active_reconciliation(&self) {
@@ -73,4 +74,3 @@ impl OperatorMetrics {
         )
     }
 }
-

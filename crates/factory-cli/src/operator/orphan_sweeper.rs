@@ -1,8 +1,8 @@
 use anyhow::Result;
 use k8s_openapi::api::core::v1::Pod;
 use kube::{
-    api::{Api, DeleteParams, ListParams},
     Client,
+    api::{Api, DeleteParams, ListParams},
 };
 use std::time::Duration;
 use tracing::{info, warn};
@@ -59,4 +59,3 @@ impl OrphanSweeper {
         }
     }
 }
-

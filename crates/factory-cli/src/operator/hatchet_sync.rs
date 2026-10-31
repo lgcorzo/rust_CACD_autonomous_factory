@@ -29,7 +29,11 @@ impl HatchetSync {
         );
 
         // Generates deterministic simulated run ID based on idempotency key
-        let run_id = format!("wf-run-{}", uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_DNS, event.idempotency_key.as_bytes()).simple());
+        let run_id = format!(
+            "wf-run-{}",
+            uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_DNS, event.idempotency_key.as_bytes())
+                .simple()
+        );
         Ok(run_id)
     }
 
@@ -66,4 +70,3 @@ mod tests {
         assert!(run_id1.starts_with("wf-run-"));
     }
 }
-

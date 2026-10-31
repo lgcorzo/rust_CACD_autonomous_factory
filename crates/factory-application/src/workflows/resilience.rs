@@ -62,7 +62,8 @@ impl DagResilienceHandler {
             return Duration::from_millis(self.policy.backoff_initial_ms);
         }
         let exp = 2u64.saturating_pow(retry_count);
-        let millis = (self.policy.backoff_initial_ms.saturating_mul(exp)).min(self.policy.backoff_max_ms);
+        let millis =
+            (self.policy.backoff_initial_ms.saturating_mul(exp)).min(self.policy.backoff_max_ms);
         Duration::from_millis(millis)
     }
 }
@@ -97,7 +98,11 @@ mod tests {
             status: "FAILED".to_string(),
             ..chk.clone()
         };
-        assert!(handler.should_execute_step(Some(&failed_chk), step_id).unwrap());
+        assert!(
+            handler
+                .should_execute_step(Some(&failed_chk), step_id)
+                .unwrap()
+        );
     }
 
     #[test]
@@ -111,4 +116,3 @@ mod tests {
         assert_eq!(b2, Duration::from_millis(2000));
     }
 }
-

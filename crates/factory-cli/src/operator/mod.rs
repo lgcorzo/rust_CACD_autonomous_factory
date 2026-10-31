@@ -1,17 +1,17 @@
-pub mod crd;
 pub mod admission_test;
+pub mod controller;
+pub mod crd;
+pub mod finalizer;
 pub mod git_resolver;
 pub mod hatchet_sync;
-pub mod controller;
-pub mod finalizer;
-pub mod orphan_sweeper;
 pub mod metrics;
+pub mod orphan_sweeper;
 
 use anyhow::Result;
 use k8s_openapi::api::coordination::v1::Lease;
 use kube::{
-    api::{Api, Patch, PatchParams},
     Client,
+    api::{Api, Patch, PatchParams},
 };
 use std::time::Duration;
 use tracing::{error, info, warn};
@@ -62,7 +62,14 @@ pub async fn run_operator(config: OperatorConfig) -> Result<()> {
         let leases: Api<Lease> = Api::namespaced(client.clone(), &config.namespace);
 
         loop {
-            match acquire_or_renew_lease(&leases, &config.lease_name, &identity, config.lease_duration).await {
+            match acquire_or_renew_lease(
+                &leases,
+                &config.lease_name,
+                &identity,
+                config.lease_duration,
+            )
+            .await
+            {
                 Ok(is_leader) => {
                     if is_leader {
                         info!(identity = %identity, "Leader election acquired! Starting active controller loop.");
@@ -94,8 +101,8 @@ async fn acquire_or_renew_lease(
     holder_identity: &str,
     lease_duration: Duration,
 ) -> Result<bool> {
-    use k8s_openapi::jiff::Timestamp;
     use k8s_openapi::apimachinery::pkg::apis::meta::v1::MicroTime;
+    use k8s_openapi::jiff::Timestamp;
     let now = Timestamp::now();
     let micro_now = MicroTime(now);
 
@@ -114,7 +121,10 @@ async fn acquire_or_renew_lease(
     });
 
     let params = PatchParams::apply("factory-operator").force();
-    match leases.patch(lease_name, &params, &Patch::Apply(&lease_patch)).await {
+    match leases
+        .patch(lease_name, &params, &Patch::Apply(&lease_patch))
+        .await
+    {
         Ok(_) => Ok(true),
         Err(e) => {
             error!(error = %e, "Failed to apply lease patch");

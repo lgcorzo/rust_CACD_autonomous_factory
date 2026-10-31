@@ -16,4 +16,3 @@ async fn test_automated_teardown_sequence() {
     let finalizer_removed = true;
     assert!(finalizer_removed);
 }
-

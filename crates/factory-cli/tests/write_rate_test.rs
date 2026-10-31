@@ -30,4 +30,3 @@ fn test_status_patch_write_ratio_under_limit() {
     let prom_text = metrics.render_prometheus();
     assert!(prom_text.contains("factory_operator_patch_write_ratio 3.00"));
 }
-

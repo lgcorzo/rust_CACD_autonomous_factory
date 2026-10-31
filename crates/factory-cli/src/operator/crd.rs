@@ -105,10 +105,9 @@ mod tests {
         assert_eq!(crd.spec.names.kind, "AgentWorkspace");
         assert_eq!(crd.spec.names.plural, "agentworkspaces");
         assert_eq!(crd.spec.names.singular.as_deref(), Some("agentworkspace"));
-        
+
         let yaml = serde_yaml::to_string(&crd).expect("failed to serialize CRD to YAML");
         assert!(yaml.contains("darkgravity.io"));
         assert!(yaml.contains("AgentWorkspace"));
     }
 }
-

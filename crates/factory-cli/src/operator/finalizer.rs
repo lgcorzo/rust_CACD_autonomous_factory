@@ -2,8 +2,8 @@ use crate::operator::crd::AgentWorkspace;
 use anyhow::Result;
 use k8s_openapi::api::core::v1::Pod;
 use kube::{
-    api::{Api, DeleteParams, ListParams, Patch, PatchParams},
     Client,
+    api::{Api, DeleteParams, ListParams, Patch, PatchParams},
 };
 use std::time::Duration;
 use tracing::{info, warn};
@@ -72,10 +72,15 @@ impl FinalizerManager {
     }
 
     /// Deletes ephemeral sandboxes (Pods/Jobs) associated with workspace in development namespace
-    pub async fn cleanup_sandboxes(client: Client, namespace: &str, workspace_uid: &str) -> Result<()> {
+    pub async fn cleanup_sandboxes(
+        client: Client,
+        namespace: &str,
+        workspace_uid: &str,
+    ) -> Result<()> {
         info!(namespace = %namespace, workspace_uid = %workspace_uid, "Cleaning up sandbox Pods matching workspace UID");
         let pod_api: Api<Pod> = Api::namespaced(client, namespace);
-        let lp = ListParams::default().labels(&format!("darkgravity.io/workspace-uid={}", workspace_uid));
+        let lp = ListParams::default()
+            .labels(&format!("darkgravity.io/workspace-uid={}", workspace_uid));
 
         match pod_api.list(&lp).await {
             Ok(pod_list) => {
@@ -103,10 +108,12 @@ impl FinalizerManager {
         info!(workspace = %name, "Executing complete teardown sequence for finalizer removal");
 
         // 1. Cancel Hatchet run if active
-        if let Some(status) = &ws.status {
-            if let Some(run_id) = &status.hatchet_workflow_run_id {
-                let _ = Self::cancel_hatchet_run(run_id).await;
-            }
+        if let Some(run_id) = ws
+            .status
+            .as_ref()
+            .and_then(|s| s.hatchet_workflow_run_id.as_deref())
+        {
+            let _ = Self::cancel_hatchet_run(run_id).await;
         }
 
         // 2. Revoke Vault JIT credentials
@@ -138,4 +145,3 @@ impl FinalizerManager {
         Ok(())
     }
 }
-

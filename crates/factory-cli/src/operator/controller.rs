@@ -2,12 +2,12 @@ use crate::operator::crd::{AgentWorkspace, AgentWorkspaceStatus, WorkspacePhase}
 use crate::operator::git_resolver::GitResolver;
 use crate::operator::hatchet_sync::{DispatchedMissionEvent, HatchetSync};
 use anyhow::Result;
-use k8s_openapi::jiff::Timestamp;
 use k8s_openapi::apimachinery::pkg::apis::meta::v1::{Condition, Time};
+use k8s_openapi::jiff::Timestamp;
 use kube::{
+    Client,
     api::{Api, Patch, PatchParams, ResourceExt},
     runtime::controller::Action,
-    Client,
 };
 use std::sync::Arc;
 use std::time::Duration;
@@ -22,7 +22,10 @@ pub struct WorkspaceController;
 
 impl WorkspaceController {
     /// Evaluates if status patch should be emitted (strictly throttled to major phase transitions)
-    pub fn should_update_status(current: &AgentWorkspaceStatus, next_phase: WorkspacePhase) -> bool {
+    pub fn should_update_status(
+        current: &AgentWorkspaceStatus,
+        next_phase: WorkspacePhase,
+    ) -> bool {
         current.phase != next_phase
     }
 
@@ -47,7 +50,9 @@ impl WorkspaceController {
         // If missionRef is specified, check dispatch state
         if let Some(ref mref) = spec.mission_ref {
             // Check if already dispatched under this missionRef
-            if status.active_mission_ref.as_deref() == Some(mref) && status.phase == WorkspacePhase::Running {
+            if status.active_mission_ref.as_deref() == Some(mref)
+                && status.phase == WorkspacePhase::Running
+            {
                 info!(name = %name, mission_ref = %mref, "Mission already actively running");
                 return Ok(Action::requeue(Duration::from_secs(60)));
             }
@@ -67,7 +72,10 @@ impl WorkspaceController {
                     type_: "MissionAccepted".to_string(),
                     status: "False".to_string(),
                     reason: "AlreadyExecuted".to_string(),
-                    message: format!("Commit {} already executed for mission {}", git_info.commit_sha, mref),
+                    message: format!(
+                        "Commit {} already executed for mission {}",
+                        git_info.commit_sha, mref
+                    ),
                     last_transition_time: now,
                     observed_generation: ws.metadata.generation,
                 };
@@ -77,19 +85,25 @@ impl WorkspaceController {
                     }
                 });
                 let pp = PatchParams::apply("factory-operator");
-                api.patch_status(&name, &pp, &Patch::Merge(&patch_json)).await?;
+                api.patch_status(&name, &pp, &Patch::Merge(&patch_json))
+                    .await?;
                 return Ok(Action::requeue(Duration::from_secs(60)));
             }
 
             // Check if active mission is currently running in another run (deferred mission)
-            if status.phase == WorkspacePhase::Running && status.active_mission_ref.as_deref() != Some(mref) {
+            if status.phase == WorkspacePhase::Running
+                && status.active_mission_ref.as_deref() != Some(mref)
+            {
                 info!(name = %name, active = ?status.active_mission_ref, pending = %mref, "Mission active; deferring until complete");
                 let now = Time(Timestamp::now());
                 let condition = Condition {
                     type_: "MissionAccepted".to_string(),
                     status: "False".to_string(),
                     reason: "MissionActive".to_string(),
-                    message: format!("Mission {} deferred because active mission is running", mref),
+                    message: format!(
+                        "Mission {} deferred because active mission is running",
+                        mref
+                    ),
                     last_transition_time: now,
                     observed_generation: ws.metadata.generation,
                 };
@@ -99,7 +113,8 @@ impl WorkspaceController {
                     }
                 });
                 let pp = PatchParams::apply("factory-operator");
-                api.patch_status(&name, &pp, &Patch::Merge(&patch_json)).await?;
+                api.patch_status(&name, &pp, &Patch::Merge(&patch_json))
+                    .await?;
                 return Ok(Action::requeue(Duration::from_secs(60)));
             }
 
@@ -149,7 +164,8 @@ impl WorkspaceController {
             });
 
             let pp = PatchParams::apply("factory-operator");
-            api.patch_status(&name, &pp, &Patch::Merge(&patch_json)).await?;
+            api.patch_status(&name, &pp, &Patch::Merge(&patch_json))
+                .await?;
             info!(name = %name, mission_ref = %mref, run_id = %run_id, "Updated AgentWorkspace status to Running");
         }
 
@@ -157,7 +173,11 @@ impl WorkspaceController {
         Ok(Action::requeue(Duration::from_secs(60)))
     }
 
-    pub fn error_policy(_ws: Arc<AgentWorkspace>, err: &anyhow::Error, _ctx: Arc<ContextData>) -> Action {
+    pub fn error_policy(
+        _ws: Arc<AgentWorkspace>,
+        err: &anyhow::Error,
+        _ctx: Arc<ContextData>,
+    ) -> Action {
         error!(error = %err, "Reconciliation error occurred");
         Action::requeue(Duration::from_secs(10))
     }

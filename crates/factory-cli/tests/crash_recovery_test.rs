@@ -30,4 +30,3 @@ async fn test_fault_injection_crash_recovery_benchmark() {
         elapsed
     );
 }
-
