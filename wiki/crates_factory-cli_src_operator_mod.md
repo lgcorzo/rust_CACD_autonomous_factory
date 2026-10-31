@@ -4,7 +4,7 @@ title: "mod.rs"
 source_path: "crates/factory-cli/src/operator/mod.rs"
 description: "Documentation for crates/factory-cli/src/operator/mod.rs"
 tags: [rust, module]
-last_verified_commit: "f4388269"
+last_verified_commit: "1ab9b9c1"
 ---
 
 # mod.rs

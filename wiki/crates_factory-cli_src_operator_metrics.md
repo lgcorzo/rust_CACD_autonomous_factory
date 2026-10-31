@@ -4,7 +4,7 @@ title: "metrics.rs"
 source_path: "crates/factory-cli/src/operator/metrics.rs"
 description: "Documentation for crates/factory-cli/src/operator/metrics.rs"
 tags: [rust, module]
-last_verified_commit: "f4388269"
+last_verified_commit: "1ab9b9c1"
 ---
 
 # metrics.rs
