@@ -38,18 +38,53 @@ pub trait SpecProvider: Send + Sync {
 #[derive(Debug, Clone)]
 pub struct MockSpecProvider {
     specs_dir: std::path::PathBuf,
+    base_dir: std::path::PathBuf,
 }
 
 impl MockSpecProvider {
     pub fn new(specs_dir: std::path::PathBuf) -> Self {
-        Self { specs_dir }
+        let base_dir = Self::determine_writable_base_dir();
+        Self {
+            specs_dir,
+            base_dir,
+        }
+    }
+
+    fn determine_writable_base_dir() -> std::path::PathBuf {
+        // Check if current directory is writable by attempting to test a temporary file or check permissions
+        if let Ok(metadata) = std::fs::metadata(".") {
+            if !metadata.permissions().readonly() {
+                // Double check by attempting a small test or checking if we can write
+                if tokio::runtime::Handle::try_current().is_ok() || true {
+                    if let Ok(temp_test) = std::fs::OpenOptions::new()
+                        .create(true)
+                        .truncate(true)
+                        .write(true)
+                        .open(".test_write_perm")
+                    {
+                        drop(temp_test);
+                        let _ = std::fs::remove_file(".test_write_perm");
+                        return std::path::PathBuf::from(".");
+                    }
+                }
+            }
+        }
+        // Fall back to /tmp or system temp directory
+        let tmp = std::path::PathBuf::from("/tmp");
+        if tmp.exists() {
+            tmp
+        } else {
+            std::env::temp_dir()
+        }
     }
 }
 
 impl Default for MockSpecProvider {
     fn default() -> Self {
+        let base = Self::determine_writable_base_dir();
         Self {
-            specs_dir: std::path::PathBuf::from("specs"),
+            specs_dir: base.join("specs"),
+            base_dir: base,
         }
     }
 }
@@ -61,34 +96,42 @@ impl SpecProvider for MockSpecProvider {
             .trim_matches('"')
             .to_string();
 
+        let specify_dir = self.base_dir.join(".specify");
+        let target_specs_dir =
+            if self.specs_dir.is_absolute() || self.base_dir == std::path::Path::new(".") {
+                self.specs_dir.clone()
+            } else {
+                self.base_dir.join(&self.specs_dir)
+            };
+
         match command {
             SpecKitCommand::Init => {
-                tokio::fs::create_dir_all(".specify").await?;
+                tokio::fs::create_dir_all(&specify_dir).await?;
                 let init_options = serde_json::json!({
-                    "specs_dir": self.specs_dir.to_string_lossy()
+                    "specs_dir": target_specs_dir.to_string_lossy()
                 });
                 tokio::fs::write(
-                    ".specify/init-options.json",
+                    specify_dir.join("init-options.json"),
                     serde_json::to_string_pretty(&init_options)?,
                 )
                 .await?;
             }
             SpecKitCommand::Specify => {
-                tokio::fs::create_dir_all(&self.specs_dir).await?;
-                tokio::fs::write(self.specs_dir.join("spec.md"), "# Mock Spec").await?;
+                tokio::fs::create_dir_all(&target_specs_dir).await?;
+                tokio::fs::write(target_specs_dir.join("spec.md"), "# Mock Spec").await?;
             }
             SpecKitCommand::Plan => {
-                tokio::fs::create_dir_all(&self.specs_dir).await?;
+                tokio::fs::create_dir_all(&target_specs_dir).await?;
                 tokio::fs::write(
-                    self.specs_dir.join("plan.md"),
+                    target_specs_dir.join("plan.md"),
                     "{\"tasks\":[{\"description\":\"print('hello world from fix')\"}]}",
                 )
                 .await?;
             }
             SpecKitCommand::Execute => {
-                tokio::fs::create_dir_all(&self.specs_dir).await?;
+                tokio::fs::create_dir_all(&target_specs_dir).await?;
                 tokio::fs::write(
-                    self.specs_dir.join("tasks.md"),
+                    target_specs_dir.join("tasks.md"),
                     "{\"tasks\":[{\"description\":\"print('hello world from fix')\"}]}",
                 )
                 .await?;
