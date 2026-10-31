@@ -1,9 +1,3 @@
-# Contract: AgentWorkspace CRD Specification
-
-**Version**: `v1alpha1`
-**Group**: `darkgravity.io`
-
-```yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -137,5 +131,3 @@ spec:
                       lastTransitionTime:
                         type: string
                         format: date-time
-```
-

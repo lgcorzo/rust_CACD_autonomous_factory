@@ -1,6 +1,3 @@
-# Contract: ValidatingAdmissionPolicy Bounds (Pods & Jobs)
-
-```yaml
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicy
 metadata:
@@ -148,5 +145,3 @@ spec:
     namespaceSelector:
       matchLabels:
         kubernetes.io/metadata.name: development
-```
-

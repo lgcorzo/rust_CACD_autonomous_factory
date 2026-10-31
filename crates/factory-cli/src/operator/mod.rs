@@ -1,4 +1,5 @@
 pub mod crd;
+pub mod admission_test;
 
 use anyhow::Result;
 use k8s_openapi::api::coordination::v1::Lease;

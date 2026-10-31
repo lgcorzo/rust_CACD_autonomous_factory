@@ -1835,6 +1835,7 @@ dependencies = [
  "k8s-openapi",
  "kube",
  "rdkafka",
+ "regex",
  "reqwest",
  "schemars",
  "sentry",

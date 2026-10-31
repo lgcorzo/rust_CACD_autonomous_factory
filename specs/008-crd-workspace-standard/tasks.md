@@ -54,10 +54,10 @@ flowchart TD
 
 **Independent Test**: Execute tests in `specs/008-crd-workspace-standard/quickstart.md#2-validation-scenario-1-admission-boundary-enforcement-sc-005` and verify 100% rejection of violations.
 
-- [ ] T010 [P] [US4] Implement unit test suite verifying CEL validation rules for `maxRam` and `maxCpu` in `crates/factory-cli/src/operator/admission_test.rs`
-- [ ] T011 [P] [US4] Create automated test runner script `tests/admission/test_admission_bounds.sh` targeting Kubernetes `ValidatingAdmissionPolicy`
-- [ ] T012 [US4] Deploy `deploy/policies/validating-admission-policies.yaml` to the development cluster and configure `ValidatingAdmissionPolicyBinding` for namespace `development`
-- [ ] T013 [US4] Verify admission rejection for missing requests/limits, RAM $> 30\text{Mi}$, CPU $> 250\text{m}$, and ephemeral containers via `tests/admission/test_admission_bounds.sh`
+- [x] T010 [P] [US4] Implement unit test suite verifying CEL validation rules for `maxRam` and `maxCpu` in `crates/factory-cli/src/operator/admission_test.rs`
+- [x] T011 [P] [US4] Create automated test runner script `tests/admission/test_admission_bounds.sh` targeting Kubernetes `ValidatingAdmissionPolicy`
+- [x] T012 [US4] Deploy `deploy/policies/validating-admission-policies.yaml` to the development cluster and configure `ValidatingAdmissionPolicyBinding` for namespace `development`
+- [x] T013 [US4] Verify admission rejection for missing requests/limits, RAM $> 30\text{Mi}$, CPU $> 250\text{m}$, and ephemeral containers via `tests/admission/test_admission_bounds.sh`
 
 ---
 
