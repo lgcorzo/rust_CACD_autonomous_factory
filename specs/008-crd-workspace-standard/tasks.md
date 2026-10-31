@@ -73,7 +73,7 @@ flowchart TD
 - [x] T017 [US1] Implement `MissionAccepted` condition logic in `crates/factory-cli/src/operator/controller.rs` handling `Dispatched`, `MissionActive` (deferred), and `AlreadyExecuted`
 - [x] T018 [US1] Implement level-triggered reconciliation poller (60-second tick) in `crates/factory-cli/src/operator/controller.rs` to resume deferred missions after active runs terminate
 - [x] T019 [US1] Wire `kube::runtime::Controller` reconcile loop in `crates/factory-cli/src/operator/controller.rs` linking Git resolver, Hatchet dispatcher, and throttled status writer
-- [ ] T020 [US1] Add integration test for declarative workspace onboarding and `kubectl get agws` printer columns in `crates/factory-cli/tests/operator_integration_test.rs`
+- [x] T020 [US1] Add integration test for declarative workspace onboarding and `kubectl get agws` printer columns in `crates/factory-cli/tests/operator_integration_test.rs`
 
 ---
 
