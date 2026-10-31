@@ -3,6 +3,8 @@ pub mod admission_test;
 pub mod git_resolver;
 pub mod hatchet_sync;
 pub mod controller;
+pub mod finalizer;
+pub mod orphan_sweeper;
 
 use anyhow::Result;
 use k8s_openapi::api::coordination::v1::Lease;

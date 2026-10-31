@@ -95,12 +95,12 @@ flowchart TD
 
 **Independent Test**: Delete an active workspace and verify workflow cancellation, token revocation, sandbox cleanup, and finalizer release.
 
-- [ ] T024 [US3] Implement finalizer registration (`darkgravity.io/workspace-finalizer`) upon workspace creation in `crates/factory-cli/src/operator/finalizer.rs`
-- [ ] T025 [US3] Implement asynchronous cancellation sequence in `crates/factory-cli/src/operator/finalizer.rs` with `T_cancel = 300s` timeout
-- [ ] T026 [US3] Implement Vault JIT credential revocation with `T_token` fallback in `crates/factory-cli/src/operator/finalizer.rs`
-- [ ] T027 [US3] Implement sandbox Pod/Job cleanup in namespace `development` matching workspace UID in `crates/factory-cli/src/operator/finalizer.rs`
-- [ ] T028 [US3] Implement background orphan sweeper task (120-second interval, 600-second grace period) in `crates/factory-cli/src/operator/orphan_sweeper.rs`
-- [ ] T029 [US3] Add automated E2E teardown verification test in `crates/factory-cli/tests/teardown_test.rs`
+- [x] T024 [US3] Implement finalizer registration (`darkgravity.io/workspace-finalizer`) upon workspace creation in `crates/factory-cli/src/operator/finalizer.rs`
+- [x] T025 [US3] Implement asynchronous cancellation sequence in `crates/factory-cli/src/operator/finalizer.rs` with `T_cancel = 300s` timeout
+- [x] T026 [US3] Implement Vault JIT credential revocation with `T_token` fallback in `crates/factory-cli/src/operator/finalizer.rs`
+- [x] T027 [US3] Implement sandbox Pod/Job cleanup in namespace `development` matching workspace UID in `crates/factory-cli/src/operator/finalizer.rs`
+- [x] T028 [US3] Implement background orphan sweeper task (120-second interval, 600-second grace period) in `crates/factory-cli/src/operator/orphan_sweeper.rs`
+- [x] T029 [US3] Add automated E2E teardown verification test in `crates/factory-cli/tests/teardown_test.rs`
 
 ---
 
