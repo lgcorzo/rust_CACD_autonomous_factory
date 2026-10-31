@@ -23,6 +23,8 @@ sentry = "0.48.4"
 jemallocator = "0.5.4"
 reqwest = { version = "0.13", features = ["json"] }
 uuid = { version = "1.0", features = ["v4"] }
+chrono = { workspace = true }
+hostname = "0.4"
 kube = { workspace = true, features = ["runtime", "client", "derive"] }
 k8s-openapi = { workspace = true, features = ["schemars"] }
 schemars = "1"

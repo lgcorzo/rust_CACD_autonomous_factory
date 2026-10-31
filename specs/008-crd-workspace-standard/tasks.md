@@ -41,8 +41,8 @@ flowchart TD
 - [x] T005 Measure steady-state and peak RSS of gVisor (`runsc` Sentry/Gofer) using a diagnostic pod in `development` namespace to validate Option (X) baseline in `specs/008-crd-workspace-standard/research.md`
 - [x] T006 Define `AgentWorkspace`, `AgentWorkspaceSpec`, `WorkspaceResourceLimits`, and `AgentWorkspaceStatus` structs in `crates/factory-cli/src/operator/crd.rs` per `specs/008-crd-workspace-standard/data-model.md`
 - [x] T007 Implement CRD generation unit test in `crates/factory-cli/src/operator/crd.rs` ensuring OpenAPI schema matches `deploy/crds/agentworkspaces.darkgravity.io.yaml`
-- [ ] T008 Scaffold `factory-cli operator` command with CLI flags (`--leader-election`, `--namespace`) in `crates/factory-cli/src/main.rs` and `crates/factory-cli/src/operator/mod.rs`
-- [ ] T009 Implement Kubernetes leader election lock (`coordination.k8s.io/v1` `Lease`) in `crates/factory-cli/src/operator/mod.rs`
+- [x] T008 Scaffold `factory-cli operator` command with CLI flags (`--leader-election`, `--namespace`) in `crates/factory-cli/src/main.rs` and `crates/factory-cli/src/operator/mod.rs`
+- [x] T009 Implement Kubernetes leader election lock (`coordination.k8s.io/v1` `Lease`) in `crates/factory-cli/src/operator/mod.rs`
 
 **Checkpoint**: Foundation ready — domain models, CLI entry point, and gVisor budget verified.
 
