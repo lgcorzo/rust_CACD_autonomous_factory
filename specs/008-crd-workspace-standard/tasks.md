@@ -69,10 +69,10 @@ flowchart TD
 
 - [x] T014 [US1] Implement Git commit resolver in `crates/factory-cli/src/operator/git_resolver.rs` to snapshot `targetBranch` to commit SHA and compute constitution hash
 - [x] T015 [US1] Implement Hatchet workflow dispatcher with idempotency key `(workspace_uid, mission_ref)` and queueing concurrency in `crates/factory-cli/src/operator/hatchet_sync.rs`
-- [ ] T016 [US1] Implement throttled status projection engine in `crates/factory-cli/src/operator/controller.rs` emitting patches only on major phases (`Pending`, `Initializing`, `Running`, `Paused`, `Completed`, `Failed`)
-- [ ] T017 [US1] Implement `MissionAccepted` condition logic in `crates/factory-cli/src/operator/controller.rs` handling `Dispatched`, `MissionActive` (deferred), and `AlreadyExecuted`
-- [ ] T018 [US1] Implement level-triggered reconciliation poller (60-second tick) in `crates/factory-cli/src/operator/controller.rs` to resume deferred missions after active runs terminate
-- [ ] T019 [US1] Wire `kube::runtime::Controller` reconcile loop in `crates/factory-cli/src/operator/controller.rs` linking Git resolver, Hatchet dispatcher, and throttled status writer
+- [x] T016 [US1] Implement throttled status projection engine in `crates/factory-cli/src/operator/controller.rs` emitting patches only on major phases (`Pending`, `Initializing`, `Running`, `Paused`, `Completed`, `Failed`)
+- [x] T017 [US1] Implement `MissionAccepted` condition logic in `crates/factory-cli/src/operator/controller.rs` handling `Dispatched`, `MissionActive` (deferred), and `AlreadyExecuted`
+- [x] T018 [US1] Implement level-triggered reconciliation poller (60-second tick) in `crates/factory-cli/src/operator/controller.rs` to resume deferred missions after active runs terminate
+- [x] T019 [US1] Wire `kube::runtime::Controller` reconcile loop in `crates/factory-cli/src/operator/controller.rs` linking Git resolver, Hatchet dispatcher, and throttled status writer
 - [ ] T020 [US1] Add integration test for declarative workspace onboarding and `kubectl get agws` printer columns in `crates/factory-cli/tests/operator_integration_test.rs`
 
 ---
