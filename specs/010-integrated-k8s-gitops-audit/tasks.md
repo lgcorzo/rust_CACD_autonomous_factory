@@ -48,8 +48,8 @@
 
 ## Phase 4: Verification, Quality Gates & Deliverables (P1/P2)
 
-- [ ] T021: Run full workspace unit and integration test suite (`cargo test --workspace`).
-- [ ] T022: Verify static formatting and zero clippy warnings (`cargo fmt --check` and `cargo clippy --workspace --all-targets -- -D warnings`).
-- [ ] T023: Update OKF documentation (`python3 .agents/tools/okf_generator.py`) and knowledge graph (`graphify update .`).
-- [ ] T024: Validate CI/CD pipeline on Draft PR, compile evidence, and present to user for manual merge (HITL).
+- [x] T021: Run full workspace unit and integration test suite (`cargo test --workspace`).
+- [x] T022: Verify static formatting and zero clippy warnings (`cargo fmt --check` and `cargo clippy --workspace --all-targets -- -D warnings`).
+- [x] T023: Update OKF documentation (`python3 .agents/tools/okf_generator.py`) and knowledge graph (`graphify update .`).
+- [x] T024: Validate CI/CD pipeline on Draft PR, compile evidence, and present to user for manual merge (HITL).
 
