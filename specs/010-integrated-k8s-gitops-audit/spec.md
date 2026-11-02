@@ -97,3 +97,4 @@ The objective is to establish that Dark Gravity cannot execute untrusted code on
 4. `docs/audit/REMEDIATION_PLAN.md`: Implementation tasks and dependency graph.
 5. `docs/audit/SECURITY_TEST_PLAN.md`: Reproducible security test commands and assertions.
 6. Passing automated quality gates in both repositories.
+
