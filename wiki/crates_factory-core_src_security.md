@@ -4,7 +4,7 @@ title: "security.rs"
 source_path: "crates/factory-core/src/security.rs"
 description: "Documentation for crates/factory-core/src/security.rs"
 tags: [rust, module]
-last_verified_commit: "00ae8eaf"
+last_verified_commit: "77e621f3"
 ---
 
 # security.rs
@@ -22,6 +22,8 @@ classDiagram
     class AuditResult
     class SastScanResult
     class ScanPolicy
+    class AstSecurityVisitor
+    class LoopBreakDetector
     class Ed25519SecurityValidator
     class JitToken
     class CredentialSessionRef
