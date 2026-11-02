@@ -183,3 +183,4 @@ last_verified_commit: "fbdc5848"
 * [[crates_factory-cli_src_operator_git_resolver]]
 * [[crates_factory-cli_src_operator_hatchet_sync]]
 * [[crates_factory-cli_src_operator_orphan_sweeper]]
+* [[crates_factory-core_src_security]]
