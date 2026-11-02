@@ -60,3 +60,4 @@ Expected labels:
      ```bash
      gitleaks git --verbose
      ```
+

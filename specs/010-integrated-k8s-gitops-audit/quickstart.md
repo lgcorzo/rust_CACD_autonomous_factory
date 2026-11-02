@@ -42,3 +42,4 @@ cargo test --workspace
 cd /mnt/F024B17C24B145FE/Repos/gitops_internal_lgcorzo
 kubectl kustomize infrastructure/agents/
 ```
+

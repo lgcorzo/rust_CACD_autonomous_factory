@@ -117,3 +117,4 @@ This audit establishes an evidence-driven baseline across:
   - `Gitleaks`: Clean, 0 secrets in commit history.
 - **GitOps Manifests**:
   - Validated with `kubectl kustomize` for syntax and structure.
+

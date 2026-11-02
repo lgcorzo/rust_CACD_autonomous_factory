@@ -65,3 +65,4 @@ flowchart TD
 | **THREAT-4** | Ingestion of fabricated test results | Require sandboxed test execution; typed `TestExecutionReport` | `crates/factory-mcp-server/src/tools/run_tests.rs` |
 | **THREAT-5** | Runaway LLM spend exceeding budget | FinOps budget latch integrated into mission admission | `factory-application/src/agents/finops.rs` |
 | **THREAT-6** | Sandbox pod resource exhaustion | Strict CPU (250m), memory (30Mi), and TTL (300s) cleanup | Kubernetes Job Spec |
+

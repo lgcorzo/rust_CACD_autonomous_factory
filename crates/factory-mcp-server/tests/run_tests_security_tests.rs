@@ -6,7 +6,9 @@ use std::sync::Arc;
 
 #[tokio::test]
 async fn test_run_tests_rejects_missing_runner_without_simulated_pass() {
-    let tool = RunTestsTool::new(Arc::new(SubprocessDriver::new().with_force_production(false)));
+    let tool = RunTestsTool::new(Arc::new(
+        SubprocessDriver::new().with_force_production(false),
+    ));
 
     // Execute a non-existent test runner command
     let res = tool
@@ -44,4 +46,3 @@ async fn test_run_tests_rejects_missing_runner_without_simulated_pass() {
         "Outcome must be explicitly infrastructure_error"
     );
 }
-

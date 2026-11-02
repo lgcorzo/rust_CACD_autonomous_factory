@@ -78,3 +78,4 @@
 | **RBAC Least Privilege** | N/A | `infrastructure/agents/rbac.yaml` | K8s RBAC authorizer | ClusterRole review | P1 Fix Required |
 | **FinOps Admission Latch** | `factory-application/src/agents/finops.rs` | N/A | Application scheduler admission | Unit test budget hardstop admission | P1 Fix Required |
 | **Secret Protection** | `factory-core`, `factory-infrastructure` | `infrastructure/sealed-secrets/` | SOPS / SealedSecrets | Gitleaks + K8s sealed secrets | Pass / Verified |
+

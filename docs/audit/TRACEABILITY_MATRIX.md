@@ -26,3 +26,4 @@
 | **Vault Repository ACLs** | `factory-infrastructure/src/vault.rs` | `infrastructure/security/` | Vault ACL path tokens | `tests/vault_isolation_tests.rs` | **PASS** (Strict 403 enforcement on foreign repos) |
 | **Secret Encryption at Rest** | `factory-infrastructure` | `infrastructure/sealed-secrets/` | Bitnami SealedSecrets controller | Clean Gitleaks scan in Git | **PASS** (SealedSecrets encrypted in Git) |
 | **Job Lifecycle & Cleanup** | `launch_sandbox_pod.rs` | `infrastructure/agents/sandbox-job.yaml` | `ttlSecondsAfterFinished: 300` | K8s Job controller | **FAIL** (No TTL configured in template) |
+

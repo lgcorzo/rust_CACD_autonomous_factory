@@ -68,7 +68,7 @@ impl MockVaultServer {
                         },
                         "renewable": is_renewable,
                         "ttl": ttl,
-                        "expire_time": "2026-11-02T12:00:00Z"
+                        "expire_time": (chrono::Utc::now() + chrono::Duration::hours(1)).to_rfc3339()
                     }
                 })))
                 .mount(&self.server)

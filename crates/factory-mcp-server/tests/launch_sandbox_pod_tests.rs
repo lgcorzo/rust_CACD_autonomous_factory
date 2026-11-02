@@ -15,13 +15,17 @@ fn test_launch_sandbox_pod_requires_gvisor_runtime_class_in_production() {
         .expect("Pod template spec must exist");
 
     assert_eq!(
-        template_spec.get("runtimeClassName").and_then(|r| r.as_str()),
+        template_spec
+            .get("runtimeClassName")
+            .and_then(|r| r.as_str()),
         Some("gvisor"),
         "Production sandbox must mandate runtimeClassName: gvisor"
     );
 
     assert_eq!(
-        template_spec.get("automountServiceAccountToken").and_then(|a| a.as_bool()),
+        template_spec
+            .get("automountServiceAccountToken")
+            .and_then(|a| a.as_bool()),
         Some(false),
         "Sandbox must disable automountServiceAccountToken"
     );
@@ -33,4 +37,3 @@ fn test_launch_sandbox_pod_requires_gvisor_runtime_class_in_production() {
         "Must fail closed if gVisor is not enabled in production"
     );
 }
-

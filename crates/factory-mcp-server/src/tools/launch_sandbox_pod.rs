@@ -182,7 +182,8 @@ impl Tool for LaunchSandboxPodTool {
             .eq_ignore_ascii_case("production")
             || cfg!(feature = "production");
         let require_gvisor = is_prod || std::env::var("USE_GVISOR").unwrap_or_default() == "true";
-        let namespace = std::env::var("SANDBOX_NAMESPACE").unwrap_or_else(|_| "factory-sandboxes".to_string());
+        let namespace =
+            std::env::var("SANDBOX_NAMESPACE").unwrap_or_else(|_| "factory-sandboxes".to_string());
 
         let jobs: Api<Job> = Api::namespaced(client.clone(), &namespace);
 

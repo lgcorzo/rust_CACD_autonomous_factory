@@ -42,4 +42,3 @@ async fn test_finops_hard_stop_blocks_mission_admission() {
         err_str
     );
 }
-

@@ -82,3 +82,4 @@ flowchart LR
     SandboxWorkload -.-x|DENIED| InternalDBs
     SandboxWorkload -->|RESTRICTED HTTPS| GitHost
 ```
+
