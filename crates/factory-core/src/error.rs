@@ -31,6 +31,9 @@ pub enum FactoryError {
 
     #[error("Remediation error: {0}")]
     RemediationError(String),
+
+    #[error("FinOps budget error: {0}")]
+    FinOps(String),
 }
 
 pub type Result<T> = std::result::Result<T, FactoryError>;

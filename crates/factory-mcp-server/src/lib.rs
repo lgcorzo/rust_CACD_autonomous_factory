@@ -67,7 +67,7 @@ impl McpServer {
             if sandbox_mode.to_lowercase() == "gvisork8s" {
                 Arc::new(crate::sandbox::GvisorK8sDriver)
             } else {
-                Arc::new(crate::sandbox::SubprocessDriver)
+                Arc::new(crate::sandbox::SubprocessDriver::new())
             };
 
         let specify_cli_path =

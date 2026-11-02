@@ -14,6 +14,75 @@ pub struct SandboxJobSpec {
     pub language: String,
 }
 
+pub fn build_sandbox_job_spec(
+    job_name: &str,
+    cmd: &str,
+    require_gvisor: bool,
+    namespace: &str,
+) -> anyhow::Result<serde_json::Value> {
+    if !require_gvisor {
+        anyhow::bail!(
+            "Untrusted sandbox execution requires gVisor runtime. Fallback to standard runc/host is forbidden."
+        );
+    }
+
+    Ok(serde_json::json!({
+        "apiVersion": "batch/v1",
+        "kind": "Job",
+        "metadata": {
+            "name": job_name,
+            "namespace": namespace
+        },
+        "spec": {
+            "ttlSecondsAfterFinished": 300,
+            "backoffLimit": 0,
+            "template": {
+                "metadata": {
+                    "labels": {
+                        "job-name": job_name,
+                        "app.kubernetes.io/component": "sandbox-workload"
+                    }
+                },
+                "spec": {
+                    "runtimeClassName": "gvisor",
+                    "restartPolicy": "Never",
+                    "automountServiceAccountToken": false,
+                    "securityContext": {
+                        "runAsNonRoot": true,
+                        "runAsUser": 65534,
+                        "runAsGroup": 65534,
+                        "seccompProfile": {
+                            "type": "RuntimeDefault"
+                        }
+                    },
+                    "containers": [{
+                        "name": "sandbox",
+                        "image": "python:3.11-slim",
+                        "command": ["/bin/sh", "-c"],
+                        "args": [cmd],
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": ["ALL"]
+                            }
+                        },
+                        "resources": {
+                            "requests": {
+                                "memory": "16Mi",
+                                "cpu": "50m"
+                            },
+                            "limits": {
+                                "memory": "30Mi",
+                                "cpu": "100m"
+                            }
+                        }
+                    }]
+                }
+            }
+        }
+    }))
+}
+
 pub struct LaunchSandboxPodTool;
 
 impl LaunchSandboxPodTool {
@@ -108,7 +177,15 @@ impl Tool for LaunchSandboxPodTool {
         let code = sanitize_executable_code(raw_code, language);
 
         let client = Client::try_default().await?;
-        let jobs: Api<Job> = Api::namespaced(client.clone(), "development");
+        let is_prod = std::env::var("FACTORY_ENV")
+            .unwrap_or_default()
+            .eq_ignore_ascii_case("production")
+            || cfg!(feature = "production");
+        let require_gvisor = is_prod || std::env::var("USE_GVISOR").unwrap_or_default() == "true";
+        let namespace =
+            std::env::var("SANDBOX_NAMESPACE").unwrap_or_else(|_| "factory-sandboxes".to_string());
+
+        let jobs: Api<Job> = Api::namespaced(client.clone(), &namespace);
 
         let job_name = format!(
             "sandbox-job-{}",
@@ -125,56 +202,7 @@ impl Tool for LaunchSandboxPodTool {
             _ => return Err(anyhow::anyhow!("Unsupported language")),
         };
 
-        let use_gvisor = std::env::var("USE_GVISOR").unwrap_or_default() == "true";
-
-        let mut job_json = serde_json::json!({
-            "apiVersion": "batch/v1",
-            "kind": "Job",
-            "metadata": {
-                "name": job_name,
-                "namespace": "development"
-            },
-            "spec": {
-                "backoffLimit": 0,
-                "template": {
-                    "metadata": {
-                        "labels": {
-                            "job-name": job_name
-                        }
-                    },
-                    "spec": {
-                        "restartPolicy": "Never",
-                        "containers": [{
-                            "name": "sandbox",
-                            "image": "python:3.11-slim",
-                            "command": ["/bin/sh", "-c"],
-                            "args": [cmd],
-                            "resources": {
-                                "requests": {
-                                    "memory": "16Mi",
-                                    "cpu": "50m"
-                                },
-                                "limits": {
-                                    "memory": "30Mi",
-                                    "cpu": "100m"
-                                }
-                            }
-                        }]
-                    }
-                }
-            }
-        });
-
-        if use_gvisor {
-            if let Some(spec) = job_json
-                .get_mut("spec")
-                .and_then(|s| s.get_mut("template"))
-                .and_then(|t| t.get_mut("spec"))
-                .and_then(|s| s.as_object_mut())
-            {
-                spec.insert("runtimeClassName".to_string(), serde_json::json!("gvisor"));
-            }
-        }
+        let job_json = build_sandbox_job_spec(&job_name, &cmd, require_gvisor, &namespace)?;
 
         let job: Job = serde_json::from_value(job_json)?;
 
@@ -204,7 +232,7 @@ impl Tool for LaunchSandboxPodTool {
 
         // Fetch logs
         let pods: Api<k8s_openapi::api::core::v1::Pod> =
-            Api::namespaced(client.clone(), "development");
+            Api::namespaced(client.clone(), &namespace);
         let lp = ListParams::default().labels(&format!("job-name={}", job_name));
         if let Ok(pod_list) = pods.list(&lp).await {
             if let Some(pod) = pod_list.items.first() {
