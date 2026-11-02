@@ -8,11 +8,12 @@ use factory_infrastructure::{
 };
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::runnables::Workflow;
+use factory_core::security::CredentialSessionRef;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 pub struct MissionInput {
     pub mission_id: Option<String>,
     pub goal: String,
@@ -24,18 +25,33 @@ pub struct MissionInput {
     #[serde(default)]
     pub issue_number: Option<u64>,
     #[serde(default)]
-    pub jit_token: Option<String>,
+    pub credential_ref: Option<CredentialSessionRef>,
     #[serde(default)]
     pub verifiable_credential: Option<factory_core::security::nhi::VerifiableCredential>,
 }
 
+impl std::fmt::Debug for MissionInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MissionInput")
+            .field("mission_id", &self.mission_id)
+            .field("goal", &self.goal)
+            .field("repository_path", &self.repository_path)
+            .field("source_platform", &self.source_platform)
+            .field("repository", &self.repository)
+            .field("issue_number", &self.issue_number)
+            .field("credential_ref", &self.credential_ref)
+            .field("verifiable_credential", &"[VERIFIABLE_CREDENTIAL]")
+            .finish()
+    }
+}
+
 impl MissionInput {
-    pub fn attach_nhi_and_jit(
+    pub fn attach_nhi_and_credential_ref(
         &mut self,
         agent_id: &str,
         signing_key: &ed25519_dalek::SigningKey,
         key_id: &str,
-        jit_token: String,
+        credential_ref: CredentialSessionRef,
     ) -> Result<(), factory_core::error::FactoryError> {
         use factory_core::security::nhi::{AgentSubject, VerifiableCredential};
 
@@ -53,7 +69,7 @@ impl MissionInput {
 
         vc.sign(signing_key, key_id)?;
         self.verifiable_credential = Some(vc);
-        self.jit_token = Some(jit_token);
+        self.credential_ref = Some(credential_ref);
         Ok(())
     }
 
@@ -76,7 +92,7 @@ impl MissionInput {
             source_platform: None,
             repository: None,
             issue_number: None,
-            jit_token: None,
+            credential_ref: None,
             verifiable_credential: None,
         })
     }
@@ -1116,16 +1132,25 @@ mod tests {
             ..Default::default()
         };
 
+        let now = chrono::Utc::now();
+        let session_ref = CredentialSessionRef::new(
+            "sess-vault-01",
+            "org/my-repo",
+            now,
+            now + chrono::Duration::hours(1),
+        );
+
         input
-            .attach_nhi_and_jit(
+            .attach_nhi_and_credential_ref(
                 "agent-zeroclaw-01",
                 &signing_key,
                 "key-id-vault-01",
-                "s.vault-jit-token-xyz".to_string(),
+                session_ref,
             )
             .unwrap();
 
-        assert_eq!(input.jit_token.as_deref(), Some("s.vault-jit-token-xyz"));
+        assert!(input.credential_ref.is_some());
+        assert_eq!(input.credential_ref.as_ref().unwrap().session_id, "sess-vault-01");
         let vc = input.verifiable_credential.as_ref().unwrap();
         assert_eq!(vc.credential_subject.id, "agent-zeroclaw-01");
         assert!(vc.proof.is_some());
