@@ -8,12 +8,12 @@
 
 ## Phase 0: Baseline Audit & Traceability Matrix (Read-Only)
 
-- [ ] T001: Generate full repository inventory and commit baseline for `rust_CACD_autonomous_factory` and `gitops_internal_lgcorzo` in `docs/audit/INTEGRATED_AUDIT.md`.
-- [ ] T002: Construct full traceability matrix mapping Rust capabilities to GitOps manifests, Kubernetes enforcement, and cluster verification in `docs/audit/TRACEABILITY_MATRIX.md`.
-- [ ] T003: Document comprehensive threat model with trust boundaries and attack paths in `docs/audit/THREAT_MODEL.md`.
-- [ ] T004: Document reproducible security test plan and verification procedures in `docs/audit/SECURITY_TEST_PLAN.md`.
-- [ ] T005: Create system architecture diagrams for control, execution, and security planes in `docs/architecture/DEPLOYMENT_ARCHITECTURE.md`.
-- [ ] T006: Create operational and incident response runbook in `docs/operations/SECURITY_RUNBOOK.md`.
+- [x] T001: Generate full repository inventory and commit baseline for `rust_CACD_autonomous_factory` and `gitops_internal_lgcorzo` in `docs/audit/INTEGRATED_AUDIT.md`.
+- [x] T002: Construct full traceability matrix mapping Rust capabilities to GitOps manifests, Kubernetes enforcement, and cluster verification in `docs/audit/TRACEABILITY_MATRIX.md`.
+- [x] T003: Document comprehensive threat model with trust boundaries and attack paths in `docs/audit/THREAT_MODEL.md`.
+- [x] T004: Document reproducible security test plan and verification procedures in `docs/audit/SECURITY_TEST_PLAN.md`.
+- [x] T005: Create system architecture diagrams for control, execution, and security planes in `docs/architecture/DEPLOYMENT_ARCHITECTURE.md`.
+- [x] T006: Create operational and incident response runbook in `docs/operations/SECURITY_RUNBOOK.md`.
 
 ---
 
@@ -52,3 +52,4 @@
 - [ ] T022: Verify static formatting and zero clippy warnings (`cargo fmt --check` and `cargo clippy --workspace --all-targets -- -D warnings`).
 - [ ] T023: Update OKF documentation (`python3 .agents/tools/okf_generator.py`) and knowledge graph (`graphify update .`).
 - [ ] T024: Validate CI/CD pipeline on Draft PR, compile evidence, and present to user for manual merge (HITL).
+
