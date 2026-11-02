@@ -30,11 +30,11 @@
 
 ## Phase 2: Kubernetes Workload & GitOps Hardening (P0/P1)
 
-- [ ] T013: Create dedicated sandbox namespace manifest `infrastructure/agents/sandboxes-namespace.yaml` with Pod Security Standard `restricted` in `gitops_internal_lgcorzo`.
-- [ ] T014: Harden `infrastructure/agents/sandbox-job.yaml` with non-root UID, `allowPrivilegeEscalation: false`, `capabilities.drop: ["ALL"]`, `readOnlyRootFilesystem: true`, and `ttlSecondsAfterFinished: 300` in `gitops_internal_lgcorzo`.
-- [ ] T015: Create default-deny ingress and egress NetworkPolicy in `infrastructure/agents/sandboxes-networkpolicy.yaml` blocking API server and metadata endpoints in `gitops_internal_lgcorzo`.
-- [ ] T016: Scope RBAC permissions in `infrastructure/agents/rbac.yaml` to restrict job creation strictly to the sandbox namespace in `gitops_internal_lgcorzo`.
-- [ ] T017: Validate GitOps manifests using `kubectl kustomize` without errors.
+- [x] T013: Create dedicated sandbox namespace manifest `infrastructure/agents/sandboxes-namespace.yaml` with Pod Security Standard `restricted` in `gitops_internal_lgcorzo`.
+- [x] T014: Harden `infrastructure/agents/sandbox-job.yaml` with non-root UID, `allowPrivilegeEscalation: false`, `capabilities.drop: ["ALL"]`, `readOnlyRootFilesystem: true`, and `ttlSecondsAfterFinished: 300` in `gitops_internal_lgcorzo`.
+- [x] T015: Create default-deny ingress and egress NetworkPolicy in `infrastructure/agents/sandboxes-networkpolicy.yaml` blocking API server and metadata endpoints in `gitops_internal_lgcorzo`.
+- [x] T016: Scope RBAC permissions in `infrastructure/agents/rbac.yaml` to restrict job creation strictly to the sandbox namespace in `gitops_internal_lgcorzo`.
+- [x] T017: Validate GitOps manifests using `kubectl kustomize` without errors.
 
 ---
 
