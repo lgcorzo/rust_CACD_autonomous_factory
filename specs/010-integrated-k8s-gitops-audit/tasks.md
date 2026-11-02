@@ -19,12 +19,12 @@
 
 ## Phase 1: Critical Execution Isolation (P0)
 
-- [ ] T007: Write failing test in `crates/factory-mcp-server/tests/sandbox_driver_tests.rs` asserting `SubprocessDriver` fails closed in production mode.
-- [ ] T008: Implement fail-closed production check in `SubprocessDriver::execute` in `crates/factory-mcp-server/src/sandbox.rs`.
-- [ ] T009: Write failing test in `crates/factory-mcp-server/tests/run_tests_security_tests.rs` verifying missing test runners return `TestExecutionOutcome::InfrastructureError` instead of simulated success.
-- [ ] T010: Refactor `crates/factory-mcp-server/src/tools/run_tests.rs` to route execution through `SandboxDriver` and return typed `TestExecutionReport`.
-- [ ] T011: Write failing test in `crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs` asserting missing or unsupported runtime class fails closed.
-- [ ] T012: Update `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs` to require `runtimeClassName: gvisor` and reject unisolated pods.
+- [x] T007: Write failing test in `crates/factory-mcp-server/tests/sandbox_driver_tests.rs` asserting `SubprocessDriver` fails closed in production mode.
+- [x] T008: Implement fail-closed production check in `SubprocessDriver::execute` in `crates/factory-mcp-server/src/sandbox.rs`.
+- [x] T009: Write failing test in `crates/factory-mcp-server/tests/run_tests_security_tests.rs` verifying missing test runners return `TestExecutionOutcome::InfrastructureError` instead of simulated success.
+- [x] T010: Refactor `crates/factory-mcp-server/src/tools/run_tests.rs` to route execution through `SandboxDriver` and return typed `TestExecutionReport`.
+- [x] T011: Write failing test in `crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs` asserting missing or unsupported runtime class fails closed.
+- [x] T012: Update `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs` to require `runtimeClassName: gvisor` and reject unisolated pods.
 
 ---
 

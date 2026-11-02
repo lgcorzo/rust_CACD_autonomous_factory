@@ -46,11 +46,48 @@ impl SandboxDriver for NativeSurgerySandboxDriver {
     }
 }
 
-pub struct SubprocessDriver;
+pub struct SubprocessDriver {
+    pub force_production: Option<bool>,
+}
+
+impl SubprocessDriver {
+    pub fn new() -> Self {
+        Self {
+            force_production: None,
+        }
+    }
+
+    pub fn with_force_production(mut self, force: bool) -> Self {
+        self.force_production = Some(force);
+        self
+    }
+
+    pub fn is_production(&self) -> bool {
+        if let Some(force) = self.force_production {
+            return force;
+        }
+        std::env::var("FACTORY_ENV")
+            .unwrap_or_default()
+            .eq_ignore_ascii_case("production")
+            || cfg!(feature = "production")
+    }
+}
+
+impl Default for SubprocessDriver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[async_trait]
 impl SandboxDriver for SubprocessDriver {
     async fn execute(&self, code: &str, language: &str) -> anyhow::Result<ExecutionResult> {
+        if self.is_production() {
+            anyhow::bail!(
+                "Host subprocess execution is forbidden in production mode. Workloads must execute inside isolated Kubernetes gVisor sandboxes."
+            );
+        }
+
         let timeout_duration = Duration::from_secs(30);
 
         let output = match language {
@@ -180,7 +217,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_subprocess_driver_timeout() {
-        let driver = SubprocessDriver;
+        let driver = SubprocessDriver::new();
         // Test normal execution
         let result = driver.execute("print('hello')", "python").await.unwrap();
         assert!(result.is_success);
