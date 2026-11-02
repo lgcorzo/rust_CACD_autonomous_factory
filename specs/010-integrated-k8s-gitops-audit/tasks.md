@@ -40,9 +40,9 @@
 
 ## Phase 3: FinOps Admission Hard-Stop (P1)
 
-- [ ] T018: Write failing unit test in `crates/factory-application/tests/finops_admission_tests.rs` asserting missions are rejected when the FinOps hard-stop latch is active.
-- [ ] T019: Implement `MissionAdmissionGate` in `crates/factory-application/src/agents/finops.rs`.
-- [ ] T020: Integrate `MissionAdmissionGate` into mission dispatching in `crates/factory-application/src/workflows/autonomous_mission.rs`.
+- [x] T018: Write failing unit test in `crates/factory-application/tests/finops_admission_tests.rs` asserting missions are rejected when the FinOps hard-stop latch is active.
+- [x] T019: Implement `MissionAdmissionGate` in `crates/factory-application/src/agents/finops.rs`.
+- [x] T020: Integrate `MissionAdmissionGate` into mission dispatching in `crates/factory-application/src/workflows/autonomous_mission.rs`.
 
 ---
 

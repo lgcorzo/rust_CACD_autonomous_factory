@@ -1,3 +1,4 @@
+use crate::agents::finops::MissionAdmissionGate;
 use crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent};
 use crate::workflows::circuit_breaker::CircuitBreakerGuard;
 use factory_core::security::CredentialSessionRef;
@@ -401,6 +402,10 @@ pub fn create_mission_workflow_with_clients(
                 .unwrap_or_else(|| Uuid::new_v4().to_string());
 
             Box::pin(async move {
+                // Pre-flight FinOps mission admission gate check
+                let finops_checker = FinOpsAgent::default();
+                finops_checker.can_admit_mission(&mission_id)?;
+
                 let rustant = RustantAgent::new(mcp_client, r2r_client);
 
                 post_mission_milestone(
@@ -829,6 +834,10 @@ pub fn create_mission_workflow_with_clients(
                 .unwrap_or_else(|| Uuid::new_v4().to_string());
 
             Box::pin(async move {
+                // Pre-flight FinOps mission admission gate check
+                let finops_checker = FinOpsAgent::default();
+                finops_checker.can_admit_mission(&mission_id)?;
+
                 let rustant = RustantAgent::new(mcp_client, r2r_client);
 
                 kafka_client

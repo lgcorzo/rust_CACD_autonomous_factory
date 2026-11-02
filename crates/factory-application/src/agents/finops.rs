@@ -30,6 +30,22 @@ pub enum BudgetEvaluation {
     },
 }
 
+pub trait MissionAdmissionGate: Send + Sync {
+    fn can_admit_mission(&self, mission_id: &str) -> Result<(), factory_core::error::FactoryError>;
+}
+
+impl MissionAdmissionGate for FinOpsAgent {
+    fn can_admit_mission(&self, mission_id: &str) -> Result<(), factory_core::error::FactoryError> {
+        if self.is_halted() {
+            return Err(factory_core::error::FactoryError::FinOps(format!(
+                "Mission admission denied for '{}': FinOps budget hard-stop latch is active. Spend exceeded threshold.",
+                mission_id
+            )));
+        }
+        Ok(())
+    }
+}
+
 pub struct FinOpsAgent {
     pub litellm_base_url: String,
     pub api_key: String,
