@@ -1814,6 +1814,7 @@ dependencies = [
  "sha2 0.11.1",
  "tokio",
  "tokio-test",
+ "tokio-util",
  "tracing",
  "uuid",
  "wiremock",
@@ -1870,6 +1871,7 @@ dependencies = [
  "serde_jcs",
  "serde_json",
  "serde_yaml",
+ "syn 2.0.119",
  "thiserror 2.0.21",
  "tokio",
  "tracing",
@@ -1908,6 +1910,7 @@ dependencies = [
  "urlencoding",
  "uuid",
  "wiremock",
+ "zeroize",
  "ziti-sdk",
 ]
 

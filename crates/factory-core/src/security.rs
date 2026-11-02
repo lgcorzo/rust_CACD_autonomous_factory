@@ -236,16 +236,79 @@ impl SastScanResult {
             score -= 3.0;
         }
 
-        // 7. Unbounded loop check
-        for line in &added_lines {
-            if line.contains("loop {")
-                && !combined_added.contains("break")
-                && !combined_added.contains("return")
-            {
-                findings
-                    .push("Potential unbounded loop without break condition detected".to_string());
-                score -= 2.5;
-                break;
+        // 9. AST-Enhanced Analysis for Rust Code
+        if let Ok(file_ast) = syn::parse_file(&combined_added) {
+            use syn::visit::Visit;
+
+            struct AstSecurityVisitor {
+                has_infinite_loop: bool,
+                has_process_command: bool,
+            }
+
+            impl<'ast> Visit<'ast> for AstSecurityVisitor {
+                fn visit_expr_loop(&mut self, i: &'ast syn::ExprLoop) {
+                    // Check if the loop block contains any break or return expr
+                    struct LoopBreakDetector {
+                        has_terminator: bool,
+                    }
+                    impl<'a> Visit<'a> for LoopBreakDetector {
+                        fn visit_expr_break(&mut self, _: &'a syn::ExprBreak) {
+                            self.has_terminator = true;
+                        }
+                        fn visit_expr_return(&mut self, _: &'a syn::ExprReturn) {
+                            self.has_terminator = true;
+                        }
+                    }
+                    let mut detector = LoopBreakDetector {
+                        has_terminator: false,
+                    };
+                    detector.visit_block(&i.body);
+                    if !detector.has_terminator {
+                        self.has_infinite_loop = true;
+                    }
+                }
+
+                fn visit_path(&mut self, i: &'ast syn::Path) {
+                    let segments: Vec<String> =
+                        i.segments.iter().map(|s| s.ident.to_string()).collect();
+                    if segments.iter().any(|s| s == "Command") {
+                        self.has_process_command = true;
+                    }
+                }
+            }
+
+            let mut visitor = AstSecurityVisitor {
+                has_infinite_loop: false,
+                has_process_command: false,
+            };
+            visitor.visit_file(&file_ast);
+
+            if visitor.has_infinite_loop {
+                findings.push(
+                    "AST Analysis: Unbounded loop without break/return statement detected"
+                        .to_string(),
+                );
+                score -= 3.0;
+            }
+
+            if visitor.has_process_command {
+                findings.push("AST Analysis: Process command execution detected".to_string());
+                critical = true;
+                score -= 5.0;
+            }
+        } else {
+            // Fallback heuristic regex loop check if not a full parseable rust file
+            for line in &added_lines {
+                if line.contains("loop {")
+                    && !combined_added.contains("break")
+                    && !combined_added.contains("return")
+                {
+                    findings.push(
+                        "Potential unbounded loop without break condition detected".to_string(),
+                    );
+                    score -= 2.5;
+                    break;
+                }
             }
         }
 
@@ -319,6 +382,77 @@ impl std::fmt::Debug for JitToken {
     }
 }
 
+/// Opaque non-sensitive reference to an active credential session.
+/// Safe to be serialized in task/mission descriptors because it contains NO bearer token.
+#[derive(serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
+pub struct CredentialSessionRef {
+    pub session_id: String,
+    pub repository: String,
+    pub issued_at: chrono::DateTime<chrono::Utc>,
+    pub expires_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Debug for CredentialSessionRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CredentialSessionRef")
+            .field("session_id", &self.session_id)
+            .field("repository", &self.repository)
+            .field("expires_at", &self.expires_at)
+            .finish()
+    }
+}
+
+impl CredentialSessionRef {
+    pub fn new(
+        session_id: impl Into<String>,
+        repository: impl Into<String>,
+        issued_at: chrono::DateTime<chrono::Utc>,
+        expires_at: chrono::DateTime<chrono::Utc>,
+    ) -> Self {
+        Self {
+            session_id: session_id.into(),
+            repository: repository.into(),
+            issued_at,
+            expires_at,
+        }
+    }
+
+    pub fn is_expired(&self, now: chrono::DateTime<chrono::Utc>) -> bool {
+        now >= self.expires_at
+    }
+}
+
+/// In-memory ephemeral execution context holding sensitive bearer secrets.
+/// NEVER implements `Serialize` or `Deserialize` to prevent workflow engines
+/// (Hatchet, Temporal, S3 checkpoints) from writing tokens to storage.
+pub struct TaskExecutionContext {
+    pub session_ref: CredentialSessionRef,
+    token: JitToken,
+}
+
+impl TaskExecutionContext {
+    pub fn new(session_ref: CredentialSessionRef, token: JitToken) -> Self {
+        Self { session_ref, token }
+    }
+
+    pub fn expose_token(&self) -> &str {
+        self.token.expose_token()
+    }
+
+    pub fn session_ref(&self) -> &CredentialSessionRef {
+        &self.session_ref
+    }
+}
+
+impl std::fmt::Debug for TaskExecutionContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TaskExecutionContext")
+            .field("session_ref", &self.session_ref)
+            .field("token", &"[REDACTED_JIT_TOKEN]")
+            .finish()
+    }
+}
+
 #[async_trait]
 pub trait SecurityBounds: Send + Sync {
     async fn validate_token(&self, token: &JitToken) -> Result<bool>;
@@ -342,6 +476,26 @@ mod tests {
         use zeroize::Zeroize;
         token.zeroize();
         assert!(token.expose_token().is_empty() || token.expose_token().chars().all(|c| c == '\0'));
+    }
+
+    #[test]
+    fn test_credential_session_ref_and_context_safety() {
+        let now = chrono::Utc::now();
+        let expires = now + chrono::Duration::hours(1);
+        let session_ref = CredentialSessionRef::new("sess-1234", "org/repo-a", now, expires);
+
+        // Safe serialization of CredentialSessionRef (contains no secrets)
+        let json = serde_json::to_string(&session_ref).expect("serialization works");
+        assert!(json.contains("sess-1234"));
+        assert!(json.contains("org/repo-a"));
+
+        // Context contains the actual secret, but debug redacts it
+        let jit = JitToken::new("secret-bearer-token-123");
+        let ctx = TaskExecutionContext::new(session_ref, jit);
+        assert_eq!(ctx.expose_token(), "secret-bearer-token-123");
+        let debug_str = format!("{:?}", ctx);
+        assert!(!debug_str.contains("secret-bearer-token-123"));
+        assert!(debug_str.contains("[REDACTED_JIT_TOKEN]"));
     }
 
     #[test]

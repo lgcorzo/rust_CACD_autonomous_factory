@@ -2,19 +2,219 @@ use async_trait::async_trait;
 use factory_core::security::{JitToken, SecurityBounds};
 use reqwest::Client;
 use serde_json::json;
+use std::time::Duration;
+
+#[derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop)]
+pub struct VaultRoleToken {
+    token: String,
+}
+
+impl VaultRoleToken {
+    pub fn new(token: impl Into<String>) -> Self {
+        Self {
+            token: token.into(),
+        }
+    }
+
+    pub fn expose(&self) -> &str {
+        &self.token
+    }
+}
+
+impl std::fmt::Debug for VaultRoleToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("VaultRoleToken")
+            .field("token", &"[REDACTED_ROLE_TOKEN]")
+            .finish()
+    }
+}
 
 pub struct VaultSecurityBounds {
     client: Client,
     vault_addr: String,
-    role_token: String,
+    role_token: VaultRoleToken,
 }
 
 impl VaultSecurityBounds {
-    pub fn new(vault_addr: String, role_token: String) -> Self {
+    pub fn new(vault_addr: String, role_token: impl Into<String>) -> Self {
+        let client = Client::builder()
+            .timeout(Duration::from_secs(10))
+            .connect_timeout(Duration::from_secs(3))
+            .build()
+            .unwrap_or_else(|_| Client::new());
+
         Self {
-            client: Client::new(),
+            client,
             vault_addr,
-            role_token,
+            role_token: VaultRoleToken::new(role_token),
+        }
+    }
+
+    /// Read secret from Vault path using the supplied JIT token, enforcing Vault's HTTP status & ACL
+    pub async fn read_secret(
+        &self,
+        token: &JitToken,
+        secret_path: &str,
+    ) -> factory_core::error::Result<serde_json::Value> {
+        let clean_path = secret_path.trim_start_matches('/');
+        let url = format!("{}/v1/{}", self.vault_addr, clean_path);
+
+        let res = self
+            .client
+            .get(&url)
+            .header("X-Vault-Token", token.expose_token())
+            .send()
+            .await
+            .map_err(|e| {
+                factory_core::error::FactoryError::Unexpected(anyhow::anyhow!(
+                    "Vault request failed: {}",
+                    e
+                ))
+            })?;
+
+        let status = res.status();
+        if status.is_success() {
+            let body: serde_json::Value = res.json().await.map_err(|e| {
+                factory_core::error::FactoryError::Unexpected(anyhow::anyhow!(
+                    "Invalid json response: {}",
+                    e
+                ))
+            })?;
+            Ok(body)
+        } else if status == reqwest::StatusCode::FORBIDDEN {
+            Err(factory_core::error::FactoryError::Security(
+                "Access denied by Vault ACL policy".to_string(),
+            ))
+        } else {
+            Err(factory_core::error::FactoryError::Unexpected(
+                anyhow::anyhow!("Vault returned status {}", status),
+            ))
+        }
+    }
+
+    /// Issues an ephemeral JIT token scoped to a repository path (secret/data/repos/<repo>/*) and agent ID.
+    /// Validates token and checks authorization claims against expected repository policy, audience, and agent ID
+    pub async fn validate_token_with_claims(
+        &self,
+        token: &JitToken,
+        expected_repo: Option<&str>,
+        expected_agent_id: Option<&str>,
+    ) -> factory_core::error::Result<bool> {
+        // Support both /lookup (called with role token) and /lookup-self (called with client token)
+        let lookup_url = format!("{}/v1/auth/token/lookup-self", self.vault_addr);
+
+        let mut res = self
+            .client
+            .get(&lookup_url)
+            .header("X-Vault-Token", token.expose_token())
+            .send()
+            .await;
+
+        // Fallback to /v1/auth/token/lookup if /lookup-self is 404
+        if let Ok(ref resp) = res {
+            if resp.status() == reqwest::StatusCode::NOT_FOUND {
+                let post_url = format!("{}/v1/auth/token/lookup", self.vault_addr);
+                res = self
+                    .client
+                    .post(&post_url)
+                    .header("X-Vault-Token", self.role_token.expose())
+                    .json(&json!({
+                        "token": token.expose_token()
+                    }))
+                    .send()
+                    .await;
+            }
+        }
+
+        match res {
+            Ok(response) => {
+                if !response.status().is_success() {
+                    tracing::warn!("Token validation failed with status: {}", response.status());
+                    return Ok(false);
+                }
+                let body: serde_json::Value = response.json().await.unwrap_or_default();
+                let data = &body["data"];
+
+                // 1. Strictly non-renewable
+                if data["renewable"].as_bool().unwrap_or(false) {
+                    tracing::warn!("Token is renewable; strict non-renewable required");
+                    return Ok(false);
+                }
+
+                // 2. Check expiration
+                if let Some(expire_time_str) = data["expire_time"].as_str() {
+                    if let Ok(expire_time) = chrono::DateTime::parse_from_rfc3339(expire_time_str) {
+                        if expire_time.with_timezone(&chrono::Utc) < chrono::Utc::now() {
+                            tracing::warn!("Token has expired at {}", expire_time_str);
+                            return Ok(false);
+                        }
+                    }
+                }
+
+                // 3. Positive TTL
+                if let Some(ttl) = data["ttl"].as_i64() {
+                    if ttl <= 0 {
+                        tracing::warn!("Token TTL is <= 0");
+                        return Ok(false);
+                    }
+                }
+
+                // 4. Policy enforcement check
+                if let Some(repo) = expected_repo {
+                    let expected_policy = format!("repo-{}", repo.replace('/', "-"));
+                    let policies: Vec<String> = data["policies"]
+                        .as_array()
+                        .map(|arr| {
+                            arr.iter()
+                                .filter_map(|v| v.as_str().map(String::from))
+                                .collect()
+                        })
+                        .unwrap_or_default();
+
+                    if !policies.contains(&expected_policy) {
+                        tracing::warn!(
+                            "Token missing required repository policy: {} (found: {:?})",
+                            expected_policy,
+                            policies
+                        );
+                        return Ok(false);
+                    }
+
+                    // 5. Audience check in meta
+                    if let Some(aud) = data["meta"]["audience"].as_str() {
+                        if aud != repo {
+                            tracing::warn!("Token audience mismatch: {} != {}", aud, repo);
+                            return Ok(false);
+                        }
+                    } else {
+                        tracing::warn!("Token metadata missing audience claim");
+                        return Ok(false);
+                    }
+                }
+
+                // 6. Agent ID check in meta
+                if let Some(agent_id) = expected_agent_id {
+                    if let Some(claimed_agent) = data["meta"]["agent_id"].as_str() {
+                        if claimed_agent != agent_id {
+                            tracing::warn!(
+                                "Token agent_id mismatch: {} != {}",
+                                claimed_agent,
+                                agent_id
+                            );
+                            return Ok(false);
+                        }
+                    } else {
+                        tracing::warn!("Token metadata missing agent_id claim");
+                        return Ok(false);
+                    }
+                }
+
+                Ok(true)
+            }
+            Err(e) => {
+                tracing::error!("Vault API error during token validation: {}", e);
+                Ok(false)
+            }
         }
     }
 
@@ -31,7 +231,7 @@ impl VaultSecurityBounds {
         let res = self
             .client
             .post(&url)
-            .header("X-Vault-Token", &self.role_token)
+            .header("X-Vault-Token", self.role_token.expose())
             .json(&json!({
                 "ttl": "300s",
                 "explicit_max_ttl": "300s",
@@ -69,56 +269,7 @@ impl VaultSecurityBounds {
 #[async_trait]
 impl SecurityBounds for VaultSecurityBounds {
     async fn validate_token(&self, token: &JitToken) -> factory_core::error::Result<bool> {
-        let url = format!("{}/v1/auth/token/lookup", self.vault_addr);
-
-        let res = self
-            .client
-            .post(&url)
-            .header("X-Vault-Token", &self.role_token)
-            .json(&json!({
-                "token": token.expose_token()
-            }))
-            .send()
-            .await;
-
-        match res {
-            Ok(response) => {
-                if response.status().is_success() {
-                    let body: serde_json::Value = response.json().await.unwrap_or_default();
-                    // Reject if renewable - zero-trust policy strictly requires non-renewable tokens
-                    if body["data"]["renewable"].as_bool().unwrap_or(false) {
-                        tracing::warn!("Token is renewable; strict non-renewable required");
-                        return Ok(false);
-                    }
-                    // Check if token has not expired
-                    if let Some(expire_time_str) = body["data"]["expire_time"].as_str() {
-                        if let Ok(expire_time) =
-                            chrono::DateTime::parse_from_rfc3339(expire_time_str)
-                        {
-                            if expire_time.with_timezone(&chrono::Utc) < chrono::Utc::now() {
-                                tracing::warn!("Token has expired at {}", expire_time_str);
-                                return Ok(false);
-                            }
-                        }
-                    }
-                    // Check TTL is positive
-                    if let Some(ttl) = body["data"]["ttl"].as_i64() {
-                        if ttl <= 0 {
-                            tracing::warn!("Token TTL is <= 0");
-                            return Ok(false);
-                        }
-                    }
-                    Ok(true)
-                } else {
-                    tracing::warn!("Token validation failed with status: {}", response.status());
-                    Ok(false)
-                }
-            }
-            Err(e) => {
-                tracing::error!("Vault API error during token validation: {}", e);
-                Ok(false)
-            }
-        }
+        self.validate_token_with_claims(token, None, None).await
     }
 
     async fn issue_jit_token(&self, audience: &str) -> factory_core::error::Result<JitToken> {

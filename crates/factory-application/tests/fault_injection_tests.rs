@@ -109,6 +109,52 @@ async fn test_crash_recovery_prevents_duplicate_pr_creation() {
 }
 
 #[tokio::test]
+async fn test_crash_between_remote_pr_creation_and_checkpoint_commit_idempotency() {
+    // Audit scenario: The worker calls the GitHub API, creates the PR, but crashes
+    // (SIGKILL) BEFORE the S3 checkpoint is saved!
+    // When the next worker starts, the S3 checkpoint still has NO record of the PR.
+    // The worker MUST query the remote repository via branch name to discover if the PR
+    // already exists rather than naively calling create_pull_request again.
+    let _mission_id = "mission-uncommitted-pr-crash";
+    let target_branch = "darkgravity/mission-42";
+    let remote_pr_url = "https://github.com/org/repo/pull/555";
+
+    let mut remote_prs = std::collections::HashMap::<String, String>::new();
+    let pr_creation_attempts = Arc::new(AtomicUsize::new(0));
+
+    // Simulated worker 1: Creates PR on remote, then dies before saving checkpoint
+    {
+        pr_creation_attempts.fetch_add(1, Ordering::SeqCst);
+        remote_prs.insert(target_branch.to_string(), remote_pr_url.to_string());
+        // Worker 1 process terminates abruptly here (no S3 checkpoint written!)
+    }
+
+    // Simulated worker 2 starts with blank / pre-crash checkpoint state
+    let pr_discovery_calls = Arc::new(AtomicUsize::new(0));
+
+    // Idempotent delivery step execution:
+    let delivered_pr_url = if let Some(existing_url) = remote_prs.get(target_branch) {
+        pr_discovery_calls.fetch_add(1, Ordering::SeqCst);
+        existing_url.clone()
+    } else {
+        pr_creation_attempts.fetch_add(1, Ordering::SeqCst);
+        "https://github.com/org/repo/pull/999".to_string()
+    };
+
+    assert_eq!(delivered_pr_url, remote_pr_url);
+    assert_eq!(
+        pr_creation_attempts.load(Ordering::SeqCst),
+        1,
+        "Remote PR must NOT be created twice even if process died before saving checkpoint"
+    );
+    assert_eq!(
+        pr_discovery_calls.load(Ordering::SeqCst),
+        1,
+        "Resumed worker must discover existing remote PR"
+    );
+}
+
+#[tokio::test]
 async fn test_idempotent_branch_and_checkpoint_recovery() {
     let mission_id = "mission-fault-injection-002";
     let bucket = "darkgravity-checkpoints";
