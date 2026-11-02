@@ -4,7 +4,7 @@ title: "vault_test_fixtures.rs"
 source_path: "crates/factory-infrastructure/src/vault_test_fixtures.rs"
 description: "Documentation for crates/factory-infrastructure/src/vault_test_fixtures.rs"
 tags: [rust, module]
-last_verified_commit: "a9ce0d2d"
+last_verified_commit: "dccd65cc"
 ---
 
 # vault_test_fixtures.rs
