@@ -47,4 +47,3 @@ fn test_adversarial_evasion_multiline_obfuscated_command() {
         scan.findings
     );
 }
-

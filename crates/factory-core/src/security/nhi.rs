@@ -13,7 +13,11 @@ pub enum VerificationOutcome {
 
 /// Trust store interface for validating authorized agent identity issuers
 pub trait IssuerTrustStore: Send + Sync {
-    fn is_trusted_issuer(&self, issuer_did: &str, verifying_key: &ed25519_dalek::VerifyingKey) -> bool;
+    fn is_trusted_issuer(
+        &self,
+        issuer_did: &str,
+        verifying_key: &ed25519_dalek::VerifyingKey,
+    ) -> bool;
 }
 
 /// Simple memory-backed trust store
@@ -28,8 +32,13 @@ impl InMemoryTrustStore {
         }
     }
 
-    pub fn register(&mut self, issuer_did: impl Into<String>, verifying_key: ed25519_dalek::VerifyingKey) {
-        self.trusted_issuers.insert(issuer_did.into(), verifying_key);
+    pub fn register(
+        &mut self,
+        issuer_did: impl Into<String>,
+        verifying_key: ed25519_dalek::VerifyingKey,
+    ) {
+        self.trusted_issuers
+            .insert(issuer_did.into(), verifying_key);
     }
 }
 
@@ -40,7 +49,11 @@ impl Default for InMemoryTrustStore {
 }
 
 impl IssuerTrustStore for InMemoryTrustStore {
-    fn is_trusted_issuer(&self, issuer_did: &str, verifying_key: &ed25519_dalek::VerifyingKey) -> bool {
+    fn is_trusted_issuer(
+        &self,
+        issuer_did: &str,
+        verifying_key: &ed25519_dalek::VerifyingKey,
+    ) -> bool {
         self.trusted_issuers
             .get(issuer_did)
             .map(|k| k == verifying_key)
@@ -62,13 +75,18 @@ impl NonceReplayCache {
         }
     }
 
-    pub fn check_and_record(&self, nonce: &str, now: DateTime<Utc>) -> Result<bool, crate::error::FactoryError> {
+    pub fn check_and_record(
+        &self,
+        nonce: &str,
+        now: DateTime<Utc>,
+    ) -> Result<bool, crate::error::FactoryError> {
         let mut map = self.seen_nonces.write().map_err(|e| {
             crate::error::FactoryError::Security(format!("Nonce cache lock poisoned: {}", e))
         })?;
 
         // Prune expired nonces
-        let ttl_chrono = chrono::Duration::from_std(self.ttl).unwrap_or_else(|_| chrono::Duration::minutes(10));
+        let ttl_chrono =
+            chrono::Duration::from_std(self.ttl).unwrap_or_else(|_| chrono::Duration::minutes(10));
         map.retain(|_, timestamp| now.signed_duration_since(*timestamp) < ttl_chrono);
 
         if map.contains_key(nonce) {
@@ -287,7 +305,9 @@ impl VerifiableCredential {
                     },
                 )
                 .await
-                .map_err(|e| crate::error::FactoryError::Security(format!("Task join error: {}", e)))?
+                .map_err(|e| {
+                    crate::error::FactoryError::Security(format!("Task join error: {}", e))
+                })?
             }));
         }
 
@@ -440,11 +460,13 @@ impl VerifiableCredential {
                 let _permit = sem.acquire().await.map_err(|e| {
                     crate::error::FactoryError::Security(format!("Semaphore error: {}", e))
                 })?;
-                tokio::task::spawn_blocking(
-                    move || -> crate::error::Result<bool> { vc_clone.verify(&key_clone) },
-                )
+                tokio::task::spawn_blocking(move || -> crate::error::Result<bool> {
+                    vc_clone.verify(&key_clone)
+                })
                 .await
-                .map_err(|e| crate::error::FactoryError::Security(format!("Task join error: {}", e)))?
+                .map_err(|e| {
+                    crate::error::FactoryError::Security(format!("Task join error: {}", e))
+                })?
             }));
         }
 
@@ -542,30 +564,36 @@ pub mod tests {
         let now = Utc::now();
 
         // 1. Untrusted issuer key check
-        let outcome_untrusted = vc.verify_with_trust_and_replay(
-            now,
-            &untrusted_verifying_key,
-            Some(&trust_store),
-            Some(&replay_cache),
-        ).unwrap();
+        let outcome_untrusted = vc
+            .verify_with_trust_and_replay(
+                now,
+                &untrusted_verifying_key,
+                Some(&trust_store),
+                Some(&replay_cache),
+            )
+            .unwrap();
         assert_eq!(outcome_untrusted, VerificationOutcome::UntrustedIssuer);
 
         // 2. First verification with trusted key -> Valid
-        let outcome_valid = vc.verify_with_trust_and_replay(
-            now,
-            &verifying_key,
-            Some(&trust_store),
-            Some(&replay_cache),
-        ).unwrap();
+        let outcome_valid = vc
+            .verify_with_trust_and_replay(
+                now,
+                &verifying_key,
+                Some(&trust_store),
+                Some(&replay_cache),
+            )
+            .unwrap();
         assert_eq!(outcome_valid, VerificationOutcome::Valid);
 
         // 3. Second verification with same nonce -> ReplayedNonce
-        let outcome_replay = vc.verify_with_trust_and_replay(
-            now,
-            &verifying_key,
-            Some(&trust_store),
-            Some(&replay_cache),
-        ).unwrap();
+        let outcome_replay = vc
+            .verify_with_trust_and_replay(
+                now,
+                &verifying_key,
+                Some(&trust_store),
+                Some(&replay_cache),
+            )
+            .unwrap();
         assert_eq!(outcome_replay, VerificationOutcome::ReplayedNonce);
     }
 }

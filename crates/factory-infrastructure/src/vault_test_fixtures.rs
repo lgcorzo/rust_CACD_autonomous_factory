@@ -1,6 +1,6 @@
+use serde_json::json;
 use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
-use serde_json::json;
 
 pub struct MockVaultServer {
     pub server: MockServer,
@@ -117,4 +117,3 @@ impl MockVaultServer {
         }
     }
 }
-

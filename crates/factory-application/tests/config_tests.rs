@@ -24,4 +24,3 @@ fn test_development_startup_allows_defaults_or_env() {
     assert_eq!(user, "prod@corp.local");
     assert_eq!(pwd, "super-secret-vault-pwd");
 }
-

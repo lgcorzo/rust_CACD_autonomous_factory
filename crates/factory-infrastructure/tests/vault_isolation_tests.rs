@@ -13,7 +13,9 @@ async fn test_cross_repository_acl_isolation_enforcement() {
     let token_a = "s.token-for-repo-a";
 
     // 1. Mock token issuance for repo-a
-    mock_vault.mock_token_create(repo_a, "agent-01", token_a).await;
+    mock_vault
+        .mock_token_create(repo_a, "agent-01", token_a)
+        .await;
 
     // 2. Mock token lookup for token_a (valid, policy repo-org-repo-a attached)
     mock_vault
@@ -48,14 +50,20 @@ async fn test_cross_repository_acl_isolation_enforcement() {
         .expect("token creation should succeed");
 
     // Validate token against expected audience/repo policy
-    let is_valid = bounds.validate_token(&jit_token).await.expect("validate ok");
+    let is_valid = bounds
+        .validate_token(&jit_token)
+        .await
+        .expect("validate ok");
     assert!(is_valid, "Token should be valid for repo-a");
 
     // Attempt to read secret under repo-a path (should succeed)
     let secret_a = bounds
         .read_secret(&jit_token, "secret/data/repos/org/repo-a/deploy-key")
         .await;
-    assert!(secret_a.is_ok(), "Access to own repository secrets must succeed");
+    assert!(
+        secret_a.is_ok(),
+        "Access to own repository secrets must succeed"
+    );
 
     // Attempt cross-repository access under repo-b path (MUST fail with 403 / ACL denial)
     let secret_b = bounds
@@ -66,4 +74,3 @@ async fn test_cross_repository_acl_isolation_enforcement() {
         "Cross-repository secret access must fail by Vault ACL policy"
     );
 }
-

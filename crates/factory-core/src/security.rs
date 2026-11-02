@@ -259,7 +259,9 @@ impl SastScanResult {
                             self.has_terminator = true;
                         }
                     }
-                    let mut detector = LoopBreakDetector { has_terminator: false };
+                    let mut detector = LoopBreakDetector {
+                        has_terminator: false,
+                    };
                     detector.visit_block(&i.body);
                     if !detector.has_terminator {
                         self.has_infinite_loop = true;
@@ -267,7 +269,8 @@ impl SastScanResult {
                 }
 
                 fn visit_path(&mut self, i: &'ast syn::Path) {
-                    let segments: Vec<String> = i.segments.iter().map(|s| s.ident.to_string()).collect();
+                    let segments: Vec<String> =
+                        i.segments.iter().map(|s| s.ident.to_string()).collect();
                     if segments.iter().any(|s| s == "Command") {
                         self.has_process_command = true;
                     }
@@ -281,7 +284,10 @@ impl SastScanResult {
             visitor.visit_file(&file_ast);
 
             if visitor.has_infinite_loop {
-                findings.push("AST Analysis: Unbounded loop without break/return statement detected".to_string());
+                findings.push(
+                    "AST Analysis: Unbounded loop without break/return statement detected"
+                        .to_string(),
+                );
                 score -= 3.0;
             }
 
@@ -297,8 +303,9 @@ impl SastScanResult {
                     && !combined_added.contains("break")
                     && !combined_added.contains("return")
                 {
-                    findings
-                        .push("Potential unbounded loop without break condition detected".to_string());
+                    findings.push(
+                        "Potential unbounded loop without break condition detected".to_string(),
+                    );
                     score -= 2.5;
                     break;
                 }

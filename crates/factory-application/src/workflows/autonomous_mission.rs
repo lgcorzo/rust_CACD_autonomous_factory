@@ -1,5 +1,6 @@
 use crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent};
 use crate::workflows::circuit_breaker::CircuitBreakerGuard;
+use factory_core::security::CredentialSessionRef;
 use factory_core::{SddMissionPlan, SddTaskItem};
 use factory_infrastructure::{
     GithubClient, GitlabClient, GitlabCommitAction, HttpGithubClient, HttpGitlabClient,
@@ -8,7 +9,6 @@ use factory_infrastructure::{
 };
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::runnables::Workflow;
-use factory_core::security::CredentialSessionRef;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -37,7 +37,9 @@ pub fn resolve_r2r_credentials(
     pwd_opt: Option<String>,
 ) -> Result<(String, String), factory_core::error::FactoryError> {
     let is_prod = env_profile.eq_ignore_ascii_case("production")
-        || std::env::var("FACTORY_ENV").unwrap_or_default().eq_ignore_ascii_case("production")
+        || std::env::var("FACTORY_ENV")
+            .unwrap_or_default()
+            .eq_ignore_ascii_case("production")
         || cfg!(feature = "production");
 
     let user = user_opt.or_else(|| std::env::var("R2R_SUPERUSER_EMAIL").ok());
@@ -1223,7 +1225,10 @@ mod tests {
             .unwrap();
 
         assert!(input.credential_ref.is_some());
-        assert_eq!(input.credential_ref.as_ref().unwrap().session_id, "sess-vault-01");
+        assert_eq!(
+            input.credential_ref.as_ref().unwrap().session_id,
+            "sess-vault-01"
+        );
         let vc = input.verifiable_credential.as_ref().unwrap();
         assert_eq!(vc.credential_subject.id, "agent-zeroclaw-01");
         assert!(vc.proof.is_some());

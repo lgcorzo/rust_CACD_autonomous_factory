@@ -14,7 +14,7 @@ fn test_mission_input_serialization_must_not_contain_bearer_tokens() {
     };
 
     let serialized = serde_json::to_string(&input).expect("MissionInput serializable");
-    
+
     // Explicit security invariant: No bearer tokens or plain "jit_token" keys in persisted JSON
     assert!(
         !serialized.contains("jit_token"),
@@ -30,4 +30,3 @@ fn test_mission_input_serialization_must_not_contain_bearer_tokens() {
         debug_output
     );
 }
-

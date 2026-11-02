@@ -11,7 +11,9 @@ pub struct VaultRoleToken {
 
 impl VaultRoleToken {
     pub fn new(token: impl Into<String>) -> Self {
-        Self { token: token.into() }
+        Self {
+            token: token.into(),
+        }
     }
 
     pub fn expose(&self) -> &str {
@@ -64,13 +66,19 @@ impl VaultSecurityBounds {
             .send()
             .await
             .map_err(|e| {
-                factory_core::error::FactoryError::Unexpected(anyhow::anyhow!("Vault request failed: {}", e))
+                factory_core::error::FactoryError::Unexpected(anyhow::anyhow!(
+                    "Vault request failed: {}",
+                    e
+                ))
             })?;
 
         let status = res.status();
         if status.is_success() {
             let body: serde_json::Value = res.json().await.map_err(|e| {
-                factory_core::error::FactoryError::Unexpected(anyhow::anyhow!("Invalid json response: {}", e))
+                factory_core::error::FactoryError::Unexpected(anyhow::anyhow!(
+                    "Invalid json response: {}",
+                    e
+                ))
             })?;
             Ok(body)
         } else if status == reqwest::StatusCode::FORBIDDEN {
@@ -78,10 +86,9 @@ impl VaultSecurityBounds {
                 "Access denied by Vault ACL policy".to_string(),
             ))
         } else {
-            Err(factory_core::error::FactoryError::Unexpected(anyhow::anyhow!(
-                "Vault returned status {}",
-                status
-            )))
+            Err(factory_core::error::FactoryError::Unexpected(
+                anyhow::anyhow!("Vault returned status {}", status),
+            ))
         }
     }
 
@@ -157,7 +164,11 @@ impl VaultSecurityBounds {
                     let expected_policy = format!("repo-{}", repo.replace('/', "-"));
                     let policies: Vec<String> = data["policies"]
                         .as_array()
-                        .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+                        .map(|arr| {
+                            arr.iter()
+                                .filter_map(|v| v.as_str().map(String::from))
+                                .collect()
+                        })
                         .unwrap_or_default();
 
                     if !policies.contains(&expected_policy) {
@@ -185,7 +196,11 @@ impl VaultSecurityBounds {
                 if let Some(agent_id) = expected_agent_id {
                     if let Some(claimed_agent) = data["meta"]["agent_id"].as_str() {
                         if claimed_agent != agent_id {
-                            tracing::warn!("Token agent_id mismatch: {} != {}", claimed_agent, agent_id);
+                            tracing::warn!(
+                                "Token agent_id mismatch: {} != {}",
+                                claimed_agent,
+                                agent_id
+                            );
                             return Ok(false);
                         }
                     } else {
