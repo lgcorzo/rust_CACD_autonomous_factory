@@ -30,6 +30,35 @@ pub struct MissionInput {
     pub verifiable_credential: Option<factory_core::security::nhi::VerifiableCredential>,
 }
 
+/// Resolves R2R credentials, failing closed in production if environment variables are not provided
+pub fn resolve_r2r_credentials(
+    env_profile: &str,
+    user_opt: Option<String>,
+    pwd_opt: Option<String>,
+) -> Result<(String, String), factory_core::error::FactoryError> {
+    let is_prod = env_profile.eq_ignore_ascii_case("production")
+        || std::env::var("FACTORY_ENV").unwrap_or_default().eq_ignore_ascii_case("production")
+        || cfg!(feature = "production");
+
+    let user = user_opt.or_else(|| std::env::var("R2R_SUPERUSER_EMAIL").ok());
+    let pwd = pwd_opt.or_else(|| std::env::var("R2R_SUPERUSER_PASSWORD").ok());
+
+    match (user, pwd) {
+        (Some(u), Some(p)) if !u.is_empty() && !p.is_empty() => Ok((u, p)),
+        _ => {
+            if is_prod {
+                Err(factory_core::error::FactoryError::Security(
+                    "Missing mandatory R2R_SUPERUSER_EMAIL and/or R2R_SUPERUSER_PASSWORD in production environment"
+                        .to_string(),
+                ))
+            } else {
+                tracing::warn!("Using development default fallback credentials for R2R");
+                Ok(("admin@example.com".to_string(), "admin".to_string()))
+            }
+        }
+    }
+}
+
 impl std::fmt::Debug for MissionInput {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MissionInput")
@@ -221,6 +250,32 @@ pub fn create_mission_workflow(
     )
 }
 
+pub struct WorkflowSupervisor {
+    cancel_token: tokio_util::sync::CancellationToken,
+}
+
+impl Default for WorkflowSupervisor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl WorkflowSupervisor {
+    pub fn new() -> Self {
+        Self {
+            cancel_token: tokio_util::sync::CancellationToken::new(),
+        }
+    }
+
+    pub fn token(&self) -> tokio_util::sync::CancellationToken {
+        self.cancel_token.clone()
+    }
+
+    pub fn cancel(&self) {
+        self.cancel_token.cancel();
+    }
+}
+
 pub fn create_mission_workflow_with_clients(
     hatchet: &Hatchet,
     mcp_url: String,
@@ -230,6 +285,10 @@ pub fn create_mission_workflow_with_clients(
     gl_client: Option<Arc<dyn GitlabClient>>,
     gh_client: Option<Arc<dyn GithubClient>>,
 ) -> Workflow<MissionInput, MissionOutput> {
+    let supervisor = WorkflowSupervisor::new();
+    let cancel_token_finops = supervisor.token();
+    let cancel_token_sentry = supervisor.token();
+
     // FinOps background monitor: only spawn if LiteLLM base URL is configured
     let has_litellm = std::env::var("LITELLM_API_BASE")
         .or_else(|_| std::env::var("LITELLM_BASE_URL"))
@@ -239,8 +298,15 @@ pub fn create_mission_workflow_with_clients(
     if has_litellm {
         tokio::spawn(async move {
             let finops_agent = FinOpsAgent::default();
-            if let Err(e) = finops_agent.monitor_budget().await {
-                tracing::error!("FinOpsAgent monitor crashed: {}", e);
+            tokio::select! {
+                _ = cancel_token_finops.cancelled() => {
+                    tracing::info!("FinOpsAgent received cancellation signal, shutting down cleanly.");
+                }
+                res = finops_agent.monitor_budget() => {
+                    if let Err(e) = res {
+                        tracing::error!("FinOpsAgent monitor crashed: {}", e);
+                    }
+                }
             }
         });
     } else {
@@ -274,8 +340,15 @@ pub fn create_mission_workflow_with_clients(
                 hatchet_clone,
             );
 
-            if let Err(e) = qa_agent.monitor_crashes().await {
-                tracing::error!("QAObserverAgent monitor crashed: {}", e);
+            tokio::select! {
+                _ = cancel_token_sentry.cancelled() => {
+                    tracing::info!("QAObserverAgent received cancellation signal, shutting down cleanly.");
+                }
+                res = qa_agent.monitor_crashes() => {
+                    if let Err(e) = res {
+                        tracing::error!("QAObserverAgent monitor crashed: {}", e);
+                    }
+                }
             }
         });
     } else {
@@ -283,9 +356,9 @@ pub fn create_mission_workflow_with_clients(
     }
 
     let mcp_client: Arc<dyn McpClient> = Arc::new(McpHttpClient::new(mcp_url));
-    let r2r_user =
-        std::env::var("R2R_SUPERUSER_EMAIL").unwrap_or_else(|_| "admin@example.com".to_string());
-    let r2r_pwd = std::env::var("R2R_SUPERUSER_PASSWORD").unwrap_or_else(|_| "admin".to_string());
+    let (r2r_user, r2r_pwd) = resolve_r2r_credentials("auto", None, None).unwrap_or_else(|e| {
+        panic!("Fatal configuration error: {}", e);
+    });
 
     let r2r_client: Arc<dyn R2rClient> = Arc::new(HttpR2rClient::new(r2r_url, r2r_user, r2r_pwd));
     let kafka_client: Arc<dyn KafkaClient> = if kafka_brokers == "mock" || kafka_brokers.is_empty()
