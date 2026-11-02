@@ -7,6 +7,77 @@ pub enum VerificationOutcome {
     Expired,
     BadSignature,
     Malformed,
+    UntrustedIssuer,
+    ReplayedNonce,
+}
+
+/// Trust store interface for validating authorized agent identity issuers
+pub trait IssuerTrustStore: Send + Sync {
+    fn is_trusted_issuer(&self, issuer_did: &str, verifying_key: &ed25519_dalek::VerifyingKey) -> bool;
+}
+
+/// Simple memory-backed trust store
+pub struct InMemoryTrustStore {
+    trusted_issuers: std::collections::HashMap<String, ed25519_dalek::VerifyingKey>,
+}
+
+impl InMemoryTrustStore {
+    pub fn new() -> Self {
+        Self {
+            trusted_issuers: std::collections::HashMap::new(),
+        }
+    }
+
+    pub fn register(&mut self, issuer_did: impl Into<String>, verifying_key: ed25519_dalek::VerifyingKey) {
+        self.trusted_issuers.insert(issuer_did.into(), verifying_key);
+    }
+}
+
+impl Default for InMemoryTrustStore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IssuerTrustStore for InMemoryTrustStore {
+    fn is_trusted_issuer(&self, issuer_did: &str, verifying_key: &ed25519_dalek::VerifyingKey) -> bool {
+        self.trusted_issuers
+            .get(issuer_did)
+            .map(|k| k == verifying_key)
+            .unwrap_or(false)
+    }
+}
+
+/// Thread-safe bounded cache tracking credential nonces to prevent replay attacks
+pub struct NonceReplayCache {
+    seen_nonces: std::sync::RwLock<std::collections::HashMap<String, DateTime<Utc>>>,
+    ttl: std::time::Duration,
+}
+
+impl NonceReplayCache {
+    pub fn new(ttl: std::time::Duration) -> Self {
+        Self {
+            seen_nonces: std::sync::RwLock::new(std::collections::HashMap::new()),
+            ttl,
+        }
+    }
+
+    pub fn check_and_record(&self, nonce: &str, now: DateTime<Utc>) -> Result<bool, crate::error::FactoryError> {
+        let mut map = self.seen_nonces.write().map_err(|e| {
+            crate::error::FactoryError::Security(format!("Nonce cache lock poisoned: {}", e))
+        })?;
+
+        // Prune expired nonces
+        let ttl_chrono = chrono::Duration::from_std(self.ttl).unwrap_or_else(|_| chrono::Duration::minutes(10));
+        map.retain(|_, timestamp| now.signed_duration_since(*timestamp) < ttl_chrono);
+
+        if map.contains_key(nonce) {
+            return Ok(false); // Replayed nonce
+        }
+
+        map.insert(nonce.to_string(), now);
+        Ok(true)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
@@ -110,6 +181,16 @@ impl VerifiableCredential {
         signing_key: &ed25519_dalek::SigningKey,
         key_id: &str,
     ) -> crate::error::Result<()> {
+        self.sign_with_nonce(signing_key, key_id, None)
+    }
+
+    /// Cryptographically signs the verifiable credential using an Ed25519 signing key with an optional nonce.
+    pub fn sign_with_nonce(
+        &mut self,
+        signing_key: &ed25519_dalek::SigningKey,
+        key_id: &str,
+        nonce: Option<String>,
+    ) -> crate::error::Result<()> {
         use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
         use ed25519_dalek::Signer;
 
@@ -125,7 +206,7 @@ impl VerifiableCredential {
             created,
             verification_method: key_id,
             proof_purpose,
-            nonce: None,
+            nonce: nonce.as_deref(),
         };
 
         // Standard JWS header for detached Ed25519 payloads
@@ -153,7 +234,7 @@ impl VerifiableCredential {
             verification_method: key_id.to_string(),
             proof_purpose: proof_purpose.to_string(),
             jws,
-            nonce: None,
+            nonce,
         });
 
         Ok(())
@@ -180,25 +261,34 @@ impl VerifiableCredential {
         Ok(())
     }
 
-    /// Asynchronously batch-signs multiple credentials concurrently and atomically.
+    /// Asynchronously batch-signs multiple credentials concurrently and atomically with bounded concurrency.
     pub async fn sign_batch_async(
         credentials: &mut [VerifiableCredential],
         signing_key: &ed25519_dalek::SigningKey,
         key_id: &str,
     ) -> crate::error::Result<()> {
         let key_id_owned = key_id.to_string();
+        let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(16));
         let mut handles = Vec::with_capacity(credentials.len());
 
         for vc in credentials.iter() {
             let mut vc_clone = vc.clone();
             let key_clone = signing_key.clone();
             let key_id_clone = key_id_owned.clone();
-            handles.push(tokio::task::spawn_blocking(
-                move || -> crate::error::Result<VerifiableCredential> {
-                    vc_clone.sign(&key_clone, &key_id_clone)?;
-                    Ok(vc_clone)
-                },
-            ));
+            let sem = semaphore.clone();
+            handles.push(tokio::spawn(async move {
+                let _permit = sem.acquire().await.map_err(|e| {
+                    crate::error::FactoryError::Security(format!("Semaphore error: {}", e))
+                })?;
+                tokio::task::spawn_blocking(
+                    move || -> crate::error::Result<VerifiableCredential> {
+                        vc_clone.sign(&key_clone, &key_id_clone)?;
+                        Ok(vc_clone)
+                    },
+                )
+                .await
+                .map_err(|e| crate::error::FactoryError::Security(format!("Task join error: {}", e)))?
+            }));
         }
 
         let mut signed_results = Vec::with_capacity(credentials.len());
@@ -219,6 +309,14 @@ impl VerifiableCredential {
 
     /// Verifies the cryptographic proof and temporal validity against the given timestamp and key.
     pub fn verify_at(
+        &self,
+        now: DateTime<Utc>,
+        verifying_key: &ed25519_dalek::VerifyingKey,
+    ) -> crate::error::Result<VerificationOutcome> {
+        self.verify_internal_crypto(now, verifying_key)
+    }
+
+    fn verify_internal_crypto(
         &self,
         now: DateTime<Utc>,
         verifying_key: &ed25519_dalek::VerifyingKey,
@@ -283,6 +381,41 @@ impl VerifiableCredential {
         }
     }
 
+    /// Verifies the cryptographic proof and temporal validity against the given timestamp and key,
+    /// with optional issuer trust store and replay prevention.
+    pub fn verify_with_trust_and_replay(
+        &self,
+        now: DateTime<Utc>,
+        verifying_key: &ed25519_dalek::VerifyingKey,
+        trust_store: Option<&dyn IssuerTrustStore>,
+        replay_cache: Option<&NonceReplayCache>,
+    ) -> crate::error::Result<VerificationOutcome> {
+        // 1. Verify issuer trust if store provided
+        if let Some(store) = trust_store {
+            if !store.is_trusted_issuer(&self.issuer, verifying_key) {
+                return Ok(VerificationOutcome::UntrustedIssuer);
+            }
+        }
+
+        // 2. Base cryptographic and temporal check
+        let base_outcome = self.verify_at(now, verifying_key)?;
+        if base_outcome != VerificationOutcome::Valid {
+            return Ok(base_outcome);
+        }
+
+        // 3. Nonce replay check if nonce present and cache provided
+        if let (Some(cache), Some(proof)) = (replay_cache, &self.proof) {
+            if let Some(nonce) = &proof.nonce {
+                let is_fresh = cache.check_and_record(nonce, now)?;
+                if !is_fresh {
+                    return Ok(VerificationOutcome::ReplayedNonce);
+                }
+            }
+        }
+
+        Ok(VerificationOutcome::Valid)
+    }
+
     /// Verifies the cryptographic proof of a Verifiable Credential against an Ed25519 verifying key at the current time.
     pub fn verify(
         &self,
@@ -291,19 +424,28 @@ impl VerifiableCredential {
         Ok(self.verify_at(Utc::now(), verifying_key)? == VerificationOutcome::Valid)
     }
 
-    /// Asynchronously verifies a batch of verifiable credentials concurrently.
+    /// Asynchronously verifies a batch of verifiable credentials concurrently with bounded concurrency.
     pub async fn verify_batch_async(
         credentials: &[VerifiableCredential],
         verifying_key: &ed25519_dalek::VerifyingKey,
     ) -> crate::error::Result<bool> {
+        let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(16));
         let mut handles = Vec::with_capacity(credentials.len());
 
         for vc in credentials.iter() {
             let vc_clone = vc.clone();
             let key_clone = *verifying_key;
-            handles.push(tokio::task::spawn_blocking(
-                move || -> crate::error::Result<bool> { vc_clone.verify(&key_clone) },
-            ));
+            let sem = semaphore.clone();
+            handles.push(tokio::spawn(async move {
+                let _permit = sem.acquire().await.map_err(|e| {
+                    crate::error::FactoryError::Security(format!("Semaphore error: {}", e))
+                })?;
+                tokio::task::spawn_blocking(
+                    move || -> crate::error::Result<bool> { vc_clone.verify(&key_clone) },
+                )
+                .await
+                .map_err(|e| crate::error::FactoryError::Security(format!("Task join error: {}", e)))?
+            }));
         }
 
         for handle in handles {
@@ -364,5 +506,66 @@ pub mod tests {
                 .await
                 .unwrap()
         );
+    }
+
+    #[tokio::test]
+    async fn test_nhi_issuer_trust_and_replay_rejection() {
+        let mut csprng = OsRng;
+        let signing_key = SigningKey::generate(&mut csprng);
+        let verifying_key = signing_key.verifying_key();
+
+        let mut untrusted_csprng = OsRng;
+        let untrusted_signing_key = SigningKey::generate(&mut untrusted_csprng);
+        let untrusted_verifying_key = untrusted_signing_key.verifying_key();
+
+        let mut trust_store = InMemoryTrustStore::new();
+        trust_store.register("did:darkgravity:authority", verifying_key);
+
+        let replay_cache = NonceReplayCache::new(std::time::Duration::from_secs(60));
+
+        let subject = AgentSubject {
+            id: "agent-007".to_string(),
+            roles: vec!["worker".to_string()],
+            allowed_namespaces: vec!["default".to_string()],
+        };
+
+        let mut vc = VerifiableCredential::new(
+            "urn:uuid:credential-1".to_string(),
+            "did:darkgravity:authority".to_string(),
+            subject,
+        );
+
+        // Sign with trusted key and specific nonce
+        vc.sign_with_nonce(&signing_key, "key-1", Some("nonce-101".to_string()))
+            .unwrap();
+
+        let now = Utc::now();
+
+        // 1. Untrusted issuer key check
+        let outcome_untrusted = vc.verify_with_trust_and_replay(
+            now,
+            &untrusted_verifying_key,
+            Some(&trust_store),
+            Some(&replay_cache),
+        ).unwrap();
+        assert_eq!(outcome_untrusted, VerificationOutcome::UntrustedIssuer);
+
+        // 2. First verification with trusted key -> Valid
+        let outcome_valid = vc.verify_with_trust_and_replay(
+            now,
+            &verifying_key,
+            Some(&trust_store),
+            Some(&replay_cache),
+        ).unwrap();
+        assert_eq!(outcome_valid, VerificationOutcome::Valid);
+
+        // 3. Second verification with same nonce -> ReplayedNonce
+        let outcome_replay = vc.verify_with_trust_and_replay(
+            now,
+            &verifying_key,
+            Some(&trust_store),
+            Some(&replay_cache),
+        ).unwrap();
+        assert_eq!(outcome_replay, VerificationOutcome::ReplayedNonce);
     }
 }

@@ -38,11 +38,14 @@ pub fn compute_diff_hash(diff: &str) -> String {
     result.iter().map(|b| format!("{:02x}", b)).collect()
 }
 
+pub const DEFAULT_MAX_DIFF_HISTORY: usize = 50;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CircuitBreakerGuard {
     pub max_attempts: u32,
     pub current_attempt: u32,
     pub min_safety_score: f32,
+    pub max_history_capacity: usize,
     #[serde(default)]
     pub diff_hash_history: Vec<String>,
     #[serde(default)]
@@ -55,6 +58,7 @@ impl Default for CircuitBreakerGuard {
             max_attempts: 3,
             current_attempt: 0,
             min_safety_score: 8.0,
+            max_history_capacity: DEFAULT_MAX_DIFF_HISTORY,
             diff_hash_history: Vec::new(),
             tripped: false,
         }
@@ -67,9 +71,18 @@ impl CircuitBreakerGuard {
             max_attempts,
             current_attempt: 0,
             min_safety_score,
+            max_history_capacity: DEFAULT_MAX_DIFF_HISTORY,
             diff_hash_history: Vec::new(),
             tripped: false,
         }
+    }
+
+    /// Appends a diff hash while respecting the bounded history capacity limit
+    fn record_diff_hash(&mut self, hash: String) {
+        if self.diff_hash_history.len() >= self.max_history_capacity {
+            self.diff_hash_history.remove(0);
+        }
+        self.diff_hash_history.push(hash);
     }
 
     pub fn is_tripped(&self) -> bool {
@@ -101,7 +114,7 @@ impl CircuitBreakerGuard {
             && scan_result.score >= self.min_safety_score
             && !scan_result.critical_vulnerabilities_detected
         {
-            self.diff_hash_history.push(diff_hash);
+            self.record_diff_hash(diff_hash);
             (CircuitBreakerStatus::Passed, scan_result)
         } else {
             self.current_attempt += 1;
@@ -121,11 +134,11 @@ impl CircuitBreakerGuard {
                         self.current_attempt, diff_hash
                     )
                 };
-                self.diff_hash_history.push(diff_hash);
+                self.record_diff_hash(diff_hash);
                 return (CircuitBreakerStatus::AgentStuck { reason }, scan_result);
             }
 
-            self.diff_hash_history.push(diff_hash);
+            self.record_diff_hash(diff_hash);
 
             if self.current_attempt >= self.max_attempts {
                 self.tripped = true;

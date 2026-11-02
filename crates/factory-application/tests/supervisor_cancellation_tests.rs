@@ -40,3 +40,4 @@ async fn test_workflow_supervisor_cancellation_propagation() {
     assert_eq!(res1.unwrap().unwrap(), "monitor1_stopped");
     assert_eq!(res2.unwrap().unwrap(), "monitor2_stopped");
 }
+

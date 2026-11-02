@@ -236,16 +236,72 @@ impl SastScanResult {
             score -= 3.0;
         }
 
-        // 7. Unbounded loop check
-        for line in &added_lines {
-            if line.contains("loop {")
-                && !combined_added.contains("break")
-                && !combined_added.contains("return")
-            {
-                findings
-                    .push("Potential unbounded loop without break condition detected".to_string());
-                score -= 2.5;
-                break;
+        // 9. AST-Enhanced Analysis for Rust Code
+        if let Ok(file_ast) = syn::parse_file(&combined_added) {
+            use syn::visit::Visit;
+
+            struct AstSecurityVisitor {
+                has_infinite_loop: bool,
+                has_process_command: bool,
+            }
+
+            impl<'ast> Visit<'ast> for AstSecurityVisitor {
+                fn visit_expr_loop(&mut self, i: &'ast syn::ExprLoop) {
+                    // Check if the loop block contains any break or return expr
+                    struct LoopBreakDetector {
+                        has_terminator: bool,
+                    }
+                    impl<'a> Visit<'a> for LoopBreakDetector {
+                        fn visit_expr_break(&mut self, _: &'a syn::ExprBreak) {
+                            self.has_terminator = true;
+                        }
+                        fn visit_expr_return(&mut self, _: &'a syn::ExprReturn) {
+                            self.has_terminator = true;
+                        }
+                    }
+                    let mut detector = LoopBreakDetector { has_terminator: false };
+                    detector.visit_block(&i.body);
+                    if !detector.has_terminator {
+                        self.has_infinite_loop = true;
+                    }
+                }
+
+                fn visit_path(&mut self, i: &'ast syn::Path) {
+                    let segments: Vec<String> = i.segments.iter().map(|s| s.ident.to_string()).collect();
+                    if segments.iter().any(|s| s == "Command") {
+                        self.has_process_command = true;
+                    }
+                }
+            }
+
+            let mut visitor = AstSecurityVisitor {
+                has_infinite_loop: false,
+                has_process_command: false,
+            };
+            visitor.visit_file(&file_ast);
+
+            if visitor.has_infinite_loop {
+                findings.push("AST Analysis: Unbounded loop without break/return statement detected".to_string());
+                score -= 3.0;
+            }
+
+            if visitor.has_process_command {
+                findings.push("AST Analysis: Process command execution detected".to_string());
+                critical = true;
+                score -= 5.0;
+            }
+        } else {
+            // Fallback heuristic regex loop check if not a full parseable rust file
+            for line in &added_lines {
+                if line.contains("loop {")
+                    && !combined_added.contains("break")
+                    && !combined_added.contains("return")
+                {
+                    findings
+                        .push("Potential unbounded loop without break condition detected".to_string());
+                    score -= 2.5;
+                    break;
+                }
             }
         }
 
