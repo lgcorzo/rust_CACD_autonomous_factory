@@ -26,6 +26,8 @@ pub mod security_validator;
 pub mod semantica;
 pub mod sentry;
 pub mod vault;
+#[cfg(any(test, feature = "test-utils"))]
+pub mod vault_test_fixtures;
 pub mod ziti;
 
 pub use cursor_store::{CursorStore, InMemoryCursorStore, PostgresCursorStore};
