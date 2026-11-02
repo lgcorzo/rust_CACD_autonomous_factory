@@ -186,3 +186,4 @@ last_verified_commit: "fbdc5848"
 * [[crates_factory-core_src_security]]
 * [[crates_factory-infrastructure_src_lib]]
 * [[crates_factory-infrastructure_src_vault_test_fixtures]]
+* [[crates_factory-application_src_workflows_autonomous_mission]]
