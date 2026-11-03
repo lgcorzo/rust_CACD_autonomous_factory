@@ -23,7 +23,7 @@ hex = "0.4"
 rand = "0.10"
 regex = { workspace = true }
 serde_jcs = "0.2"
-syn = { version = "2.0", features = ["full", "visit"] }
+syn = { version = "3.0", features = ["full", "visit"] }
 
 [dev-dependencies]
 criterion = "0.8"
