@@ -1871,7 +1871,7 @@ dependencies = [
  "serde_jcs",
  "serde_json",
  "serde_yaml",
- "syn 2.0.119",
+ "syn 3.0.3",
  "thiserror 2.0.21",
  "tokio",
  "tracing",
