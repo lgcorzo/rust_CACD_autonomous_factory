@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Verified Autonomous Execution Evidence Record",
+  "description": "A revision-bound observation. Passing this schema does not by itself promote a requirement to VERIFIED.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "evidence_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "requirement_id": {
+      "type": "string",
+      "pattern": "^(FR|SC)-[0-9]{3}$"
+    },
+    "collected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_revision": {
+      "$ref": "#/$defs/revision"
+    },
+    "deployment_revision": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/revision"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["local", "ci", "development", "staging", "production", "cluster", "other"]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["kind", "identifier"]
+    },
+    "verification_class": {
+      "type": "string",
+      "enum": [
+        "mock",
+        "unit",
+        "integration",
+        "infrastructure",
+        "live_runtime",
+        "documentation",
+        "performance",
+        "accessibility"
+      ]
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command_or_test": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["tool", "command_or_test"]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "passed",
+        "failed",
+        "not_executed",
+        "infrastructure_error",
+        "timeout",
+        "mocked",
+        "unavailable"
+      ]
+    },
+    "exit_code": {
+      "type": ["integer", "null"]
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "uri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{64}$"
+          },
+          "media_type": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["uri"]
+      }
+    },
+    "collector": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "enum": ["implementer", "test_runner", "independent_verifier", "automated_system", "operator"]
+        }
+      },
+      "required": ["id", "role"]
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "evidence_id",
+    "requirement_id",
+    "collected_at",
+    "source_revision",
+    "deployment_revision",
+    "environment",
+    "verification_class",
+    "method",
+    "outcome",
+    "exit_code",
+    "artifacts",
+    "collector",
+    "limitations"
+  ],
+  "$defs": {
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "branch": {
+          "type": ["string", "null"]
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{40,64}$"
+        }
+      },
+      "required": ["repository", "branch", "commit"]
+    }
+  }
+}

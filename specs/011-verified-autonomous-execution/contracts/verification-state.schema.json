@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Requirement Verification State",
+  "description": "The current requirement status and append-only transition history. Business-policy checks are required in addition to schema validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "requirement_id": {
+      "type": "string",
+      "pattern": "^(FR|SC)-[0-9]{3}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OPEN", "IMPLEMENTED", "TESTED", "VERIFIED"]
+    },
+    "implementation_agent_id": {
+      "type": ["string", "null"]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/transition"
+      }
+    },
+    "verified_by": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/verifier"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "invalidated_at": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "requirement_id",
+    "status",
+    "implementation_agent_id",
+    "evidence_refs",
+    "transitions",
+    "verified_by",
+    "invalidated_at"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "VERIFIED"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "verified_by": {
+            "$ref": "#/$defs/verifier"
+          },
+          "evidence_refs": {
+            "minItems": 1
+          },
+          "transitions": {
+            "minItems": 1
+          },
+          "invalidated_at": {
+            "const": null
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "OPEN"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "verified_by": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": ["string", "null"],
+          "enum": [null, "OPEN", "IMPLEMENTED", "TESTED", "VERIFIED"]
+        },
+        "to": {
+          "type": "string",
+          "enum": ["OPEN", "IMPLEMENTED", "TESTED", "VERIFIED"]
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["from", "to", "at", "actor_id", "reason"],
+      "oneOf": [
+        {
+          "properties": {
+            "from": {
+              "const": null
+            },
+            "to": {
+              "const": "OPEN"
+            }
+          }
+        },
+        {
+          "properties": {
+            "from": {
+              "const": "OPEN"
+            },
+            "to": {
+              "const": "IMPLEMENTED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "from": {
+              "const": "IMPLEMENTED"
+            },
+            "to": {
+              "const": "TESTED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "from": {
+              "const": "TESTED"
+            },
+            "to": {
+              "const": "VERIFIED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "from": {
+              "const": "VERIFIED"
+            },
+            "to": {
+              "const": "OPEN"
+            }
+          }
+        }
+      ]
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "const": "independent_verifier"
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "required": ["id", "role", "verified_at", "evidence_refs"]
+    }
+  }
+}
