@@ -132,18 +132,18 @@
 
 ### Tests and repository reviews for User Story 6
 
-- [ ] T035 [P] [US6] Review the current Python package revision, supported interpreter/dependency groups, packaging, lockfiles, tests, and CI commands; record reproducibility and security outcomes in `docs/audit/reviews/mlops-python-package.md` using `../mlops-python-package/pyproject.toml`, `../mlops-python-package/README.md`, and its current CI configuration.
-- [ ] T036 [P] [US6] Review the Rust agent service API, Rust edition, stream behavior, LiteLLM/R2R integration, telemetry, tests, and naming compatibility; record exact revision and test outcomes in `docs/audit/reviews/fastapi-autogen-team.md` using `../fastapi-autogen-team/Cargo.toml`, `../fastapi-autogen-team/src/`, and `../fastapi-autogen-team/README.md`.
-- [ ] T037 [P] [US6] Inspect `lince-rs` and `autonomous_factory` only if accessible, recording revision and evidence or explicitly marking each inaccessible without inferred findings in `docs/audit/ECOSYSTEM_INVENTORY.md`.
-- [ ] T038 [P] [US6] Add tests that detect divergent canonical counts, lifecycle facts, and unsupported security/runtime claims across public pages in `../lgcorzo.github.io/tests/test_public_claims.py`.
+- [x] T035 [P] [US6] Review the current Python package revision, supported interpreter/dependency groups, packaging, lockfiles, tests, and CI commands; record reproducibility and security outcomes in `docs/audit/reviews/mlops-python-package.md` using `../mlops-python-package/pyproject.toml`, `../mlops-python-package/README.md`, and its current CI configuration.
+- [x] T036 [P] [US6] Review the Rust agent service API, Rust edition, stream behavior, LiteLLM/R2R integration, telemetry, tests, and naming compatibility; record exact revision and test outcomes in `docs/audit/reviews/fastapi-autogen-team.md` using `../fastapi-autogen-team/Cargo.toml`, `../fastapi-autogen-team/src/`, and `../fastapi-autogen-team/README.md`.
+- [x] T037 [P] [US6] Inspect `lince-rs` and `autonomous_factory` only if accessible, recording revision and evidence or explicitly marking each inaccessible without inferred findings in `docs/audit/ECOSYSTEM_INVENTORY.md`.
+- [x] T038 [P] [US6] Add tests that detect divergent canonical counts, lifecycle facts, and unsupported security/runtime claims across public pages in `../lgcorzo.github.io/tests/test_public_claims.py`.
 
 ### Implementation and reporting for User Story 6
 
-- [ ] T039 [US6] Create a dated canonical source for public architecture/lifecycle/security claims and repository statistics, including definitions and source links, in `../lgcorzo.github.io/data/canonical-claims.json`.
-- [ ] T040 [US6] Implement a deterministic checker that compares canonical facts to the rendered source pages and fails on material contradictions or missing evidence metadata in `../lgcorzo.github.io/scripts/check_public_claims.py`.
-- [ ] T041 [US6] Run the canonical-claims check in the website repository's CI and ensure pull-request validation requires no privileged statistics credential in `../lgcorzo.github.io/.github/workflows/site-consistency.yml`.
-- [ ] T042 [US6] Reconcile unsupported or inconsistent lifecycle, security, and dated-statistic claims to the canonical evidence source in `../lgcorzo.github.io/index.html`, `../lgcorzo.github.io/architecture.html`, `../lgcorzo.github.io/lifecycle.html`, `../lgcorzo.github.io/notebooks.html`, and `../lgcorzo.github.io/fork-policy.html`.
-- [ ] T043 [US6] Measure and report metadata, structured information, accessibility, responsive behavior, links, and page performance; distinguish measured findings from unverified claims in `docs/audit/PUBLIC_SITE_REVIEW.md`.
+- [x] T039 [US6] Create a dated canonical source for public architecture/lifecycle/security claims and repository statistics, including definitions and source links, in `../lgcorzo.github.io/data/canonical-claims.json`.
+- [x] T040 [US6] Implement a deterministic checker that compares canonical facts to the rendered source pages and fails on material contradictions or missing evidence metadata in `../lgcorzo.github.io/scripts/check_public_claims.py`.
+- [x] T041 [US6] Run the canonical-claims check in the website repository's CI and ensure pull-request validation requires no privileged statistics credential in `../lgcorzo.github.io/.github/workflows/site-consistency.yml`.
+- [x] T042 [US6] Reconcile unsupported or inconsistent lifecycle, security, and dated-statistic claims to the canonical evidence source in `../lgcorzo.github.io/index.html`, `../lgcorzo.github.io/architecture.html`, `../lgcorzo.github.io/lifecycle.html`, `../lgcorzo.github.io/notebooks.html`, and `../lgcorzo.github.io/fork-policy.html`.
+- [x] T043 [US6] Measure and report metadata, structured information, accessibility, responsive behavior, links, and page performance; distinguish measured findings from unverified claims in `docs/audit/PUBLIC_SITE_REVIEW.md`.
 
 **Checkpoint**: Run website consistency tests and the available site-quality measurements. Do not claim accessibility or performance is verified without current measurements.
 
