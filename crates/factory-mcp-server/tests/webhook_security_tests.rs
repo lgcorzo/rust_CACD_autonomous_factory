@@ -52,6 +52,10 @@ fn sign_payload(secret: &str, body: &[u8]) -> String {
     format!("sha256={}", hex::encode(mac.finalize().into_bytes()))
 }
 
+fn generate_ephemeral_secret() -> String {
+    uuid::Uuid::new_v4().to_string()
+}
+
 #[tokio::test]
 async fn test_webhook_rejects_missing_secret_in_protected_mode() {
     let server = Arc::new(
@@ -88,12 +92,12 @@ async fn test_webhook_rejects_missing_secret_in_protected_mode() {
 
 #[tokio::test]
 async fn test_webhook_rejects_invalid_signature_malformed_and_oversized_payload() {
-    let secret = "test-webhook-hmac-secret-011";
+    let secret = generate_ephemeral_secret();
     let dispatched = Arc::new(AtomicUsize::new(0));
     let server = Arc::new(
         McpServer::new()
             .with_protected_mode(true)
-            .with_webhook_secret(secret.to_string())
+            .with_webhook_secret(secret.clone())
             .with_max_webhook_payload_bytes(1024)
             .with_webhook_dispatcher(Arc::new(RecordingMissionDispatcher {
                 dispatched_count: dispatched.clone(),
@@ -126,7 +130,7 @@ async fn test_webhook_rejects_invalid_signature_malformed_and_oversized_payload(
 
     // 2. Malformed JSON with valid signature -> 400
     let malformed = b"{not-valid-json";
-    let sig_malformed = sign_payload(secret, malformed);
+    let sig_malformed = sign_payload(&secret, malformed);
     let req_malformed = Request::builder()
         .method("POST")
         .uri("/webhooks/github")
@@ -140,7 +144,7 @@ async fn test_webhook_rejects_invalid_signature_malformed_and_oversized_payload(
 
     // 3. Oversized payload (> 1024 bytes) -> 413 Payload Too Large
     let oversized = vec![b'a'; 2048];
-    let sig_oversized = sign_payload(secret, &oversized);
+    let sig_oversized = sign_payload(&secret, &oversized);
     let req_oversized = Request::builder()
         .method("POST")
         .uri("/webhooks/github")
@@ -161,12 +165,12 @@ async fn test_webhook_rejects_invalid_signature_malformed_and_oversized_payload(
 
 #[tokio::test]
 async fn test_webhook_replay_rejection_and_verifiable_mission_dispatch() {
-    let secret = "test-webhook-hmac-secret-replay";
+    let secret = generate_ephemeral_secret();
     let dispatched = Arc::new(AtomicUsize::new(0));
     let server = Arc::new(
         McpServer::new()
             .with_protected_mode(true)
-            .with_webhook_secret(secret.to_string())
+            .with_webhook_secret(secret.clone())
             .with_webhook_dispatcher(Arc::new(RecordingMissionDispatcher {
                 dispatched_count: dispatched.clone(),
                 should_fail: false,
@@ -188,7 +192,7 @@ async fn test_webhook_replay_rejection_and_verifiable_mission_dispatch() {
         }
     }))
     .unwrap();
-    let sig = sign_payload(secret, &body);
+    let sig = sign_payload(&secret, &body);
 
     // First delivery succeeds and returns verifiable dispatch receipt
     let req1 = Request::builder()
@@ -236,12 +240,12 @@ async fn test_webhook_replay_rejection_and_verifiable_mission_dispatch() {
 
 #[tokio::test]
 async fn test_webhook_returns_error_when_mission_dispatch_fails() {
-    let secret = "test-webhook-hmac-secret-fail";
+    let secret = generate_ephemeral_secret();
     let dispatched = Arc::new(AtomicUsize::new(0));
     let server = Arc::new(
         McpServer::new()
             .with_protected_mode(true)
-            .with_webhook_secret(secret.to_string())
+            .with_webhook_secret(secret.clone())
             .with_webhook_dispatcher(Arc::new(RecordingMissionDispatcher {
                 dispatched_count: dispatched.clone(),
                 should_fail: true,
@@ -255,7 +259,7 @@ async fn test_webhook_returns_error_when_mission_dispatch_fails() {
         "repository": { "full_name": "org/repo", "html_url": "https://github.com/org/repo" }
     }))
     .unwrap();
-    let sig = sign_payload(secret, &body);
+    let sig = sign_payload(&secret, &body);
 
     let req = Request::builder()
         .method("POST")
@@ -272,5 +276,5 @@ async fn test_webhook_returns_error_when_mission_dispatch_fails() {
         StatusCode::BAD_GATEWAY,
         "Webhook must fail with 502 Bad Gateway when mission submission fails rather than returning false 200 OK"
     );
-    let _ = verify_github_signature(secret, "sha256=00", b"");
+    let _ = verify_github_signature(&secret, "sha256=00", b"");
 }
