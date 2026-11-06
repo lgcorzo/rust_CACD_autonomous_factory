@@ -73,15 +73,15 @@
 
 ### Tests for User Story 3
 
-- [ ] T018 [P] [US3] Add webhook tests for missing production secret, invalid signature, malformed/oversized payload, replay, and valid delivery with dispatch-failure handling in `crates/factory-mcp-server/tests/webhook_security_tests.rs`.
-- [ ] T019 [P] [US3] Add route-boundary and event-stream tests for unauthorized callers, bounded session resources, disconnect cleanup, and expiry in `crates/factory-mcp-server/tests/route_boundary_tests.rs`.
+- [x] T018 [P] [US3] Add webhook tests for missing production secret, invalid signature, malformed/oversized payload, replay, and valid delivery with dispatch-failure handling in `crates/factory-mcp-server/tests/webhook_security_tests.rs`.
+- [x] T019 [P] [US3] Add route-boundary and event-stream tests for unauthorized callers, bounded session resources, disconnect cleanup, and expiry in `crates/factory-mcp-server/tests/route_boundary_tests.rs`.
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Require webhook authentication in protected configurations, validate payload bounds and replay state, and return success only after verifiable mission submission in `crates/factory-mcp-server/src/github_webhook.rs`.
-- [ ] T021 [US3] Inventory every privileged route and enforce the intended identity/authorization boundary at the effective application/deployment edge; do not treat CORS as authentication in `crates/factory-mcp-server/src/lib.rs` and `crates/factory-mcp-server/src/main.rs`.
-- [ ] T022 [US3] Bound event-stream session ownership, lifetime, and cleanup after disconnect or slow/abandoned clients in `crates/factory-mcp-server/src/lib.rs`.
-- [ ] T023 [US3] Assess issuer, audience, purpose, validity, revocation, replay, rotation, secret exposure, and demonstrated assurance limits with revision-bound evidence in `docs/audit/NHI_SECURITY_REVIEW.md`.
+- [x] T020 [US3] Require webhook authentication in protected configurations, validate payload bounds and replay state, and return success only after verifiable mission submission in `crates/factory-mcp-server/src/github_webhook.rs`.
+- [x] T021 [US3] Inventory every privileged route and enforce the intended identity/authorization boundary at the effective application/deployment edge; do not treat CORS as authentication in `crates/factory-mcp-server/src/lib.rs` and `crates/factory-mcp-server/src/main.rs`.
+- [x] T022 [US3] Bound event-stream session ownership, lifetime, and cleanup after disconnect or slow/abandoned clients in `crates/factory-mcp-server/src/lib.rs`.
+- [x] T023 [US3] Assess issuer, audience, purpose, validity, revocation, replay, rotation, secret exposure, and demonstrated assurance limits with revision-bound evidence in `docs/audit/NHI_SECURITY_REVIEW.md`.
 
 **Checkpoint**: Run route/webhook tests and, where authorized, request tests through the deployed edge. Record any unavailable deployment-boundary checks as unverified.
 

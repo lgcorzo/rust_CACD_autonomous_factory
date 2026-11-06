@@ -6,25 +6,82 @@ pub mod sandbox;
 pub mod skills;
 pub mod tools;
 
+use crate::github_webhook::{
+    DefaultLocalMissionDispatcher, MissionDispatchReceipt, WebhookMissionDispatcher,
+};
 use crate::protocol::{JsonRpcRequest, JsonRpcResponse, McpTool};
 use crate::tools::Tool;
 use axum::{
-    extract::{Query, State},
-    response::sse::{Event, Sse},
-    Json,
+    extract::{Query, Request, State},
+    http::{HeaderMap, HeaderValue, StatusCode},
+    middleware::{self, Next},
+    response::{
+        sse::{Event, Sse},
+        IntoResponse, Response,
+    },
+    routing::{get, post},
+    Json, Router,
 };
 use serde_json::{json, Value};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::convert::Infallible;
+use std::pin::Pin;
 use std::sync::Arc;
-use std::time::Duration;
+use std::task::{Context, Poll};
+use std::time::{Duration, Instant};
 use tokio::sync::{mpsc, RwLock};
-use tokio_stream::wrappers::UnboundedReceiverStream;
+use tokio_stream::wrappers::ReceiverStream;
 use tokio_stream::{Stream, StreamExt};
+
+pub struct SessionRecord {
+    pub owner_id: String,
+    pub created_at: Instant,
+    pub last_active: Instant,
+    pub tx: mpsc::Sender<JsonRpcResponse>,
+}
+
+struct SessionDisconnectGuard<S> {
+    inner: S,
+    session_id: String,
+    sessions: Arc<RwLock<HashMap<String, SessionRecord>>>,
+}
+
+impl<S, Item> Stream for SessionDisconnectGuard<S>
+where
+    S: Stream<Item = Item> + Unpin,
+{
+    type Item = Item;
+
+    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        Pin::new(&mut self.inner).poll_next(cx)
+    }
+}
+
+impl<S> Drop for SessionDisconnectGuard<S> {
+    fn drop(&mut self) {
+        let sid = self.session_id.clone();
+        if let Ok(mut guard) = self.sessions.try_write() {
+            guard.remove(&sid);
+        } else {
+            let sessions = self.sessions.clone();
+            tokio::spawn(async move {
+                sessions.write().await.remove(&sid);
+            });
+        }
+    }
+}
 
 pub struct McpServer {
     tools: Arc<RwLock<HashMap<String, Box<dyn Tool>>>>,
-    sessions: Arc<RwLock<HashMap<String, mpsc::UnboundedSender<JsonRpcResponse>>>>,
+    sessions: Arc<RwLock<HashMap<String, SessionRecord>>>,
+    protected_mode: bool,
+    api_bearer_token: Option<String>,
+    webhook_secret: Option<String>,
+    max_webhook_payload_bytes: usize,
+    seen_webhook_deliveries: Arc<RwLock<HashSet<String>>>,
+    webhook_dispatcher: Arc<dyn WebhookMissionDispatcher>,
+    max_sessions: usize,
+    session_ttl: Duration,
 }
 
 impl Default for McpServer {
@@ -35,16 +92,146 @@ impl Default for McpServer {
 
 impl McpServer {
     pub fn new() -> Self {
+        let is_prod = std::env::var("FACTORY_ENV")
+            .unwrap_or_default()
+            .eq_ignore_ascii_case("production")
+            || cfg!(feature = "production");
+        let token = std::env::var("MCP_API_BEARER_TOKEN")
+            .ok()
+            .filter(|t| !t.trim().is_empty());
+
         Self {
             tools: Arc::new(RwLock::new(HashMap::new())),
             sessions: Arc::new(RwLock::new(HashMap::new())),
+            protected_mode: is_prod || token.is_some(),
+            api_bearer_token: token,
+            webhook_secret: None,
+            max_webhook_payload_bytes: 256 * 1024,
+            seen_webhook_deliveries: Arc::new(RwLock::new(HashSet::new())),
+            webhook_dispatcher: Arc::new(DefaultLocalMissionDispatcher),
+            max_sessions: 64,
+            session_ttl: Duration::from_secs(300),
         }
+    }
+
+    pub fn with_protected_mode(mut self, protected: bool) -> Self {
+        self.protected_mode = protected;
+        self
+    }
+
+    pub fn with_api_bearer_token(mut self, token: String) -> Self {
+        self.api_bearer_token = Some(token);
+        self
+    }
+
+    pub fn with_webhook_secret(mut self, secret: String) -> Self {
+        self.webhook_secret = Some(secret);
+        self
+    }
+
+    pub fn with_max_webhook_payload_bytes(mut self, max_bytes: usize) -> Self {
+        self.max_webhook_payload_bytes = max_bytes;
+        self
+    }
+
+    pub fn with_webhook_dispatcher(
+        mut self,
+        dispatcher: Arc<dyn WebhookMissionDispatcher>,
+    ) -> Self {
+        self.webhook_dispatcher = dispatcher;
+        self
+    }
+
+    pub fn with_max_sessions(mut self, max_sessions: usize) -> Self {
+        self.max_sessions = max_sessions;
+        self
+    }
+
+    pub fn with_session_ttl(mut self, ttl: Duration) -> Self {
+        self.session_ttl = ttl;
+        self
+    }
+
+    pub fn is_protected_mode(&self) -> bool {
+        self.protected_mode
+    }
+
+    pub fn webhook_secret(&self) -> Option<String> {
+        self.webhook_secret.clone()
+    }
+
+    pub fn max_webhook_payload_bytes(&self) -> usize {
+        self.max_webhook_payload_bytes
+    }
+
+    pub async fn record_webhook_delivery(&self, delivery_id: &str) -> bool {
+        let mut seen = self.seen_webhook_deliveries.write().await;
+        if seen.contains(delivery_id) {
+            return false;
+        }
+        seen.insert(delivery_id.to_string());
+        true
+    }
+
+    pub async fn dispatch_webhook_mission(
+        &self,
+        delivery_id: &str,
+        mission_id: &str,
+        repository: &str,
+        goal: &str,
+    ) -> Result<MissionDispatchReceipt, String> {
+        self.webhook_dispatcher
+            .dispatch_webhook_mission(delivery_id, mission_id, repository, goal)
+            .await
+    }
+
+    pub async fn active_session_count(&self) -> usize {
+        self.prune_expired_and_closed_sessions().await;
+        self.sessions.read().await.len()
+    }
+
+    pub async fn prune_expired_and_closed_sessions(&self) {
+        let now = Instant::now();
+        let ttl = self.session_ttl;
+        let mut sessions = self.sessions.write().await;
+        sessions.retain(|_, rec| {
+            !rec.tx.is_closed() && now.duration_since(rec.last_active) < ttl
+        });
+    }
+
+    pub fn verify_caller_authorized(&self, headers: &HeaderMap) -> bool {
+        if !self.protected_mode {
+            return true;
+        }
+        let Some(expected) = self.api_bearer_token.as_deref() else {
+            return false;
+        };
+        if expected.trim().is_empty() {
+            return false;
+        }
+        let Some(auth_val) = headers.get("authorization").and_then(|v| v.to_str().ok()) else {
+            return false;
+        };
+        let Some(provided) = auth_val.strip_prefix("Bearer ") else {
+            return false;
+        };
+        provided.trim() == expected
+    }
+
+    fn resolve_owner_id(&self, headers: &HeaderMap) -> String {
+        headers
+            .get("x-mcp-client-id")
+            .and_then(|v| v.to_str().ok())
+            .filter(|s| !s.trim().is_empty())
+            .map(|s| s.trim().to_string())
+            .unwrap_or_else(|| "default-authenticated-caller".to_string())
     }
 
     pub async fn add_tool(&self, tool: Box<dyn Tool>) {
         let mut tools = self.tools.write().await;
         tools.insert(tool.name(), tool);
     }
+
     pub async fn register_default_tools(&self) -> anyhow::Result<()> {
         use crate::tools::{
             bridge::BridgeTool, deep_research_tool::DeepResearchTool,
@@ -236,48 +423,103 @@ impl McpServer {
 
     pub async fn sse_handler(
         State(server): State<Arc<McpServer>>,
-    ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+        headers: HeaderMap,
+    ) -> Response {
+        server.prune_expired_and_closed_sessions().await;
+
+        let owner_id = server.resolve_owner_id(&headers);
         let session_id = uuid::Uuid::new_v4().to_string();
-        let (tx, rx) = mpsc::unbounded_channel::<JsonRpcResponse>();
+        // Bounded channel capacity (32 messages) so slow/abandoned clients cannot exhaust memory
+        let (tx, rx) = mpsc::channel::<JsonRpcResponse>(32);
 
         {
             let mut sessions = server.sessions.write().await;
-            sessions.insert(session_id.clone(), tx);
+            if sessions.len() >= server.max_sessions {
+                return (
+                    StatusCode::TOO_MANY_REQUESTS,
+                    Json(json!({"error": "Maximum concurrent SSE sessions reached"})),
+                )
+                    .into_response();
+            }
+            let now = Instant::now();
+            sessions.insert(
+                session_id.clone(),
+                SessionRecord {
+                    owner_id,
+                    created_at: now,
+                    last_active: now,
+                    tx,
+                },
+            );
         }
 
         tracing::info!("New SSE session established: {}", session_id);
 
-        let stream = UnboundedReceiverStream::new(rx).map(|msg| {
+        let stream = ReceiverStream::new(rx).map(|msg| {
             let json = serde_json::to_string(&msg).unwrap();
             Ok::<Event, Infallible>(Event::default().event("message").data(json))
         });
 
-        // Send the initial endpoint event as per MCP spec
         let endpoint_url = format!("/mcp?session_id={}", session_id);
         let endpoint_event = Event::default().event("endpoint").data(endpoint_url);
 
         let initial_stream = tokio_stream::once(Ok(endpoint_event));
         let combined_stream = initial_stream.chain(stream);
+        let guarded_stream = SessionDisconnectGuard {
+            inner: Box::pin(combined_stream),
+            session_id: session_id.clone(),
+            sessions: server.sessions.clone(),
+        };
 
-        Sse::new(combined_stream).keep_alive(ax_keep_alive())
+        let mut resp = Sse::new(guarded_stream)
+            .keep_alive(ax_keep_alive())
+            .into_response();
+        if let Ok(hv) = HeaderValue::from_str(&session_id) {
+            resp.headers_mut().insert("x-mcp-session-id", hv);
+        }
+        resp
     }
 
     pub async fn post_handler(
         State(server): State<Arc<McpServer>>,
+        headers: HeaderMap,
         Query(params): Query<HashMap<String, String>>,
         Json(request): Json<JsonRpcRequest>,
-    ) -> Json<JsonRpcResponse> {
+    ) -> Response {
+        server.prune_expired_and_closed_sessions().await;
+
+        let caller_owner = server.resolve_owner_id(&headers);
         let session_id = params.get("session_id");
+
+        if let Some(sid) = session_id {
+            let mut sessions = server.sessions.write().await;
+            let Some(rec) = sessions.get_mut(sid) else {
+                return (
+                    StatusCode::NOT_FOUND,
+                    Json(json!({"error": "SSE session not found or expired"})),
+                )
+                    .into_response();
+            };
+            if rec.owner_id != caller_owner {
+                return (
+                    StatusCode::FORBIDDEN,
+                    Json(json!({"error": "Caller does not own the requested SSE session"})),
+                )
+                    .into_response();
+            }
+            rec.last_active = Instant::now();
+        }
+
         let response = server.handle_request(request).await;
 
         if let Some(sid) = session_id {
             let sessions = server.sessions.read().await;
-            if let Some(tx) = sessions.get(sid) {
-                let _ = tx.send(response.clone());
+            if let Some(rec) = sessions.get(sid) {
+                let _ = rec.tx.try_send(response.clone());
             }
         }
 
-        Json(response)
+        Json(response).into_response()
     }
 
     fn error_response(&self, id: Option<Value>, code: i32, message: &str) -> JsonRpcResponse {
@@ -292,6 +534,41 @@ impl McpServer {
             id,
         }
     }
+}
+
+async fn require_privileged_auth(
+    State(server): State<Arc<McpServer>>,
+    req: Request,
+    next: Next,
+) -> Response {
+    if !server.verify_caller_authorized(req.headers()) {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({"error": "Unauthorized: missing or invalid bearer authentication for privileged route"})),
+        )
+            .into_response();
+    }
+    next.run(req).await
+}
+
+pub fn build_mcp_router(server: Arc<McpServer>) -> Router {
+    let privileged = Router::new()
+        .route("/mcp", post(McpServer::post_handler))
+        .route("/sse", get(McpServer::sse_handler))
+        .route("/feedback", post(crate::feedback_route::handle_feedback))
+        .route_layer(middleware::from_fn_with_state(
+            server.clone(),
+            require_privileged_auth,
+        ));
+
+    Router::new()
+        .merge(privileged)
+        .route(
+            "/webhooks/github",
+            post(crate::github_webhook::handle_github_webhook),
+        )
+        .route("/health", get(|| async { Json(json!({"status": "ok"})) }))
+        .with_state(server)
 }
 
 fn ax_keep_alive() -> axum::response::sse::KeepAlive {

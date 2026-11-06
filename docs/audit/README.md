@@ -71,3 +71,4 @@ Every record MUST classify its `outcome` as one of:
 2. **Unavailable Repositories or Environments**:
    - When a repository (such as `lince-rs`) or live cluster (`server.internal.lgcorzo`) is unreachable or unauthorized, record `access_status: not_accessible` or `outcome: unavailable` with explicit `limitations`.
    - Never infer code contents, silently skip a required stage, or substitute a mocked pass for an unavailable environment.
+

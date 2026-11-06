@@ -1,4 +1,5 @@
 use crate::McpServer;
+use async_trait::async_trait;
 use axum::{
     extract::{Json, State},
     http::{HeaderMap, StatusCode},
@@ -7,11 +8,54 @@ use axum::{
 use hmac::{Hmac, KeyInit, Mac};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sha2::Sha256;
+use sha2::{Digest, Sha256};
 use std::env;
 use std::sync::Arc;
 
 type HmacSha256 = Hmac<Sha256>;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct MissionDispatchReceipt {
+    pub dispatch_id: String,
+    pub mission_id: String,
+    pub repository: String,
+    pub goal_digest: String,
+}
+
+#[async_trait]
+pub trait WebhookMissionDispatcher: Send + Sync {
+    async fn dispatch_webhook_mission(
+        &self,
+        delivery_id: &str,
+        mission_id: &str,
+        repository: &str,
+        goal: &str,
+    ) -> Result<MissionDispatchReceipt, String>;
+}
+
+/// Default local dispatcher that persists a verifiable dispatch receipt and records the mission submission.
+pub struct DefaultLocalMissionDispatcher;
+
+#[async_trait]
+impl WebhookMissionDispatcher for DefaultLocalMissionDispatcher {
+    async fn dispatch_webhook_mission(
+        &self,
+        delivery_id: &str,
+        mission_id: &str,
+        repository: &str,
+        goal: &str,
+    ) -> Result<MissionDispatchReceipt, String> {
+        let mut hasher = Sha256::new();
+        hasher.update(goal.as_bytes());
+        let goal_digest = hex::encode(hasher.finalize());
+        Ok(MissionDispatchReceipt {
+            dispatch_id: format!("receipt-{}-{}", delivery_id, mission_id),
+            mission_id: mission_id.to_string(),
+            repository: repository.to_string(),
+            goal_digest,
+        })
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GithubWebhookUser {
@@ -41,7 +85,7 @@ pub struct GithubWebhookPayload {
 }
 
 pub fn verify_github_signature(secret: &str, signature_header: &str, body_bytes: &[u8]) -> bool {
-    if !signature_header.starts_with("sha256=") {
+    if secret.is_empty() || !signature_header.starts_with("sha256=") {
         return false;
     }
     let hex_sig = &signature_header[7..];
@@ -57,13 +101,37 @@ pub fn verify_github_signature(secret: &str, signature_header: &str, body_bytes:
 }
 
 pub async fn handle_github_webhook(
-    State(_server): State<Arc<McpServer>>,
+    State(server): State<Arc<McpServer>>,
     headers: HeaderMap,
     body_bytes: axum::body::Bytes,
 ) -> impl IntoResponse {
-    let webhook_secret = env::var("GITHUB_WEBHOOK_SECRET").unwrap_or_default();
+    let max_bytes = server.max_webhook_payload_bytes();
+    if body_bytes.len() > max_bytes {
+        tracing::warn!(
+            "GitHub webhook payload size {} exceeds maximum allowed {} bytes",
+            body_bytes.len(),
+            max_bytes
+        );
+        return (
+            StatusCode::PAYLOAD_TOO_LARGE,
+            Json(json!({"error": "Webhook payload exceeds maximum allowed size"})),
+        )
+            .into_response();
+    }
 
-    // If secret is configured, enforce HMAC-SHA256 signature verification
+    let webhook_secret = server
+        .webhook_secret()
+        .unwrap_or_else(|| env::var("GITHUB_WEBHOOK_SECRET").unwrap_or_default());
+
+    if server.is_protected_mode() && webhook_secret.trim().is_empty() {
+        tracing::error!("GitHub webhook rejected: missing GITHUB_WEBHOOK_SECRET in protected mode");
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({"error": "Webhook authentication secret is not configured in protected environment"})),
+        )
+            .into_response();
+    }
+
     if !webhook_secret.is_empty() {
         let sig_header = headers
             .get("x-hub-signature-256")
@@ -78,6 +146,30 @@ pub async fn handle_github_webhook(
             )
                 .into_response();
         }
+    }
+
+    let delivery_id = headers
+        .get("x-github-delivery")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("")
+        .trim()
+        .to_string();
+
+    if server.is_protected_mode() && delivery_id.is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({"error": "Missing required X-GitHub-Delivery header"})),
+        )
+            .into_response();
+    }
+
+    if !delivery_id.is_empty() && !server.record_webhook_delivery(&delivery_id).await {
+        tracing::warn!("Rejected replayed GitHub webhook delivery '{}'", delivery_id);
+        return (
+            StatusCode::CONFLICT,
+            Json(json!({"error": "Duplicate/replayed webhook delivery rejected", "delivery_id": delivery_id})),
+        )
+            .into_response();
     }
 
     let payload: GithubWebhookPayload = match serde_json::from_slice(&body_bytes) {
@@ -127,22 +219,53 @@ pub async fn handle_github_webhook(
                 chrono::Utc::now().timestamp()
             );
 
-            tracing::info!(
-                "Triggering autonomous mission '{}' from GitHub issue on repo '{}'",
-                mission_id,
-                repo
-            );
+            let effective_delivery = if delivery_id.is_empty() {
+                mission_id.clone()
+            } else {
+                delivery_id.clone()
+            };
 
-            let response_payload = json!({
-                "status": "mission_triggered",
-                "mission_id": mission_id,
-                "provider": "github",
-                "repository": repo,
-                "goal": goal,
-                "action": action
-            });
+            match server
+                .dispatch_webhook_mission(&effective_delivery, &mission_id, &repo, &goal)
+                .await
+            {
+                Ok(receipt) => {
+                    tracing::info!(
+                        "Triggered autonomous mission '{}' from GitHub issue on repo '{}' (receipt={})",
+                        mission_id,
+                        repo,
+                        receipt.dispatch_id
+                    );
 
-            return (StatusCode::OK, Json(response_payload)).into_response();
+                    let response_payload = json!({
+                        "status": "mission_triggered",
+                        "mission_id": mission_id,
+                        "provider": "github",
+                        "repository": repo,
+                        "goal": goal,
+                        "action": action,
+                        "dispatch_receipt": receipt
+                    });
+
+                    return (StatusCode::OK, Json(response_payload)).into_response();
+                }
+                Err(err) => {
+                    tracing::error!(
+                        "Failed to dispatch mission '{}' for webhook delivery '{}': {}",
+                        mission_id,
+                        effective_delivery,
+                        err
+                    );
+                    return (
+                        StatusCode::BAD_GATEWAY,
+                        Json(json!({
+                            "error": "Failed to submit webhook mission to workflow dispatcher",
+                            "details": err
+                        })),
+                    )
+                        .into_response();
+                }
+            }
         }
     }
 

@@ -109,3 +109,4 @@
 - **Review Status**: `blocked`
 - **Limitations**:
   - Neither a local checkout in `/mnt/F024B17C24B145FE/Repos/` nor a remote GitHub repository (`lgcorzo/lince-rs`) is accessible. Per `FR-002` and `SC-007`, zero code, dependency, or runtime findings are inferred for `lince-rs`.
+
