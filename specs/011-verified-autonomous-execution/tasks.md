@@ -113,14 +113,14 @@
 
 ### Tests for User Story 5
 
-- [ ] T030 [P] [US5] Add valid/invalid fixtures for required evidence fields, revision formats, evidence class/outcome, artifact references, verifier identity, and allowed transitions against `specs/011-verified-autonomous-execution/contracts/evidence-record.schema.json` and `specs/011-verified-autonomous-execution/contracts/verification-state.schema.json` in `crates/factory-cli/tests/evidence_contract_tests.rs`.
+- [x] T030 [P] [US5] Add valid/invalid fixtures for required evidence fields, revision formats, evidence class/outcome, artifact references, verifier identity, and allowed transitions against `specs/011-verified-autonomous-execution/contracts/evidence-record.schema.json` and `specs/011-verified-autonomous-execution/contracts/verification-state.schema.json` in `crates/factory-cli/tests/evidence_contract_tests.rs`.
 
 ### Implementation for User Story 5
 
-- [ ] T031 [US5] Implement evidence-record parsing and validation for required fields, exact source/deployment revisions, evidence class, outcome, artifact references, and freshness policy using the versioned schemas in `crates/factory-cli/src/evidence.rs`.
-- [ ] T032 [US5] Implement requirement-state transition enforcement, including no `IMPLEMENTED → VERIFIED` jump, independent verifier identity, and invalidation on relevant revision changes in `crates/factory-cli/src/evidence.rs` and `crates/factory-cli/src/main.rs`.
-- [ ] T033 [US5] Make evidence generation invoke the contract/policy validator and fail CI on invalid, stale, failed, missing, mocked-only, or self-reported-only proof in `scripts/generate_evidence.sh`, `Makefile`, and `.github/workflows/pipeline.yml`.
-- [ ] T034 [US5] Independently inspect the generated evidence against every mandatory condition and report pass/fail, evidence class, revisions, and limitations in `docs/audit/VERIFICATION_EVIDENCE_REPORT.md`.
+- [x] T031 [US5] Implement evidence-record parsing and validation for required fields, exact source/deployment revisions, evidence class, outcome, artifact references, and freshness policy using the versioned schemas in `crates/factory-cli/src/evidence.rs`.
+- [x] T032 [US5] Implement requirement-state transition enforcement, including no `IMPLEMENTED → VERIFIED` jump, independent verifier identity, and invalidation on relevant revision changes in `crates/factory-cli/src/evidence.rs` and `crates/factory-cli/src/main.rs`.
+- [x] T033 [US5] Make evidence generation invoke the contract/policy validator and fail CI on invalid, stale, failed, missing, mocked-only, or self-reported-only proof in `scripts/generate_evidence.sh`, `Makefile`, and `.github/workflows/pipeline.yml`.
+- [x] T034 [US5] Independently inspect the generated evidence against every mandatory condition and report pass/fail, evidence class, revisions, and limitations in `docs/audit/VERIFICATION_EVIDENCE_REPORT.md`.
 
 **Checkpoint**: Re-run all negative fixtures and the existing `make evidence` CI path. A schema-valid record alone does not prove that the underlying result is sufficient.
 

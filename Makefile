@@ -1,4 +1,4 @@
-.PHONY: all test check fmt fmt-check adversarial evidence clean
+.PHONY: all test check fmt fmt-check adversarial evidence validate-evidence clean
 
 all: fmt-check check test evidence
 
@@ -19,6 +19,9 @@ test:
 
 evidence:
 	bash scripts/generate_evidence.sh
+
+validate-evidence:
+	cargo run -p factory-cli -- validate-evidence --evidence-dir evidence --expected-commit $$(git rev-parse HEAD)
 
 clean:
 	cargo clean
