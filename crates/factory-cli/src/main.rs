@@ -5,6 +5,7 @@ use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::Message;
 
+pub mod evidence;
 pub mod operator;
 
 #[global_allocator]
@@ -181,6 +182,14 @@ enum Commands {
 
         #[arg(long)]
         json: bool,
+    },
+    /// Validate evidence records and requirement verification states against contract schemas and policy
+    ValidateEvidence {
+        #[arg(long, default_value = "evidence")]
+        evidence_dir: String,
+
+        #[arg(long)]
+        expected_commit: Option<String>,
     },
 }
 
@@ -542,6 +551,65 @@ async fn main() -> anyhow::Result<()> {
                 ..Default::default()
             };
             operator::run_operator(config).await?;
+        }
+        Commands::ValidateEvidence {
+            evidence_dir,
+            expected_commit,
+        } => {
+            use std::path::Path;
+            let dir_path = Path::new(&evidence_dir);
+            let records_dir = dir_path.join("records");
+            let states_dir = dir_path.join("states");
+            let repo_root = Path::new(".");
+
+            let mut records = Vec::new();
+            if records_dir.is_dir() {
+                for entry in std::fs::read_dir(&records_dir)? {
+                    let entry = entry?;
+                    if entry.path().extension().and_then(|s| s.to_str()) == Some("json") {
+                        let content = std::fs::read_to_string(entry.path())?;
+                        let rec: evidence::EvidenceRecord = serde_json::from_str(&content)?;
+                        evidence::validate_evidence_record(&rec, Some(repo_root))?;
+                        records.push(rec);
+                    }
+                }
+            }
+            if records.is_empty() {
+                anyhow::bail!(
+                    "No valid evidence records found in {}",
+                    records_dir.display()
+                );
+            }
+
+            let policy = evidence::VerificationPolicyConfig {
+                expected_source_commit: expected_commit,
+                required_classes: Vec::new(),
+            };
+
+            let mut state_count = 0usize;
+            if states_dir.is_dir() {
+                for entry in std::fs::read_dir(&states_dir)? {
+                    let entry = entry?;
+                    if entry.path().extension().and_then(|s| s.to_str()) == Some("json") {
+                        let content = std::fs::read_to_string(entry.path())?;
+                        let st: evidence::RequirementState = serde_json::from_str(&content)?;
+                        evidence::validate_requirement_state(&st, &records, &policy)?;
+                        state_count += 1;
+                    }
+                }
+            }
+            if state_count == 0 {
+                anyhow::bail!(
+                    "No valid requirement state files found in {}",
+                    states_dir.display()
+                );
+            }
+
+            tracing::info!(
+                records = records.len(),
+                states = state_count,
+                "All evidence records and requirement verification states passed contract and policy validation."
+            );
         }
     }
 

@@ -41,3 +41,5 @@ production = ["factory-infrastructure/production"]
 
 [dev-dependencies]
 rustls = { version = "0.23.41", features = ["ring"] }
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"

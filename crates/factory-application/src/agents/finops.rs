@@ -1,6 +1,9 @@
 use crate::Agent;
 use async_trait::async_trait;
 use factory_core::FinOpsTag;
+use factory_infrastructure::finops_stop_store::{
+    FileFinOpsStopStore, FinOpsStopState, FinOpsStopStore,
+};
 use reqwest::Client;
 use serde_json::Value;
 use std::sync::Arc;
@@ -30,19 +33,20 @@ pub enum BudgetEvaluation {
     },
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AdmissionDecision {
+    pub admitted: bool,
+    pub state_version: u64,
+    pub reason: Option<String>,
+}
+
 pub trait MissionAdmissionGate: Send + Sync {
     fn can_admit_mission(&self, mission_id: &str) -> Result<(), factory_core::error::FactoryError>;
 }
 
 impl MissionAdmissionGate for FinOpsAgent {
     fn can_admit_mission(&self, mission_id: &str) -> Result<(), factory_core::error::FactoryError> {
-        if self.is_halted() {
-            return Err(factory_core::error::FactoryError::FinOps(format!(
-                "Mission admission denied for '{}': FinOps budget hard-stop latch is active. Spend exceeded threshold.",
-                mission_id
-            )));
-        }
-        Ok(())
+        self.evaluate_admission(mission_id).map(|_| ())
     }
 }
 
@@ -52,6 +56,7 @@ pub struct FinOpsAgent {
     pub client: Client,
     pub tag: FinOpsTag,
     pub halted: Arc<AtomicBool>,
+    pub stop_store: Arc<dyn FinOpsStopStore>,
 }
 
 impl Default for FinOpsAgent {
@@ -86,27 +91,103 @@ impl Default for FinOpsAgent {
 
 impl FinOpsAgent {
     pub fn new(litellm_base_url: String, api_key: String, tag: FinOpsTag) -> Self {
+        Self::with_stop_store(
+            litellm_base_url,
+            api_key,
+            tag,
+            FileFinOpsStopStore::default_shared(),
+        )
+    }
+
+    pub fn with_stop_store(
+        litellm_base_url: String,
+        api_key: String,
+        tag: FinOpsTag,
+        stop_store: Arc<dyn FinOpsStopStore>,
+    ) -> Self {
         let client = Client::builder()
             .timeout(Duration::from_secs(10))
             .connect_timeout(Duration::from_secs(3))
             .build()
             .unwrap_or_else(|_| Client::new());
 
+        let initial_halted = stop_store.read_state().map(|s| s.halted).unwrap_or(false);
+
         Self {
             litellm_base_url,
             api_key,
             client,
             tag,
-            halted: Arc::new(AtomicBool::new(false)),
+            halted: Arc::new(AtomicBool::new(initial_halted)),
+            stop_store,
         }
     }
 
     pub fn is_halted(&self) -> bool {
-        self.halted.load(Ordering::SeqCst)
+        if self.halted.load(Ordering::SeqCst) {
+            return true;
+        }
+        match self.stop_store.read_state() {
+            Ok(state) => {
+                if state.halted {
+                    self.halted.store(true, Ordering::SeqCst);
+                }
+                state.halted
+            }
+            // Fail closed on read error
+            Err(_) => true,
+        }
     }
 
     pub fn set_halted(&self, val: bool) {
         self.halted.store(val, Ordering::SeqCst);
+        let reason = if val {
+            Some("FinOps budget hard-stop latch activated".to_string())
+        } else {
+            None
+        };
+        let _ = self.stop_store.write_state(val, reason, 0.0, 50.0);
+    }
+
+    pub fn set_halted_with_context(
+        &self,
+        val: bool,
+        reason: Option<String>,
+        current_spend: f64,
+        max_daily_budget: f64,
+    ) -> Result<FinOpsStopState, String> {
+        self.halted.store(val, Ordering::SeqCst);
+        self.stop_store
+            .write_state(val, reason, current_spend, max_daily_budget)
+    }
+
+    pub fn evaluate_admission(
+        &self,
+        mission_id: &str,
+    ) -> Result<AdmissionDecision, factory_core::error::FactoryError> {
+        let state = self.stop_store.read_state().map_err(|e| {
+            factory_core::error::FactoryError::FinOps(format!(
+                "Mission admission denied for '{}': failed to read authoritative FinOps stop store (fail-closed): {}",
+                mission_id, e
+            ))
+        })?;
+
+        if state.halted || self.halted.load(Ordering::SeqCst) {
+            let reason = state
+                .reason
+                .clone()
+                .unwrap_or_else(|| "Spend exceeded threshold".to_string());
+            return Err(factory_core::error::FactoryError::FinOps(format!(
+                "Mission admission denied for '{}': FinOps budget hard-stop latch is active (version={}, reason='{}').",
+                mission_id, state.state_version, reason
+            )));
+        }
+
+        Ok(AdmissionDecision {
+            admitted: true,
+            state_version: state.state_version,
+            reason: None,
+        })
     }
 
     pub fn halted_latch(&self) -> Arc<AtomicBool> {
@@ -153,7 +234,12 @@ impl FinOpsAgent {
                 "HARDSTOP TRIGGERED! Spend ${:.2} reached 90% threshold of daily budget (${:.2}). Halting missions.",
                 current_spend, max_daily_budget
             );
-            self.set_halted(true);
+            let _ = self.set_halted_with_context(
+                true,
+                Some(alert.clone()),
+                current_spend,
+                max_daily_budget,
+            );
             BudgetEvaluation::HardStop {
                 spend: current_spend,
                 velocity: previous_spend
@@ -480,10 +566,13 @@ mod tests {
 
     #[test]
     fn test_hardstop_threshold_tripping() {
-        let agent = FinOpsAgent::new(
+        let store_path =
+            std::env::temp_dir().join(format!("finops_unit_test_{}.json", uuid::Uuid::new_v4()));
+        let agent = FinOpsAgent::with_stop_store(
             "https://litellm:4000".to_string(),
             "key".to_string(),
             test_tag(),
+            Arc::new(FileFinOpsStopStore::new(store_path.clone())),
         );
 
         // 90% of $50.00 = $45.00
@@ -505,6 +594,7 @@ mod tests {
             }
             _ => panic!("Expected HardStop"),
         }
+        let _ = std::fs::remove_file(&store_path);
     }
 
     #[tokio::test]

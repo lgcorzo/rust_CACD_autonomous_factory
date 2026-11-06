@@ -1,120 +1,59 @@
 # Integrated Security, Kubernetes & GitOps Audit Report
 
-**Audit Target**: Dark Gravity CA/CD Autonomous Software Factory  
-**Date**: `2026-11-02`  
-**Auditor**: Antigravity Autonomous Security Engineer  
-**Status**: `Phase 0 - Completed Audit Baseline`
+**Audit Target**: Dark Gravity CA/CD Autonomous Software Factory & Supporting Ecosystem  
+**Feature**: `011-verified-autonomous-execution`  
+**Finalized At (UTC)**: `2026-11-06T18:15:00Z`  
+**Auditor**: Antigravity Autonomous Security & Assurance Engineer  
+**Status**: `Phase 9 - Source, Integration & Manifest Remediations Verified; Live Cluster AUD-010 Tracked`
 
 ---
 
 ## 1. Executive Summary
 
-Dark Gravity CA/CD implements an autonomous agent software factory leveraging Hatchet DAG workflows, Ed25519 Non-Human Identity (NHI) credentials, HashiCorp Vault secrets management, and container execution. While application code previously claimed robust gVisor sandboxing and isolated execution, an integrated audit across both the application repository (`rust_CACD_autonomous_factory`) and the deployment GitOps repository (`gitops_internal_lgcorzo`) reveals that security boundaries were not strictly enforced by Kubernetes admission or runtime configurations.
+This report updates the `010-integrated-k8s-gitops-audit` and `011-verified-autonomous-execution` baselines against the final inspected repository revisions at `2026-11-06T18:15:00Z`. In accordance with `FR-001`, `FR-002`, `FR-015`, `FR-022`, and `SC-009`, every prior audit claim and `evidence/` artifact is explicitly classified as **Current**, **Historical**, **Contradictory**, or **Unverified** against the inspected revisions.
 
-This audit establishes an evidence-driven baseline across:
-1. **Implemented in Application Code**: What the Rust crates express.
-2. **Configured in GitOps**: What Flux manifests declare.
-3. **Enforced by Kubernetes**: What admission controllers and the cluster kernel actively mandate.
-4. **Verified in Live Cluster**: What runs on `server.internal.lgcorzo`.
-5. **Demonstrated by Reproducible Tests**: What automated TDD suites verify.
+No capability is treated as `runtime_verified` based solely on source code, unit tests, static YAML manifests, or older commit-bound evidence.
 
 ---
 
-## 2. Repository Inventory & Baseline SHAs
+## 2. Final Inspected Repository Revisions (`2026-11-06T18:15:00Z`)
 
-### Application Repository
-- **URL**: `https://github.com/lgcorzo/rust_CACD_autonomous_factory`
-- **Active Branch**: `010-integrated-k8s-gitops-audit`
-- **Baseline Commit SHA**: `62aa735331a254be1b32afe8b60c9a983398e3e8`
-- **Main Commit SHA**: `87459f84092b679116e6f9b2c89e3a6122d64020`
-- **Key Crates Audited**:
-  - `crates/factory-mcp-server`: Model Context Protocol server exposing tool endpoints and sandbox runners.
-  - `crates/factory-application`: Hatchet workflow DAGs, agent orchestration, and FinOps budget controllers.
-  - `crates/factory-infrastructure`: Vault, Kafka, GitHub, GitLab, and HTTP clients.
-  - `crates/factory-core`: Domain models, NHI credentials, and heuristic AST security scanner.
-
-### GitOps Repository (Source of Truth for Cluster)
-- **URL**: `https://github.com/lgcorzo/gitops_internal_lgcorzo`
-- **Active Branch**: `main`
-- **Baseline Commit SHA**: `c24b52c837d9a6f256c9ecad734df870a76419e1`
-- **Key Manifest Directories**:
-  - `infrastructure/agents`: Agent deployments, sandbox Job templates, RBAC bindings, and ServiceAccounts.
-  - `infrastructure/security`: Keycloak, certificates, and sealed secrets.
-  - `infrastructure/orchestrators`: Hatchet and KEDA controller configurations.
-  - `clusters/local-microk8s`: Flux Kustomizations and sync roots.
-
-### Live Cluster Environment
-- **Node**: `server.internal.lgcorzo` (Single-node MicroK8s v1.31.14 on Ubuntu 24.04.5 LTS, kernel 6.17.0-14-generic).
-- **Runtime Classes**:
-  - `gvisor` (Handler: `runsc`) - Active and available.
-  - `nvidia` (Handler: `nvidia`) - Active and available.
+| Repository | Branch / PR | Full Commit SHA | Access Status | Review & Verification Outcome |
+|---|---|---|---|---|
+| `rust_CACD_autonomous_factory` | `011-verified-autonomous-execution` ([PR #675](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/675)) | `1b9a51f8b19169d0a302ea26cf47caa307280281` | `accessible` | All `US1`–`US6` code/test/contract gates passing (`cargo fmt`, `cargo clippy`, `cargo test --workspace`, `validate-evidence`). |
+| `gitops_internal_lgcorzo` | `011-sandbox-job-policy-alignment` ([PR #175](https://github.com/lgcorzo/gitops_internal_lgcorzo/pull/175)); live cluster at `main` | `8f655e5eca9f0b22c6f2c8b7f3d259e0d888eb1b` (live cluster: `48b9c0e333ce541fc741c056bd67e2932fdc50e9`) | `accessible` | `tests/test_sandbox_job_policy.sh` (`12/12` checks) and `kubectl kustomize infrastructure/agents` passing; live cluster inspected in `GITOPS_RUNTIME_VERIFICATION.md`. |
+| `mlops-python-package` | `main` | `bf05a509b1e41597c823d030f2108c9e9c00ed83` | `accessible` | `poetry check --lock` and `poetry run pytest` (`98 passed, 3 xfailed`) verified in `docs/audit/reviews/mlops-python-package.md`. |
+| `fastapi-autogen-team` | `main` | `6b9c4513eea630a04255a68412f2042cd61dbea1` | `accessible` | `cargo test` (`12/12 unit`, `19/19 integration`) verified in `docs/audit/reviews/fastapi-autogen-team.md`; parallel test env race recorded as `AUD-011`. |
+| `lgcorzo.github.io` | `011-canonical-public-claims` ([PR #47](https://github.com/lgcorzo/lgcorzo.github.io/pull/47)) | `b1dc9311000d408b37425f49313574a248f8824f` (base `main`: `e69db33ccceb3e7fdfaaa7bca5d593dedb296f7c`) | `accessible` | `scripts/check_public_claims.py` and `pytest tests/test_public_claims.py` (`5/5 passed`) verified in `docs/audit/PUBLIC_SITE_REVIEW.md`. |
+| `autonomous_factory` | `main` | `4a8f2f3eb0b4484c0627919a5e3020bc1beb02f7` | `accessible` | Historical GitLab predecessor repository inspected in `docs/audit/ECOSYSTEM_INVENTORY.md`. |
+| `lince-rs` | `N/A` | `N/A` | `not_accessible` | Explicitly marked `not_accessible`; zero findings inferred (`FR-002`, `SC-007`). |
 
 ---
 
-## 3. Findings Ranked by Severity
+## 3. Classification of `evidence/` & Audit Artifacts
 
-### 3.1 P0 (Critical - Execution & Boundary Isolation)
-
-#### Finding SEC-001: Local Host Subprocess Execution Fallback
-- **Location**: `crates/factory-mcp-server/src/sandbox.rs:49-88`
-- **Description**: `SubprocessDriver` executes code directly on the host using `tokio::process::Command::new("python3")`, `rustc`, or `go`.
-- **Impact**: Untrusted code generated by LLM agents can compromise the host node, access local filesystems, host environment variables, and network interfaces.
-- **Remediation**: Fail-closed check refusing execution in production environments; isolate execution to Kubernetes gVisor Jobs.
-
-#### Finding SEC-002: False-Positive Test Success & Host Shell Bypass in `run_tests`
-- **Location**: `crates/factory-mcp-server/src/tools/run_tests.rs:56-98`
-- **Description**:
-  1. `run_tests` spawns `sh -c` directly on the host machine.
-  2. If the executable is missing (exit code 127) or fails to spawn, the tool intercepts the error and returns a simulated passing result: `{"status": "success", "exit_code": 0, "output": "Simulated test execution..."}`.
-- **Impact**: Fabricated test results satisfy verification gates without actually executing tests.
-- **Remediation**: Route test commands strictly through the `SandboxDriver` inside a gVisor Job; return typed outcomes (`passed`, `failed`, `not_executed`, `infrastructure_error`, `timeout`).
-
-#### Finding SEC-003: Optional gVisor Selection & Contradictory Runtime Configuration
-- **Location**: `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:128, 168-177`
-- **Description**: `use_gvisor` is checked via `std::env::var("USE_GVISOR") == "true"`. If unset or false, `runtimeClassName` is omitted, falling back to standard `runc`.
-- **Impact**: Untrusted code executes in an unisolated container sharing the Linux host kernel.
-- **Remediation**: Enforce mandatory `runtimeClassName: gvisor` for untrusted execution. Fail closed if the runtime is unsupported or missing.
+| Artifact Path | Classification | Rationale Against Final Revisions |
+|---|---|---|
+| `evidence/records/*.json` & `evidence/states/*.json` | **Current (Contract-Validated for `011`)** | Generated by `scripts/generate_evidence.sh` and validated by `cargo run -p factory-cli -- validate-evidence` against `contracts/evidence-record.schema.json` and `contracts/verification-state.schema.json` (`T030`–`T034`). |
+| `evidence/verified_status.json` | **Current (Summary Gate Output)** | Updated by `scripts/generate_evidence.sh` for the current branch and commit SHA. |
+| `evidence/baseline.md` (`2026-10-01`) | **Historical & Contradictory** | Superseded by `docs/audit/GITOPS_RUNTIME_VERIFICATION.md` (`2026-11-06`). |
+| `evidence/security-tests.md` (`2026-10-15`) | **Historical** | Superseded by `docs/audit/SECURITY_TEST_PLAN.md` and `evidence/records/FR-003.json`–`FR-014.json`. |
+| `evidence/reliability-tests.md` (`2026-10-15`) | **Historical** | Superseded by `docs/audit/WORKFLOW_RELIABILITY.md` and `crates/factory-application/tests/workflow_recovery_tests.rs`. |
 
 ---
 
-### 3.2 P1 (High - Hardening, RBAC & Operational Controls)
+## 4. Findings Ledger & Final Remediation Status (`AUD-001`–`AUD-011`)
 
-#### Finding SEC-004: Inadequate Pod SecurityContext and Namespace Hardening
-- **Location**:
-  - `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs:130-166`
-  - `gitops_internal_lgcorzo/infrastructure/agents/sandbox-job.yaml`
-- **Description**: Sandbox Jobs are created in `development` namespace without restricted Pod Security Standards, non-root enforcement, `allowPrivilegeEscalation: false`, or `capabilities.drop: ["ALL"]`. No automatic TTL cleanup is configured.
-- **Impact**: Privilege escalation risks and resource exhaustion.
-- **Remediation**: Dedicate `factory-sandboxes` namespace; enforce `PodSecurity: restricted`; configure non-root UID 65534, dropped capabilities, read-only rootfs, and `ttlSecondsAfterFinished: 300`.
-
-#### Finding SEC-005: Missing Default-Deny NetworkPolicies for Sandbox Workloads
-- **Location**: `gitops_internal_lgcorzo/infrastructure/agents/`
-- **Description**: No NetworkPolicy restricts egress or ingress for sandbox Jobs.
-- **Impact**: Untrusted code can access the Kubernetes API server (`kubernetes.default`), cloud/host metadata services (`169.254.169.254`), and internal database/Vault endpoints.
-- **Remediation**: Deploy default-deny Ingress and Egress NetworkPolicy blocking all internal endpoints and cluster services.
-
-#### Finding SEC-006: Broad ClusterRole Permissions for Worker ServiceAccount
-- **Location**: `gitops_internal_lgcorzo/infrastructure/agents/rbac.yaml`
-- **Description**: `factory-job-launcher` ClusterRole grants cluster-wide `create`, `delete`, and `get` on jobs.
-- **Impact**: Worker identity can launch jobs in any namespace.
-- **Remediation**: Scope role bindings strictly to the dedicated sandbox namespace (`factory-sandboxes`).
-
-#### Finding SEC-007: FinOps Hard-Stop Latch Disconnected from Mission Admission
-- **Location**: `crates/factory-application/src/agents/finops.rs:140`
-- **Description**: When budget hits 90% hard-stop threshold, `set_halted(true)` is set on the agent, but mission entry points do not evaluate this state.
-- **Impact**: Unbounded financial spend continues after threshold breach.
-- **Remediation**: Implement `MissionAdmissionGate` blocking mission starts when budget hard-stop is active.
-
----
-
-## 4. Current Test & CI Baseline
-
-- **Rust Workspace**:
-  - `cargo test --workspace`: 92 unit and integration tests passing.
-  - `cargo clippy --workspace --all-targets -- -D warnings`: Clean, 0 warnings.
-  - `cargo fmt --check`: Clean formatting across all crates.
-- **Security Scanners**:
-  - `Gitleaks`: Clean, 0 secrets in commit history.
-- **GitOps Manifests**:
-  - Validated with `kubectl kustomize` for syntax and structure.
-
+| Finding ID | Severity | Summary | Baseline Status (`5464b9ca`) | Final Status (`1b9a51f8` / `8f655e5e` / `b1dc931`) | Verification Evidence |
+|---|:---:|---|---|---|---|
+| `AUD-001` | **P0** | `run_tests.rs` executed untrusted tests via host `sh -c` and returned `Passed` for `"mock"` commands | Open | **Remediated & Verified (`unit`/`integration`)** | `crates/factory-mcp-server/src/tools/run_tests.rs`, `tests/run_tests_security_tests.rs` (`6/6 passed`) |
+| `AUD-002` | **P0** | `SubprocessDriver` stubbed out `rust`/`go` execution and lacked runtime rejection boundaries | Open | **Remediated & Verified (`unit`/`integration`)** | `crates/factory-mcp-server/src/sandbox.rs`, `tests/sandbox_driver_tests.rs` (`5/5 passed`) |
+| `AUD-003` | **P0** | FinOps hard-stop latch was process-local (`FinOpsAgent::default()`) and ignored across mission admissions | Open | **Remediated & Verified (`unit`/`integration`)** | `crates/factory-infrastructure/src/finops_stop_store.rs`, `crates/factory-application/tests/finops_admission_tests.rs` (`2/2 passed`) |
+| `AUD-004` | **P0** | Mission workflow lacked durable event deduplication, step checkpoints across worker restarts, and cancellation compensation | Open | **Remediated & Verified (`unit`/`integration`)** | `crates/factory-application/src/workflows/autonomous_mission.rs`, `tests/workflow_recovery_tests.rs` (`3/3 passed`), `docs/audit/WORKFLOW_RELIABILITY.md` |
+| `AUD-005` | **P0** | GitHub webhook handler skipped HMAC when secret env was empty, lacked replay/size bounds, and simulated dispatch | Open | **Remediated & Verified (`unit`/`integration`)** | `crates/factory-mcp-server/src/github_webhook.rs`, `tests/webhook_security_tests.rs` (`4/4 passed`) |
+| `AUD-006` | **P0** | Privileged MCP HTTP routes (`/mcp`, `/sse`, `/feedback`) lacked bearer auth and bounded SSE session lifecycle | Open | **Remediated & Verified (`unit`/`integration`)** | `crates/factory-mcp-server/src/lib.rs`, `tests/route_boundary_tests.rs` (`2/2 passed`) |
+| `AUD-007` | **P1** | Drift between `launch_sandbox_pod.rs` and `gitops_internal_lgcorzo/infrastructure/agents/sandbox-job.yaml` | Open | **Remediated & Verified (`unit`/`infrastructure`)** | `crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs` (`5/5 passed`), `../gitops_internal_lgcorzo/tests/test_sandbox_job_policy.sh` (`12/12 passed`), `docs/audit/GITOPS_RUNTIME_VERIFICATION.md` |
+| `AUD-008` | **P1** | Evidence pipeline lacked schema validation, transition-chain checks, and independent verifier enforcement | Open | **Remediated & Verified (`unit`/`integration`)** | `crates/factory-cli/src/evidence.rs`, `tests/evidence_contract_tests.rs` (`6/6 passed`), `docs/audit/VERIFICATION_EVIDENCE_REPORT.md` |
+| `AUD-009` | **P1** | Public website (`lgcorzo.github.io`) lacked dated canonical claims registry and automated contradiction checks | Open | **Remediated & Verified (`unit`/`integration`)** | `../lgcorzo.github.io/data/canonical-claims.json`, `scripts/check_public_claims.py`, `tests/test_public_claims.py` (`5/5 passed`), `docs/audit/PUBLIC_SITE_REVIEW.md` |
+| `AUD-010` | **P0 (Host Infra)** | Host node `server.internal.lgcorzo` configures `runsc` under `io.containerd.runc.v2` instead of `io.containerd.runsc.v1` in `/var/snap/microk8s/current/args/containerd-template.toml`, causing gVisor container exit signaling to hang until `activeDeadlineSeconds` (`60s`) | Discovered in `T028` | **Application Fail-Closed Verified; Host Node CRI Shim Change Pending Operator Action** | `GvisorK8sDriver` fails closed without host fallback (`gvisor_integration.rs`); `FR-008` and `CTRL-02` `runtime_verified` stage kept **open (`TESTED` / `NOT_VERIFIED`)** per `FR-015` and `T048` (`docs/audit/GITOPS_RUNTIME_VERIFICATION.md`). |
+| `AUD-011` | **P2** | `fastapi-autogen-team` `integration_tests` mutates process-global `ALLOWED_ORIGINS` env var concurrently across CORS tests | Discovered in `T036` | **Documented (`docs/audit/reviews/fastapi-autogen-team.md`)** | Passes `31/31` with `--test-threads=1`. |

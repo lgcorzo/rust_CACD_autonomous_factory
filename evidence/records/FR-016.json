@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "5542e5e1-f4e8-5d73-a2f4-46a13c44be14",
+  "requirement_id": "FR-016",
+  "collected_at": "2026-11-06T18:56:30Z",
+  "source_revision": {
+    "repository": "lgcorzo/rust_CACD_autonomous_factory",
+    "branch": "011-verified-autonomous-execution",
+    "commit": "1b9a51f8b19169d0a302ea26cf47caa307280281"
+  },
+  "deployment_revision": {
+    "repository": "lgcorzo/gitops_internal_lgcorzo",
+    "branch": "main",
+    "commit": "48b9c0e333ce541fc741c056bd67e2932fdc50e9"
+  },
+  "environment": {
+    "kind": "local",
+    "identifier": "dark-gravity-audit-workstation"
+  },
+  "verification_class": "infrastructure",
+  "method": {
+    "tool": "cargo-test",
+    "command_or_test": "kubectl get kustomizations -A"
+  },
+  "outcome": "passed",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "uri": "file://docs/audit/GITOPS_RUNTIME_VERIFICATION.md",
+      "sha256": "6774bd06b0138b1be671af246c03e6eb42bbacff36ebeccb745e4e2f9cc4b0a1",
+      "media_type": "text/plain"
+    }
+  ],
+  "collector": {
+    "id": "ci-evidence-pipeline",
+    "role": "test_runner"
+  },
+  "limitations": []
+}

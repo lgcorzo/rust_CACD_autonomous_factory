@@ -1,18 +1,411 @@
-use crate::agents::finops::MissionAdmissionGate;
+use crate::agents::finops::AdmissionDecision;
 use crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent};
 use crate::workflows::circuit_breaker::CircuitBreakerGuard;
 use factory_core::security::CredentialSessionRef;
 use factory_core::{SddMissionPlan, SddTaskItem};
 use factory_infrastructure::{
-    GithubClient, GitlabClient, GitlabCommitAction, HttpGithubClient, HttpGitlabClient,
-    HttpR2rClient, KafkaClient, McpClient, McpHttpClient, R2rClient,
+    FileFinOpsStopStore, FinOpsStopStore, GithubClient, GitlabClient, GitlabCommitAction,
+    HttpGithubClient, HttpGitlabClient, HttpR2rClient, KafkaClient, McpClient, McpHttpClient,
+    R2rClient,
     aethalgard::{AethalgardClient, HttpAethalgardClient},
 };
 use hatchet_sdk::Hatchet;
 use hatchet_sdk::runnables::Workflow;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+use std::collections::HashMap;
+use std::future::Future;
+use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
 use uuid::Uuid;
+
+/// Evaluates mission admission against the authoritative `FinOpsStopStore`, failing closed on read errors
+/// or active hard-stop state and returning the observed `state_version`.
+pub fn admit_mission_with_store(
+    input: &MissionInput,
+    stop_store: &dyn FinOpsStopStore,
+) -> Result<AdmissionDecision, factory_core::error::FactoryError> {
+    let mission_id = input.mission_id.as_deref().unwrap_or("unknown");
+    let state = stop_store.read_state().map_err(|e| {
+        factory_core::error::FactoryError::FinOps(format!(
+            "Mission admission denied for '{}': failed to read authoritative FinOps stop store (fail-closed): {}",
+            mission_id, e
+        ))
+    })?;
+
+    if state.halted {
+        let reason = state
+            .reason
+            .clone()
+            .unwrap_or_else(|| "Spend exceeded threshold".to_string());
+        return Err(factory_core::error::FactoryError::FinOps(format!(
+            "Mission admission denied for '{}': FinOps budget hard-stop latch is active (version={}, reason='{}').",
+            mission_id, state.state_version, reason
+        )));
+    }
+
+    Ok(AdmissionDecision {
+        admitted: true,
+        state_version: state.state_version,
+        reason: None,
+    })
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum MissionLifecycleStatus {
+    Admitted,
+    Running,
+    FailedRetryable,
+    Cancelled,
+    Completed,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ActiveMissionHardStopPolicy {
+    /// Missions already admitted may complete their current step, then halt at the next step boundary with compensation.
+    CancelAtStepBoundary,
+    /// Missions already admitted are allowed to finish their remaining steps, while all new mission admissions are rejected.
+    DrainAdmittedMissions,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PersistedMissionRecord {
+    pub mission_id: String,
+    pub idempotency_keys: Vec<String>,
+    pub admission_state_version: u64,
+    pub status: MissionLifecycleStatus,
+    pub retry_count: u32,
+    pub completed_steps: HashMap<String, String>,
+    pub last_output: Option<String>,
+    pub last_error: Option<String>,
+    pub cancellation_reason: Option<String>,
+    pub compensation_record: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+struct PersistedMissionStoreData {
+    missions: HashMap<String, PersistedMissionRecord>,
+    event_to_mission: HashMap<String, String>,
+}
+
+/// Coordinates idempotent mission admission, step checkpointing across worker restarts,
+/// retry tracking, cancellation/compensation, and active-mission policy on FinOps hard stop.
+pub struct MissionExecutionCoordinator {
+    state_path: PathBuf,
+    stop_store: Arc<dyn FinOpsStopStore>,
+    active_policy: ActiveMissionHardStopPolicy,
+    lock: Mutex<()>,
+}
+
+impl MissionExecutionCoordinator {
+    pub fn new(
+        state_path: PathBuf,
+        stop_store: Arc<dyn FinOpsStopStore>,
+        active_policy: ActiveMissionHardStopPolicy,
+    ) -> Self {
+        Self {
+            state_path,
+            stop_store,
+            active_policy,
+            lock: Mutex::new(()),
+        }
+    }
+
+    fn load_store(&self) -> Result<PersistedMissionStoreData, factory_core::error::FactoryError> {
+        if !self.state_path.exists() {
+            return Ok(PersistedMissionStoreData::default());
+        }
+        let raw = std::fs::read_to_string(&self.state_path).map_err(|e| {
+            factory_core::error::FactoryError::Internal(format!(
+                "Failed to read mission state store '{}': {}",
+                self.state_path.display(),
+                e
+            ))
+        })?;
+        serde_json::from_str(&raw).map_err(|e| {
+            factory_core::error::FactoryError::Internal(format!(
+                "Corrupted mission state store '{}': {}",
+                self.state_path.display(),
+                e
+            ))
+        })
+    }
+
+    fn save_store(
+        &self,
+        data: &PersistedMissionStoreData,
+    ) -> Result<(), factory_core::error::FactoryError> {
+        if let Some(parent) = self.state_path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                factory_core::error::FactoryError::Internal(format!(
+                    "Failed to create mission state parent dir: {}",
+                    e
+                ))
+            })?;
+        }
+        let tmp = self.state_path.with_extension("json.tmp");
+        let serialized = serde_json::to_string_pretty(data).map_err(|e| {
+            factory_core::error::FactoryError::Internal(format!(
+                "Failed to serialize mission store: {}",
+                e
+            ))
+        })?;
+        std::fs::write(&tmp, serialized).map_err(|e| {
+            factory_core::error::FactoryError::Internal(format!(
+                "Failed to write temp mission store: {}",
+                e
+            ))
+        })?;
+        std::fs::rename(&tmp, &self.state_path).map_err(|e| {
+            factory_core::error::FactoryError::Internal(format!(
+                "Failed to commit mission store: {}",
+                e
+            ))
+        })?;
+        Ok(())
+    }
+
+    pub fn get_mission_record(
+        &self,
+        mission_id: &str,
+    ) -> Result<Option<PersistedMissionRecord>, factory_core::error::FactoryError> {
+        let _guard = self.lock.lock().unwrap();
+        let data = self.load_store()?;
+        Ok(data.missions.get(mission_id).cloned())
+    }
+
+    pub async fn process_event<F, Fut>(
+        &self,
+        event_key: &str,
+        input: &MissionInput,
+        runner: F,
+    ) -> Result<PersistedMissionRecord, factory_core::error::FactoryError>
+    where
+        F: FnOnce() -> Fut,
+        Fut: Future<Output = Result<String, factory_core::error::FactoryError>>,
+    {
+        let mission_id = input
+            .mission_id
+            .clone()
+            .unwrap_or_else(|| format!("mission-{}", event_key));
+
+        // 1. Check idempotency / existing state before executing side effects
+        {
+            let _guard = self.lock.lock().unwrap();
+            let mut data = self.load_store()?;
+
+            if let Some(existing_id) = data.event_to_mission.get(event_key).cloned()
+                && let Some(existing) = data.missions.get(&existing_id)
+            {
+                if existing.status == MissionLifecycleStatus::Completed
+                    || existing.status == MissionLifecycleStatus::Running
+                {
+                    return Ok(existing.clone());
+                }
+                if existing.status == MissionLifecycleStatus::Cancelled {
+                    return Err(factory_core::error::FactoryError::Internal(format!(
+                        "Mission '{}' is cancelled and cannot process event '{}'",
+                        existing_id, event_key
+                    )));
+                }
+            }
+
+            if !data.missions.contains_key(&mission_id) {
+                // New mission admission check against authoritative FinOps stop store
+                let decision = admit_mission_with_store(input, self.stop_store.as_ref())?;
+                let rec = PersistedMissionRecord {
+                    mission_id: mission_id.clone(),
+                    idempotency_keys: vec![event_key.to_string()],
+                    admission_state_version: decision.state_version,
+                    status: MissionLifecycleStatus::Running,
+                    retry_count: 0,
+                    completed_steps: HashMap::new(),
+                    last_output: None,
+                    last_error: None,
+                    cancellation_reason: None,
+                    compensation_record: None,
+                };
+                data.event_to_mission
+                    .insert(event_key.to_string(), mission_id.clone());
+                data.missions.insert(mission_id.clone(), rec);
+                self.save_store(&data)?;
+            } else {
+                // Retry of FailedRetryable mission: check if hard stop now blocks retry
+                let _ = admit_mission_with_store(input, self.stop_store.as_ref())?;
+                if let Some(rec) = data.missions.get_mut(&mission_id) {
+                    if !rec.idempotency_keys.contains(&event_key.to_string()) {
+                        rec.idempotency_keys.push(event_key.to_string());
+                    }
+                    rec.status = MissionLifecycleStatus::Running;
+                }
+                data.event_to_mission
+                    .insert(event_key.to_string(), mission_id.clone());
+                self.save_store(&data)?;
+            }
+        }
+
+        // 2. Execute workload outside lock
+        let exec_res = runner().await;
+
+        // 3. Persist outcome atomically
+        let _guard = self.lock.lock().unwrap();
+        let mut data = self.load_store()?;
+        let rec = data.missions.get_mut(&mission_id).ok_or_else(|| {
+            factory_core::error::FactoryError::Internal("Mission record disappeared".to_string())
+        })?;
+
+        match exec_res {
+            Ok(output) => {
+                rec.status = MissionLifecycleStatus::Completed;
+                rec.last_output = Some(output);
+                rec.last_error = None;
+                let snapshot = rec.clone();
+                self.save_store(&data)?;
+                Ok(snapshot)
+            }
+            Err(err) => {
+                rec.status = MissionLifecycleStatus::FailedRetryable;
+                rec.retry_count += 1;
+                rec.last_error = Some(err.to_string());
+                self.save_store(&data)?;
+                Err(err)
+            }
+        }
+    }
+
+    pub async fn execute_checkpointed_step<F, Fut>(
+        &self,
+        mission_id: &str,
+        step_name: &str,
+        step_fn: F,
+    ) -> Result<String, factory_core::error::FactoryError>
+    where
+        F: FnOnce() -> Fut,
+        Fut: Future<Output = Result<String, factory_core::error::FactoryError>>,
+    {
+        {
+            let _guard = self.lock.lock().unwrap();
+            let mut data = self.load_store()?;
+
+            if let Some(rec) = data.missions.get(mission_id) {
+                if rec.status == MissionLifecycleStatus::Cancelled {
+                    return Err(factory_core::error::FactoryError::Internal(format!(
+                        "Mission '{}' is cancelled; refusing step '{}'",
+                        mission_id, step_name
+                    )));
+                }
+                if let Some(cached_out) = rec.completed_steps.get(step_name) {
+                    return Ok(cached_out.clone());
+                }
+            }
+
+            // Evaluate active-mission policy if FinOps hard stop became active mid-mission
+            let stop_state = self.stop_store.read_state().map_err(|e| {
+                factory_core::error::FactoryError::FinOps(format!(
+                    "Failed to read FinOps stop state at step boundary '{}': {}",
+                    step_name, e
+                ))
+            })?;
+
+            if stop_state.halted
+                && self.active_policy == ActiveMissionHardStopPolicy::CancelAtStepBoundary
+            {
+                let rec = data
+                    .missions
+                    .entry(mission_id.to_string())
+                    .or_insert_with(|| PersistedMissionRecord {
+                        mission_id: mission_id.to_string(),
+                        idempotency_keys: Vec::new(),
+                        admission_state_version: stop_state.state_version,
+                        status: MissionLifecycleStatus::Cancelled,
+                        retry_count: 0,
+                        completed_steps: HashMap::new(),
+                        last_output: None,
+                        last_error: None,
+                        cancellation_reason: None,
+                        compensation_record: None,
+                    });
+                rec.status = MissionLifecycleStatus::Cancelled;
+                rec.cancellation_reason = Some(format!(
+                    "Halted at step boundary '{}' due to FinOps hard stop (version={})",
+                    step_name, stop_state.state_version
+                ));
+                rec.compensation_record = Some(
+                    "Preserved completed step checkpoints and revoked active step execution"
+                        .to_string(),
+                );
+                self.save_store(&data)?;
+                return Err(factory_core::error::FactoryError::FinOps(format!(
+                    "Mission '{}' halted at step boundary '{}' due to active FinOps hard stop (version={})",
+                    mission_id, step_name, stop_state.state_version
+                )));
+            }
+
+            if !data.missions.contains_key(mission_id) {
+                data.missions.insert(
+                    mission_id.to_string(),
+                    PersistedMissionRecord {
+                        mission_id: mission_id.to_string(),
+                        idempotency_keys: Vec::new(),
+                        admission_state_version: stop_state.state_version,
+                        status: MissionLifecycleStatus::Running,
+                        retry_count: 0,
+                        completed_steps: HashMap::new(),
+                        last_output: None,
+                        last_error: None,
+                        cancellation_reason: None,
+                        compensation_record: None,
+                    },
+                );
+                self.save_store(&data)?;
+            }
+        }
+
+        let out = step_fn().await?;
+
+        let _guard = self.lock.lock().unwrap();
+        let mut data = self.load_store()?;
+        if let Some(rec) = data.missions.get_mut(mission_id) {
+            rec.completed_steps
+                .insert(step_name.to_string(), out.clone());
+            rec.last_output = Some(out.clone());
+            self.save_store(&data)?;
+        }
+        Ok(out)
+    }
+
+    pub fn cancel_mission(
+        &self,
+        mission_id: &str,
+        reason: &str,
+        compensation: &str,
+    ) -> Result<PersistedMissionRecord, factory_core::error::FactoryError> {
+        let _guard = self.lock.lock().unwrap();
+        let mut data = self.load_store()?;
+        let rec = data
+            .missions
+            .entry(mission_id.to_string())
+            .or_insert_with(|| PersistedMissionRecord {
+                mission_id: mission_id.to_string(),
+                idempotency_keys: Vec::new(),
+                admission_state_version: 0,
+                status: MissionLifecycleStatus::Cancelled,
+                retry_count: 0,
+                completed_steps: HashMap::new(),
+                last_output: None,
+                last_error: None,
+                cancellation_reason: None,
+                compensation_record: None,
+            });
+        rec.status = MissionLifecycleStatus::Cancelled;
+        rec.cancellation_reason = Some(reason.to_string());
+        rec.compensation_record = Some(compensation.to_string());
+        let snapshot = rec.clone();
+        self.save_store(&data)?;
+        Ok(snapshot)
+    }
+}
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct MissionInput {
@@ -291,6 +684,7 @@ pub fn create_mission_workflow_with_clients(
     let supervisor = WorkflowSupervisor::new();
     let cancel_token_finops = supervisor.token();
     let cancel_token_sentry = supervisor.token();
+    let shared_stop_store = FileFinOpsStopStore::default_shared();
 
     // FinOps background monitor: only spawn if LiteLLM base URL is configured
     let has_litellm = std::env::var("LITELLM_API_BASE")
@@ -299,8 +693,12 @@ pub fn create_mission_workflow_with_clients(
         .unwrap_or(false);
 
     if has_litellm {
+        let stop_store_monitor = shared_stop_store.clone();
         tokio::spawn(async move {
-            let finops_agent = FinOpsAgent::default();
+            let finops_agent = FinOpsAgent {
+                stop_store: stop_store_monitor,
+                ..Default::default()
+            };
             tokio::select! {
                 _ = cancel_token_finops.cancelled() => {
                     tracing::info!("FinOpsAgent received cancellation signal, shutting down cleanly.");
@@ -389,6 +787,7 @@ pub fn create_mission_workflow_with_clients(
     let kafka_client_clone = kafka_client.clone();
     let gl_client_plan = gl_client.clone();
     let gh_client_plan = gh_client.clone();
+    let stop_store_plan = shared_stop_store.clone();
     let plan_task = hatchet
         .task("rustant-plan", move |input: MissionInput, _ctx| {
             let mcp_client = mcp_client_clone.clone();
@@ -396,15 +795,15 @@ pub fn create_mission_workflow_with_clients(
             let kafka_client = kafka_client_clone.clone();
             let gl_client = gl_client_plan.clone();
             let gh_client = gh_client_plan.clone();
+            let stop_store = stop_store_plan.clone();
             let mission_id = input
                 .mission_id
                 .clone()
                 .unwrap_or_else(|| Uuid::new_v4().to_string());
 
             Box::pin(async move {
-                // Pre-flight FinOps mission admission gate check
-                let finops_checker = FinOpsAgent::default();
-                finops_checker.can_admit_mission(&mission_id)?;
+                // Pre-flight FinOps mission admission gate check using shared authoritative store
+                admit_mission_with_store(&input, stop_store.as_ref())?;
 
                 let rustant = RustantAgent::new(mcp_client, r2r_client);
 
@@ -821,6 +1220,7 @@ pub fn create_mission_workflow_with_clients(
     let kafka_client_clone = kafka_client.clone();
     let gl_client_rev = gl_client.clone();
     let gh_client_rev = gh_client.clone();
+    let stop_store_rev = shared_stop_store.clone();
     let review_task = hatchet
         .task("rustant-review", move |input: MissionInput, _ctx| {
             let mcp_client = mcp_client_clone.clone();
@@ -828,15 +1228,15 @@ pub fn create_mission_workflow_with_clients(
             let kafka_client = kafka_client_clone.clone();
             let gl_client = gl_client_rev.clone();
             let gh_client = gh_client_rev.clone();
+            let stop_store = stop_store_rev.clone();
             let mission_id = input
                 .mission_id
                 .clone()
                 .unwrap_or_else(|| Uuid::new_v4().to_string());
 
             Box::pin(async move {
-                // Pre-flight FinOps mission admission gate check
-                let finops_checker = FinOpsAgent::default();
-                finops_checker.can_admit_mission(&mission_id)?;
+                // Pre-flight FinOps mission admission gate check using shared authoritative store
+                admit_mission_with_store(&input, stop_store.as_ref())?;
 
                 let rustant = RustantAgent::new(mcp_client, r2r_client);
 

@@ -1,39 +1,53 @@
 use factory_mcp_server::tools::launch_sandbox_pod::build_sandbox_job_spec;
 
 #[test]
-fn test_launch_sandbox_pod_requires_gvisor_runtime_class_in_production() {
+fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
     let job_name = "test-sandbox-01";
     let cmd = "python3 -c 'print(1)'";
 
-    // In production, runtimeClassName must be "gvisor"
     let job_spec = build_sandbox_job_spec(job_name, cmd, true, "factory-sandboxes").unwrap();
 
-    let template_spec = job_spec
-        .get("spec")
-        .and_then(|s| s.get("template"))
+    let spec = job_spec.get("spec").expect("Job spec must exist");
+    assert_eq!(spec["ttlSecondsAfterFinished"], 300);
+    assert_eq!(spec["activeDeadlineSeconds"], 60);
+    assert_eq!(spec["backoffLimit"], 0);
+
+    let template_spec = spec
+        .get("template")
         .and_then(|t| t.get("spec"))
         .expect("Pod template spec must exist");
 
+    assert_eq!(template_spec["runtimeClassName"], "gvisor");
+    assert_eq!(template_spec["automountServiceAccountToken"], false);
+    assert_eq!(template_spec["securityContext"]["runAsNonRoot"], true);
+    assert_eq!(template_spec["securityContext"]["runAsUser"], 65534);
+    assert_eq!(template_spec["securityContext"]["runAsGroup"], 65534);
     assert_eq!(
-        template_spec
-            .get("runtimeClassName")
-            .and_then(|r| r.as_str()),
-        Some("gvisor"),
-        "Production sandbox must mandate runtimeClassName: gvisor"
+        template_spec["securityContext"]["seccompProfile"]["type"],
+        "RuntimeDefault"
     );
 
+    let container = &template_spec["containers"][0];
     assert_eq!(
-        template_spec
-            .get("automountServiceAccountToken")
-            .and_then(|a| a.as_bool()),
-        Some(false),
-        "Sandbox must disable automountServiceAccountToken"
+        container["securityContext"]["allowPrivilegeEscalation"],
+        false
+    );
+    assert_eq!(container["securityContext"]["readOnlyRootFilesystem"], true);
+    assert_eq!(
+        container["securityContext"]["capabilities"]["drop"][0],
+        "ALL"
+    );
+    assert_eq!(container["resources"]["limits"]["memory"], "30Mi");
+    assert_eq!(container["resources"]["limits"]["cpu"], "250m");
+    assert_eq!(
+        container["resources"]["limits"]["ephemeral-storage"],
+        "100Mi"
     );
 
-    // In production, if gVisor is disabled, it MUST fail closed
-    let err_result = build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes");
-    assert!(
-        err_result.is_err(),
-        "Must fail closed if gVisor is not enabled in production"
-    );
+    // Must fail closed if gVisor is not enabled
+    assert!(build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes").is_err());
+    // Must fail closed if default namespace is used
+    assert!(build_sandbox_job_spec(job_name, cmd, true, "default").is_err());
+    // Must fail closed on empty command
+    assert!(build_sandbox_job_spec(job_name, "   ", true, "factory-sandboxes").is_err());
 }

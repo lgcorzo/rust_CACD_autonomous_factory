@@ -1,8 +1,4 @@
-use axum::{
-    routing::{get, post},
-    Router,
-};
-use factory_mcp_server::McpServer;
+use factory_mcp_server::{build_mcp_router, McpServer};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tower_http::cors::CorsLayer;
@@ -19,23 +15,17 @@ async fn main() -> anyhow::Result<()> {
     server.register_default_tools().await?;
 
     // Security: Restrict CORS to allowed origins and specific methods/headers.
-    // Defaults to a restrictive policy (denying all) if ALLOWED_ORIGINS is unset.
+    // Note (FR-011): CORS is browser cross-origin policy only and is NEVER treated as caller authentication.
+    // Privileged routes (/mcp, /sse, /feedback) enforce bearer authentication via build_mcp_router.
     let allowed_origins_raw = std::env::var("ALLOWED_ORIGINS").unwrap_or_default();
     let cors = CorsLayer::new()
         .allow_methods([axum::http::Method::GET, axum::http::Method::POST])
-        .allow_headers([axum::http::header::CONTENT_TYPE]);
+        .allow_headers([
+            axum::http::header::CONTENT_TYPE,
+            axum::http::header::AUTHORIZATION,
+        ]);
 
-    let app = Router::new()
-        .route("/mcp", post(McpServer::post_handler))
-        .route("/sse", get(McpServer::sse_handler))
-        .route(
-            "/feedback",
-            post(factory_mcp_server::feedback_route::handle_feedback),
-        )
-        .route(
-            "/webhooks/github",
-            post(factory_mcp_server::github_webhook::handle_github_webhook),
-        );
+    let app = build_mcp_router(server);
 
     let app = if allowed_origins_raw.is_empty() {
         app.layer(cors)
@@ -45,8 +35,7 @@ async fn main() -> anyhow::Result<()> {
             .map(|s| s.trim().parse().expect("Invalid origin in ALLOWED_ORIGINS"))
             .collect::<Vec<axum::http::HeaderValue>>();
         app.layer(cors.allow_origin(origins))
-    }
-    .with_state(server);
+    };
 
     let port = std::env::var("PORT")
         .unwrap_or_else(|_| "8100".to_string())

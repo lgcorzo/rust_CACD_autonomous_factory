@@ -25,6 +25,18 @@ pub fn build_sandbox_job_spec(
             "Untrusted sandbox execution requires gVisor runtime. Fallback to standard runc/host is forbidden."
         );
     }
+    if job_name.trim().is_empty() {
+        anyhow::bail!("Sandbox job_name must not be empty");
+    }
+    if cmd.trim().is_empty() {
+        anyhow::bail!("Sandbox command must not be empty");
+    }
+    if namespace.trim().is_empty() || namespace == "default" {
+        anyhow::bail!(
+            "Sandbox Job must target an isolated namespace (e.g. 'factory-sandboxes'), got '{}'",
+            namespace
+        );
+    }
 
     Ok(serde_json::json!({
         "apiVersion": "batch/v1",
@@ -35,12 +47,14 @@ pub fn build_sandbox_job_spec(
         },
         "spec": {
             "ttlSecondsAfterFinished": 300,
+            "activeDeadlineSeconds": 60,
             "backoffLimit": 0,
             "template": {
                 "metadata": {
                     "labels": {
                         "job-name": job_name,
-                        "app.kubernetes.io/component": "sandbox-workload"
+                        "app.kubernetes.io/component": "sandbox-workload",
+                        "app.kubernetes.io/part-of": "dark-gravity"
                     }
                 },
                 "spec": {
@@ -55,25 +69,38 @@ pub fn build_sandbox_job_spec(
                             "type": "RuntimeDefault"
                         }
                     },
+                    "volumes": [{
+                        "name": "sandbox-tmp",
+                        "emptyDir": {
+                            "sizeLimit": "32Mi"
+                        }
+                    }],
                     "containers": [{
                         "name": "sandbox",
-                        "image": "python:3.11-slim",
+                        "image": "python:3.11.11-slim",
                         "command": ["/bin/sh", "-c"],
                         "args": [cmd],
                         "securityContext": {
                             "allowPrivilegeEscalation": false,
+                            "readOnlyRootFilesystem": true,
                             "capabilities": {
                                 "drop": ["ALL"]
                             }
                         },
+                        "volumeMounts": [{
+                            "name": "sandbox-tmp",
+                            "mountPath": "/tmp"
+                        }],
                         "resources": {
                             "requests": {
                                 "memory": "16Mi",
-                                "cpu": "50m"
+                                "cpu": "50m",
+                                "ephemeral-storage": "50Mi"
                             },
                             "limits": {
                                 "memory": "30Mi",
-                                "cpu": "100m"
+                                "cpu": "250m",
+                                "ephemeral-storage": "100Mi"
                             }
                         }
                     }]
@@ -165,7 +192,7 @@ impl Tool for LaunchSandboxPodTool {
                 "task_id": {"type": "string"},
                 "task_description": {"type": "string"},
                 "code": {"type": "string"},
-                "language": {"type": "string", "enum": ["python", "rust"]}
+                "language": {"type": "string", "enum": ["python"]}
             },
             "required": ["code", "language"]
         })
@@ -174,18 +201,32 @@ impl Tool for LaunchSandboxPodTool {
     async fn call(&self, params: Value) -> anyhow::Result<CallToolResult> {
         let raw_code = params["code"].as_str().unwrap_or("");
         let language = params["language"].as_str().unwrap_or("python");
+        if raw_code.trim().is_empty() {
+            anyhow::bail!("Sandbox code payload must not be empty");
+        }
+        // Only python is available inside the python:3.11.11-slim sandbox image unless a dedicated rust image is configured
+        if language != "python" {
+            anyhow::bail!(
+                "Unsupported sandbox container runtime language '{}': sandbox image python:3.11.11-slim only provides verified Python 3.11 runtime",
+                language
+            );
+        }
+
         let code = sanitize_executable_code(raw_code, language);
 
-        let client = Client::try_default().await?;
+        // Fail closed unless gVisor is explicitly disabled via ALLOW_UNSAFE_NO_GVISOR=true (never allowed in production)
         let is_prod = std::env::var("FACTORY_ENV")
             .unwrap_or_default()
             .eq_ignore_ascii_case("production")
             || cfg!(feature = "production");
-        let require_gvisor = is_prod || std::env::var("USE_GVISOR").unwrap_or_default() == "true";
+        let explicit_disable = std::env::var("USE_GVISOR")
+            .ok()
+            .map(|v| v.eq_ignore_ascii_case("false") || v == "0")
+            .unwrap_or(false);
+        let require_gvisor = is_prod || !explicit_disable;
+
         let namespace =
             std::env::var("SANDBOX_NAMESPACE").unwrap_or_else(|_| "factory-sandboxes".to_string());
-
-        let jobs: Api<Job> = Api::namespaced(client.clone(), &namespace);
 
         let job_name = format!(
             "sandbox-job-{}",
@@ -196,15 +237,42 @@ impl Tool for LaunchSandboxPodTool {
                 .collect::<String>()
         );
 
-        let cmd = match language {
-            "python" => format!("python3 -c '{}'", code.replace('\'', "'\\''")),
-            "rust" => format!("rustc -e '{}'", code.replace('\'', "'\\''")),
-            _ => return Err(anyhow::anyhow!("Unsupported language")),
-        };
-
+        let cmd = format!("python3 -c '{}'", code.replace('\'', "'\\''"));
         let job_json = build_sandbox_job_spec(&job_name, &cmd, require_gvisor, &namespace)?;
-
         let job: Job = serde_json::from_value(job_json)?;
+
+        let client = Client::try_default().await.map_err(|e| {
+            anyhow::anyhow!(
+                "Kubernetes sandbox isolation unavailable (failed to initialize K8s client): {}",
+                e
+            )
+        })?;
+
+        // Verify RuntimeClass 'gvisor' exists on the cluster before scheduling untrusted work
+        let rc_api: Api<k8s_openapi::api::node::v1::RuntimeClass> = Api::all(client.clone());
+        match rc_api.get_opt("gvisor").await {
+            Ok(Some(rc)) => {
+                if rc.handler != "runsc" {
+                    anyhow::bail!(
+                        "Cluster RuntimeClass 'gvisor' has unexpected handler '{}' (expected 'runsc')",
+                        rc.handler
+                    );
+                }
+            }
+            Ok(None) => {
+                anyhow::bail!(
+                    "Cluster is missing required RuntimeClass 'gvisor'; refusing untrusted execution"
+                );
+            }
+            Err(e) => {
+                anyhow::bail!(
+                    "Failed to verify cluster RuntimeClass 'gvisor' availability: {}",
+                    e
+                );
+            }
+        }
+
+        let jobs: Api<Job> = Api::namespaced(client.clone(), &namespace);
 
         // Create Job
         jobs.create(&PostParams::default(), &job).await?;
@@ -213,9 +281,7 @@ impl Tool for LaunchSandboxPodTool {
         let mut success = false;
         let mut logs = String::new();
 
-        // polling for simplicity
         for _ in 0..60 {
-            // wait up to 60s
             sleep(Duration::from_secs(1)).await;
             if let Ok(Some(j)) = jobs.get_opt(&job_name).await {
                 if let Some(status) = j.status {
@@ -238,7 +304,6 @@ impl Tool for LaunchSandboxPodTool {
             if let Some(pod) = pod_list.items.first() {
                 if let Some(pod_name) = &pod.metadata.name {
                     let log_params = kube::api::LogParams::default();
-                    // Just read logs
                     if let Ok(pod_logs) = pods.logs(pod_name, &log_params).await {
                         logs = pod_logs;
                     }

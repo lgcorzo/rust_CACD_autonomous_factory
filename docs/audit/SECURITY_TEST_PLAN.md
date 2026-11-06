@@ -1,42 +1,64 @@
 # Security Test Plan & Verification Procedures
 
-**Specification**: `010-integrated-k8s-gitops-audit`  
-**Date**: `2026-11-02`
+**Specification**: `011-verified-autonomous-execution`  
+**Updated At (UTC)**: `2026-11-06T17:15:00Z`  
+**Governed By**: `docs/audit/README.md`, `FR-003`–`FR-021`, `FR-027`, `FR-028`
+
+This test plan defines the required positive and negative checks, required access, safe execution conditions, and retained evidence for every security-sensitive acceptance scenario across User Stories 1 through 5.
 
 ---
 
-## 1. Test Categories & Verification Requirements
+## 1. Safety & Execution Boundary Principles
 
-### STP-1: Host Subprocess Denial Test
-- **Objective**: Ensure that untrusted code execution fails closed and refuses to execute on the host machine in production.
-- **Test File**: `crates/factory-mcp-server/tests/sandbox_driver_tests.rs`
-- **Assertion**:
-  - In `production` mode, `SubprocessDriver::execute(...)` returns an `Err` containing `"Host subprocess execution is forbidden in production mode"`.
+1. **No Destructive Payloads on Host**: All negative/adversarial command tests (`run_tests_security_tests.rs`, `sandbox_driver_tests.rs`) MUST use harmless sentinel payloads (e.g., `echo`, `true`, `false`, non-existent binary names, bounded `sleep`, or injected mock/recording `SandboxDriver` implementations) so that even if a test fails during RED phase, the host filesystem and credentials are never modified or exfiltrated.
+2. **Cluster Authorization Gate**: Live Kubernetes tests (`gvisor_integration.rs` in `T011`, disposable workload in `T028`) are opt-in (`#[ignore]` or gated by `RUN_LIVE_CLUSTER_TESTS=1`) and execute strictly in the isolated `factory-sandboxes` namespace with `ttlSecondsAfterFinished` cleanup. If the cluster is unreachable or unauthorized, the test MUST record `outcome: unavailable` rather than simulating a pass.
+3. **Positive & Negative Pairing**: Every security boundary requires at least one positive test (valid authorized/isolated execution succeeds) and one or more negative tests (unauthorized, malformed, replayed, unsupported, or unisolated execution fails closed).
 
-### STP-2: Test Execution Integrity & Non-Simulation Test
-- **Objective**: Verify that `run_tests` does not simulate successful test passes when a test runner is missing or fails.
-- **Test File**: `crates/factory-mcp-server/tests/run_tests_security_tests.rs`
-- **Assertion**:
-  - When given an invalid or missing command, `run_tests` returns a structured report with `outcome: TestExecutionOutcome::InfrastructureError` or `Failed`.
-  - It NEVER returns `exit_code: 0` or `"status": "success"` for non-executed commands.
+---
 
-### STP-3: gVisor RuntimeClass Mandatory Selection Test
-- **Objective**: Ensure that a sandbox Job cannot be scheduled without `runtimeClassName: gvisor`.
-- **Test File**: `crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs`
-- **Assertion**:
-  - Attempting to launch an untrusted sandbox job when gVisor is disabled or unavailable triggers an immediate fail-closed error.
+## 2. Test Scenarios by User Story
 
-### STP-4: FinOps Budget Admission Hard-Stop Test
-- **Objective**: Ensure that missions are rejected when the FinOps hard-stop latch is active.
-- **Test File**: `crates/factory-application/tests/finops_admission_tests.rs`
-- **Assertion**:
-  - `MissionAdmissionGate::can_admit_mission` returns `Err(FactoryError::FinOps(...))` when `agent.is_halted()` is `true`.
+### 2.1 User Story 1 — Untrusted Execution & Sandbox Isolation (`FR-003`–`FR-008`, `SC-001`, `SC-002`)
 
-### STP-5: GitOps Manifest Schema & Policy Validation
-- **Objective**: Verify that GitOps manifests conform to Kubernetes v1.31 schemas and enforce restricted Pod Security Standards.
-- **Command**:
-  ```bash
-  cd /mnt/F024B17C24B145FE/Repos/gitops_internal_lgcorzo
-  kubectl kustomize infrastructure/agents/
-  ```
+| Test ID | Target Component & Test File | Positive Check(s) | Negative Check(s) | Required Access | Safe Execution Conditions | Evidence to Retain |
+|---|---|---|---|---|---|---|
+| `STP-US1-01` | `RunTestsTool` (`crates/factory-mcp-server/tests/run_tests_security_tests.rs`) | Valid allowlisted test command (`cargo test`, `pytest`) is routed through the injected `SandboxDriver` and reports `TestExecutionOutcome::Passed` when the driver returns exit code `0`. | 1. Direct host-shell metacharacter injection (`;`, `&&`, `\|`, `` ` ``, `$()`) is rejected as `NotExecuted` without invoking `sh -c` on host.<br>2. Unapproved executable/command is rejected as `NotExecuted`.<br>3. Missing test runner (`127`) or driver failure returns `InfrastructureError`, never `Passed`.<br>4. Command starting with `mock` returns `TestExecutionOutcome::Mocked` (`status: "mocked"`), never `Passed`. | Local Cargo test runner (`unit` / `integration`) | Inject a recording/spy `SandboxDriver` to prove zero host `sh -c` execution and test harmless sentinel strings. | `cargo test -p factory-mcp-server --test run_tests_security_tests` exit status, stdout log, source commit SHA. |
+| `STP-US1-02` | `SandboxDriver` implementations (`crates/factory-mcp-server/tests/sandbox_driver_tests.rs`) | Approved sandbox driver executes supported language (`python`, `rust`) and accurately reports `stdout`, `stderr`, `exit_code`, and `outcome`. | 1. `SubprocessDriver` in production mode (`force_production = true` or `FACTORY_ENV=production`) fails closed.<br>2. Unsupported language/runtime (`cobol`, `bash`, etc.) is rejected (`NotExecuted` / error).<br>3. Execution exceeding timeout deadline returns `Timeout` and kills process.<br>4. Real non-zero exit code (`exit 1` / `assert False`) is reported as `Failed` (`is_success: false`). | Local Cargo test runner (`unit` / `integration`) | Use short timeouts (`100ms`–`1s`) and harmless Python/Rust one-liners (`sys.exit(1)`, `time.sleep(2)`). | `cargo test -p factory-mcp-server --test sandbox_driver_tests` output and commit SHA. |
+| `STP-US1-03` | `build_sandbox_job_spec` & `LaunchSandboxPodTool` (`crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs`) | Generated Kubernetes `Job` JSON includes `runtimeClassName: "gvisor"`, `namespace: "factory-sandboxes"`, `runAsNonRoot: true`, `runAsUser: 65534`, `readOnlyRootFilesystem: true`, `allowPrivilegeEscalation: false`, `capabilities.drop: ["ALL"]`, `activeDeadlineSeconds`, `ttlSecondsAfterFinished: 300`, and bounded CPU/memory/ephemeral-storage. | 1. Calling `build_sandbox_job_spec` with `require_gvisor = false` fails closed.<br>2. Unsupported language or empty command is rejected before K8s API call. | Local Cargo test runner (`unit`) | Pure JSON specification validation without contacting cluster API. | `cargo test -p factory-mcp-server` output and commit SHA. |
+| `STP-US1-04` | Live gVisor Sandbox Integration (`crates/factory-mcp-server/tests/gvisor_integration.rs`) | Harmless Python/Rust snippet runs inside a Kubernetes `Job` with `runtimeClassName: gvisor` in `factory-sandboxes` and returns real stdout. | When cluster/gVisor is unreachable or rejects the Job, execution fails closed and never falls back to host subprocess execution. | Live K8s cluster with `gvisor` `RuntimeClass` (opt-in) | Ephemeral Job with `activeDeadlineSeconds: 60`, `ttlSecondsAfterFinished: 300`, and explicit delete on completion. | Test log or explicit `unavailable` record if cluster access is absent. |
 
+---
+
+### 2.2 User Story 2 — Authoritative FinOps Hard-Stop & Workflow Reliability (`FR-009`, `FR-010`, `SC-003`)
+
+| Test ID | Target Component & Test File | Positive Check(s) | Negative Check(s) | Required Access | Safe Execution Conditions | Evidence to Retain |
+|---|---|---|---|---|---|---|
+| `STP-US2-01` | `FinOpsStopStore` & `FinOpsAgent` Admission (`crates/factory-application/tests/finops_admission_tests.rs`) | Missions are admitted when the shared durable store reports `halted: false` and healthy budget state; admission records the observed `state_version`. | 1. When the monitor trips the 90% hard stop on one `FinOpsAgent` instance, a separate admission worker consulting the shared `FinOpsStopStore` rejects new missions with the active stop reason and `state_version`.<br>2. Concurrent mission admission requests evaluated after hard-stop activation are 100% rejected.<br>3. Store read/corruption failure fails closed (denies admission). | Local Cargo test runner (`integration`) using temp file / shared store | Use temporary directory (`tempfile` / `/tmp`) per test so host state is untouched. | `cargo test -p factory-application --test finops_admission_tests` output and commit SHA. |
+| `STP-US2-02` | Workflow Idempotency & Recovery (`crates/factory-application/tests/workflow_recovery_tests.rs`) | 1. Transient step failure recovers on retry and completes once.<br>2. Worker restart resumes from persisted step cursor without re-executing completed steps. | 1. Duplicate event delivery with the same idempotency key / `mission_id` is deduplicated and does not spawn a second run or duplicate side effects.<br>2. Cancelled mission records explicit `Cancelled` + compensation state and does not advance to subsequent steps.<br>3. Already-running mission policy under hard stop is deterministic and explicit. | Local Cargo test runner (`integration`) | Use deterministic in-memory / temp-file state store and mock external APIs (`GithubClient`, `KafkaClient`). | `cargo test -p factory-application --test workflow_recovery_tests` output and `docs/audit/WORKFLOW_RELIABILITY.md`. |
+
+---
+
+### 2.3 User Story 3 — External Service Boundaries, Webhooks, Event Streams & NHI (`FR-011`–`FR-014`)
+
+| Test ID | Target Component & Test File | Positive Check(s) | Negative Check(s) | Required Access | Safe Execution Conditions | Evidence to Retain |
+|---|---|---|---|---|---|---|
+| `STP-US3-01` | GitHub Webhook Boundary (`crates/factory-mcp-server/tests/webhook_security_tests.rs`) | Valid HMAC-SHA256 signed `issues` webhook within size bounds and unique `X-GitHub-Delivery` ID is accepted (`200 OK`) ONLY after verifiable submission to the mission dispatcher, returning receipt metadata. | 1. Missing `GITHUB_WEBHOOK_SECRET` in protected/production config rejects webhook (`401`/`503`).<br>2. Missing or invalid `X-Hub-Signature-256` rejected (`401`).<br>3. Malformed JSON (`400`) or oversized payload (`413`) rejected.<br>4. Replayed `X-GitHub-Delivery` ID rejected (`409`).<br>5. Mission dispatcher failure returns `502`/`500` rather than false `200 OK`. | Local Cargo test runner (`integration`) via `tower::ServiceExt::oneshot` | In-process Axum router testing with recording mission dispatcher. | `cargo test -p factory-mcp-server --test webhook_security_tests` output and commit SHA. |
+| `STP-US3-02` | Privileged Route & SSE Session Boundary (`crates/factory-mcp-server/tests/route_boundary_tests.rs`) | 1. Authorized caller with valid bearer token / NHI credential can invoke `/mcp`, `/sse`, `/message`.<br>2. `/health` remains accessible for liveness probes.<br>3. Disconnected or expired SSE sessions release their slot in the session registry. | 1. Unauthenticated caller or caller with only CORS `Origin` header is rejected (`401`/`403`) on privileged routes.<br>2. Exceeding max concurrent SSE sessions rejects additional streams (`429`/`503`).<br>3. Accessing another caller's or expired session ID is rejected (`403`/`404`). | Local Cargo test runner (`integration`) | In-process Axum router with short session TTLs (`100ms`) for expiry tests. | `cargo test -p factory-mcp-server --test route_boundary_tests` output and commit SHA. |
+| `STP-US3-03` | NHI Credential & Vault Isolation (`crates/factory-core/src/security/nhi.rs`, `tests/mission_input_security_tests.rs`, `tests/vault_isolation_tests.rs`) | Valid Ed25519-signed `VerifiableCredential` with trusted issuer, valid audience/purpose/window, and unrevoked ID passes verification. | Untrusted issuer, expired TTL, wrong audience/namespace, tampered signature, replayed nonce/credential ID, or foreign repository Vault path (`403`) is rejected. | Local Cargo test runner (`unit` / `integration`) | Ephemeral Ed25519 keypairs in memory. | Test output and `docs/audit/NHI_SECURITY_REVIEW.md`. |
+
+---
+
+### 2.4 User Story 4 — Declared vs. Enforced GitOps & Runtime Controls (`FR-015`, `FR-016`, `SC-004`)
+
+| Test ID | Target Component & Test File | Positive Check(s) | Negative Check(s) | Required Access | Safe Execution Conditions | Evidence to Retain |
+|---|---|---|---|---|---|---|
+| `STP-US4-01` | GitOps Manifest Policy Regression (`../gitops_internal_lgcorzo/tests/test_sandbox_job_policy.sh`) | Rendered `infrastructure/agents` overlay (`kubectl kustomize`) contains `factory-sandboxes` namespace with `pod-security.kubernetes.io/enforce: restricted`, default-deny `NetworkPolicy`, scoped RBAC, and `sandbox-job.yaml` with `runtimeClassName: gvisor`, non-root `65534`, `readOnlyRootFilesystem: true`, `drop: ["ALL"]`, resource limits, `activeDeadlineSeconds`, and `ttlSecondsAfterFinished`. | Script fails non-zero if any required security control is missing, weakened, or uses unpinned `latest` image tags. | Local `kubectl kustomize` + bash (`infrastructure`) | Read-only manifest rendering and static policy inspection. | Script exit code, rendered manifest digest, and `docs/audit/GITOPS_RUNTIME_VERIFICATION.md`. |
+| `STP-US4-02` | Live Cluster Reconciliation & Runtime Verification (`docs/audit/GITOPS_RUNTIME_VERIFICATION.md`) | Inspect Flux `GitRepository` / `Kustomization` revisions, `RuntimeClass` `gvisor` (`runsc`), `factory-sandboxes` PSA labels, `NetworkPolicy`, and disposable sandbox Job execution. | Verify negative network egress (e.g. metadata IP `169.254.169.254` / internal service blocked) and non-root enforcement; or mark `unavailable` / `NOT_VERIFIED` if cluster is unreachable. | Kubernetes cluster (`server.internal.lgcorzo`) (`live_runtime`) | Read-only `kubectl get` inspection + harmless disposable pod in `factory-sandboxes` with operator authorization. | Exact `kubectl` outputs, source/deployment SHAs, or explicit `unavailable` gap record in `docs/audit/GITOPS_RUNTIME_VERIFICATION.md`. |
+
+---
+
+### 2.5 User Story 5 — Independent Evidence Contract & Transition Enforcement (`FR-017`–`FR-021`, `SC-005`, `SC-006`)
+
+| Test ID | Target Component & Test File | Positive Check(s) | Negative Check(s) | Required Access | Safe Execution Conditions | Evidence to Retain |
+|---|---|---|---|---|---|---|
+| `STP-US5-01` | Evidence Contract & State Machine Validator (`crates/factory-cli/tests/evidence_contract_tests.rs`) | Complete, schema-valid `EvidenceRecord` (40-char commit SHA, valid class/outcome, existing artifact with matching SHA-256) and valid `OPEN → IMPLEMENTED → TESTED → VERIFIED` transition by an independent `verified_by` actor pass validation. | 1. Missing required fields or short commit SHA rejected.<br>2. `verification_class: mock` or `outcome: mocked` rejected for real-execution requirements.<br>3. `outcome: failed`, `not_executed`, `infrastructure_error`, `timeout`, or `unavailable` rejected for `VERIFIED` promotion.<br>4. Stale `source_revision.commit` or `deployment_revision.commit` rejected.<br>5. Forbidden jump `IMPLEMENTED → VERIFIED` rejected.<br>6. Self-verification (`verified_by.id == implementation_agent_id`) rejected. | Local Cargo test runner (`unit` / `integration`) | Fixture-driven validation in `crates/factory-cli`. | `cargo test -p factory-cli --test evidence_contract_tests` output and `docs/audit/VERIFICATION_EVIDENCE_REPORT.md`. |

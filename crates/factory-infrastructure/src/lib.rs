@@ -13,6 +13,7 @@ pub trait S3Storage: Send + Sync {
 
 pub mod aethalgard;
 pub mod cursor_store;
+pub mod finops_stop_store;
 pub mod git_poller;
 pub mod github;
 pub mod gitlab;
@@ -31,6 +32,9 @@ pub mod vault_test_fixtures;
 pub mod ziti;
 
 pub use cursor_store::{CursorStore, InMemoryCursorStore, PostgresCursorStore};
+pub use finops_stop_store::{
+    FailingFinOpsStopStore, FileFinOpsStopStore, FinOpsStopState, FinOpsStopStore,
+};
 pub use git_poller::GitPlatformPoller;
 
 #[cfg(any(test, feature = "test-utils"))]
