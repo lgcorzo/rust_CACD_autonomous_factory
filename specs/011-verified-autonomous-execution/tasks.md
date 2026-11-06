@@ -20,8 +20,8 @@
 
 **Purpose**: Set shared reporting rules that all story-level evidence and audit deliverables must follow.
 
-- [ ] T004 [P] Document evidence classes, revision/timestamp requirements, immutable artifact references, unavailable-access handling, and the rule that manifest/CI evidence is not runtime proof in `docs/audit/README.md`.
-- [ ] T005 [P] Define positive and negative checks, required access, safe execution conditions, and evidence to retain for every security-sensitive acceptance scenario in `docs/audit/SECURITY_TEST_PLAN.md`.
+- [x] T004 [P] Document evidence classes, revision/timestamp requirements, immutable artifact references, unavailable-access handling, and the rule that manifest/CI evidence is not runtime proof in `docs/audit/README.md`.
+- [x] T005 [P] Define positive and negative checks, required access, safe execution conditions, and evidence to retain for every security-sensitive acceptance scenario in `docs/audit/SECURITY_TEST_PLAN.md`.
 
 **Checkpoint**: Current revisions and evidence rules are recorded; story work can proceed. Keep checks marked unavailable rather than inferring a pass.
 
