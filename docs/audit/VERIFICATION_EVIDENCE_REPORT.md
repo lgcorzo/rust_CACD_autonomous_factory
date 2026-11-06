@@ -42,3 +42,4 @@ The independent verification engine in [`crates/factory-cli/src/evidence.rs`](..
 | `FR-016` | `evidence/records/FR-016.json` | `infrastructure` | `kubectl get kustomizations -A` | `0` (`passed`) | `VERIFIED` | Exact source and Flux revisions (`main@48b9c0e333ce541fc741c056bd67e2932fdc50e9`) recorded in `docs/audit/GITOPS_RUNTIME_VERIFICATION.md`. |
 | `FR-018`–`FR-021` | `evidence/records/FR-018.json`..`FR-021.json` | `unit` | `cargo test -p factory-cli --test evidence_contract_tests` | `0` (`passed`) | `VERIFIED` | Contract & policy validator wired into `scripts/generate_evidence.sh`, `Makefile`, and `.github/workflows/pipeline.yml`. |
 | `SC-001`–`SC-006` | `evidence/records/SC-001.json`..`SC-006.json` | `unit` / `integration` | `cargo test` suites | `0` (`passed`) | `VERIFIED` | All 6 P1 measurable success criteria validated by automated test suites. |
+

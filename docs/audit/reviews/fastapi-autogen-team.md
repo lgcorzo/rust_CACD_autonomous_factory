@@ -44,3 +44,4 @@
   - `rust_CACD_autonomous_factory/crates/factory-cli/src/main.rs` (`Poller` default `GITHUB_REPOS` and `GitlabVerify` default `GITLAB_PROJECTS`) hardcodes `lgcorzo/fastapi-autogen-team`.
   - `gitops_internal_lgcorzo` image automation and deployment manifests reference the existing repository coordinates.
 - **Decision (`FR-026`)**: **Retain the repository slug `lgcorzo/fastapi-autogen-team` until a coordinated cross-repo migration PR updates `factory-cli` defaults, GitOps Flux sources, and container registry paths simultaneously.** Document in public materials that `lgcorzo/fastapi-autogen-team` hosts the `rust-agent-team` (Axum + Rig) service.
+

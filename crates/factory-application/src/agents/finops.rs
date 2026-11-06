@@ -111,10 +111,7 @@ impl FinOpsAgent {
             .build()
             .unwrap_or_else(|_| Client::new());
 
-        let initial_halted = stop_store
-            .read_state()
-            .map(|s| s.halted)
-            .unwrap_or(false);
+        let initial_halted = stop_store.read_state().map(|s| s.halted).unwrap_or(false);
 
         Self {
             litellm_base_url,
@@ -569,10 +566,8 @@ mod tests {
 
     #[test]
     fn test_hardstop_threshold_tripping() {
-        let store_path = std::env::temp_dir().join(format!(
-            "finops_unit_test_{}.json",
-            uuid::Uuid::new_v4()
-        ));
+        let store_path =
+            std::env::temp_dir().join(format!("finops_unit_test_{}.json", uuid::Uuid::new_v4()));
         let agent = FinOpsAgent::with_stop_store(
             "https://litellm:4000".to_string(),
             "key".to_string(),

@@ -42,3 +42,4 @@ Per `FR-029` and `SC-011`, only directly measured attributes are marked `MEASURE
   - All 5 primary content pages use `<header class="site-header">`, `<nav class="site-nav" aria-label="Main">`, `aria-current="page"`, `<nav class="toc" aria-label="On this page">`, `<main id="main">`, `<th scope="col">`, `<abbr title="...">`, and `<footer class="site-footer">`.
 - **Unmeasured Attributes (`FR-029`, `SC-011`)**:
   - Live browser Core Web Vitals (LCP, CLS, INP) and automated WCAG AA color-contrast ratio calculation across rendered DOM states were not executed via a headless browser during this run and are therefore classified as **`UNMEASURED` (not claimed as verified)**. Static payload sizes (`13.3 KiB`–`67.1 KiB` HTML + `19.9 KiB` CSS, zero external JS bundles) are `MEASURED`.
+

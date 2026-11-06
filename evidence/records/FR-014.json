@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "89b5042d-ffb7-5113-af1a-a5ef2d6aa7dd",
+  "requirement_id": "FR-014",
+  "collected_at": "2026-11-06T18:56:30Z",
+  "source_revision": {
+    "repository": "lgcorzo/rust_CACD_autonomous_factory",
+    "branch": "011-verified-autonomous-execution",
+    "commit": "1b9a51f8b19169d0a302ea26cf47caa307280281"
+  },
+  "deployment_revision": null,
+  "environment": {
+    "kind": "local",
+    "identifier": "dark-gravity-audit-workstation"
+  },
+  "verification_class": "documentation",
+  "method": {
+    "tool": "cargo-test",
+    "command_or_test": "cargo test -p factory-core"
+  },
+  "outcome": "passed",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "uri": "file://docs/audit/NHI_SECURITY_REVIEW.md",
+      "sha256": "fa409d2db94bf46438b55131de5feee247890e9bc4973935a797957960d52c13",
+      "media_type": "text/plain"
+    }
+  ],
+  "collector": {
+    "id": "ci-evidence-pipeline",
+    "role": "test_runner"
+  },
+  "limitations": []
+}

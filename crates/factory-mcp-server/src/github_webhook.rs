@@ -164,7 +164,10 @@ pub async fn handle_github_webhook(
     }
 
     if !delivery_id.is_empty() && !server.record_webhook_delivery(&delivery_id).await {
-        tracing::warn!("Rejected replayed GitHub webhook delivery '{}'", delivery_id);
+        tracing::warn!(
+            "Rejected replayed GitHub webhook delivery '{}'",
+            delivery_id
+        );
         return (
             StatusCode::CONFLICT,
             Json(json!({"error": "Duplicate/replayed webhook delivery rejected", "delivery_id": delivery_id})),

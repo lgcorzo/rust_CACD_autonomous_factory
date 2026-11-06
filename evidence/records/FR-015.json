@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "3b375fc1-9541-5fb4-a1e7-b65339a97e45",
+  "requirement_id": "FR-015",
+  "collected_at": "2026-11-06T18:56:30Z",
+  "source_revision": {
+    "repository": "lgcorzo/rust_CACD_autonomous_factory",
+    "branch": "011-verified-autonomous-execution",
+    "commit": "1b9a51f8b19169d0a302ea26cf47caa307280281"
+  },
+  "deployment_revision": null,
+  "environment": {
+    "kind": "local",
+    "identifier": "dark-gravity-audit-workstation"
+  },
+  "verification_class": "documentation",
+  "method": {
+    "tool": "cargo-test",
+    "command_or_test": "cargo test -p factory-cli --test evidence_contract_tests"
+  },
+  "outcome": "passed",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "uri": "file://docs/audit/TRACEABILITY_MATRIX.md",
+      "sha256": "bba1347babee07eb08a7da73c1e2450812b59bc8d4b8ec9f9ca98b4ed2d3bc54",
+      "media_type": "text/plain"
+    }
+  ],
+  "collector": {
+    "id": "ci-evidence-pipeline",
+    "role": "test_runner"
+  },
+  "limitations": []
+}

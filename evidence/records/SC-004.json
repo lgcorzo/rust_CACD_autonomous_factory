@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "194738bf-91d4-54d7-9678-89833e07a9d8",
+  "requirement_id": "SC-004",
+  "collected_at": "2026-11-06T18:56:30Z",
+  "source_revision": {
+    "repository": "lgcorzo/rust_CACD_autonomous_factory",
+    "branch": "011-verified-autonomous-execution",
+    "commit": "1b9a51f8b19169d0a302ea26cf47caa307280281"
+  },
+  "deployment_revision": null,
+  "environment": {
+    "kind": "local",
+    "identifier": "dark-gravity-audit-workstation"
+  },
+  "verification_class": "documentation",
+  "method": {
+    "tool": "cargo-test",
+    "command_or_test": "cargo test -p factory-cli --test evidence_contract_tests"
+  },
+  "outcome": "passed",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "uri": "file://docs/audit/GITOPS_RUNTIME_VERIFICATION.md",
+      "sha256": "6774bd06b0138b1be671af246c03e6eb42bbacff36ebeccb745e4e2f9cc4b0a1",
+      "media_type": "text/plain"
+    }
+  ],
+  "collector": {
+    "id": "ci-evidence-pipeline",
+    "role": "test_runner"
+  },
+  "limitations": []
+}

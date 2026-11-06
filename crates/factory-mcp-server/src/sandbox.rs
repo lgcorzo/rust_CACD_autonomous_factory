@@ -109,7 +109,8 @@ impl SandboxDriver for SubprocessDriver {
                 }
             }
             "rust" => {
-                let run_dir = std::env::temp_dir().join(format!("factory_rust_{}", uuid::Uuid::new_v4()));
+                let run_dir =
+                    std::env::temp_dir().join(format!("factory_rust_{}", uuid::Uuid::new_v4()));
                 tokio::fs::create_dir_all(&run_dir).await?;
                 let src_path = run_dir.join("snippet.rs");
                 let bin_path = run_dir.join("snippet_bin");

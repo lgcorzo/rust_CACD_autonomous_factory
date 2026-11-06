@@ -1,8 +1,8 @@
 use factory_application::agents::finops::{FinOpsAgent, MissionAdmissionGate};
-use factory_application::workflows::autonomous_mission::{admit_mission_with_store, MissionInput};
+use factory_application::workflows::autonomous_mission::{MissionInput, admit_mission_with_store};
 use factory_core::FinOpsTag;
 use factory_infrastructure::finops_stop_store::{
-    FileFinOpsStopStore, FinOpsStopStore, FailingFinOpsStopStore,
+    FailingFinOpsStopStore, FileFinOpsStopStore, FinOpsStopStore,
 };
 use std::sync::Arc;
 
@@ -18,10 +18,8 @@ fn create_test_tag() -> FinOpsTag {
 
 #[tokio::test]
 async fn test_finops_hard_stop_blocks_mission_admission_across_workers_with_version() {
-    let state_path = std::env::temp_dir().join(format!(
-        "finops_stop_state_{}.json",
-        uuid::Uuid::new_v4()
-    ));
+    let state_path =
+        std::env::temp_dir().join(format!("finops_stop_state_{}.json", uuid::Uuid::new_v4()));
 
     // Monitor worker and separate admission worker share the same durable file-backed store
     let monitor_store: Arc<dyn FinOpsStopStore> =
@@ -104,8 +102,9 @@ async fn test_finops_hard_stop_blocks_mission_admission_across_workers_with_vers
 
 #[tokio::test]
 async fn test_finops_admission_fails_closed_on_store_read_error() {
-    let failing_store: Arc<dyn FinOpsStopStore> =
-        Arc::new(FailingFinOpsStopStore::new("disk I/O failure reading stop state"));
+    let failing_store: Arc<dyn FinOpsStopStore> = Arc::new(FailingFinOpsStopStore::new(
+        "disk I/O failure reading stop state",
+    ));
     let agent = FinOpsAgent::with_stop_store(
         "http://mock-litellm".to_string(),
         "key".to_string(),

@@ -45,3 +45,4 @@
 
 1. **Fork Governance**: Documented in `README.md` as an independently maintained derivative of `fmind/mlops-python-package` (MIT license preserved in `LICENSE.txt`), adapted from `bikes` to `regression_model_template` with Kafka inference controllers and Dark Gravity HITL rules.
 2. **Resource Claim Nuance**: `README.md` lines 27 & 69 state that the test suite is calibrated for gVisor limits (`<= 30 MiB RAM`). While ADR-008 `development` ValidatingAdmissionPolicies enforce `30Mi` for micro-containers, full `pytest` execution loading `scikit-learn`, `mlflow`, `shap`, and `pandas` requires standard Python scientific memory (`~250-512 MiB` as configured in `infrastructure/agents/sandbox-job.yaml` and `launch_sandbox_pod.rs`). Public claims must distinguish ADR-008 `development` admission policies (`30Mi`) from `factory-sandboxes` execution limits (`512Mi`).
+

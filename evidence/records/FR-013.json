@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "e6437827-889f-5311-9741-393df6db8fd5",
+  "requirement_id": "FR-013",
+  "collected_at": "2026-11-06T18:56:30Z",
+  "source_revision": {
+    "repository": "lgcorzo/rust_CACD_autonomous_factory",
+    "branch": "011-verified-autonomous-execution",
+    "commit": "1b9a51f8b19169d0a302ea26cf47caa307280281"
+  },
+  "deployment_revision": null,
+  "environment": {
+    "kind": "local",
+    "identifier": "dark-gravity-audit-workstation"
+  },
+  "verification_class": "integration",
+  "method": {
+    "tool": "cargo-test",
+    "command_or_test": "cargo test -p factory-mcp-server --test route_boundary_tests"
+  },
+  "outcome": "passed",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "uri": "file://crates/factory-mcp-server/src/lib.rs",
+      "sha256": "64f47ef1831d076655d627d546c8f5a6d3949d43d486b94f885018bc9123dab1",
+      "media_type": "text/plain"
+    }
+  ],
+  "collector": {
+    "id": "ci-evidence-pipeline",
+    "role": "test_runner"
+  },
+  "limitations": []
+}

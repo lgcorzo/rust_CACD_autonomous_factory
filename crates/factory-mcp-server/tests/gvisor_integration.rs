@@ -59,7 +59,10 @@ async fn test_gvisor_k8s_driver_live_sandbox_execution_opt_in() {
     let _ = rustls::crypto::ring::default_provider().install_default();
     let driver = GvisorK8sDriver;
     let result = driver
-        .execute("import platform; print('gvisor-ok:', platform.system())", "python")
+        .execute(
+            "import platform; print('gvisor-ok:', platform.system())",
+            "python",
+        )
         .await
         .expect("Authorized live gVisor execution must succeed on target cluster");
 

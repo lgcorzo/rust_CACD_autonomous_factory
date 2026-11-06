@@ -75,7 +75,9 @@ fn parse_report(res: &factory_mcp_server::protocol::CallToolResult) -> Value {
 
 #[tokio::test]
 async fn test_run_tests_routes_through_injected_sandbox_driver_no_host_bypass() {
-    let driver = Arc::new(RecordingSandboxDriver::new_success("test result: ok. 5 passed"));
+    let driver = Arc::new(RecordingSandboxDriver::new_success(
+        "test result: ok. 5 passed",
+    ));
     let call_count = driver.call_count.clone();
     let tool = RunTestsTool::new(driver);
 

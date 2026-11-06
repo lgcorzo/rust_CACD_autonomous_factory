@@ -32,10 +32,7 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
         container["securityContext"]["allowPrivilegeEscalation"],
         false
     );
-    assert_eq!(
-        container["securityContext"]["readOnlyRootFilesystem"],
-        true
-    );
+    assert_eq!(container["securityContext"]["readOnlyRootFilesystem"], true);
     assert_eq!(
         container["securityContext"]["capabilities"]["drop"][0],
         "ALL"

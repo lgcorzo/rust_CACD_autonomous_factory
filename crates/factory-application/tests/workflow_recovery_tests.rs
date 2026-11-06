@@ -3,16 +3,15 @@ use factory_application::workflows::autonomous_mission::{
 };
 use factory_infrastructure::finops_stop_store::{FileFinOpsStopStore, FinOpsStopStore};
 use std::sync::{
-    atomic::{AtomicUsize, Ordering},
     Arc,
+    atomic::{AtomicUsize, Ordering},
 };
 
 #[tokio::test]
 async fn test_duplicate_event_delivery_is_idempotent_without_duplicate_side_effects() {
     let state_dir = std::env::temp_dir().join(format!("wf_recovery_{}", uuid::Uuid::new_v4()));
-    let stop_store: Arc<dyn FinOpsStopStore> = Arc::new(FileFinOpsStopStore::new(
-        state_dir.join("finops_stop.json"),
-    ));
+    let stop_store: Arc<dyn FinOpsStopStore> =
+        Arc::new(FileFinOpsStopStore::new(state_dir.join("finops_stop.json")));
     let coordinator = MissionExecutionCoordinator::new(
         state_dir.join("missions_state.json"),
         stop_store,
@@ -64,9 +63,8 @@ async fn test_duplicate_event_delivery_is_idempotent_without_duplicate_side_effe
 #[tokio::test]
 async fn test_retry_after_transient_failure_advances_once_without_advancing_incomplete_work() {
     let state_dir = std::env::temp_dir().join(format!("wf_retry_{}", uuid::Uuid::new_v4()));
-    let stop_store: Arc<dyn FinOpsStopStore> = Arc::new(FileFinOpsStopStore::new(
-        state_dir.join("finops_stop.json"),
-    ));
+    let stop_store: Arc<dyn FinOpsStopStore> =
+        Arc::new(FileFinOpsStopStore::new(state_dir.join("finops_stop.json")));
     let coordinator = MissionExecutionCoordinator::new(
         state_dir.join("missions_state.json"),
         stop_store,
@@ -125,7 +123,8 @@ async fn test_cancellation_compensation_and_worker_restart_recovery() {
     let state_file = state_dir.join("missions_state.json");
     let stop_file = state_dir.join("finops_stop.json");
 
-    let stop_store: Arc<dyn FinOpsStopStore> = Arc::new(FileFinOpsStopStore::new(stop_file.clone()));
+    let stop_store: Arc<dyn FinOpsStopStore> =
+        Arc::new(FileFinOpsStopStore::new(stop_file.clone()));
     let worker_1 = MissionExecutionCoordinator::new(
         state_file.clone(),
         stop_store.clone(),

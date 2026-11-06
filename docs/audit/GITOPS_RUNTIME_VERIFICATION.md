@@ -81,3 +81,4 @@ Validated via `bash ../gitops_internal_lgcorzo/tests/test_sandbox_job_policy.sh`
        - `PodSecurity: restricted` admission is **Reconciled**, **Enforced**, and **Runtime-Verified**.
        - `gVisor` (`runsc`) workload completion and in-pod negative network egress checks are **Declared** and **Reconciled**, and `runsc-sandbox` process creation is **Observed**, but end-to-end gVisor Job completion is **NOT `runtime_verified`** (Classified as `FAIL / PARTIAL` due to host containerd `runtime_type` misconfiguration on `server.internal.lgcorzo`).
        - Per `FR-004` and `SC-001`, `GvisorK8sDriver` and `LaunchSandboxPodTool` **fail closed** (`is_error: true`) when the Job times out rather than falling back to host execution or simulating success.
+

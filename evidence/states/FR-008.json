@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "requirement_id": "FR-008",
+  "status": "TESTED",
+  "implementation_agent_id": "antigravity-implementer",
+  "evidence_refs": [
+    "ce4582f2-d299-57a2-a31e-eee1fd268a2e"
+  ],
+  "transitions": [
+    {
+      "from": null,
+      "to": "OPEN",
+      "at": "2026-11-06T18:56:30Z",
+      "actor_id": "spec-kit-011",
+      "reason": "Registered in 011-verified-autonomous-execution"
+    },
+    {
+      "from": "OPEN",
+      "to": "IMPLEMENTED",
+      "at": "2026-11-06T18:56:30Z",
+      "actor_id": "antigravity-implementer",
+      "reason": "Implemented FR-008 at revision 1b9a51f8b19169d0a302ea26cf47caa307280281"
+    },
+    {
+      "from": "IMPLEMENTED",
+      "to": "TESTED",
+      "at": "2026-11-06T18:56:30Z",
+      "actor_id": "ci-evidence-pipeline",
+      "reason": "Executed cargo test -p factory-mcp-server --test launch_sandbox_pod_tests with exit_code=0"
+    }
+  ],
+  "verified_by": null,
+  "invalidated_at": null
+}

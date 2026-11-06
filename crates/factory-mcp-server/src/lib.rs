@@ -194,9 +194,7 @@ impl McpServer {
         let now = Instant::now();
         let ttl = self.session_ttl;
         let mut sessions = self.sessions.write().await;
-        sessions.retain(|_, rec| {
-            !rec.tx.is_closed() && now.duration_since(rec.last_active) < ttl
-        });
+        sessions.retain(|_, rec| !rec.tx.is_closed() && now.duration_since(rec.last_active) < ttl);
     }
 
     pub fn verify_caller_authorized(&self, headers: &HeaderMap) -> bool {
@@ -421,10 +419,7 @@ impl McpServer {
         }
     }
 
-    pub async fn sse_handler(
-        State(server): State<Arc<McpServer>>,
-        headers: HeaderMap,
-    ) -> Response {
+    pub async fn sse_handler(State(server): State<Arc<McpServer>>, headers: HeaderMap) -> Response {
         server.prune_expired_and_closed_sessions().await;
 
         let owner_id = server.resolve_owner_id(&headers);

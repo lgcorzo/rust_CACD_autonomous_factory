@@ -195,19 +195,19 @@ impl MissionExecutionCoordinator {
             let _guard = self.lock.lock().unwrap();
             let mut data = self.load_store()?;
 
-            if let Some(existing_id) = data.event_to_mission.get(event_key).cloned() {
-                if let Some(existing) = data.missions.get(&existing_id) {
-                    if existing.status == MissionLifecycleStatus::Completed
-                        || existing.status == MissionLifecycleStatus::Running
-                    {
-                        return Ok(existing.clone());
-                    }
-                    if existing.status == MissionLifecycleStatus::Cancelled {
-                        return Err(factory_core::error::FactoryError::Internal(format!(
-                            "Mission '{}' is cancelled and cannot process event '{}'",
-                            existing_id, event_key
-                        )));
-                    }
+            if let Some(existing_id) = data.event_to_mission.get(event_key).cloned()
+                && let Some(existing) = data.missions.get(&existing_id)
+            {
+                if existing.status == MissionLifecycleStatus::Completed
+                    || existing.status == MissionLifecycleStatus::Running
+                {
+                    return Ok(existing.clone());
+                }
+                if existing.status == MissionLifecycleStatus::Cancelled {
+                    return Err(factory_core::error::FactoryError::Internal(format!(
+                        "Mission '{}' is cancelled and cannot process event '{}'",
+                        existing_id, event_key
+                    )));
                 }
             }
 
@@ -695,8 +695,10 @@ pub fn create_mission_workflow_with_clients(
     if has_litellm {
         let stop_store_monitor = shared_stop_store.clone();
         tokio::spawn(async move {
-            let mut finops_agent = FinOpsAgent::default();
-            finops_agent.stop_store = stop_store_monitor;
+            let finops_agent = FinOpsAgent {
+                stop_store: stop_store_monitor,
+                ..Default::default()
+            };
             tokio::select! {
                 _ = cancel_token_finops.cancelled() => {
                     tracing::info!("FinOpsAgent received cancellation signal, shutting down cleanly.");

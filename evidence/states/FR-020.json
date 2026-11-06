@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "requirement_id": "FR-020",
+  "status": "VERIFIED",
+  "implementation_agent_id": "antigravity-implementer",
+  "evidence_refs": [
+    "30bf0204-aa86-59ce-854d-ef0888cab1d4"
+  ],
+  "transitions": [
+    {
+      "from": null,
+      "to": "OPEN",
+      "at": "2026-11-06T18:56:30Z",
+      "actor_id": "spec-kit-011",
+      "reason": "Registered in 011-verified-autonomous-execution"
+    },
+    {
+      "from": "OPEN",
+      "to": "IMPLEMENTED",
+      "at": "2026-11-06T18:56:30Z",
+      "actor_id": "antigravity-implementer",
+      "reason": "Implemented FR-020 at revision 1b9a51f8b19169d0a302ea26cf47caa307280281"
+    },
+    {
+      "from": "IMPLEMENTED",
+      "to": "TESTED",
+      "at": "2026-11-06T18:56:30Z",
+      "actor_id": "ci-evidence-pipeline",
+      "reason": "Executed cargo test -p factory-cli --test evidence_contract_tests with exit_code=0"
+    },
+    {
+      "from": "TESTED",
+      "to": "VERIFIED",
+      "at": "2026-11-06T18:56:30Z",
+      "actor_id": "factory-cli-independent-verifier",
+      "reason": "Independently validated schema, artifact SHA-256, transition chain, and revision freshness"
+    }
+  ],
+  "verified_by": {
+    "id": "factory-cli-independent-verifier",
+    "role": "independent_verifier",
+    "verified_at": "2026-11-06T18:56:30Z",
+    "evidence_refs": [
+      "30bf0204-aa86-59ce-854d-ef0888cab1d4"
+    ]
+  },
+  "invalidated_at": null
+}

@@ -79,7 +79,10 @@ fn validate_and_parse_test_command(
     // Reject dangerous flags that execute arbitrary commands or modify manifest paths outside repo
     for arg in &args {
         if arg.contains("..") || arg.starts_with("--config") {
-            return Err(format!("Argument '{}' is not permitted in sandbox test runner", arg));
+            return Err(format!(
+                "Argument '{}' is not permitted in sandbox test runner",
+                arg
+            ));
         }
     }
 
@@ -88,9 +91,9 @@ fn validate_and_parse_test_command(
         "pytest" | "python3" | "python" => "python",
         _ => {
             return Err(format!(
-                "Unapproved test runner executable '{}'; allowed runners are cargo, pytest, python3",
-                exe
-            ))
+            "Unapproved test runner executable '{}'; allowed runners are cargo, pytest, python3",
+            exe
+        ))
         }
     };
 

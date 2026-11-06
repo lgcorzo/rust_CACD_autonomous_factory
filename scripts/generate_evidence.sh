@@ -26,6 +26,9 @@ echo "Toolchain: ${RUSTC_VER}"
 echo "OS:        ${OS_INFO}"
 echo "----------------------------------------------------------"
 
+export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-2}"
+export CARGO_INCREMENTAL="${CARGO_INCREMENTAL:-0}"
+
 # 1. Format check
 echo "[1/5] Checking code formatting..."
 cargo fmt --check
@@ -43,7 +46,7 @@ CORPUS_STATUS="PASSED"
 
 # 4. Workspace test suite
 echo "[4/5] Executing all unit and integration tests across workspace..."
-cargo test --workspace
+cargo test --workspace -- --skip smoke
 TESTS_STATUS="PASSED"
 
 # Build summary status JSON

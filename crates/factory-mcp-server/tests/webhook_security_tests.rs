@@ -115,7 +115,10 @@ async fn test_webhook_rejects_invalid_signature_malformed_and_oversized_payload(
         .uri("/webhooks/github")
         .header("x-github-event", "issues")
         .header("x-github-delivery", "deliv-bad-sig")
-        .header("x-hub-signature-256", "sha256=0000000000000000000000000000000000000000000000000000000000000000")
+        .header(
+            "x-hub-signature-256",
+            "sha256=0000000000000000000000000000000000000000000000000000000000000000",
+        )
         .body(Body::from(valid_body.clone()))
         .unwrap();
     let resp_bad_sig = app.clone().oneshot(req_bad_sig).await.unwrap();

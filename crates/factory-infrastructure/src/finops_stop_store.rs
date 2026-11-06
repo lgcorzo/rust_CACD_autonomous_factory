@@ -206,10 +206,8 @@ mod tests {
 
     #[test]
     fn test_file_finops_stop_store_cross_worker_visibility_and_versioning() {
-        let path = std::env::temp_dir().join(format!(
-            "unit_finops_stop_{}.json",
-            uuid::Uuid::new_v4()
-        ));
+        let path =
+            std::env::temp_dir().join(format!("unit_finops_stop_{}.json", uuid::Uuid::new_v4()));
         let worker_a = FileFinOpsStopStore::new(path.clone());
         let worker_b = FileFinOpsStopStore::new(path.clone());
 
@@ -226,12 +224,8 @@ mod tests {
         let observed_by_b = worker_b.read_state().unwrap();
         assert!(observed_by_b.halted);
         assert_eq!(observed_by_b.state_version, 1);
-        assert_eq!(
-            observed_by_b.reason.as_deref(),
-            Some("Budget reached 90%")
-        );
+        assert_eq!(observed_by_b.reason.as_deref(), Some("Budget reached 90%"));
 
         let _ = std::fs::remove_file(&path);
     }
 }
-

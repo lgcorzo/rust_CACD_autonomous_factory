@@ -39,9 +39,7 @@ async fn test_subprocess_driver_enforces_timeout() {
         .with_force_production(false)
         .with_timeout(Duration::from_millis(150));
 
-    let res = driver
-        .execute("import time; time.sleep(5)", "python")
-        .await;
+    let res = driver.execute("import time; time.sleep(5)", "python").await;
 
     assert!(res.is_err(), "Timed-out execution must return an error");
     let msg = res.unwrap_err().to_string();
@@ -64,7 +62,10 @@ async fn test_subprocess_driver_reports_actual_nonzero_exit_result() {
         .await
         .expect("Process execution should return ExecutionResult on non-zero exit");
 
-    assert!(!res.is_success, "Non-zero exit code must set is_success=false");
+    assert!(
+        !res.is_success,
+        "Non-zero exit code must set is_success=false"
+    );
     assert_eq!(res.exit_code, Some(3));
     assert!(res.stderr.contains("assertion failed"));
 }

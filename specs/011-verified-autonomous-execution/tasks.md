@@ -151,11 +151,11 @@
 
 **Purpose**: Integrate results, close evidence gaps where possible, and report remaining risks without overstating verification.
 
-- [ ] T044 Regenerate the integrated findings and requirement/control mappings from the final inspected repository revisions in `docs/audit/INTEGRATED_AUDIT.md` and `docs/audit/TRACEABILITY_MATRIX.md`.
-- [ ] T045 Produce the final remediation summary with P0/P1 impact, evidence, owning repository/revision, remediation status, and remaining runtime/access limitations in `docs/audit/REMEDIATION_SUMMARY.md`.
-- [ ] T046 Run every safe, available scenario in `specs/011-verified-autonomous-execution/quickstart.md` and attach command output and limitations to the relevant evidence records.
-- [ ] T047 Re-run affected Rust formatting, Clippy, workspace tests, repository-specific checks, GitOps rendering, evidence validation, and website consistency checks; record exact commands and revisions in `docs/audit/REMEDIATION_SUMMARY.md`.
-- [ ] T048 Review all unresolved findings and evidence gaps; keep overall completion open while any P0 remains unresolved and mark inaccessible live checks as unverified in `docs/audit/REMEDIATION_SUMMARY.md`.
+- [x] T044 Regenerate the integrated findings and requirement/control mappings from the final inspected repository revisions in `docs/audit/INTEGRATED_AUDIT.md` and `docs/audit/TRACEABILITY_MATRIX.md`.
+- [x] T045 Produce the final remediation summary with P0/P1 impact, evidence, owning repository/revision, remediation status, and remaining runtime/access limitations in `docs/audit/REMEDIATION_SUMMARY.md`.
+- [x] T046 Run every safe, available scenario in `specs/011-verified-autonomous-execution/quickstart.md` and attach command output and limitations to the relevant evidence records.
+- [x] T047 Re-run affected Rust formatting, Clippy, workspace tests, repository-specific checks, GitOps rendering, evidence validation, and website consistency checks; record exact commands and revisions in `docs/audit/REMEDIATION_SUMMARY.md`.
+- [x] T048 Review all unresolved findings and evidence gaps; keep overall completion open while any P0 remains unresolved and mark inaccessible live checks as unverified in `docs/audit/REMEDIATION_SUMMARY.md`.
 
 ## Dependencies & Execution Order
 
