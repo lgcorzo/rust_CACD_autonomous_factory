@@ -33,15 +33,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T006 [P] [US1] Add regression tests for direct host-shell bypass, missing runner, unsupported runtime, invalid arguments, and mocked-success classification in `crates/factory-mcp-server/tests/run_tests_security_tests.rs`.
-- [ ] T007 [P] [US1] Add sandbox-driver tests for isolation unavailable, runtime rejected, timeout, and actual exit-result reporting in `crates/factory-mcp-server/tests/sandbox_driver_tests.rs`.
+- [x] T006 [P] [US1] Add regression tests for direct host-shell bypass, missing runner, unsupported runtime, invalid arguments, and mocked-success classification in `crates/factory-mcp-server/tests/run_tests_security_tests.rs`.
+- [x] T007 [P] [US1] Add sandbox-driver tests for isolation unavailable, runtime rejected, timeout, and actual exit-result reporting in `crates/factory-mcp-server/tests/sandbox_driver_tests.rs`.
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Replace direct `sh -c` execution with the injected approved `SandboxDriver`, preserving validated executable/argument boundaries and returning an explicit not-executed or infrastructure result on failure in `crates/factory-mcp-server/src/tools/run_tests.rs`.
-- [ ] T009 [US1] Remove mock-command success behavior and return distinct real-pass, real-failure, not-executed, infrastructure-error, timeout, and mocked outcomes in `crates/factory-mcp-server/src/tools/run_tests.rs`.
-- [ ] T010 [P] [US1] Make dynamically created sandbox Jobs enforce the approved RuntimeClass, non-root/read-only/no-capabilities policy, bounded resources, completion deadline, and cleanup behavior, failing closed when required controls are unavailable in `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs`.
-- [ ] T011 [US1] Add an opt-in end-to-end gVisor test that confirms a real test runs in the approved sandbox and that sandbox failure never falls back to the host in `crates/factory-mcp-server/tests/gvisor_integration.rs`.
+- [x] T008 [US1] Replace direct `sh -c` execution with the injected approved `SandboxDriver`, preserving validated executable/argument boundaries and returning an explicit not-executed or infrastructure result on failure in `crates/factory-mcp-server/src/tools/run_tests.rs`.
+- [x] T009 [US1] Remove mock-command success behavior and return distinct real-pass, real-failure, not-executed, infrastructure-error, timeout, and mocked outcomes in `crates/factory-mcp-server/src/tools/run_tests.rs`.
+- [x] T010 [P] [US1] Make dynamically created sandbox Jobs enforce the approved RuntimeClass, non-root/read-only/no-capabilities policy, bounded resources, completion deadline, and cleanup behavior, failing closed when required controls are unavailable in `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs`.
+- [x] T011 [US1] Add an opt-in end-to-end gVisor test that confirms a real test runs in the approved sandbox and that sandbox failure never falls back to the host in `crates/factory-mcp-server/tests/gvisor_integration.rs`.
 
 **Checkpoint**: Run the focused MCP-server tests and the authorized gVisor integration test. Do not mark the story complete if live isolation was not exercised; record that evidence gap.
 

@@ -4,7 +4,7 @@ use std::time::Duration;
 use tokio::process::Command;
 use tokio::time::timeout;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ExecutionResult {
     pub stdout: String,
     pub stderr: String,
@@ -48,17 +48,24 @@ impl SandboxDriver for NativeSurgerySandboxDriver {
 
 pub struct SubprocessDriver {
     pub force_production: Option<bool>,
+    pub timeout_duration: Duration,
 }
 
 impl SubprocessDriver {
     pub fn new() -> Self {
         Self {
             force_production: None,
+            timeout_duration: Duration::from_secs(30),
         }
     }
 
     pub fn with_force_production(mut self, force: bool) -> Self {
         self.force_production = Some(force);
+        self
+    }
+
+    pub fn with_timeout(mut self, timeout_duration: Duration) -> Self {
+        self.timeout_duration = timeout_duration;
         self
     }
 
@@ -88,7 +95,7 @@ impl SandboxDriver for SubprocessDriver {
             );
         }
 
-        let timeout_duration = Duration::from_secs(30);
+        let timeout_duration = self.timeout_duration;
 
         let output = match language {
             "python" => {
@@ -97,45 +104,63 @@ impl SandboxDriver for SubprocessDriver {
                 match timeout(timeout_duration, cmd.output()).await {
                     Ok(res) => res?,
                     Err(_) => {
-                        anyhow::bail!("Execution timed out after {}s", timeout_duration.as_secs())
+                        anyhow::bail!("Execution timed out after {:?}", timeout_duration)
                     }
                 }
             }
             "rust" => {
-                // Simplified rustc execution for now
-                let mut cmd = Command::new("rustc");
-                cmd.arg("-e")
-                    .arg("println!(\"{}\", \"Hello from Rust!\")")
+                let run_dir = std::env::temp_dir().join(format!("factory_rust_{}", uuid::Uuid::new_v4()));
+                tokio::fs::create_dir_all(&run_dir).await?;
+                let src_path = run_dir.join("snippet.rs");
+                let bin_path = run_dir.join("snippet_bin");
+                let wrapped = if code.contains("fn main") {
+                    code.to_string()
+                } else {
+                    format!("fn main() {{\n{}\n}}", code)
+                };
+                tokio::fs::write(&src_path, wrapped).await?;
+
+                let mut compile_cmd = Command::new("rustc");
+                compile_cmd
+                    .arg(&src_path)
+                    .arg("-o")
+                    .arg(&bin_path)
                     .kill_on_drop(true);
-                match timeout(timeout_duration, cmd.output()).await {
+                let compile_out = match timeout(timeout_duration, compile_cmd.output()).await {
                     Ok(res) => res?,
                     Err(_) => {
-                        anyhow::bail!("Execution timed out after {}s", timeout_duration.as_secs())
+                        let _ = tokio::fs::remove_dir_all(&run_dir).await;
+                        anyhow::bail!("Execution timed out after {:?}", timeout_duration)
                     }
+                };
+                if !compile_out.status.success() {
+                    let _ = tokio::fs::remove_dir_all(&run_dir).await;
+                    return Ok(ExecutionResult {
+                        stdout: String::from_utf8_lossy(&compile_out.stdout).to_string(),
+                        stderr: String::from_utf8_lossy(&compile_out.stderr).to_string(),
+                        exit_code: compile_out.status.code(),
+                        is_success: false,
+                    });
                 }
-            }
-            "go" => {
-                // go run ignores stdin easily, so we usually write to a temp file, but for simplicity:
-                let mut cmd = Command::new("go");
-                cmd.arg("run").arg("-").kill_on_drop(true); // go run - accepts stdin? No, not normally. We'll mock it like rustc for now.
-                match timeout(timeout_duration, cmd.output()).await {
-                    Ok(res) => res?,
+
+                let mut run_cmd = Command::new(&bin_path);
+                run_cmd.kill_on_drop(true);
+                let run_res = match timeout(timeout_duration, run_cmd.output()).await {
+                    Ok(res) => res,
                     Err(_) => {
-                        anyhow::bail!("Execution timed out after {}s", timeout_duration.as_secs())
+                        let _ = tokio::fs::remove_dir_all(&run_dir).await;
+                        anyhow::bail!("Execution timed out after {:?}", timeout_duration)
                     }
-                }
+                };
+                let _ = tokio::fs::remove_dir_all(&run_dir).await;
+                run_res?
             }
-            "typescript" | "ts" => {
-                let mut cmd = Command::new("ts-node");
-                cmd.arg("-e").arg(code).kill_on_drop(true);
-                match timeout(timeout_duration, cmd.output()).await {
-                    Ok(res) => res?,
-                    Err(_) => {
-                        anyhow::bail!("Execution timed out after {}s", timeout_duration.as_secs())
-                    }
-                }
+            _ => {
+                anyhow::bail!(
+                    "Unsupported or unverified execution runtime language: {}",
+                    language
+                )
             }
-            _ => return Err(anyhow::anyhow!("Unsupported language: {}", language)),
         };
 
         Ok(ExecutionResult {
@@ -168,31 +193,17 @@ impl SandboxDriver for GvisorK8sDriver {
             "language": language
         });
 
-        // We reuse the new tool we are creating to run the job
         let result = tool.call(params).await?;
 
-        // Parse the result
-        let output_text = if result.is_error {
-            result
-                .content
-                .iter()
-                .map(|c| match c {
-                    crate::protocol::McpContent::Text { text } => text.clone(),
-                    _ => String::new(),
-                })
-                .collect::<Vec<_>>()
-                .join("\n")
-        } else {
-            result
-                .content
-                .iter()
-                .map(|c| match c {
-                    crate::protocol::McpContent::Text { text } => text.clone(),
-                    _ => String::new(),
-                })
-                .collect::<Vec<_>>()
-                .join("\n")
-        };
+        let output_text = result
+            .content
+            .iter()
+            .map(|c| match c {
+                crate::protocol::McpContent::Text { text } => text.clone(),
+                _ => String::new(),
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
 
         Ok(ExecutionResult {
             stdout: if !result.is_error {
@@ -217,8 +228,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_subprocess_driver_timeout() {
-        let driver = SubprocessDriver::new();
-        // Test normal execution
+        let driver = SubprocessDriver::new().with_force_production(false);
         let result = driver.execute("print('hello')", "python").await.unwrap();
         assert!(result.is_success);
         assert_eq!(result.stdout.trim(), "hello");
