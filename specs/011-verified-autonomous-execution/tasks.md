@@ -93,15 +93,15 @@
 
 ### Tests and verification for User Story 4
 
-- [ ] T024 [P] [US4] Add a manifest regression check for required RuntimeClass, namespace PSA, RBAC, network policy, image, resource, timeout, and cleanup settings in `../gitops_internal_lgcorzo/tests/test_sandbox_job_policy.sh`.
-- [ ] T025 [US4] Align the GitOps sandbox Job with the approved sandbox policy and fail closed on missing required isolation controls in `../gitops_internal_lgcorzo/infrastructure/agents/sandbox-job.yaml`.
-- [ ] T026 [US4] Render the agent overlay and compare its declared controls with the dynamically generated Job policy; record source revisions and rendered results in `docs/audit/GITOPS_RUNTIME_VERIFICATION.md` using `../gitops_internal_lgcorzo/infrastructure/agents/kustomization.yaml` and `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs`.
-- [ ] T027 [US4] Record current Flux source/Kustomization revisions, RuntimeClass handler, and observed namespace/network/RBAC/workload state; identify each check as unavailable if cluster access is missing in `docs/audit/GITOPS_RUNTIME_VERIFICATION.md`.
-- [ ] T028 [US4] With cluster-owner authorization, execute a harmless disposable sandbox workload and safe negative network/resource checks; capture admitted workload, observed runtime handler, result, cleanup, source revision, and deployment revision in `docs/audit/GITOPS_RUNTIME_VERIFICATION.md`.
+- [x] T024 [P] [US4] Add a manifest regression check for required RuntimeClass, namespace PSA, RBAC, network policy, image, resource, timeout, and cleanup settings in `../gitops_internal_lgcorzo/tests/test_sandbox_job_policy.sh`.
+- [x] T025 [US4] Align the GitOps sandbox Job with the approved sandbox policy and fail closed on missing required isolation controls in `../gitops_internal_lgcorzo/infrastructure/agents/sandbox-job.yaml`.
+- [x] T026 [US4] Render the agent overlay and compare its declared controls with the dynamically generated Job policy; record source revisions and rendered results in `docs/audit/GITOPS_RUNTIME_VERIFICATION.md` using `../gitops_internal_lgcorzo/infrastructure/agents/kustomization.yaml` and `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs`.
+- [x] T027 [US4] Record current Flux source/Kustomization revisions, RuntimeClass handler, and observed namespace/network/RBAC/workload state; identify each check as unavailable if cluster access is missing in `docs/audit/GITOPS_RUNTIME_VERIFICATION.md`.
+- [x] T028 [US4] With cluster-owner authorization, execute a harmless disposable sandbox workload and safe negative network/resource checks; capture admitted workload, observed runtime handler, result, cleanup, source revision, and deployment revision in `docs/audit/GITOPS_RUNTIME_VERIFICATION.md`.
 
 ### Implementation and reporting for User Story 4
 
-- [ ] T029 [US4] Update each control's lifecycle-stage status and attach exact evidence references, marking stale or unavailable stages unverified in `docs/audit/TRACEABILITY_MATRIX.md`.
+- [x] T029 [US4] Update each control's lifecycle-stage status and attach exact evidence references, marking stale or unavailable stages unverified in `docs/audit/TRACEABILITY_MATRIX.md`.
 
 **Checkpoint**: No control is labeled runtime-verified without live evidence for the exact inspected source/deployment revision and environment.
 
