@@ -62,7 +62,10 @@ impl FileFinOpsStopStore {
                 let path = std::env::var("FINOPS_STOP_STORE_PATH")
                     .map(PathBuf::from)
                     .unwrap_or_else(|_| {
-                        std::env::temp_dir().join("dark_gravity_finops_stop_state.json")
+                        std::env::temp_dir().join(format!(
+                            "dark_gravity_finops_stop_state_{}.json",
+                            std::process::id()
+                        ))
                     });
                 Arc::new(FileFinOpsStopStore::new(path))
             })
