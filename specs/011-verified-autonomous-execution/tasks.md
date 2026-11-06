@@ -53,15 +53,15 @@
 
 ### Tests for User Story 2
 
-- [ ] T012 [P] [US2] Extend admission integration tests to activate the monitor-owned hard stop, submit concurrent requests through normal mission admission, and assert each request beginning after the stop is rejected with the observed stop-state version in `crates/factory-application/tests/finops_admission_tests.rs`.
-- [ ] T013 [P] [US2] Add workflow recovery tests for duplicate event delivery, retry after transient failure, cancellation/compensation, and worker restart without duplicate side effects in `crates/factory-application/tests/workflow_recovery_tests.rs`.
+- [x] T012 [P] [US2] Extend admission integration tests to activate the monitor-owned hard stop, submit concurrent requests through normal mission admission, and assert each request beginning after the stop is rejected with the observed stop-state version in `crates/factory-application/tests/finops_admission_tests.rs`.
+- [x] T013 [P] [US2] Add workflow recovery tests for duplicate event delivery, retry after transient failure, cancellation/compensation, and worker restart without duplicate side effects in `crates/factory-application/tests/workflow_recovery_tests.rs`.
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Implement a shared, durable FinOps hard-stop store using the existing persistence/workflow integration; fail admission closed on read errors and test cross-worker visibility in `crates/factory-infrastructure/src/finops_stop_store.rs`.
-- [ ] T015 [US2] Inject the shared hard-stop store into both budget monitoring and every mission admission path, removing independently default-constructed latches from `crates/factory-application/src/agents/finops.rs` and `crates/factory-application/src/workflows/autonomous_mission.rs`.
-- [ ] T016 [US2] Make mission event handling idempotent and define persisted retry, cancellation, worker-restart, and already-running-mission behavior in `crates/factory-application/src/workflows/autonomous_mission.rs`.
-- [ ] T017 [US2] Record the admission boundary, cross-worker hard-stop evidence, retry/restart scenarios, active-mission policy, and remaining gaps in `docs/audit/WORKFLOW_RELIABILITY.md`.
+- [x] T014 [US2] Implement a shared, durable FinOps hard-stop store using the existing persistence/workflow integration; fail admission closed on read errors and test cross-worker visibility in `crates/factory-infrastructure/src/finops_stop_store.rs`.
+- [x] T015 [US2] Inject the shared hard-stop store into both budget monitoring and every mission admission path, removing independently default-constructed latches from `crates/factory-application/src/agents/finops.rs` and `crates/factory-application/src/workflows/autonomous_mission.rs`.
+- [x] T016 [US2] Make mission event handling idempotent and define persisted retry, cancellation, worker-restart, and already-running-mission behavior in `crates/factory-application/src/workflows/autonomous_mission.rs`.
+- [x] T017 [US2] Record the admission boundary, cross-worker hard-stop evidence, retry/restart scenarios, active-mission policy, and remaining gaps in `docs/audit/WORKFLOW_RELIABILITY.md`.
 
 **Checkpoint**: Run FinOps admission and recovery integration tests against the actual admission/workflow boundary. A process-local latch test alone does not satisfy this story.
 
