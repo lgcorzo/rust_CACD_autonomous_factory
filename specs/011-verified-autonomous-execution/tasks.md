@@ -12,9 +12,9 @@
 
 **Purpose**: Establish a revision-bound, current baseline before making repository-specific claims.
 
-- [ ] T001 [P] Record branch, full commit SHA, access status, CI/test entry points, and collection time for every in-scope repository in `docs/audit/ECOSYSTEM_INVENTORY.md`; include `lince-rs` and `autonomous_factory` only if accessible.
-- [ ] T002 [P] Compare existing audit reports and evidence artifacts with the current source/GitOps revisions, labeling each item current, historical, contradictory, or unverified in `docs/audit/INTEGRATED_AUDIT.md`.
-- [ ] T003 [P] Map every FR and SC to its owning user story, acceptance condition, required evidence class, and verification source in `docs/audit/TRACEABILITY_MATRIX.md`.
+- [x] T001 [P] Record branch, full commit SHA, access status, CI/test entry points, and collection time for every in-scope repository in `docs/audit/ECOSYSTEM_INVENTORY.md`; include `lince-rs` and `autonomous_factory` only if accessible.
+- [x] T002 [P] Compare existing audit reports and evidence artifacts with the current source/GitOps revisions, labeling each item current, historical, contradictory, or unverified in `docs/audit/INTEGRATED_AUDIT.md`.
+- [x] T003 [P] Map every FR and SC to its owning user story, acceptance condition, required evidence class, and verification source in `docs/audit/TRACEABILITY_MATRIX.md`.
 
 ## Phase 2: Foundational
 
