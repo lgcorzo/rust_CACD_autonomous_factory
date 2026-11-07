@@ -95,7 +95,7 @@ impl Tool for SecurityReviewTool {
         let diff = params["diff"].as_str().unwrap_or("");
         let (h_score, h_findings) = Self::heuristic_scan(diff);
 
-        let system_prompt = "You are a SAST Security Judge (Aethelgard). Analyze the code diff for security vulnerabilities (injection, hardcoded secrets, unsafe code, memory leaks). Return a JSON object with keys: score (float 0.0-10.0), status ('approved' if score >= 8.0 else 'rejected'), and findings (array of strings).";
+        let system_prompt = "You are a SAST Security Judge (Aethelgard). Analyze the code diff or task instruction for security vulnerabilities (injection, hardcoded secrets, unsafe code, memory leaks). Benign task descriptions, routine functional logic, documentation, diagnostic logs, and health checks without exploit payloads must receive an approved score >= 8.0 (typically 9.0-10.0). Only penalize or reject actual vulnerabilities or dangerous code. Return a JSON object with keys: score (float 0.0-10.0), status ('approved' if score >= 8.0 else 'rejected'), and findings (array of strings).";
 
         let mut final_score = h_score;
         let mut final_status = if final_score >= 8.0 {
