@@ -12,6 +12,7 @@ pub trait McpClient: Send + Sync {
 pub struct McpHttpClient {
     client: Client,
     base_url: String,
+    bearer_token: Option<String>,
 }
 
 #[async_trait::async_trait]
@@ -27,12 +28,22 @@ impl McpClient for McpHttpClient {
             "id": 1
         });
 
-        let response = self
+        let mut req_builder = self
             .client
             .post(format!("{}/mcp", self.base_url))
-            .json(&request)
-            .send()
-            .await?;
+            .json(&request);
+
+        let token = self
+            .bearer_token
+            .clone()
+            .or_else(|| std::env::var("MCP_API_BEARER_TOKEN").ok())
+            .filter(|t| !t.trim().is_empty());
+
+        if let Some(token) = token {
+            req_builder = req_builder.header("Authorization", format!("Bearer {}", token.trim()));
+        }
+
+        let response = req_builder.send().await?;
 
         if !response.status().is_success() {
             return Err(anyhow!("MCP server returned error: {}", response.status()));
@@ -65,7 +76,13 @@ impl McpHttpClient {
         Self {
             client: Client::new(),
             base_url,
+            bearer_token: None,
         }
+    }
+
+    pub fn with_bearer_token(mut self, token: impl Into<String>) -> Self {
+        self.bearer_token = Some(token.into());
+        self
     }
 }
 
@@ -74,6 +91,7 @@ pub struct McpSseClient {
     client: Client,
     base_url: String,
     session_url: OnceCell<String>,
+    bearer_token: Option<String>,
 }
 
 impl McpSseClient {
@@ -82,14 +100,31 @@ impl McpSseClient {
             client: Client::new(),
             base_url,
             session_url: OnceCell::new(),
+            bearer_token: None,
         }
+    }
+
+    pub fn with_bearer_token(mut self, token: impl Into<String>) -> Self {
+        self.bearer_token = Some(token.into());
+        self
+    }
+
+    fn resolve_bearer_token(&self) -> Option<String> {
+        self.bearer_token
+            .clone()
+            .or_else(|| std::env::var("MCP_API_BEARER_TOKEN").ok())
+            .filter(|t| !t.trim().is_empty())
     }
 
     async fn get_session_url(&self) -> anyhow::Result<String> {
         self.session_url
             .get_or_try_init(|| async {
                 let sse_url = format!("{}/sse", self.base_url);
-                let response = self.client.get(&sse_url).send().await?;
+                let mut req_builder = self.client.get(&sse_url);
+                if let Some(token) = self.resolve_bearer_token() {
+                    req_builder = req_builder.header("Authorization", format!("Bearer {}", token.trim()));
+                }
+                let response = req_builder.send().await?;
 
                 if !response.status().is_success() {
                     return Err(anyhow!("Failed to connect to SSE: {}", response.status()));
@@ -141,7 +176,12 @@ impl McpClient for McpSseClient {
             "id": 1
         });
 
-        let response = self.client.post(&session_url).json(&request).send().await?;
+        let mut req_builder = self.client.post(&session_url).json(&request);
+        if let Some(token) = self.resolve_bearer_token() {
+            req_builder = req_builder.header("Authorization", format!("Bearer {}", token.trim()));
+        }
+
+        let response = req_builder.send().await?;
 
         if !response.status().is_success() {
             return Err(anyhow!("MCP session returned error: {}", response.status()));
@@ -227,5 +267,64 @@ mod tests {
         let result = client.call_tool_json("test_tool", json!({})).await.unwrap();
 
         assert_eq!(result["output"], "sse_success");
+    }
+
+    #[tokio::test]
+    async fn test_call_tool_http_with_bearer_token() {
+        use wiremock::matchers::header;
+
+        let mock_server: MockServer = MockServer::start().await;
+        let response_body = json!({
+            "jsonrpc": "2.0",
+            "result": { "output": "auth_success" },
+            "id": 1
+        });
+
+        Mock::given(method("POST"))
+            .and(path("/mcp"))
+            .and(header("Authorization", "Bearer test-secret-token"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
+            .mount(&mock_server)
+            .await;
+
+        let client = McpHttpClient::new(mock_server.uri()).with_bearer_token("test-secret-token");
+        let result = client.call_tool_json("test_tool", json!({})).await.unwrap();
+
+        assert_eq!(result["output"], "auth_success");
+    }
+
+    #[tokio::test]
+    async fn test_call_tool_sse_with_bearer_token() {
+        use wiremock::matchers::header;
+
+        let mock_server: MockServer = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/sse"))
+            .and(header("Authorization", "Bearer test-sse-token"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(format!(
+                "event: endpoint\ndata: {}/mcp/session/1\n\n",
+                mock_server.uri()
+            )))
+            .mount(&mock_server)
+            .await;
+
+        let response_body = json!({
+            "jsonrpc": "2.0",
+            "result": { "output": "sse_auth_success" },
+            "id": 1
+        });
+
+        Mock::given(method("POST"))
+            .and(path("/mcp/session/1"))
+            .and(header("Authorization", "Bearer test-sse-token"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
+            .mount(&mock_server)
+            .await;
+
+        let client = McpSseClient::new(mock_server.uri()).with_bearer_token("test-sse-token");
+        let result = client.call_tool_json("test_tool", json!({})).await.unwrap();
+
+        assert_eq!(result["output"], "sse_auth_success");
     }
 }
