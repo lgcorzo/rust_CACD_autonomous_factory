@@ -186,13 +186,20 @@ impl Tool for RunTestsTool {
         };
 
         let start_time = std::time::Instant::now();
-        let snippet = build_driver_snippet(&exe, &args);
-
-        // Execute strictly through the injected SandboxDriver (using python argv runner inside sandbox)
-        let driver_lang = if language == "rust" || language == "python" {
-            "python"
+        let (snippet, driver_lang) = if language == "rust" {
+            let escaped_args = args
+                .iter()
+                .map(|a| format!("\"{}\"", a.replace('"', "\\\"")))
+                .collect::<Vec<_>>()
+                .join(" ");
+            let cmd = if escaped_args.is_empty() {
+                exe.to_string()
+            } else {
+                format!("{} {}", exe, escaped_args)
+            };
+            (cmd, "rust")
         } else {
-            language.as_str()
+            (build_driver_snippet(&exe, &args), "python")
         };
 
         let report = match self.driver.execute(&snippet, driver_lang).await {
