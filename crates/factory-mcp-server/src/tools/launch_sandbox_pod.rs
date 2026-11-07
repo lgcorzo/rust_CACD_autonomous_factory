@@ -180,12 +180,14 @@ pub fn sanitize_executable_code(code: &str, language: &str) -> String {
         }
         "rust" => {
             if extracted.contains("fn main") || extracted.contains("println!") {
-                extracted.to_string()
-            } else {
+                let escaped_rust = extracted.replace('\'', "'\\''");
                 format!(
-                    "fn main() {{ println!(\"[DarkGravity Sandbox] Task executed: {}\"); }}",
-                    extracted.replace('\\', "\\\\").replace('"', "\\\"")
+                    "echo '{}' > /tmp/runner.rs && rustc /tmp/runner.rs -o /tmp/runner && /tmp/runner",
+                    escaped_rust
                 )
+            } else {
+                // Command line / shell execution for cargo or direct commands
+                extracted.to_string()
             }
         }
         _ => extracted.to_string(),
