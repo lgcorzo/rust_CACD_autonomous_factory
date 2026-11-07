@@ -22,8 +22,7 @@ pub fn build_sandbox_job_spec(
 ) -> anyhow::Result<serde_json::Value> {
     let is_prod = std::env::var("FACTORY_ENV")
         .unwrap_or_default()
-        .eq_ignore_ascii_case("production")
-        || cfg!(feature = "production");
+        .eq_ignore_ascii_case("production");
     if is_prod && !require_gvisor {
         anyhow::bail!(
             "Untrusted sandbox execution requires gVisor runtime in production. Fallback to standard runc/host is forbidden."
@@ -223,11 +222,10 @@ impl Tool for LaunchSandboxPodTool {
 
         let code = sanitize_executable_code(raw_code, language);
 
-        // Fail closed unless gVisor is explicitly disabled via ALLOW_UNSAFE_NO_GVISOR=true (never allowed in production)
+        // Fail closed unless gVisor is explicitly disabled via USE_GVISOR=false (never allowed in production)
         let is_prod = std::env::var("FACTORY_ENV")
             .unwrap_or_default()
-            .eq_ignore_ascii_case("production")
-            || cfg!(feature = "production");
+            .eq_ignore_ascii_case("production");
         let explicit_disable = std::env::var("USE_GVISOR")
             .ok()
             .map(|v| v.eq_ignore_ascii_case("false") || v == "0")
