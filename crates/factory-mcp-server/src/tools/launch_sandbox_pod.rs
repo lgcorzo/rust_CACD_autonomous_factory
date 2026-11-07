@@ -185,7 +185,10 @@ pub fn sanitize_executable_code(code: &str, language: &str) -> String {
                     "echo '{}' > /tmp/runner.rs && rustc /tmp/runner.rs -o /tmp/runner && /tmp/runner",
                     escaped_rust
                 )
-            } else if extracted.starts_with("cargo test") || extracted.starts_with("cargo \"test\"") || extracted == "cargo" {
+            } else if extracted.starts_with("cargo test")
+                || extracted.starts_with("cargo \"test\"")
+                || extracted == "cargo"
+            {
                 // If running cargo test in an empty container, bootstrap a minimal Cargo package in /tmp if Cargo.toml is absent
                 format!(
                     "if [ ! -f Cargo.toml ]; then cd /tmp && ([ -f Cargo.toml ] || cargo init --lib --name sandbox_workspace --vcs none >/dev/null 2>&1) && cargo test; else {}; fi",
