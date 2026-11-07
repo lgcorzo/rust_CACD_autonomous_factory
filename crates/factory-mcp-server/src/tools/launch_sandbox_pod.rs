@@ -41,6 +41,9 @@ pub fn build_sandbox_job_spec(
         );
     }
 
+    let image = std::env::var("SANDBOX_IMAGE")
+        .unwrap_or_else(|_| "python:3.11.11-slim".to_string());
+
     let mut template_spec = serde_json::json!({
         "restartPolicy": "Never",
         "automountServiceAccountToken": false,
@@ -60,7 +63,7 @@ pub fn build_sandbox_job_spec(
         }],
         "containers": [{
             "name": "sandbox",
-            "image": "python:3.11.11-slim",
+            "image": image,
             "command": ["/bin/sh", "-c"],
             "args": [cmd],
             "securityContext": {
@@ -200,7 +203,7 @@ impl Tool for LaunchSandboxPodTool {
                 "task_id": {"type": "string"},
                 "task_description": {"type": "string"},
                 "code": {"type": "string"},
-                "language": {"type": "string", "enum": ["python"]}
+                "language": {"type": "string", "enum": ["python", "rust"]}
             },
             "required": ["code", "language"]
         })
@@ -212,10 +215,9 @@ impl Tool for LaunchSandboxPodTool {
         if raw_code.trim().is_empty() {
             anyhow::bail!("Sandbox code payload must not be empty");
         }
-        // Only python is available inside the python:3.11.11-slim sandbox image unless a dedicated rust image is configured
-        if language != "python" {
+        if language != "python" && language != "rust" {
             anyhow::bail!(
-                "Unsupported sandbox container runtime language '{}': sandbox image python:3.11.11-slim only provides verified Python 3.11 runtime",
+                "Unsupported sandbox container runtime language '{}': only 'python' and 'rust' runtimes are supported",
                 language
             );
         }
@@ -244,7 +246,11 @@ impl Tool for LaunchSandboxPodTool {
                 .collect::<String>()
         );
 
-        let cmd = format!("python3 -c '{}'", code.replace('\'', "'\\''"));
+        let cmd = if language == "rust" {
+            format!("sh -c '{}'", code.replace('\'', "'\\''"))
+        } else {
+            format!("python3 -c '{}'", code.replace('\'', "'\\''"))
+        };
         let job_json = build_sandbox_job_spec(&job_name, &cmd, require_gvisor, &namespace)?;
         let job: Job = serde_json::from_value(job_json)?;
 
