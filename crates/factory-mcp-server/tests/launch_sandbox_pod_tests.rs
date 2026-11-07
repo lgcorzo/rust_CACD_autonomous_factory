@@ -5,7 +5,8 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
     let job_name = "test-sandbox-01";
     let cmd = "python3 -c 'print(1)'";
 
-    let job_spec = build_sandbox_job_spec(job_name, cmd, true, "factory-sandboxes").unwrap();
+    let job_spec =
+        build_sandbox_job_spec(job_name, cmd, true, "factory-sandboxes", "python").unwrap();
 
     let spec = job_spec.get("spec").expect("Job spec must exist");
     assert_eq!(spec["ttlSecondsAfterFinished"], 300);
@@ -46,12 +47,20 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
 
     // Must omit runtimeClassName if gVisor is disabled in non-production
     let non_gvisor_spec =
-        build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes").unwrap();
+        build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes", "python").unwrap();
     assert!(non_gvisor_spec["spec"]["template"]["spec"]
         .get("runtimeClassName")
         .is_none());
     // Must fail closed if default namespace is used
-    assert!(build_sandbox_job_spec(job_name, cmd, true, "default").is_err());
+    assert!(build_sandbox_job_spec(job_name, cmd, true, "default", "python").is_err());
     // Must fail closed on empty command
-    assert!(build_sandbox_job_spec(job_name, "   ", true, "factory-sandboxes").is_err());
+    assert!(build_sandbox_job_spec(job_name, "   ", true, "factory-sandboxes", "python").is_err());
+
+    // Must use rust image for rust language
+    let rust_spec =
+        build_sandbox_job_spec(job_name, "cargo test", true, "factory-sandboxes", "rust").unwrap();
+    assert_eq!(
+        rust_spec["spec"]["template"]["spec"]["containers"][0]["image"],
+        "rust:1.85-slim"
+    );
 }

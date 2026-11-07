@@ -19,6 +19,7 @@ pub fn build_sandbox_job_spec(
     cmd: &str,
     require_gvisor: bool,
     namespace: &str,
+    language: &str,
 ) -> anyhow::Result<serde_json::Value> {
     let is_prod = std::env::var("FACTORY_ENV")
         .unwrap_or_default()
@@ -41,8 +42,13 @@ pub fn build_sandbox_job_spec(
         );
     }
 
-    let image =
-        std::env::var("SANDBOX_IMAGE").unwrap_or_else(|_| "python:3.11.11-slim".to_string());
+    let image = if let Ok(custom_image) = std::env::var("SANDBOX_IMAGE") {
+        custom_image
+    } else if language == "rust" {
+        std::env::var("SANDBOX_RUST_IMAGE").unwrap_or_else(|_| "rust:1.85-slim".to_string())
+    } else {
+        std::env::var("SANDBOX_PYTHON_IMAGE").unwrap_or_else(|_| "python:3.11.11-slim".to_string())
+    };
 
     let mut template_spec = serde_json::json!({
         "restartPolicy": "Never",
@@ -251,7 +257,8 @@ impl Tool for LaunchSandboxPodTool {
         } else {
             format!("python3 -c '{}'", code.replace('\'', "'\\''"))
         };
-        let job_json = build_sandbox_job_spec(&job_name, &cmd, require_gvisor, &namespace)?;
+        let job_json =
+            build_sandbox_job_spec(&job_name, &cmd, require_gvisor, &namespace, language)?;
         let job: Job = serde_json::from_value(job_json)?;
 
         let client = Client::try_default().await.map_err(|e| {
