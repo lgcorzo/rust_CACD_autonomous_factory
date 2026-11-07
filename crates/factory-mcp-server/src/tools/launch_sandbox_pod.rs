@@ -50,6 +50,11 @@ pub fn build_sandbox_job_spec(
         std::env::var("SANDBOX_PYTHON_IMAGE").unwrap_or_else(|_| "python:3.11.11-slim".to_string())
     };
 
+    let memory_limit =
+        std::env::var("SANDBOX_MEMORY_LIMIT").unwrap_or_else(|_| "512Mi".to_string());
+    let memory_request =
+        std::env::var("SANDBOX_MEMORY_REQUEST").unwrap_or_else(|_| "64Mi".to_string());
+
     let mut template_spec = serde_json::json!({
         "restartPolicy": "Never",
         "automountServiceAccountToken": false,
@@ -64,7 +69,7 @@ pub fn build_sandbox_job_spec(
         "volumes": [{
             "name": "sandbox-tmp",
             "emptyDir": {
-                "sizeLimit": "32Mi"
+                "sizeLimit": "128Mi"
             }
         }],
         "containers": [{
@@ -85,14 +90,14 @@ pub fn build_sandbox_job_spec(
             }],
             "resources": {
                 "requests": {
-                    "memory": "16Mi",
+                    "memory": memory_request,
                     "cpu": "50m",
                     "ephemeral-storage": "50Mi"
                 },
                 "limits": {
-                    "memory": "30Mi",
-                    "cpu": "250m",
-                    "ephemeral-storage": "100Mi"
+                    "memory": memory_limit,
+                    "cpu": "500m",
+                    "ephemeral-storage": "200Mi"
                 }
             }
         }]

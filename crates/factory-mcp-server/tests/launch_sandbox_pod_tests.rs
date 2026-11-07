@@ -38,11 +38,11 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
         container["securityContext"]["capabilities"]["drop"][0],
         "ALL"
     );
-    assert_eq!(container["resources"]["limits"]["memory"], "30Mi");
-    assert_eq!(container["resources"]["limits"]["cpu"], "250m");
+    assert_eq!(container["resources"]["limits"]["memory"], "512Mi");
+    assert_eq!(container["resources"]["limits"]["cpu"], "500m");
     assert_eq!(
         container["resources"]["limits"]["ephemeral-storage"],
-        "100Mi"
+        "200Mi"
     );
 
     // Must omit runtimeClassName if gVisor is disabled in non-production
