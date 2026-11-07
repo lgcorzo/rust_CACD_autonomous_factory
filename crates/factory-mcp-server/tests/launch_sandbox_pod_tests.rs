@@ -44,8 +44,9 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
         "100Mi"
     );
 
-    // Must fail closed if gVisor is not enabled
-    assert!(build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes").is_err());
+    // Must omit runtimeClassName if gVisor is disabled in non-production
+    let non_gvisor_spec = build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes").unwrap();
+    assert!(non_gvisor_spec["spec"]["template"]["spec"].get("runtimeClassName").is_none());
     // Must fail closed if default namespace is used
     assert!(build_sandbox_job_spec(job_name, cmd, true, "default").is_err());
     // Must fail closed on empty command

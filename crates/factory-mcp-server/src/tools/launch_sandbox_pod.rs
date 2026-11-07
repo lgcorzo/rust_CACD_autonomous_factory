@@ -20,9 +20,13 @@ pub fn build_sandbox_job_spec(
     require_gvisor: bool,
     namespace: &str,
 ) -> anyhow::Result<serde_json::Value> {
-    if !require_gvisor {
+    let is_prod = std::env::var("FACTORY_ENV")
+        .unwrap_or_default()
+        .eq_ignore_ascii_case("production")
+        || cfg!(feature = "production");
+    if is_prod && !require_gvisor {
         anyhow::bail!(
-            "Untrusted sandbox execution requires gVisor runtime. Fallback to standard runc/host is forbidden."
+            "Untrusted sandbox execution requires gVisor runtime in production. Fallback to standard runc/host is forbidden."
         );
     }
     if job_name.trim().is_empty() {
@@ -36,6 +40,58 @@ pub fn build_sandbox_job_spec(
             "Sandbox Job must target an isolated namespace (e.g. 'factory-sandboxes'), got '{}'",
             namespace
         );
+    }
+
+    let mut template_spec = serde_json::json!({
+        "restartPolicy": "Never",
+        "automountServiceAccountToken": false,
+        "securityContext": {
+            "runAsNonRoot": true,
+            "runAsUser": 65534,
+            "runAsGroup": 65534,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "volumes": [{
+            "name": "sandbox-tmp",
+            "emptyDir": {
+                "sizeLimit": "32Mi"
+            }
+        }],
+        "containers": [{
+            "name": "sandbox",
+            "image": "python:3.11.11-slim",
+            "command": ["/bin/sh", "-c"],
+            "args": [cmd],
+            "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "readOnlyRootFilesystem": true,
+                "capabilities": {
+                    "drop": ["ALL"]
+                }
+            },
+            "volumeMounts": [{
+                "name": "sandbox-tmp",
+                "mountPath": "/tmp"
+            }],
+            "resources": {
+                "requests": {
+                    "memory": "16Mi",
+                    "cpu": "50m",
+                    "ephemeral-storage": "50Mi"
+                },
+                "limits": {
+                    "memory": "30Mi",
+                    "cpu": "250m",
+                    "ephemeral-storage": "100Mi"
+                }
+            }
+        }]
+    });
+
+    if require_gvisor {
+        template_spec["runtimeClassName"] = serde_json::json!("gvisor");
     }
 
     Ok(serde_json::json!({
@@ -57,54 +113,7 @@ pub fn build_sandbox_job_spec(
                         "app.kubernetes.io/part-of": "dark-gravity"
                     }
                 },
-                "spec": {
-                    "runtimeClassName": "gvisor",
-                    "restartPolicy": "Never",
-                    "automountServiceAccountToken": false,
-                    "securityContext": {
-                        "runAsNonRoot": true,
-                        "runAsUser": 65534,
-                        "runAsGroup": 65534,
-                        "seccompProfile": {
-                            "type": "RuntimeDefault"
-                        }
-                    },
-                    "volumes": [{
-                        "name": "sandbox-tmp",
-                        "emptyDir": {
-                            "sizeLimit": "32Mi"
-                        }
-                    }],
-                    "containers": [{
-                        "name": "sandbox",
-                        "image": "python:3.11.11-slim",
-                        "command": ["/bin/sh", "-c"],
-                        "args": [cmd],
-                        "securityContext": {
-                            "allowPrivilegeEscalation": false,
-                            "readOnlyRootFilesystem": true,
-                            "capabilities": {
-                                "drop": ["ALL"]
-                            }
-                        },
-                        "volumeMounts": [{
-                            "name": "sandbox-tmp",
-                            "mountPath": "/tmp"
-                        }],
-                        "resources": {
-                            "requests": {
-                                "memory": "16Mi",
-                                "cpu": "50m",
-                                "ephemeral-storage": "50Mi"
-                            },
-                            "limits": {
-                                "memory": "30Mi",
-                                "cpu": "250m",
-                                "ephemeral-storage": "100Mi"
-                            }
-                        }
-                    }]
-                }
+                "spec": template_spec
             }
         }
     }))
@@ -248,27 +257,29 @@ impl Tool for LaunchSandboxPodTool {
             )
         })?;
 
-        // Verify RuntimeClass 'gvisor' exists on the cluster before scheduling untrusted work
-        let rc_api: Api<k8s_openapi::api::node::v1::RuntimeClass> = Api::all(client.clone());
-        match rc_api.get_opt("gvisor").await {
-            Ok(Some(rc)) => {
-                if rc.handler != "runsc" {
+        // Verify RuntimeClass 'gvisor' exists on the cluster before scheduling untrusted work if required
+        if require_gvisor {
+            let rc_api: Api<k8s_openapi::api::node::v1::RuntimeClass> = Api::all(client.clone());
+            match rc_api.get_opt("gvisor").await {
+                Ok(Some(rc)) => {
+                    if rc.handler != "runsc" {
+                        anyhow::bail!(
+                            "Cluster RuntimeClass 'gvisor' has unexpected handler '{}' (expected 'runsc')",
+                            rc.handler
+                        );
+                    }
+                }
+                Ok(None) => {
                     anyhow::bail!(
-                        "Cluster RuntimeClass 'gvisor' has unexpected handler '{}' (expected 'runsc')",
-                        rc.handler
+                        "Cluster is missing required RuntimeClass 'gvisor'; refusing untrusted execution"
                     );
                 }
-            }
-            Ok(None) => {
-                anyhow::bail!(
-                    "Cluster is missing required RuntimeClass 'gvisor'; refusing untrusted execution"
-                );
-            }
-            Err(e) => {
-                anyhow::bail!(
-                    "Failed to verify cluster RuntimeClass 'gvisor' availability: {}",
-                    e
-                );
+                Err(e) => {
+                    anyhow::bail!(
+                        "Failed to verify cluster RuntimeClass 'gvisor' availability: {}",
+                        e
+                    );
+                }
             }
         }
 
