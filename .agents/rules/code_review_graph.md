@@ -1,6 +1,6 @@
 ---
-description: Mandatory rules for using code-review-graph MCP tools and CLI during code analysis, pre-modification impact assessment, and post-modification verification
-globs: ["**/*.rs", "**/*.py", "**/*.ts", "**/*.js", "**/*.sh"]
+trigger: always_on
+description: "Mandatory rules for using code-review-graph MCP tools and CLI during code analysis, pre-modification impact assessment, and post-modification verification"
 ---
 
 # code-review-graph Agent Rules
