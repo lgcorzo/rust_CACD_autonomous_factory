@@ -126,14 +126,12 @@ impl ZeroClawAgent {
             task_description.to_string()
         } else {
             let files_summary = _files.join(", ");
-            format!(
-                "import sys\nprint('[ZeroClawAgent] Executing SDD task: {} | target_files: [{}]')",
-                task_description
-                    .replace('\\', "\\\\")
-                    .replace('\'', "\\'")
-                    .replace('"', "\\\""),
-                files_summary
-            )
+            let escaped_task = serde_json::to_string(&format!(
+                "[ZeroClawAgent] Executing SDD task: {} | target_files: [{}]",
+                task_description, files_summary
+            ))
+            .unwrap_or_else(|_| "\"Failed to format task description\"".to_string());
+            format!("import sys\nprint({})", escaped_task)
         };
 
         // Call MCP tool for execution with task_id and structured metadata
