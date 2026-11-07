@@ -191,3 +191,4 @@ last_verified_commit: "fbdc5848"
 * [[crates_factory-application_src_workflows_circuit_breaker]]
 * [[crates_factory-core_src_security_nhi]]
 * [[crates_factory-mcp-server_src_tools_launch_sandbox_pod]]
+* [[crates_factory-infrastructure_src_mcp_client]]
