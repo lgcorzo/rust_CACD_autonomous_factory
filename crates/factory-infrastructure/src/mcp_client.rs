@@ -122,7 +122,8 @@ impl McpSseClient {
                 let sse_url = format!("{}/sse", self.base_url);
                 let mut req_builder = self.client.get(&sse_url);
                 if let Some(token) = self.resolve_bearer_token() {
-                    req_builder = req_builder.header("Authorization", format!("Bearer {}", token.trim()));
+                    req_builder =
+                        req_builder.header("Authorization", format!("Bearer {}", token.trim()));
                 }
                 let response = req_builder.send().await?;
 
