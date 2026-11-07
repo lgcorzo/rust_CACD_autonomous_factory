@@ -80,6 +80,9 @@ impl Tool for UpdateMissionStatusTool {
 
         let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
 
+        // Ensure target documentation directory exists
+        tokio::fs::create_dir_all(&self.docs_path).await?;
+
         // 1. Update wiki/mission_history.md (Terminal-friendly table)
         let history_path = format!("{}/mission_history.md", self.docs_path);
         let mut file = OpenOptions::new()
