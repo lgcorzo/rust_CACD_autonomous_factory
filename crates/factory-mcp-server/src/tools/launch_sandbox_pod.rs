@@ -41,8 +41,8 @@ pub fn build_sandbox_job_spec(
         );
     }
 
-    let image = std::env::var("SANDBOX_IMAGE")
-        .unwrap_or_else(|_| "python:3.11.11-slim".to_string());
+    let image =
+        std::env::var("SANDBOX_IMAGE").unwrap_or_else(|_| "python:3.11.11-slim".to_string());
 
     let mut template_spec = serde_json::json!({
         "restartPolicy": "Never",
