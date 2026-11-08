@@ -72,10 +72,10 @@ description: "Task list for 012-secure-gvisor-execution implementation"
 
 **Independent Test**: Concurrent budget check and admission operations across multiple simulated worker processes serialize correctly without budget overrun.
 
-- [ ] T014 [P] [US3] Write concurrent multi-process admission tests in `crates/factory-application/tests/finops_admission_tests.rs`
-- [ ] T015 [US3] Implement cross-process file-locking (`fs2` / advisory locks) in `FileFinOpsStopStore` in `crates/factory-application/src/agents/finops.rs`
-- [ ] T016 [US3] Ensure fail-closed behavior if the shared lock cannot be acquired within timeout
-- [ ] T017 [US3] Execute `cargo test -p factory-application --test finops_admission_tests` to verify atomic synchronization
+- [x] T014 [P] [US3] Write concurrent multi-process admission tests in `crates/factory-application/tests/finops_admission_tests.rs`
+- [x] T015 [US3] Implement cross-process file-locking (`fs2` / advisory locks) in `FileFinOpsStopStore` in `crates/factory-application/src/agents/finops.rs`
+- [x] T016 [US3] Ensure fail-closed behavior if the shared lock cannot be acquired within timeout
+- [x] T017 [US3] Execute `cargo test -p factory-application --test finops_admission_tests` to verify atomic synchronization
 
 ---
 
