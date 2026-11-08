@@ -6,7 +6,7 @@
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
     "branch": "012-secure-gvisor-execution",
-    "commit": "03dbe828ed5c0629cdf743281f47721e326315d0"
+    "commit": "\"$head\""
   },
   "deployment_revision": null,
   "environment": {
