@@ -125,3 +125,4 @@ As a public observer and stakeholder, I want public claims, READMEs, and canonic
 - MicroK8s or target Kubernetes cluster has the gVisor (`runsc`) addon/shim installed and configured in containerd.
 - Shared storage or network-accessible persistent storage is available for distributed worker pods in the cluster.
 - Repository CI/CD and verification tooling have access to Git metadata to compute commit SHAs and artifact checksums.
+

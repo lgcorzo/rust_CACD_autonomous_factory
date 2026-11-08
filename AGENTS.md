@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/011-verified-autonomous-execution/plan.md
+at specs/012-secure-gvisor-execution/plan.md
 <!-- SPECKIT END -->
 
 ## Branch & Pull Request Policy: Human-in-the-Loop (HITL)

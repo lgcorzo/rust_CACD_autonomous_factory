@@ -39,3 +39,4 @@
   4. Evidence Gate freshness and non-mock attestation against current HEAD (P1).
   5. Canonical public claims and documentation alignment (P2).
 - Ready for `/speckit-plan`.
+
