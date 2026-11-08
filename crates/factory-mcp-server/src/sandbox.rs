@@ -277,7 +277,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_subprocess_driver_timeout() {
-        let driver = SubprocessDriver::new().with_force_production(false);
+        let driver = SubprocessDriver::new()
+            .with_force_production(false)
+            .with_allow_insecure_host_execution(true);
         let result = driver.execute("print('hello')", "python").await.unwrap();
         assert!(result.is_success);
         assert_eq!(result.stdout.trim(), "hello");

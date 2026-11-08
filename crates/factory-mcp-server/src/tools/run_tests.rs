@@ -315,7 +315,9 @@ mod tests {
     #[tokio::test]
     async fn test_run_tests_tool_python_command() {
         let tool = RunTestsTool::new(Arc::new(
-            SubprocessDriver::new().with_force_production(false),
+            SubprocessDriver::new()
+                .with_force_production(false)
+                .with_allow_insecure_host_execution(true),
         ));
         let res = tool
             .call(json!({"test_command": "python3 --version"}))
