@@ -82,3 +82,4 @@ Invalid Transitions Rejected by Gate:
 - `IMPLEMENTED` -> `VERIFIED` (Requires `TESTED` state with test results)
 - Any state -> `VERIFIED` if `attestation_type == MockInterfaceOnly`
 - Any state -> `VERIFIED` if `commit_sha != HEAD_SHA`
+

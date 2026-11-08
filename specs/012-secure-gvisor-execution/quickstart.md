@@ -63,3 +63,4 @@ Generate fresh evidence against HEAD and execute validator:
 ```bash
 factory-cli validate-evidence --evidence-file docs/audit/VERIFICATION_EVIDENCE.json --target-commit $(git rev-parse HEAD) --strict-attestation
 ```
+

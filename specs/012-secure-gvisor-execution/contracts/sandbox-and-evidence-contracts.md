@@ -98,3 +98,4 @@ factory-cli validate-evidence --evidence-file <PATH> --target-commit <SHA> --str
 - `2`: Illegal state jump (e.g. `OPEN` -> `VERIFIED`).
 - `3`: Mock/Synthetic attestation rejected under strict attestation mode.
 - `4`: Implementer and Verifier identity collision.
+

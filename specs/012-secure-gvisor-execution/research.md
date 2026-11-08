@@ -70,3 +70,4 @@ The public claims in `canonical-claims.json` and web pages must accurately repor
 
 ### Decision
 Update `canonical-claims.json` and associated checks to guarantee 100% synchronization with code realities and automated test results.
+
