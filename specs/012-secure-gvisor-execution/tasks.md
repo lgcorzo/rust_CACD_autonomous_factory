@@ -144,3 +144,4 @@ description: "Task list for 012-secure-gvisor-execution implementation"
 - **Batch 2 (US1 & US2 Prep)**: T007 (US1 unit tests) and T012 (US2 pod spec audit) can run in parallel.
 - **Batch 3 (US3 & US4 Tests)**: T014 (FinOps concurrency test) and T018 (Evidence Gate unit test) can run in parallel.
 - **Batch 4 (US5 Documentation)**: T022 and T023 can run in parallel.
+
