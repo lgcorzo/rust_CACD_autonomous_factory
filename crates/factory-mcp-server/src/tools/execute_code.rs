@@ -44,7 +44,10 @@ impl Tool for ExecuteCodeTool {
         match self.driver.execute(code, language).await {
             Ok(res) => {
                 let att_str = if let Some(att) = &res.attestation {
-                    format!("\nAttestation: {} ({})", att.runtime_class, att.runtime_type)
+                    format!(
+                        "\nAttestation: {} ({})",
+                        att.runtime_class, att.runtime_type
+                    )
                 } else {
                     String::new()
                 };

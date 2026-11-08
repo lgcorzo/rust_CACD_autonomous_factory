@@ -101,7 +101,10 @@ async fn test_subprocess_driver_allowed_only_with_explicit_insecure_override() {
 
     let result = driver.execute("print('dev test')", "python").await;
 
-    assert!(result.is_ok(), "SubprocessDriver allowed only with explicit override");
+    assert!(
+        result.is_ok(),
+        "SubprocessDriver allowed only with explicit override"
+    );
     let out = result.unwrap();
     assert!(out.is_success);
     assert_eq!(out.exit_code, Some(0));

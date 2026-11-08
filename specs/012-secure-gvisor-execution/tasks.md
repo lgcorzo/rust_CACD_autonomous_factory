@@ -60,8 +60,8 @@ description: "Task list for 012-secure-gvisor-execution implementation"
 
 **Independent Test**: Launch a test pod specifying `runtimeClassName: gvisor` that compiles and runs a Rust test cleanly.
 
-- [ ] T011 [US2] Verify `runsc` shim registration in `/var/snap/microk8s/current/args/containerd-template.toml` and ensure Kubernetes `RuntimeClass` `gvisor` exists (`kubectl get runtimeclass gvisor`)
-- [ ] T012 [P] [US2] Audit `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs` to guarantee immutable image digests and 512Mi memory limits
+- [x] T011 [US2] Verify `runsc` shim registration in `/var/snap/microk8s/current/args/containerd-template.toml` and ensure Kubernetes `RuntimeClass` `gvisor` exists (`kubectl get runtimeclass gvisor`)
+- [x] T012 [P] [US2] Audit `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs` to guarantee immutable image digests and 512Mi memory limits
 - [ ] T013 [US2] Execute a verification container on MicroK8s using `runtimeClassName: gvisor` executing `cargo test` to validate real `runsc` containment and exit code 0
 
 ---
