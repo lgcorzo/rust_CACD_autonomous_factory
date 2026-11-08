@@ -1,5 +1,7 @@
 use factory_application::agents::finops::{BudgetEvaluation, FinOpsAgent};
 use factory_core::FinOpsTag;
+use factory_infrastructure::finops_stop_store::{FileFinOpsStopStore, FinOpsStopStore};
+use std::sync::Arc;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -26,7 +28,17 @@ async fn test_finops_client_poll_and_hardstop_latch() {
         .mount(&mock_server)
         .await;
 
-    let agent = FinOpsAgent::new(mock_server.uri(), "mock-api-key".to_string(), test_tag());
+    let test_store_path =
+        std::env::temp_dir().join(format!("finops_agent_test_{}.json", uuid::Uuid::new_v4()));
+    let stop_store: Arc<dyn FinOpsStopStore> =
+        Arc::new(FileFinOpsStopStore::new(test_store_path.clone()));
+
+    let agent = FinOpsAgent::with_stop_store(
+        mock_server.uri(),
+        "mock-api-key".to_string(),
+        test_tag(),
+        stop_store,
+    );
 
     assert!(!agent.is_halted(), "Agent must not be halted initially");
 
@@ -44,6 +56,9 @@ async fn test_finops_client_poll_and_hardstop_latch() {
         agent.is_halted(),
         "Agent must be halted after HardStop breached"
     );
+
+    let _ = std::fs::remove_file(&test_store_path);
+    let _ = std::fs::remove_file(test_store_path.with_extension("lock"));
 }
 
 #[tokio::test]
