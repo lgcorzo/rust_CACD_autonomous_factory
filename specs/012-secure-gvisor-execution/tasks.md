@@ -22,8 +22,8 @@ description: "Task list for 012-secure-gvisor-execution implementation"
 **Purpose**: Baseline preparation and test harness setup
 
 - [x] T001 Verify git branch state and clean working tree on `012-secure-gvisor-execution`
-- [ ] T002 Inspect existing driver tests in `crates/factory-mcp-server/tests/` and identify test fixtures
-- [ ] T003 [P] Add file locking crate (`fs2 = "0.4"`) to `crates/factory-application/Cargo.toml` if not already present
+- [x] T002 Inspect existing driver tests in `crates/factory-mcp-server/tests/` and identify test fixtures
+- [x] T003 [P] Add file locking crate (`fs2 = "0.4"`) to `crates/factory-application/Cargo.toml` if not already present
 
 ---
 
@@ -33,9 +33,9 @@ description: "Task list for 012-secure-gvisor-execution implementation"
 
 **⚠️ CRITICAL**: Must complete before user story implementation
 
-- [ ] T004 Define `SecurityPolicyViolation` error variant in `crates/factory-core/src/errors.rs` or `crates/factory-mcp-server/src/sandbox.rs`
-- [ ] T005 [P] Create `SandboxAttestation` struct and serialization in `crates/factory-mcp-server/src/sandbox.rs` per `data-model.md`
-- [ ] T006 [P] Update execution response payload to include `attestation` in `crates/factory-mcp-server/src/tools/execute_code.rs` and `run_tests.rs`
+- [x] T004 Define `SecurityPolicyViolation` error variant in `crates/factory-core/src/errors.rs` or `crates/factory-mcp-server/src/sandbox.rs`
+- [x] T005 [P] Create `SandboxAttestation` struct and serialization in `crates/factory-mcp-server/src/sandbox.rs` per `data-model.md`
+- [x] T006 [P] Update execution response payload to include `attestation` in `crates/factory-mcp-server/src/tools/execute_code.rs` and `run_tests.rs`
 
 **Checkpoint**: Foundation ready - user story implementation can begin
 
@@ -47,10 +47,10 @@ description: "Task list for 012-secure-gvisor-execution implementation"
 
 **Independent Test**: Invoking test or code execution with `SANDBOX_MODE` unset or set to subprocess rejects untrusted payloads with `SecurityPolicyViolation`.
 
-- [ ] T007 [P] [US1] Write unit tests in `crates/factory-mcp-server/tests/sandbox_driver_tests.rs` asserting untrusted code fails closed when subprocess is requested without explicit override
-- [ ] T008 [US1] Update `crates/factory-mcp-server/src/lib.rs` to set `GvisorK8sDriver` as default when `SANDBOX_MODE` is unset or empty
-- [ ] T009 [US1] Modify `SubprocessDriver::execute` in `crates/factory-mcp-server/src/sandbox.rs` to reject untrusted code execution unconditionally unless an explicit testing flag (`ALLOW_INSECURE_HOST_EXECUTION=true`) is active
-- [ ] T010 [US1] Run `cargo test -p factory-mcp-server --test sandbox_driver_tests` and ensure all zero-trust enforcement tests pass
+- [x] T007 [P] [US1] Write unit tests in `crates/factory-mcp-server/tests/sandbox_driver_tests.rs` asserting untrusted code fails closed when subprocess is requested without explicit override
+- [x] T008 [US1] Update `crates/factory-mcp-server/src/lib.rs` to set `GvisorK8sDriver` as default when `SANDBOX_MODE` is unset or empty
+- [x] T009 [US1] Modify `SubprocessDriver::execute` in `crates/factory-mcp-server/src/sandbox.rs` to reject untrusted code execution unconditionally unless an explicit testing flag (`ALLOW_INSECURE_HOST_EXECUTION=true`) is active
+- [x] T010 [US1] Run `cargo test -p factory-mcp-server --test sandbox_driver_tests` and ensure all zero-trust enforcement tests pass
 
 ---
 

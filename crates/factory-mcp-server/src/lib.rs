@@ -246,13 +246,14 @@ impl McpServer {
             HttpGitlabClient, HttpJiraClient, HttpR2rClient, KafkaClient,
         };
 
+        // Zero-Trust Default: Default to GvisorK8sDriver for all environments unless explicitly requested otherwise
         let sandbox_mode =
-            std::env::var("SANDBOX_MODE").unwrap_or_else(|_| "subprocess".to_string());
+            std::env::var("SANDBOX_MODE").unwrap_or_else(|_| "gvisork8s".to_string());
         let sandbox_driver: Arc<dyn crate::sandbox::SandboxDriver> =
-            if sandbox_mode.to_lowercase() == "gvisork8s" {
-                Arc::new(crate::sandbox::GvisorK8sDriver)
-            } else {
+            if sandbox_mode.to_lowercase() == "subprocess" {
                 Arc::new(crate::sandbox::SubprocessDriver::new())
+            } else {
+                Arc::new(crate::sandbox::GvisorK8sDriver)
             };
 
         let specify_cli_path =

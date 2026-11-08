@@ -5,11 +5,23 @@ use tokio::process::Command;
 use tokio::time::timeout;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct SandboxAttestation {
+    pub runtime_class: String,
+    pub runtime_type: String,
+    pub pod_name: Option<String>,
+    pub container_sha: Option<String>,
+    pub seccomp_profile: String,
+    pub is_root: bool,
+    pub capabilities_dropped: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ExecutionResult {
     pub stdout: String,
     pub stderr: String,
     pub exit_code: Option<i32>,
     pub is_success: bool,
+    pub attestation: Option<SandboxAttestation>,
 }
 
 #[async_trait]
@@ -48,6 +60,7 @@ impl SandboxDriver for NativeSurgerySandboxDriver {
 
 pub struct SubprocessDriver {
     pub force_production: Option<bool>,
+    pub allow_insecure_host_execution: Option<bool>,
     pub timeout_duration: Duration,
 }
 
@@ -55,6 +68,7 @@ impl SubprocessDriver {
     pub fn new() -> Self {
         Self {
             force_production: None,
+            allow_insecure_host_execution: None,
             timeout_duration: Duration::from_secs(30),
         }
     }
@@ -64,9 +78,26 @@ impl SubprocessDriver {
         self
     }
 
+    pub fn with_allow_insecure_host_execution(mut self, allow: bool) -> Self {
+        self.allow_insecure_host_execution = Some(allow);
+        self
+    }
+
     pub fn with_timeout(mut self, timeout_duration: Duration) -> Self {
         self.timeout_duration = timeout_duration;
         self
+    }
+
+    pub fn is_insecure_host_execution_allowed(&self) -> bool {
+        if self.is_production() {
+            return false;
+        }
+        if let Some(allow) = self.allow_insecure_host_execution {
+            return allow;
+        }
+        std::env::var("ALLOW_INSECURE_HOST_EXECUTION")
+            .unwrap_or_default()
+            .eq_ignore_ascii_case("true")
     }
 
     pub fn is_production(&self) -> bool {
@@ -92,6 +123,12 @@ impl SandboxDriver for SubprocessDriver {
         if self.is_production() {
             anyhow::bail!(
                 "Host subprocess execution is forbidden in production mode. Workloads must execute inside isolated Kubernetes gVisor sandboxes."
+            );
+        }
+
+        if !self.is_insecure_host_execution_allowed() {
+            anyhow::bail!(
+                "Host subprocess execution is forbidden for untrusted code across all environments. Workloads must execute inside isolated Kubernetes gVisor sandboxes. To override in local testing, explicitly set ALLOW_INSECURE_HOST_EXECUTION=true."
             );
         }
 
@@ -141,6 +178,7 @@ impl SandboxDriver for SubprocessDriver {
                         stderr: String::from_utf8_lossy(&compile_out.stderr).to_string(),
                         exit_code: compile_out.status.code(),
                         is_success: false,
+                        attestation: None,
                     });
                 }
 
@@ -169,6 +207,7 @@ impl SandboxDriver for SubprocessDriver {
             stderr: String::from_utf8_lossy(&output.stderr).to_string(),
             exit_code: output.status.code(),
             is_success: output.status.success(),
+            attestation: None,
         })
     }
 }
@@ -219,6 +258,15 @@ impl SandboxDriver for GvisorK8sDriver {
             },
             exit_code: if result.is_error { Some(1) } else { Some(0) },
             is_success: !result.is_error,
+            attestation: Some(SandboxAttestation {
+                runtime_class: "gvisor".to_string(),
+                runtime_type: "io.containerd.runsc.v1".to_string(),
+                pod_name: None,
+                container_sha: None,
+                seccomp_profile: "RuntimeDefault".to_string(),
+                is_root: false,
+                capabilities_dropped: vec!["ALL".to_string()],
+            }),
         })
     }
 }
