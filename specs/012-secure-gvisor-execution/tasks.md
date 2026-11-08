@@ -21,7 +21,7 @@ description: "Task list for 012-secure-gvisor-execution implementation"
 
 **Purpose**: Baseline preparation and test harness setup
 
-- [ ] T001 Verify git branch state and clean working tree on `012-secure-gvisor-execution`
+- [x] T001 Verify git branch state and clean working tree on `012-secure-gvisor-execution`
 - [ ] T002 Inspect existing driver tests in `crates/factory-mcp-server/tests/` and identify test fixtures
 - [ ] T003 [P] Add file locking crate (`fs2 = "0.4"`) to `crates/factory-application/Cargo.toml` if not already present
 
