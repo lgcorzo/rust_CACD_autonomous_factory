@@ -11,9 +11,9 @@
 
 | Repository | Branch | Latest Commit SHA | Release / Status |
 |---|---|---|---|
-| `lgcorzo/rust_CACD_autonomous_factory` | `main` | `7ab32fa66b770761d559a55eb4ed01b3752eac16` | Release [`v0.3.3`](https://github.com/lgcorzo/rust_CACD_autonomous_factory/releases/tag/v0.3.3), CI/CD green (`42689562611`), CodeQL green (`42689562946`) |
+| `lgcorzo/rust_CACD_autonomous_factory` | `main` | Code/Image Release: `7ab32fa66b770761d559a55eb4ed01b3752eac16` (`v0.3.3`)<br>Audit & Evidence Closure: `ec07add0` (+ `tasks.md` sync) | Release [`v0.3.3`](https://github.com/lgcorzo/rust_CACD_autonomous_factory/releases/tag/v0.3.3), CI/CD green (`42689562611`), CodeQL green (`42689562946`) |
 | `lgcorzo/gitops_internal_lgcorzo` | `main` | `2716e548fa5bd7563ebfce232ee68a6a24bb11b2` | Merged [PR #202](https://github.com/lgcorzo/gitops_internal_lgcorzo/pull/202), Reconciled by Flux CD (`Ready=True`) |
-| `lgcorzo/lgcorzo.github.io` | `main` | `d64c432` | Merged [PR #52](https://github.com/lgcorzo/lgcorzo.github.io/pull/52) (footer & canonical claims updated to `v0.3.3` / `7ab32fa`) |
+| `lgcorzo/lgcorzo.github.io` | `main` | `e3f4b13f2f8b1534049cb01f140754cc308573b7` (merged in [PR #53](https://github.com/lgcorzo/lgcorzo.github.io/pull/53)) | Merged [PR #52](https://github.com/lgcorzo/lgcorzo.github.io/pull/52) & [PR #53](https://github.com/lgcorzo/lgcorzo.github.io/pull/53) (all 6 pages & canonical claims synchronized to `v0.3.3`) |
 | `lgcorzo/fastapi-autogen-team` | `main` | `07a14f64e58b8498a38d0fa9866468eb5a24a459` | Synced & clean |
 
 ---

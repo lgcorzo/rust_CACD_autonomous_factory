@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "evidence_id": "6a08802a-e48c-56b8-b7cb-cf7d4631cd43",
+  "evidence_id": "b7a80708-c2b3-515e-8b9c-761c462af623",
   "requirement_id": "FR-009",
-  "collected_at": "2026-11-09T21:12:05Z",
+  "collected_at": "2026-11-09T21:40:00Z",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
     "branch": "main",
-    "commit": "7ab32fa66b770761d559a55eb4ed01b3752eac16"
+    "commit": "ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
   },
   "deployment_revision": null,
   "environment": {

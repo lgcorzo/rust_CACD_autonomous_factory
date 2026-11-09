@@ -3,11 +3,11 @@
 **Specification**: `013-verified-autonomous-execution-closure` (updating `011-verified-autonomous-execution`)  
 **Finalized At (UTC)**: `2026-11-09T21:15:00Z`  
 **Inspected Revisions**:
-- `rust_CACD_autonomous_factory`: `7ab32fa66b770761d559a55eb4ed01b3752eac16` (release [`v0.3.3`](https://github.com/lgcorzo/rust_CACD_autonomous_factory/releases/tag/v0.3.3), [PR #754](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/754) & [PR #755](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/755))
+- `rust_CACD_autonomous_factory`: Deployed release image [`v0.3.3`](https://github.com/lgcorzo/rust_CACD_autonomous_factory/releases/tag/v0.3.3) @ `7ab32fa66b770761d559a55eb4ed01b3752eac16` ([PR #754](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/754)); audit documentation & evidence closure commits on `main` ([PR #755](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/755), [PR #756](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/756) @ `ec07add0`)
 - `gitops_internal_lgcorzo`: `2716e548fa5bd7563ebfce232ee68a6a24bb11b2` (branch `main`, [PR #202](https://github.com/lgcorzo/gitops_internal_lgcorzo/pull/202)); live cluster reconciled to `main@2716e548fa5bd7563ebfce232ee68a6a24bb11b2`
 - `mlops-python-package`: `bf05a509b1e41597c823d030f2108c9e9c00ed83` (branch `main`)
 - `fastapi-autogen-team`: `07a14f64e58b8498a38d0fa9866468eb5a24a459` (branch `main`)
-- `lgcorzo.github.io`: `d64c432` (branch `main`, [PR #52](https://github.com/lgcorzo/lgcorzo.github.io/pull/52))
+- `lgcorzo.github.io`: `e3f4b13f2f8b1534049cb01f140754cc308573b7` (branch `main`, [PR #52](https://github.com/lgcorzo/lgcorzo.github.io/pull/52) & [PR #53](https://github.com/lgcorzo/lgcorzo.github.io/pull/53))
 - `autonomous_factory`: `4a8f2f3eb0b4484c0627919a5e3020bc1beb02f7` (branch `main`)
 - `lince-rs`: `NOT_ACCESSIBLE`
 

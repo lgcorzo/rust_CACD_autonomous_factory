@@ -1,8 +1,8 @@
 # Independent Verification Evidence Report (`FR-017`–`FR-021`, `FR-028`, `SC-005`–`SC-006`)
 
 **Specification**: `013-verified-autonomous-execution-closure` (closing `011-verified-autonomous-execution` & `012-verified-remediation-closure`)  
-**Evaluated At (UTC)**: `2026-11-09T21:15:00Z`  
-**Release**: [`v0.3.3`](https://github.com/lgcorzo/rust_CACD_autonomous_factory/releases/tag/v0.3.3) (`7ab32fa66b770761d559a55eb4ed01b3752eac16`)  
+**Evaluated At (UTC)**: `2026-11-09T21:35:00Z`  
+**Release (Code & Deployed Image)**: [`v0.3.3`](https://github.com/lgcorzo/rust_CACD_autonomous_factory/releases/tag/v0.3.3) (`7ab32fa66b770761d559a55eb4ed01b3752eac16`); subsequent commits on `main` (`ed5028d5`, `ec07add0`) contain only audit documentation and evidence synchronization (`cargo run -p factory-cli -- validate-evidence` re-generates and validates commit-bound records on every CI run via `scripts/generate_evidence.sh`).  
 **Evaluator / Verifier Identity**: `factory-cli-independent-verifier` (`role: independent_verifier`)  
 **Implementation Agent Identity**: `antigravity-implementer` (`role: implementer`)  
 

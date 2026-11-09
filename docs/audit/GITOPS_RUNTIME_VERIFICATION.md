@@ -11,7 +11,7 @@
 
 | Layer | Repository / Resource | Inspected Branch / Ref | Full Commit SHA / Revision | Status |
 |---|---|---|---|---|
-| **Application Source** | `lgcorzo/rust_CACD_autonomous_factory` | `main` (`v0.3.3`) | `7ab32fa66b770761d559a55eb4ed01b3752eac16` | Inspected, Released & Verified |
+| **Application Source (Deployed Image)** | `lgcorzo/rust_CACD_autonomous_factory` | `main` (`v0.3.3`) | `7ab32fa66b770761d559a55eb4ed01b3752eac16` (audit docs & evidence finalized on `main` via [PR #755](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/755)–[PR #757](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pulls)) | Inspected, Released & Verified |
 | **GitOps Source (PR #202)** | `lgcorzo/gitops_internal_lgcorzo` | `main` ([PR #202](https://github.com/lgcorzo/gitops_internal_lgcorzo/pull/202)) | `2716e548fa5bd7563ebfce232ee68a6a24bb11b2` | Merged & Reconciled |
 | **Flux Reconciled GitRepository** | `flux-system/gitops-internal` | `main` | `2716e548fa5bd7563ebfce232ee68a6a24bb11b2` | `Ready=True` (`stored artifact for revision 'main@sha1:2716e548fa5bd7563ebfce232ee68a6a24bb11b2'`) |
 | **Flux Reconciled Kustomizations** | `flux-system/infrastructure`, `infrastructure-apps`, `security` | `main` | `2716e548fa5bd7563ebfce232ee68a6a24bb11b2` | `Ready=True` (`Applied revision: main@sha1:2716e548fa5bd7563ebfce232ee68a6a24bb11b2`) |

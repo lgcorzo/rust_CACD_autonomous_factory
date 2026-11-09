@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "evidence_id": "f62809ea-0b4b-53ca-aad4-57969682be96",
+  "evidence_id": "13c386a5-b5e1-5f5b-8e96-876e6055e2ef",
   "requirement_id": "FR-008",
-  "collected_at": "2026-11-09T21:12:05Z",
+  "collected_at": "2026-11-09T21:40:00Z",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
     "branch": "main",
-    "commit": "7ab32fa66b770761d559a55eb4ed01b3752eac16"
+    "commit": "ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
   },
   "deployment_revision": {
     "repository": "lgcorzo/gitops_internal_lgcorzo",
@@ -27,7 +27,7 @@
   "artifacts": [
     {
       "uri": "file://docs/audit/GITOPS_RUNTIME_VERIFICATION.md",
-      "sha256": "ef5cce353878f7fac070e12a2bfb3e6a4637c5c74ec7c491a53fddbb866128b9",
+      "sha256": "0c81159f566fcd9d2aa7530096a2b9f6bdaeceda7f03f17f5a1c76337e00e01c",
       "media_type": "text/plain"
     }
   ],

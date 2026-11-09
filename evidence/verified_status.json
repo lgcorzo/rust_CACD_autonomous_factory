@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-09T21:15:00Z",
-  "commit_sha": "7ab32fa66b770761d559a55eb4ed01b3752eac16",
+  "timestamp": "2026-11-09T21:40:00Z",
+  "commit_sha": "ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1",
   "release_tag": "v0.3.3",
   "branch": "main",
   "environment": {
@@ -17,5 +17,6 @@
     "live_gvisor_sandbox": "PASSED",
     "hatchet_e2e_mission": "PASSED (e32a4202-2a30-44a4-b1dd-ef23f620e481)"
   },
-  "verified": true
+  "verified": true,
+  "deployed_release_commit_sha": "7ab32fa66b770761d559a55eb4ed01b3752eac16"
 }
