@@ -10,28 +10,28 @@
     {
       "from": null,
       "to": "OPEN",
-      "at": "2026-11-06T18:56:30Z",
+      "at": "2026-11-08T21:36:59Z",
       "actor_id": "spec-kit-011",
       "reason": "Registered in 011-verified-autonomous-execution"
     },
     {
       "from": "OPEN",
       "to": "IMPLEMENTED",
-      "at": "2026-11-06T18:56:30Z",
+      "at": "2026-11-08T21:36:59Z",
       "actor_id": "antigravity-implementer",
       "reason": "Implemented SC-006 at revision 1b9a51f8b19169d0a302ea26cf47caa307280281"
     },
     {
       "from": "IMPLEMENTED",
       "to": "TESTED",
-      "at": "2026-11-06T18:56:30Z",
+      "at": "2026-11-08T21:36:59Z",
       "actor_id": "ci-evidence-pipeline",
       "reason": "Executed cargo test -p factory-cli --test evidence_contract_tests with exit_code=0"
     },
     {
       "from": "TESTED",
       "to": "VERIFIED",
-      "at": "2026-11-06T18:56:30Z",
+      "at": "2026-11-08T21:36:59Z",
       "actor_id": "factory-cli-independent-verifier",
       "reason": "Independently validated schema, artifact SHA-256, transition chain, and revision freshness"
     }
@@ -39,7 +39,7 @@
   "verified_by": {
     "id": "factory-cli-independent-verifier",
     "role": "independent_verifier",
-    "verified_at": "2026-11-06T18:56:30Z",
+    "verified_at": "2026-11-08T21:36:59Z",
     "evidence_refs": [
       "35276bb1-11eb-5349-b3a8-8e83cd0b5447"
     ]

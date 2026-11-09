@@ -27,6 +27,8 @@ pub struct TestExecutionReport {
     pub stderr: String,
     pub duration_ms: u64,
     pub execution_environment: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attestation: Option<crate::sandbox::SandboxAttestation>,
 }
 
 pub struct RunTestsTool {
@@ -153,6 +155,7 @@ impl Tool for RunTestsTool {
                 stderr: String::new(),
                 duration_ms: 0,
                 execution_environment: "mock".to_string(),
+                attestation: None,
             };
             return Ok(CallToolResult {
                 content: vec![McpContent::Text {
@@ -175,6 +178,7 @@ impl Tool for RunTestsTool {
                     stderr: validation_err,
                     duration_ms: 0,
                     execution_environment: "sandbox-policy-gate".to_string(),
+                    attestation: None,
                 };
                 return Ok(CallToolResult {
                     content: vec![McpContent::Text {
@@ -210,6 +214,13 @@ impl Tool for RunTestsTool {
                     || exec_res.stderr.contains("Test runner binary not found")
                     || exec_res.stderr.contains("not found");
 
+                let attestation = exec_res.attestation;
+                let env_name = if let Some(ref att) = attestation {
+                    att.runtime_class.clone()
+                } else {
+                    "sandbox-driver".to_string()
+                };
+
                 if !exec_res.is_success && is_missing_runner {
                     TestExecutionReport {
                         status: "failed".to_string(),
@@ -219,7 +230,8 @@ impl Tool for RunTestsTool {
                         stdout: exec_res.stdout,
                         stderr: exec_res.stderr,
                         duration_ms: start_time.elapsed().as_millis() as u64,
-                        execution_environment: "sandbox-driver".to_string(),
+                        execution_environment: env_name,
+                        attestation,
                     }
                 } else if exec_res.is_success {
                     TestExecutionReport {
@@ -230,7 +242,8 @@ impl Tool for RunTestsTool {
                         stdout: exec_res.stdout,
                         stderr: exec_res.stderr,
                         duration_ms: start_time.elapsed().as_millis() as u64,
-                        execution_environment: "sandbox-driver".to_string(),
+                        execution_environment: env_name,
+                        attestation,
                     }
                 } else {
                     TestExecutionReport {
@@ -241,7 +254,8 @@ impl Tool for RunTestsTool {
                         stdout: exec_res.stdout,
                         stderr: exec_res.stderr,
                         duration_ms: start_time.elapsed().as_millis() as u64,
-                        execution_environment: "sandbox-driver".to_string(),
+                        execution_environment: env_name,
+                        attestation,
                     }
                 }
             }
@@ -262,6 +276,7 @@ impl Tool for RunTestsTool {
                     stderr: format!("Sandbox driver execution failed: {}", err_msg),
                     duration_ms: start_time.elapsed().as_millis() as u64,
                     execution_environment: "sandbox-driver".to_string(),
+                    attestation: None,
                 }
             }
         };
@@ -300,7 +315,9 @@ mod tests {
     #[tokio::test]
     async fn test_run_tests_tool_python_command() {
         let tool = RunTestsTool::new(Arc::new(
-            SubprocessDriver::new().with_force_production(false),
+            SubprocessDriver::new()
+                .with_force_production(false)
+                .with_allow_insecure_host_execution(true),
         ));
         let res = tool
             .call(json!({"test_command": "python3 --version"}))

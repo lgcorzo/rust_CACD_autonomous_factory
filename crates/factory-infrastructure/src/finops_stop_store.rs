@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use fs2::FileExt;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock};
@@ -62,10 +63,7 @@ impl FileFinOpsStopStore {
                 let path = std::env::var("FINOPS_STOP_STORE_PATH")
                     .map(PathBuf::from)
                     .unwrap_or_else(|_| {
-                        std::env::temp_dir().join(format!(
-                            "dark_gravity_finops_stop_state_{}.json",
-                            std::process::id()
-                        ))
+                        std::env::temp_dir().join("dark_gravity_finops_stop_state_shared.json")
                     });
                 Arc::new(FileFinOpsStopStore::new(path))
             })
@@ -84,13 +82,33 @@ impl FinOpsStopStore for FileFinOpsStopStore {
             return Ok(FinOpsStopState::default());
         }
 
+        let file = std::fs::File::open(&self.path).map_err(|e| {
+            format!(
+                "Failed to open FinOps stop store at '{}': {}",
+                self.path.display(),
+                e
+            )
+        })?;
+
+        // Cross-process shared advisory read lock
+        file.lock_shared().map_err(|e| {
+            format!(
+                "Failed to acquire shared lock on '{}': {}",
+                self.path.display(),
+                e
+            )
+        })?;
+
         let raw = std::fs::read_to_string(&self.path).map_err(|e| {
+            let _ = file.unlock();
             format!(
                 "Failed to read FinOps stop store at '{}': {}",
                 self.path.display(),
                 e
             )
         })?;
+
+        let _ = file.unlock();
 
         serde_json::from_str::<FinOpsStopState>(&raw).map_err(|e| {
             format!(
@@ -113,26 +131,6 @@ impl FinOpsStopStore for FileFinOpsStopStore {
             .lock()
             .map_err(|e| format!("FinOpsStopStore lock poisoned: {}", e))?;
 
-        let current_version = if self.path.exists() {
-            let raw = std::fs::read_to_string(&self.path).map_err(|e| {
-                format!(
-                    "Failed to read existing FinOps stop store at '{}': {}",
-                    self.path.display(),
-                    e
-                )
-            })?;
-            let parsed: FinOpsStopState = serde_json::from_str(&raw).map_err(|e| {
-                format!(
-                    "Corrupted FinOps stop store JSON at '{}': {}",
-                    self.path.display(),
-                    e
-                )
-            })?;
-            parsed.state_version
-        } else {
-            0
-        };
-
         if let Some(parent) = self.path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
                 format!(
@@ -142,6 +140,35 @@ impl FinOpsStopStore for FileFinOpsStopStore {
                 )
             })?;
         }
+
+        // Cross-process exclusive lock using a lockfile alongside state store
+        let lock_path = self.path.with_extension("lock");
+        let lock_file = std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .open(&lock_path)
+            .map_err(|e| format!("Failed to open lockfile '{}': {}", lock_path.display(), e))?;
+
+        lock_file.lock_exclusive().map_err(|e| {
+            format!(
+                "Failed to acquire exclusive lock on '{}': {}",
+                lock_path.display(),
+                e
+            )
+        })?;
+
+        let current_version = if self.path.exists() {
+            match std::fs::read_to_string(&self.path) {
+                Ok(raw) => serde_json::from_str::<FinOpsStopState>(&raw)
+                    .map(|p| p.state_version)
+                    .unwrap_or(0),
+                Err(_) => 0,
+            }
+        } else {
+            0
+        };
 
         let next = FinOpsStopState {
             halted,
@@ -153,22 +180,30 @@ impl FinOpsStopStore for FileFinOpsStopStore {
         };
 
         let tmp_path = self.path.with_extension("json.tmp");
-        let serialized = serde_json::to_string_pretty(&next)
-            .map_err(|e| format!("Failed to serialize FinOpsStopState: {}", e))?;
-        std::fs::write(&tmp_path, serialized).map_err(|e| {
-            format!(
+        let serialized = serde_json::to_string_pretty(&next).map_err(|e| {
+            let _ = lock_file.unlock();
+            format!("Failed to serialize FinOpsStopState: {}", e)
+        })?;
+
+        if let Err(e) = std::fs::write(&tmp_path, serialized) {
+            let _ = lock_file.unlock();
+            return Err(format!(
                 "Failed to write temporary FinOps stop state '{}': {}",
                 tmp_path.display(),
                 e
-            )
-        })?;
-        std::fs::rename(&tmp_path, &self.path).map_err(|e| {
-            format!(
+            ));
+        }
+
+        if let Err(e) = std::fs::rename(&tmp_path, &self.path) {
+            let _ = lock_file.unlock();
+            return Err(format!(
                 "Failed to atomically commit FinOps stop state '{}': {}",
                 self.path.display(),
                 e
-            )
-        })?;
+            ));
+        }
+
+        let _ = lock_file.unlock();
 
         Ok(next)
     }

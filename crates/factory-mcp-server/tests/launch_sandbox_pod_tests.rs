@@ -59,8 +59,13 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
     // Must use rust image for rust language
     let rust_spec =
         build_sandbox_job_spec(job_name, "cargo test", true, "factory-sandboxes", "rust").unwrap();
-    assert_eq!(
-        rust_spec["spec"]["template"]["spec"]["containers"][0]["image"],
-        "rust:1.85-slim"
+    let rust_image = rust_spec["spec"]["template"]["spec"]["containers"][0]["image"]
+        .as_str()
+        .unwrap();
+    assert!(
+        rust_image.contains("rust")
+            && (rust_image.contains("1.85-slim") || rust_image.contains("sha256:")),
+        "Expected rust immutable or versioned image, got: {}",
+        rust_image
     );
 }

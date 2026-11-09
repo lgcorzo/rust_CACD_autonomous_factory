@@ -45,9 +45,11 @@ pub fn build_sandbox_job_spec(
     let image = if let Ok(custom_image) = std::env::var("SANDBOX_IMAGE") {
         custom_image
     } else if language == "rust" {
-        std::env::var("SANDBOX_RUST_IMAGE").unwrap_or_else(|_| "rust:1.85-slim".to_string())
+        std::env::var("SANDBOX_RUST_IMAGE")
+            .unwrap_or_else(|_| "docker.io/library/rust@sha256:d6b63c4ffdfdca5745dc67e7c87cbfab180b064c1ad61fbce3aeaa2e70c793ff".to_string())
     } else {
-        std::env::var("SANDBOX_PYTHON_IMAGE").unwrap_or_else(|_| "python:3.11.11-slim".to_string())
+        std::env::var("SANDBOX_PYTHON_IMAGE")
+            .unwrap_or_else(|_| "docker.io/library/python@sha256:f526b701bc9cc4527ec503be481c9646b5a3ee2a901ae0eb3cc66ea5cae48bf0".to_string())
     };
 
     let memory_limit =

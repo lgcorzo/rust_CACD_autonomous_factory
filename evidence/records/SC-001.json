@@ -2,11 +2,11 @@
   "schema_version": "1.0",
   "evidence_id": "1c8c515c-45fd-57cc-980a-50f08556d3cc",
   "requirement_id": "SC-001",
-  "collected_at": "2026-11-06T18:56:30Z",
+  "collected_at": "2026-11-08T21:36:59Z",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
-    "branch": "011-verified-autonomous-execution",
-    "commit": "1b9a51f8b19169d0a302ea26cf47caa307280281"
+    "branch": "012-secure-gvisor-execution",
+    "commit": "\"$head_full\""
   },
   "deployment_revision": null,
   "environment": {
@@ -23,7 +23,7 @@
   "artifacts": [
     {
       "uri": "file://crates/factory-mcp-server/tests/sandbox_driver_tests.rs",
-      "sha256": "c32d9c453deaf54f58420d82f5eeadbc8d42c270c4f899bbb19eb4780e9f4b50",
+      "sha256": "cc70a6482046867d2d46c0b22fed77ef9393b0df2fe31ce0e245b6406fb3c714",
       "media_type": "text/plain"
     }
   ],

@@ -37,6 +37,7 @@ async fn test_subprocess_driver_rejects_unsupported_runtime_and_stubbed_language
 async fn test_subprocess_driver_enforces_timeout() {
     let driver = SubprocessDriver::new()
         .with_force_production(false)
+        .with_allow_insecure_host_execution(true)
         .with_timeout(Duration::from_millis(150));
 
     let res = driver.execute("import time; time.sleep(5)", "python").await;
@@ -52,7 +53,9 @@ async fn test_subprocess_driver_enforces_timeout() {
 
 #[tokio::test]
 async fn test_subprocess_driver_reports_actual_nonzero_exit_result() {
-    let driver = SubprocessDriver::new().with_force_production(false);
+    let driver = SubprocessDriver::new()
+        .with_force_production(false)
+        .with_allow_insecure_host_execution(true);
 
     let res = driver
         .execute(
@@ -71,12 +74,37 @@ async fn test_subprocess_driver_reports_actual_nonzero_exit_result() {
 }
 
 #[tokio::test]
-async fn test_subprocess_driver_allowed_in_development() {
+async fn test_subprocess_driver_fails_closed_in_all_envs_without_explicit_override() {
+    // In dev or default environments, SubprocessDriver must still reject untrusted code execution
+    // unless an explicit allow flag is active
     let driver = SubprocessDriver::new().with_force_production(false);
+
+    let result = driver.execute("print('untrusted')", "python").await;
+
+    assert!(
+        result.is_err(),
+        "SubprocessDriver must reject untrusted execution in development without explicit override"
+    );
+    let err_msg = result.unwrap_err().to_string();
+    assert!(
+        err_msg.contains("Host subprocess execution is forbidden for untrusted code"),
+        "Expected zero-trust security violation message, got: {}",
+        err_msg
+    );
+}
+
+#[tokio::test]
+async fn test_subprocess_driver_allowed_only_with_explicit_insecure_override() {
+    let driver = SubprocessDriver::new()
+        .with_force_production(false)
+        .with_allow_insecure_host_execution(true);
 
     let result = driver.execute("print('dev test')", "python").await;
 
-    assert!(result.is_ok(), "SubprocessDriver allowed in development");
+    assert!(
+        result.is_ok(),
+        "SubprocessDriver allowed only with explicit override"
+    );
     let out = result.unwrap();
     assert!(out.is_success);
     assert_eq!(out.exit_code, Some(0));

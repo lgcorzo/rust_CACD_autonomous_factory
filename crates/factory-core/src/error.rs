@@ -14,6 +14,9 @@ pub enum FactoryError {
     #[error("Unauthorized access or security violation: {0}")]
     Security(String),
 
+    #[error("Security policy violation: {0}")]
+    SecurityPolicyViolation(String),
+
     #[error("Agent failure: {0}")]
     Agent(String),
 

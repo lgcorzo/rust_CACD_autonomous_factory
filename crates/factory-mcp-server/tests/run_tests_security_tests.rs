@@ -61,6 +61,7 @@ impl SandboxDriver for RecordingSandboxDriver {
             stderr: self.simulated_stderr.clone(),
             exit_code: Some(code_exit),
             is_success: code_exit == 0,
+            attestation: None,
         })
     }
 }

@@ -43,9 +43,17 @@ impl Tool for ExecuteCodeTool {
 
         match self.driver.execute(code, language).await {
             Ok(res) => {
+                let att_str = if let Some(att) = &res.attestation {
+                    format!(
+                        "\nAttestation: {} ({})",
+                        att.runtime_class, att.runtime_type
+                    )
+                } else {
+                    String::new()
+                };
                 let output = format!(
-                    "Execution finished.\nExit code: {:?}\nStdout:\n{}\nStderr:\n{}",
-                    res.exit_code, res.stdout, res.stderr
+                    "Execution finished.\nExit code: {:?}\nStdout:\n{}\nStderr:\n{}{}",
+                    res.exit_code, res.stdout, res.stderr, att_str
                 );
                 Ok(CallToolResult {
                     content: vec![McpContent::Text { text: output }],

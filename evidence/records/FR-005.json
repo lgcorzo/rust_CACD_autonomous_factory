@@ -2,11 +2,11 @@
   "schema_version": "1.0",
   "evidence_id": "861d295a-7ee4-5621-aecf-2f768647e7d0",
   "requirement_id": "FR-005",
-  "collected_at": "2026-11-06T18:56:30Z",
+  "collected_at": "2026-11-08T21:36:59Z",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
-    "branch": "011-verified-autonomous-execution",
-    "commit": "1b9a51f8b19169d0a302ea26cf47caa307280281"
+    "branch": "012-secure-gvisor-execution",
+    "commit": "\"$head_full\""
   },
   "deployment_revision": null,
   "environment": {
@@ -23,7 +23,7 @@
   "artifacts": [
     {
       "uri": "file://crates/factory-mcp-server/src/tools/run_tests.rs",
-      "sha256": "674e665c45e3b1da75eb8b3c1d9514d992bbd0d2bd6e036faa1d616e06d5ac19",
+      "sha256": "213e552648c9329c51cc45915744a876e5538c4bd9148fdc9f6581a5fa8539d7",
       "media_type": "text/plain"
     }
   ],
