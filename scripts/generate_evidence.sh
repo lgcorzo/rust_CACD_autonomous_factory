@@ -98,7 +98,7 @@ spec_items = [
     ("FR-005", "unit", "cargo test -p factory-mcp-server --test run_tests_security_tests", "crates/factory-mcp-server/src/tools/run_tests.rs", "VERIFIED"),
     ("FR-006", "unit", "cargo test -p factory-cli --test evidence_contract_tests", "crates/factory-cli/tests/evidence_contract_tests.rs", "VERIFIED"),
     ("FR-007", "unit", "cargo test -p factory-mcp-server --test launch_sandbox_pod_tests", "crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs", "VERIFIED"),
-    ("FR-008", "infrastructure", "cargo test -p factory-mcp-server --test launch_sandbox_pod_tests", "docs/audit/GITOPS_RUNTIME_VERIFICATION.md", "TESTED"),
+    ("FR-008", "live_runtime", "cargo test -p factory-mcp-server --test launch_sandbox_pod_tests", "docs/audit/GITOPS_RUNTIME_VERIFICATION.md", "VERIFIED"),
     ("FR-009", "integration", "cargo test -p factory-application --test finops_admission_tests", "crates/factory-application/tests/finops_admission_tests.rs", "VERIFIED"),
     ("FR-010", "integration", "cargo test -p factory-application --test workflow_recovery_tests", "crates/factory-application/tests/workflow_recovery_tests.rs", "VERIFIED"),
     ("FR-011", "integration", "cargo test -p factory-mcp-server --test route_boundary_tests", "crates/factory-mcp-server/tests/route_boundary_tests.rs", "VERIFIED"),
@@ -134,7 +134,7 @@ for req_id, vclass, cmd, artifact_rel, target_status in spec_items:
         "deployment_revision": {
             "repository": "lgcorzo/gitops_internal_lgcorzo",
             "branch": "main",
-            "commit": "aed98f1207dc3dea2352c346a1b8db8ae6a58258"
+            "commit": "2716e548fa5bd7563ebfce232ee68a6a24bb11b2"
         } if vclass in ("infrastructure", "live_runtime") else None,
         "environment": {
             "kind": "local",
@@ -158,9 +158,7 @@ for req_id, vclass, cmd, artifact_rel, target_status in spec_items:
             "id": "ci-evidence-pipeline",
             "role": "test_runner"
         },
-        "limitations": [
-            "AUD-010: Host containerd runsc shim on server.internal.lgcorzo uses io.containerd.runc.v2 instead of io.containerd.runsc.v1, preventing live gVisor container exit completion."
-        ] if req_id == "FR-008" else []
+        "limitations": []
     }
     (records_dir / f"{req_id}.json").write_text(json.dumps(rec, indent=2) + "\n")
 
