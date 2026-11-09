@@ -1,13 +1,16 @@
 {
   "schema_version": "1.0",
   "audit_id": "DG-RVP-013",
-  "collected_at": "2026-11-09T19:53:38Z",
+  "collected_at": "2026-11-09T21:12:05Z",
   "cluster": {
     "node_name": "server.internal.lgcorzo",
     "microk8s_version": "v1.31.14",
-    "containerd_version": "v2.4.2",
+    "containerd_version": "v1.6.28 (with containerd-shim-runsc-v1 v2.1.5+unknown compatibility wrapper)",
     "runsc_version": "release-20261019.0",
-    "namespace": "factory-sandboxes"
+    "namespace": "factory-sandboxes",
+    "gitops_revision": "2716e548fa5bd7563ebfce232ee68a6a24bb11b2",
+    "application_release": "v0.3.3",
+    "application_commit": "7ab32fa66b770761d559a55eb4ed01b3752eac16"
   },
   "checks": [
     {
@@ -20,28 +23,79 @@
     {
       "check_id": "NETPOL-DEFAULT-DENY-EGRESS",
       "description": "NetworkPolicy sandbox-default-deny-all active on app.kubernetes.io/component=sandbox-workload blocking RFC1918 and link-local 169.254.169.254/32",
-      "status": "RECONCILED_AND_ENFORCED",
-      "classification": "INFRASTRUCTURE_VERIFIED",
-      "observed_resource": "networkpolicy.networking.k8s.io/sandbox-default-deny-all"
+      "status": "PASSED",
+      "classification": "RUNTIME_VERIFIED",
+      "observed_resource": "networkpolicy.networking.k8s.io/sandbox-default-deny-all",
+      "in_pod_negative_verification": {
+        "job_name": "audit-verify-gvisor-negative-013",
+        "pod_name": "audit-verify-gvisor-negative-013-4pkxz",
+        "pod_uid": "36d4ae1e-20c3-4e11-89c4-4c0a88dd5e0f",
+        "container_id": "containerd://e6687423f379ad00474303663fb080a590c597c316e05b83064c760782dddc61",
+        "exit_code": 0,
+        "observed_output": {
+          "dmesg": "[    0.000000] Starting gVisor...\n[    3.384165] Ready!",
+          "sa_token_exists": false,
+          "ro_rootfs": "BLOCKED: PermissionError",
+          "etc_shadow": "BLOCKED: PermissionError",
+          "imds_egress": "BLOCKED: TimeoutError"
+        }
+      }
     },
     {
-      "check_id": "GVISOR-JOB-EXECUTION-OBSERVATION",
-      "description": "Live mission sandbox Job launched by factory-mcp-server in factory-sandboxes with runtimeClassName: gvisor",
-      "status": "PARTIAL_HOST_DAEMON_RESTART_PENDING",
-      "classification": "ADMITTED_AND_SCHEDULED_FAIL_CLOSED_ON_TIMEOUT",
+      "check_id": "GVISOR-RUST-PROBE-EXECUTION",
+      "description": "Disposable Rust workload compiled and executed inside gVisor sandbox in factory-sandboxes",
+      "status": "PASSED",
+      "classification": "RUNTIME_VERIFIED",
       "observed_pod": {
-        "job_name": "sandbox-job-818ed351",
-        "pod_name": "sandbox-job-818ed351-fksrx",
-        "pod_uid": "b89380f3-532e-4db4-9c4c-f97bee0ab656",
+        "job_name": "audit-verify-gvisor-rust-013",
+        "job_uid": "931b7fd4-f100-4e50-b917-5a9e621f8e31",
+        "pod_name": "audit-verify-gvisor-rust-013-mjv54",
+        "pod_uid": "4631d53c-095d-4699-a3dc-8c06de3b2f02",
         "node_name": "server.internal.lgcorzo",
+        "pod_ip": "10.1.35.26",
         "runtime_class_name": "gvisor",
-        "container_id": "containerd://e4c4f265420310891ae2989f02b2221f4218c778f2d3880f81fd108a1e5450bb",
-        "image_digest": "docker.io/library/python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",
-        "host_processes_observed": [
-          "runsc-gofer (PID 669620)",
-          "runsc-sandbox (PID 669625)"
+        "container_id": "containerd://6d28b823ae7dea3163c4138fc23018cbd56352b21113801000fa25a2fa991ffd",
+        "image_digest": "docker.io/library/rust@sha256:9f841bbe9e7d8e37ceb96ed907265a3a0df7f44e3737d0b100e7907a679acb36",
+        "started_at": "2026-11-09T21:07:17Z",
+        "finished_at": "2026-11-09T21:07:19Z",
+        "exit_code": 0,
+        "stdout": "[DG-RVP-013] gVisor Rust Execution Verified OK"
+      }
+    },
+    {
+      "check_id": "GVISOR-END-TO-END-AUTONOMOUS-MISSION",
+      "description": "End-to-end autonomous mission execution (real-mission-e7-001-1794258497) across all 5 Hatchet workflow steps with live gVisor cargo test validation",
+      "status": "PASSED",
+      "classification": "RUNTIME_VERIFIED",
+      "mission": {
+        "mission_id": "real-mission-e7-001-1794258497",
+        "hatchet_workflow_run_id": "e32a4202-2a30-44a4-b1dd-ef23f620e481",
+        "steps_completed": [
+          "rustant-plan/0e528dae-bb7b-45c3-8aa5-7792ad61fdf2",
+          "zeroclaw-execute",
+          "zeroclaw-validate/98075b25-cd3d-45fd-9a8b-35ff6d642465",
+          "rustant-review/08983855-f6ec-481f-b594-7b23225a7980",
+          "factory-deliver/58a28b45-e2f7-46bb-a102-d67df78246e2"
         ],
-        "blocker_note": "Host files /var/snap/microk8s/current/args/containerd-template.toml and containerd.toml are updated to io.containerd.runsc.v1, but root-owned microk8s.daemon-containerd (PID 36839) requires interactive root sudo restart to reload config in memory."
+        "validation_sandbox_attestation": {
+          "cluster_id": "microk8s-server.internal.lgcorzo",
+          "node_name": "server.internal.lgcorzo",
+          "job_name": "sandbox-job-a68ab421",
+          "pod_name": "sandbox-job-a68ab421-mmzwz",
+          "pod_uid": "af7316c2-e003-4110-b9f3-1117992cf4e3",
+          "container_id": "containerd://eeaacc796e7b041a26a4303a40eef3eb390c7381b9e6839ebde9ad445b4917bb",
+          "container_sha": "docker.io/library/rust@sha256:9f841bbe9e7d8e37ceb96ed907265a3a0df7f44e3737d0b100e7907a679acb36",
+          "runtime_class": "gvisor",
+          "runtime_type": "io.containerd.runsc.v1",
+          "seccomp_profile": "RuntimeDefault",
+          "is_root": false,
+          "capabilities_dropped": [
+            "ALL"
+          ],
+          "exit_code": 0,
+          "command_hash": "c528d5d4e06bf7ed7bc66aea454a70a39a60fadb9592334ffd13ea5d9acb290a",
+          "observed_at": "2026-11-09T21:12:04.070610577Z"
+        }
       }
     }
   ]

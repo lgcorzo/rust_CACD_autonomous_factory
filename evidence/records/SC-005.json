@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "evidence_id": "1894fffa-69a7-59fa-b4a9-a1d0d16a9338",
+  "evidence_id": "8f1fb9d0-500a-5fda-bb58-caeb699e38c3",
   "requirement_id": "SC-005",
-  "collected_at": "2026-11-08T21:36:59Z",
+  "collected_at": "2026-11-09T21:12:05Z",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
-    "branch": "012-secure-gvisor-execution",
-    "commit": "\"$head_full\""
+    "branch": "main",
+    "commit": "7ab32fa66b770761d559a55eb4ed01b3752eac16"
   },
   "deployment_revision": null,
   "environment": {
