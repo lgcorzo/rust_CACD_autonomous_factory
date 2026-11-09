@@ -10,13 +10,21 @@ use tokio::time::timeout;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct SandboxAttestation {
+    pub cluster_id: Option<String>,
+    pub node_name: Option<String>,
+    pub job_name: Option<String>,
+    pub pod_name: Option<String>,
+    pub pod_uid: Option<String>,
+    pub container_id: Option<String>,
+    pub container_sha: Option<String>,
     pub runtime_class: String,
     pub runtime_type: String,
-    pub pod_name: Option<String>,
-    pub container_sha: Option<String>,
     pub seccomp_profile: String,
     pub is_root: bool,
     pub capabilities_dropped: Vec<String>,
+    pub exit_code: Option<i32>,
+    pub command_hash: Option<String>,
+    pub observed_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -273,13 +281,21 @@ impl SandboxDriver for GvisorK8sDriver {
             exit_code: if result.is_error { Some(1) } else { Some(0) },
             is_success: !result.is_error,
             attestation: Some(SandboxAttestation {
+                cluster_id: std::env::var("CLUSTER_ID").ok().or_else(|| Some("microk8s-server.internal.lgcorzo".to_string())),
+                node_name: std::env::var("NODE_NAME").ok(),
+                job_name: None,
+                pod_name: None,
+                pod_uid: None,
+                container_id: None,
+                container_sha: None,
                 runtime_class: "gvisor".to_string(),
                 runtime_type: "io.containerd.runsc.v1".to_string(),
-                pod_name: None,
-                container_sha: None,
                 seccomp_profile: "RuntimeDefault".to_string(),
                 is_root: false,
                 capabilities_dropped: vec!["ALL".to_string()],
+                exit_code: if result.is_error { Some(1) } else { Some(0) },
+                command_hash: None,
+                observed_at: Some(chrono::Utc::now()),
             }),
         })
     }
