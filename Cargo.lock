@@ -1881,6 +1881,7 @@ dependencies = [
  "ed25519-dalek",
  "factory-core",
  "factory-infrastructure",
+ "fs2",
  "futures-util",
  "hex",
  "mockall",
