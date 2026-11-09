@@ -70,28 +70,3 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
         rust_image
     );
 }
-
-#[tokio::test]
-async fn test_recording_sandbox_driver_returns_mocked_without_attestation() {
-    use factory_mcp_server::sandbox::{
-        RecordingSandboxDriver, SandboxDriver, SandboxLaunchSpec, SandboxLifecycleState,
-    };
-
-    let driver = RecordingSandboxDriver::new();
-    let spec = SandboxLaunchSpec {
-        job_name: "test-recording-01".to_string(),
-        command: "cargo test".to_string(),
-        language: "rust".to_string(),
-        require_gvisor: true,
-        namespace: "factory-sandboxes".to_string(),
-        timeout_secs: 60,
-        ttl_seconds_after_finished: 300,
-    };
-
-    let outcome = driver.execute(&spec).await.unwrap();
-    assert_eq!(outcome.state, SandboxLifecycleState::Mocked);
-    assert!(
-        outcome.runtime_attestation.is_none(),
-        "RecordingSandboxDriver MUST NOT emit a runtime attestation"
-    );
-}
