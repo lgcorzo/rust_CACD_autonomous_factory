@@ -212,6 +212,10 @@ async fn test_run_tests_mock_command_is_classified_as_mocked_not_passed() {
         "Mocked command must return status: mocked, NEVER success"
     );
     assert_eq!(parsed["execution_environment"], "mock");
+    assert!(
+        parsed.get("attestation").is_none() || parsed["attestation"].is_null(),
+        "Mocked execution MUST NOT emit a runtime attestation"
+    );
 }
 
 #[tokio::test]
