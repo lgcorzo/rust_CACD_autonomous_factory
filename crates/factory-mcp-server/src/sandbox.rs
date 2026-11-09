@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 use factory_core::security_policy::{
-    ExecutionEnvironment, ExecutionSecurityPolicy, SandboxIsolationType,
-    WorkloadTrustLevel,
+    ExecutionEnvironment, ExecutionSecurityPolicy, SandboxIsolationType, WorkloadTrustLevel,
 };
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
@@ -120,8 +119,7 @@ impl SubprocessDriver {
     }
 
     pub fn is_production(&self) -> bool {
-        self.policy.environment == ExecutionEnvironment::Production
-            || cfg!(feature = "production")
+        self.policy.environment == ExecutionEnvironment::Production || cfg!(feature = "production")
     }
 }
 
@@ -281,7 +279,9 @@ impl SandboxDriver for GvisorK8sDriver {
             exit_code: if result.is_error { Some(1) } else { Some(0) },
             is_success: !result.is_error,
             attestation: Some(SandboxAttestation {
-                cluster_id: std::env::var("CLUSTER_ID").ok().or_else(|| Some("microk8s-server.internal.lgcorzo".to_string())),
+                cluster_id: std::env::var("CLUSTER_ID")
+                    .ok()
+                    .or_else(|| Some("microk8s-server.internal.lgcorzo".to_string())),
                 node_name: std::env::var("NODE_NAME").ok(),
                 job_name: None,
                 pod_name: None,

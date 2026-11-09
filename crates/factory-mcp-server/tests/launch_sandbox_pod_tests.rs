@@ -46,7 +46,8 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
     );
 
     // Must fail closed when untrusted workload attempts to bypass gVisor
-    let non_gvisor_res = build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes", "python");
+    let non_gvisor_res =
+        build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes", "python");
     assert!(
         non_gvisor_res.is_err(),
         "Untrusted code execution MUST reject disabling gVisor across all environments"

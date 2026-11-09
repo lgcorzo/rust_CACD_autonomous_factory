@@ -89,15 +89,26 @@ impl ExecutionSecurityPolicy {
     pub fn validate(&self) -> Result<(), SecurityPolicyViolation> {
         match (&self.environment, &self.trust_level, &self.isolation) {
             // Production NEVER permits host subprocess execution under any circumstance
-            (ExecutionEnvironment::Production, _, SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev) => {
-                Err(SecurityPolicyViolation::ForbiddenHostExecutionInProduction)
-            }
+            (
+                ExecutionEnvironment::Production,
+                _,
+                SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev,
+            ) => Err(SecurityPolicyViolation::ForbiddenHostExecutionInProduction),
             // Untrusted workloads NEVER permit host subprocess execution in ANY environment
-            (_, WorkloadTrustLevel::Untrusted, SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev) => {
-                Err(SecurityPolicyViolation::ForbiddenHostExecutionForUntrustedWorkload)
-            }
+            (
+                _,
+                WorkloadTrustLevel::Untrusted,
+                SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev,
+            ) => Err(SecurityPolicyViolation::ForbiddenHostExecutionForUntrustedWorkload),
             // Kubernetes gVisor isolation checks
-            (_, _, SandboxIsolationType::KubernetesGVisor { runtime_class, namespace }) => {
+            (
+                _,
+                _,
+                SandboxIsolationType::KubernetesGVisor {
+                    runtime_class,
+                    namespace,
+                },
+            ) => {
                 if runtime_class.trim().is_empty() {
                     return Err(SecurityPolicyViolation::MissingRuntimeConfiguration(
                         "RuntimeClass cannot be empty".to_string(),
@@ -111,13 +122,17 @@ impl ExecutionSecurityPolicy {
                 Ok(())
             }
             // Host execution only permitted for TrustedInternal workloads strictly in Dev/Test environments
-            (ExecutionEnvironment::Development | ExecutionEnvironment::Test, WorkloadTrustLevel::TrustedInternal, SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev) => {
-                Ok(())
-            }
+            (
+                ExecutionEnvironment::Development | ExecutionEnvironment::Test,
+                WorkloadTrustLevel::TrustedInternal,
+                SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev,
+            ) => Ok(()),
             // Staging rejects host execution
-            (ExecutionEnvironment::Staging, _, SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev) => {
-                Err(SecurityPolicyViolation::ForbiddenHostExecutionInProduction)
-            }
+            (
+                ExecutionEnvironment::Staging,
+                _,
+                SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev,
+            ) => Err(SecurityPolicyViolation::ForbiddenHostExecutionInProduction),
         }
     }
 
@@ -132,25 +147,39 @@ impl ExecutionSecurityPolicy {
             _ => ExecutionEnvironment::Production, // Fail closed
         };
 
-        let trust_str = std::env::var("WORKLOAD_TRUST_LEVEL").unwrap_or_else(|_| "untrusted".to_string());
+        let trust_str =
+            std::env::var("WORKLOAD_TRUST_LEVEL").unwrap_or_else(|_| "untrusted".to_string());
         let trust_level = match trust_str.to_lowercase().as_str() {
             "trusted" | "trusted_internal" => WorkloadTrustLevel::TrustedInternal,
             _ => WorkloadTrustLevel::Untrusted, // Fail closed
         };
 
         // If untrusted or production, force Kubernetes gVisor
-        let isolation = if environment == ExecutionEnvironment::Production || trust_level == WorkloadTrustLevel::Untrusted {
-            let runtime_class = std::env::var("GVISOR_RUNTIME_CLASS").unwrap_or_else(|_| "gvisor".to_string());
-            let namespace = std::env::var("SANDBOX_NAMESPACE").unwrap_or_else(|_| "factory-sandboxes".to_string());
-            SandboxIsolationType::KubernetesGVisor { runtime_class, namespace }
+        let isolation = if environment == ExecutionEnvironment::Production
+            || trust_level == WorkloadTrustLevel::Untrusted
+        {
+            let runtime_class =
+                std::env::var("GVISOR_RUNTIME_CLASS").unwrap_or_else(|_| "gvisor".to_string());
+            let namespace = std::env::var("SANDBOX_NAMESPACE")
+                .unwrap_or_else(|_| "factory-sandboxes".to_string());
+            SandboxIsolationType::KubernetesGVisor {
+                runtime_class,
+                namespace,
+            }
         } else {
-            let allow_dev_host = std::env::var("ALLOW_DEV_HOST_EXECUTION").unwrap_or_else(|_| "false".to_string());
+            let allow_dev_host =
+                std::env::var("ALLOW_DEV_HOST_EXECUTION").unwrap_or_else(|_| "false".to_string());
             if allow_dev_host.to_lowercase() == "true" {
                 SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev
             } else {
-                let runtime_class = std::env::var("GVISOR_RUNTIME_CLASS").unwrap_or_else(|_| "gvisor".to_string());
-                let namespace = std::env::var("SANDBOX_NAMESPACE").unwrap_or_else(|_| "factory-sandboxes".to_string());
-                SandboxIsolationType::KubernetesGVisor { runtime_class, namespace }
+                let runtime_class =
+                    std::env::var("GVISOR_RUNTIME_CLASS").unwrap_or_else(|_| "gvisor".to_string());
+                let namespace = std::env::var("SANDBOX_NAMESPACE")
+                    .unwrap_or_else(|_| "factory-sandboxes".to_string());
+                SandboxIsolationType::KubernetesGVisor {
+                    runtime_class,
+                    namespace,
+                }
             }
         };
 
@@ -226,4 +255,3 @@ mod tests {
         ));
     }
 }
-
