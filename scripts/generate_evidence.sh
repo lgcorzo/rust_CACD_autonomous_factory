@@ -134,7 +134,7 @@ for req_id, vclass, cmd, artifact_rel, target_status in spec_items:
         "deployment_revision": {
             "repository": "lgcorzo/gitops_internal_lgcorzo",
             "branch": "main",
-            "commit": "48b9c0e333ce541fc741c056bd67e2932fdc50e9"
+            "commit": "aed98f1207dc3dea2352c346a1b8db8ae6a58258"
         } if vclass in ("infrastructure", "live_runtime") else None,
         "environment": {
             "kind": "local",
