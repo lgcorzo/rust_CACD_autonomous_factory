@@ -1,31 +1,21 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum ExecutionEnvironment {
+    #[default]
     Production,
     Staging,
     Development,
     Test,
 }
 
-impl Default for ExecutionEnvironment {
-    fn default() -> Self {
-        Self::Production
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum WorkloadTrustLevel {
+    #[default]
     Untrusted,
     TrustedInternal,
-}
-
-impl Default for WorkloadTrustLevel {
-    fn default() -> Self {
-        Self::Untrusted
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
