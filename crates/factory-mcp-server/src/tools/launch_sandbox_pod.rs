@@ -1,6 +1,7 @@
 use crate::protocol::{CallToolResult, McpContent};
 use crate::tools::Tool;
 use async_trait::async_trait;
+use factory_core::security_policy::{ExecutionEnvironment, ExecutionSecurityPolicy, WorkloadTrustLevel};
 use k8s_openapi::api::batch::v1::Job;
 use kube::api::{Api, DeleteParams, ListParams, PostParams};
 use kube::Client;
@@ -21,12 +22,10 @@ pub fn build_sandbox_job_spec(
     namespace: &str,
     language: &str,
 ) -> anyhow::Result<serde_json::Value> {
-    let is_prod = std::env::var("FACTORY_ENV")
-        .unwrap_or_default()
-        .eq_ignore_ascii_case("production");
-    if is_prod && !require_gvisor {
+    let policy = ExecutionSecurityPolicy::from_env();
+    if (policy.environment == ExecutionEnvironment::Production || policy.trust_level == WorkloadTrustLevel::Untrusted) && !require_gvisor {
         anyhow::bail!(
-            "Untrusted sandbox execution requires gVisor runtime in production. Fallback to standard runc/host is forbidden."
+            "Untrusted sandbox execution requires gVisor runtime across all environments. Fallback to standard runc/host is forbidden."
         );
     }
     if job_name.trim().is_empty() {

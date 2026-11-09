@@ -45,12 +45,12 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
         "200Mi"
     );
 
-    // Must omit runtimeClassName if gVisor is disabled in non-production
-    let non_gvisor_spec =
-        build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes", "python").unwrap();
-    assert!(non_gvisor_spec["spec"]["template"]["spec"]
-        .get("runtimeClassName")
-        .is_none());
+    // Must fail closed when untrusted workload attempts to bypass gVisor
+    let non_gvisor_res = build_sandbox_job_spec(job_name, cmd, false, "factory-sandboxes", "python");
+    assert!(
+        non_gvisor_res.is_err(),
+        "Untrusted code execution MUST reject disabling gVisor across all environments"
+    );
     // Must fail closed if default namespace is used
     assert!(build_sandbox_job_spec(job_name, cmd, true, "default", "python").is_err());
     // Must fail closed on empty command

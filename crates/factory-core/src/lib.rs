@@ -7,6 +7,7 @@ pub mod config;
 pub mod error;
 pub mod executor;
 pub mod security;
+pub mod security_policy;
 
 pub use config::AgentModelConfig;
 

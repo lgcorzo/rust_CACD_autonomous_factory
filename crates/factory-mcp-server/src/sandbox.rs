@@ -1,4 +1,8 @@
 use async_trait::async_trait;
+use factory_core::security_policy::{
+    ExecutionEnvironment, ExecutionSecurityPolicy, SandboxIsolationType,
+    WorkloadTrustLevel,
+};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tokio::process::Command;
@@ -59,27 +63,38 @@ impl SandboxDriver for NativeSurgerySandboxDriver {
 }
 
 pub struct SubprocessDriver {
-    pub force_production: Option<bool>,
-    pub allow_insecure_host_execution: Option<bool>,
+    pub policy: ExecutionSecurityPolicy,
     pub timeout_duration: Duration,
 }
 
 impl SubprocessDriver {
     pub fn new() -> Self {
         Self {
-            force_production: None,
-            allow_insecure_host_execution: None,
+            policy: ExecutionSecurityPolicy::from_env(),
             timeout_duration: Duration::from_secs(30),
         }
     }
 
+    pub fn with_policy(mut self, policy: ExecutionSecurityPolicy) -> Self {
+        self.policy = policy;
+        self
+    }
+
     pub fn with_force_production(mut self, force: bool) -> Self {
-        self.force_production = Some(force);
+        if force {
+            self.policy.environment = ExecutionEnvironment::Production;
+            self.policy.isolation = SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev;
+        } else {
+            self.policy.environment = ExecutionEnvironment::Development;
+        }
         self
     }
 
     pub fn with_allow_insecure_host_execution(mut self, allow: bool) -> Self {
-        self.allow_insecure_host_execution = Some(allow);
+        if allow && self.policy.environment != ExecutionEnvironment::Production {
+            self.policy.trust_level = WorkloadTrustLevel::TrustedInternal;
+            self.policy.isolation = SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev;
+        }
         self
     }
 
@@ -89,24 +104,15 @@ impl SubprocessDriver {
     }
 
     pub fn is_insecure_host_execution_allowed(&self) -> bool {
-        if self.is_production() {
-            return false;
-        }
-        if let Some(allow) = self.allow_insecure_host_execution {
-            return allow;
-        }
-        std::env::var("ALLOW_INSECURE_HOST_EXECUTION")
-            .unwrap_or_default()
-            .eq_ignore_ascii_case("true")
+        self.policy.validate().is_ok()
+            && matches!(
+                self.policy.isolation,
+                SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev
+            )
     }
 
     pub fn is_production(&self) -> bool {
-        if let Some(force) = self.force_production {
-            return force;
-        }
-        std::env::var("FACTORY_ENV")
-            .unwrap_or_default()
-            .eq_ignore_ascii_case("production")
+        self.policy.environment == ExecutionEnvironment::Production
             || cfg!(feature = "production")
     }
 }
@@ -123,6 +129,14 @@ impl SandboxDriver for SubprocessDriver {
         if self.is_production() {
             anyhow::bail!(
                 "Host subprocess execution is forbidden in production mode. Workloads must execute inside isolated Kubernetes gVisor sandboxes."
+            );
+        }
+
+        // Enforce ExecutionSecurityPolicy
+        if let Err(violation) = self.policy.validate() {
+            anyhow::bail!(
+                "ExecutionSecurityPolicy violation: {}. Host subprocess execution is forbidden for untrusted code across all environments. Workloads must execute inside isolated Kubernetes gVisor sandboxes.",
+                violation
             );
         }
 
