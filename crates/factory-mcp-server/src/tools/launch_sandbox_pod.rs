@@ -46,10 +46,10 @@ pub fn build_sandbox_job_spec(
         custom_image
     } else if language == "rust" {
         std::env::var("SANDBOX_RUST_IMAGE")
-            .unwrap_or_else(|_| "docker.io/library/rust@sha256:d6b63c4ffdfdca5745dc67e7c87cbfab180b064c1ad61fbce3aeaa2e70c793ff".to_string())
+            .unwrap_or_else(|_| "docker.io/library/rust@sha256:9f841bbe9e7d8e37ceb96ed907265a3a0df7f44e3737d0b100e7907a679acb36".to_string())
     } else {
         std::env::var("SANDBOX_PYTHON_IMAGE")
-            .unwrap_or_else(|_| "docker.io/library/python@sha256:f526b701bc9cc4527ec503be481c9646b5a3ee2a901ae0eb3cc66ea5cae48bf0".to_string())
+            .unwrap_or_else(|_| "docker.io/library/python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b".to_string())
     };
 
     let memory_limit =
