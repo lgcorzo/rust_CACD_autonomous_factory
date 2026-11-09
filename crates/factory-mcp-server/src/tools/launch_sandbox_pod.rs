@@ -252,15 +252,10 @@ impl Tool for LaunchSandboxPodTool {
 
         let code = sanitize_executable_code(raw_code, language);
 
-        // Fail closed unless gVisor is explicitly disabled via USE_GVISOR=false (never allowed in production)
-        let is_prod = std::env::var("FACTORY_ENV")
-            .unwrap_or_default()
-            .eq_ignore_ascii_case("production");
-        let explicit_disable = std::env::var("USE_GVISOR")
-            .ok()
-            .map(|v| v.eq_ignore_ascii_case("false") || v == "0")
-            .unwrap_or(false);
-        let require_gvisor = is_prod || !explicit_disable;
+        // Evaluate unified fail-closed ExecutionSecurityPolicy before untrusted code execution
+        let policy = ExecutionSecurityPolicy::from_env();
+        let require_gvisor = policy.environment == ExecutionEnvironment::Production
+            || policy.trust_level == WorkloadTrustLevel::Untrusted;
 
         let namespace =
             std::env::var("SANDBOX_NAMESPACE").unwrap_or_else(|_| "factory-sandboxes".to_string());

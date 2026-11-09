@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "audit_id": "DG-RVP-013",
+  "collected_at": "2026-11-09T19:53:38Z",
+  "cluster": {
+    "node_name": "server.internal.lgcorzo",
+    "microk8s_version": "v1.31.14",
+    "containerd_version": "v2.4.2",
+    "runsc_version": "release-20261019.0",
+    "namespace": "factory-sandboxes"
+  },
+  "checks": [
+    {
+      "check_id": "PSA-RESTRICTED-NEGATIVE",
+      "description": "Negative admission check: attempt to create pod with runAsNonRoot=false and runAsUser=0 in factory-sandboxes",
+      "status": "PASSED",
+      "classification": "RUNTIME_VERIFIED",
+      "observed_response": "Error from server (Forbidden): pods \"audit-negative-psa-check\" is forbidden: violates PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false, unrestricted capabilities, runAsNonRoot != true, runAsUser=0, seccompProfile"
+    },
+    {
+      "check_id": "NETPOL-DEFAULT-DENY-EGRESS",
+      "description": "NetworkPolicy sandbox-default-deny-all active on app.kubernetes.io/component=sandbox-workload blocking RFC1918 and link-local 169.254.169.254/32",
+      "status": "RECONCILED_AND_ENFORCED",
+      "classification": "INFRASTRUCTURE_VERIFIED",
+      "observed_resource": "networkpolicy.networking.k8s.io/sandbox-default-deny-all"
+    },
+    {
+      "check_id": "GVISOR-JOB-EXECUTION-OBSERVATION",
+      "description": "Live mission sandbox Job launched by factory-mcp-server in factory-sandboxes with runtimeClassName: gvisor",
+      "status": "PARTIAL_HOST_DAEMON_RESTART_PENDING",
+      "classification": "ADMITTED_AND_SCHEDULED_FAIL_CLOSED_ON_TIMEOUT",
+      "observed_pod": {
+        "job_name": "sandbox-job-818ed351",
+        "pod_name": "sandbox-job-818ed351-fksrx",
+        "pod_uid": "b89380f3-532e-4db4-9c4c-f97bee0ab656",
+        "node_name": "server.internal.lgcorzo",
+        "runtime_class_name": "gvisor",
+        "container_id": "containerd://e4c4f265420310891ae2989f02b2221f4218c778f2d3880f81fd108a1e5450bb",
+        "image_digest": "docker.io/library/python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",
+        "host_processes_observed": [
+          "runsc-gofer (PID 669620)",
+          "runsc-sandbox (PID 669625)"
+        ],
+        "blocker_note": "Host files /var/snap/microk8s/current/args/containerd-template.toml and containerd.toml are updated to io.containerd.runsc.v1, but root-owned microk8s.daemon-containerd (PID 36839) requires interactive root sudo restart to reload config in memory."
+      }
+    }
+  ]
+}

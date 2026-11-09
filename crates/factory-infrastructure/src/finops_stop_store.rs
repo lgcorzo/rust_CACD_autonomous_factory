@@ -39,6 +39,13 @@ pub trait FinOpsStopStore: Send + Sync {
         current_spend: f64,
         max_daily_budget: f64,
     ) -> Result<FinOpsStopState, String>;
+
+    /// Atomically checks admission against the 90% hard-stop threshold and reserves `estimated_cost`.
+    fn check_and_reserve_budget(
+        &self,
+        mission_id: &str,
+        estimated_cost: f64,
+    ) -> Result<FinOpsStopState, String>;
 }
 
 /// Durable file-backed FinOps stop store enabling cross-worker visibility across OS processes
@@ -82,25 +89,26 @@ impl FinOpsStopStore for FileFinOpsStopStore {
             return Ok(FinOpsStopState::default());
         }
 
-        let file = std::fs::File::open(&self.path).map_err(|e| {
-            format!(
-                "Failed to open FinOps stop store at '{}': {}",
-                self.path.display(),
-                e
-            )
-        })?;
+        let lock_path = self.path.with_extension("lock");
+        let lock_file = std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .open(&lock_path)
+            .map_err(|e| format!("Failed to open lockfile '{}': {}", lock_path.display(), e))?;
 
-        // Cross-process shared advisory read lock
-        file.lock_shared().map_err(|e| {
+        // Cross-process shared advisory read lock on the unified .lock file
+        lock_file.lock_shared().map_err(|e| {
             format!(
                 "Failed to acquire shared lock on '{}': {}",
-                self.path.display(),
+                lock_path.display(),
                 e
             )
         })?;
 
         let raw = std::fs::read_to_string(&self.path).map_err(|e| {
-            let _ = file.unlock();
+            let _ = lock_file.unlock();
             format!(
                 "Failed to read FinOps stop store at '{}': {}",
                 self.path.display(),
@@ -108,7 +116,7 @@ impl FinOpsStopStore for FileFinOpsStopStore {
             )
         })?;
 
-        let _ = file.unlock();
+        let _ = lock_file.unlock();
 
         serde_json::from_str::<FinOpsStopState>(&raw).map_err(|e| {
             format!(
@@ -207,6 +215,126 @@ impl FinOpsStopStore for FileFinOpsStopStore {
 
         Ok(next)
     }
+
+    fn check_and_reserve_budget(
+        &self,
+        mission_id: &str,
+        estimated_cost: f64,
+    ) -> Result<FinOpsStopState, String> {
+        let _guard = self
+            .lock
+            .lock()
+            .map_err(|e| format!("FinOpsStopStore lock poisoned: {}", e))?;
+
+        if let Some(parent) = self.path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                format!(
+                    "Failed to create parent directory '{}': {}",
+                    parent.display(),
+                    e
+                )
+            })?;
+        }
+
+        let lock_path = self.path.with_extension("lock");
+        let lock_file = std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .open(&lock_path)
+            .map_err(|e| format!("Failed to open lockfile '{}': {}", lock_path.display(), e))?;
+
+        lock_file.lock_exclusive().map_err(|e| {
+            format!(
+                "Failed to acquire exclusive lock on '{}': {}",
+                lock_path.display(),
+                e
+            )
+        })?;
+
+        let current = if self.path.exists() {
+            let raw = std::fs::read_to_string(&self.path).map_err(|e| {
+                let _ = lock_file.unlock();
+                format!(
+                    "Failed to read FinOps stop store at '{}': {}",
+                    self.path.display(),
+                    e
+                )
+            })?;
+            serde_json::from_str::<FinOpsStopState>(&raw).map_err(|e| {
+                let _ = lock_file.unlock();
+                format!(
+                    "Corrupted FinOps stop store JSON at '{}': {}",
+                    self.path.display(),
+                    e
+                )
+            })?
+        } else {
+            FinOpsStopState::default()
+        };
+
+        let hard_stop_threshold = current.max_daily_budget * 0.90;
+        let projected_spend = current.current_spend + estimated_cost;
+
+        if current.halted
+            || current.current_spend >= hard_stop_threshold
+            || projected_spend > hard_stop_threshold
+        {
+            let _ = lock_file.unlock();
+            return Err(format!(
+                "FinOps hard stop active or budget exceeded for mission '{}' (current_spend={:.2}, projected={:.2}, threshold={:.2})",
+                mission_id, current.current_spend, projected_spend, hard_stop_threshold
+            ));
+        }
+
+        let next_halted = projected_spend >= hard_stop_threshold;
+        let next_reason = if next_halted {
+            Some(format!(
+                "FinOps hard stop triggered by mission '{}': projected spend ${:.2} reached 90% threshold (${:.2})",
+                mission_id, projected_spend, hard_stop_threshold
+            ))
+        } else {
+            current.reason
+        };
+
+        let next = FinOpsStopState {
+            halted: next_halted,
+            state_version: current.state_version + 1,
+            reason: next_reason,
+            current_spend: projected_spend,
+            max_daily_budget: current.max_daily_budget,
+            updated_at: Utc::now(),
+        };
+
+        let tmp_path = self.path.with_extension("json.tmp");
+        let serialized = serde_json::to_string_pretty(&next).map_err(|e| {
+            let _ = lock_file.unlock();
+            format!("Failed to serialize FinOpsStopState: {}", e)
+        })?;
+
+        if let Err(e) = std::fs::write(&tmp_path, serialized) {
+            let _ = lock_file.unlock();
+            return Err(format!(
+                "Failed to write temporary FinOps stop state '{}': {}",
+                tmp_path.display(),
+                e
+            ));
+        }
+
+        if let Err(e) = std::fs::rename(&tmp_path, &self.path) {
+            let _ = lock_file.unlock();
+            return Err(format!(
+                "Failed to atomically commit FinOps stop state '{}': {}",
+                self.path.display(),
+                e
+            ));
+        }
+
+        let _ = lock_file.unlock();
+
+        Ok(next)
+    }
 }
 
 /// Deterministic failing store used to verify fail-closed admission on storage read/write errors.
@@ -233,6 +361,14 @@ impl FinOpsStopStore for FailingFinOpsStopStore {
         _reason: Option<String>,
         _current_spend: f64,
         _max_daily_budget: f64,
+    ) -> Result<FinOpsStopState, String> {
+        Err(self.error_message.clone())
+    }
+
+    fn check_and_reserve_budget(
+        &self,
+        _mission_id: &str,
+        _estimated_cost: f64,
     ) -> Result<FinOpsStopState, String> {
         Err(self.error_message.clone())
     }
