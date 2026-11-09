@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "evidence_id": "e4ceba87-f782-53d5-adc0-a2d2b8486084",
+  "evidence_id": "bd9b413b-cd1d-5414-8a30-08a28551f486",
   "requirement_id": "FR-015",
-  "collected_at": "2026-11-09T21:12:05Z",
+  "collected_at": "2026-11-09T21:40:00Z",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
     "branch": "main",
-    "commit": "7ab32fa66b770761d559a55eb4ed01b3752eac16"
+    "commit": "ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
   },
   "deployment_revision": null,
   "environment": {
@@ -23,7 +23,7 @@
   "artifacts": [
     {
       "uri": "file://docs/audit/TRACEABILITY_MATRIX.md",
-      "sha256": "a8693edfdcbf2c5ade1a76035a74bcfed297c8aba650aa77f680ea849b87d9d3",
+      "sha256": "63fea57b384a6ac37704ff96fe117702ec0d34bd0ed55be0d7c09512866c2922",
       "media_type": "text/plain"
     }
   ],
