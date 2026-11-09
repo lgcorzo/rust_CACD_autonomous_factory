@@ -55,14 +55,18 @@ Prior to remediation, `AutonomousMissionWorkflow` constructed an isolated `FinOp
 
 ## 4. Verification Evidence & Remaining Limitations
 
-- **Verified by Automated Integration Tests (`verification_class: integration`)**:
+- **Verified by Automated Integration Tests (`verification_class: integration`) & Live Runtime Execution (`verification_class: live_runtime`)**:
   - `crates/factory-application/tests/finops_admission_tests.rs`:
     - `test_finops_hard_stop_blocks_mission_admission_across_workers_with_version` (8 concurrent admission requests across separate worker instances after monitor trips 90% hard stop; 100% rejected with `version=1`).
     - `test_finops_admission_fails_closed_on_store_read_error` (verifies fail-closed denial on store read error).
+  - `crates/factory-infrastructure/tests/finops_concurrency_test.rs`:
+    - 10-thread concurrent `check_and_reserve_budget` stress test verifying unified `.lock` file acquisition and zero race conditions or partial writes (`DG-RVP-013` `US4`).
   - `crates/factory-application/tests/workflow_recovery_tests.rs`:
     - `test_duplicate_event_delivery_is_idempotent_without_duplicate_side_effects`
     - `test_retry_after_transient_failure_advances_once_without_advancing_incomplete_work`
     - `test_cancellation_compensation_and_worker_restart_recovery`
+  - **Live Cluster End-to-End Mission (`real-mission-e7-001-1794258497` / Hatchet Run `e32a4202-2a30-44a4-b1dd-ef23f620e481`)**:
+    - Executed on `server.internal.lgcorzo` (`v0.3.3` / `7ab32fa66b770761d559a55eb4ed01b3752eac16`); all 5 Hatchet steps (`rustant-plan`, `zeroclaw-execute`, `zeroclaw-validate`, `rustant-review`, `factory-deliver`) completed with `status: Succeeded` in `3m 47s`.
 - **Remaining Limitations**:
-  - Multi-node Kubernetes deployments where worker pods do not share a ReadWriteMany PVC or Redis/PostgreSQL backend for `FINOPS_STOP_STORE_PATH` require mounting a shared volume or backing `FinOpsStopStore` with PostgreSQL/Redis in cluster production. Live multi-pod cluster failover remains `NOT_VERIFIED` until exercised on `server.internal.lgcorzo`.
+  - Multi-node Kubernetes deployments where worker pods do not share a ReadWriteMany PVC or Redis/PostgreSQL backend for `FINOPS_STOP_STORE_PATH` require mounting a shared volume or backing `FinOpsStopStore` with PostgreSQL/Redis in cluster production. Multi-node Chaos Mesh failover drills remain `Designed`.
 

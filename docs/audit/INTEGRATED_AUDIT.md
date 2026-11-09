@@ -1,30 +1,30 @@
 # Integrated Security, Kubernetes & GitOps Audit Report
 
 **Audit Target**: Dark Gravity CA/CD Autonomous Software Factory & Supporting Ecosystem  
-**Feature**: `011-verified-autonomous-execution`  
-**Finalized At (UTC)**: `2026-11-06T18:15:00Z`  
+**Feature**: `013-verified-autonomous-execution-closure` (closing `011-verified-autonomous-execution` & `012-verified-remediation-closure`)  
+**Finalized At (UTC)**: `2026-11-09T21:15:00Z`  
 **Auditor**: Antigravity Autonomous Security & Assurance Engineer  
-**Status**: `Phase 9 - Source, Integration & Manifest Remediations Verified; Live Cluster AUD-010 Tracked`
+**Status**: `All Source, Integration, Manifest & Live Cluster gVisor Runtime Remediations Verified (v0.3.3)`
 
 ---
 
 ## 1. Executive Summary
 
-This report updates the `010-integrated-k8s-gitops-audit` and `011-verified-autonomous-execution` baselines against the final inspected repository revisions at `2026-11-06T18:15:00Z`. In accordance with `FR-001`, `FR-002`, `FR-015`, `FR-022`, and `SC-009`, every prior audit claim and `evidence/` artifact is explicitly classified as **Current**, **Historical**, **Contradictory**, or **Unverified** against the inspected revisions.
+This report updates the `010-integrated-k8s-gitops-audit`, `011-verified-autonomous-execution`, and `012-verified-remediation-closure` baselines against the final inspected and deployed repository revisions at `2026-11-09T21:15:00Z` (release [`v0.3.3`](https://github.com/lgcorzo/rust_CACD_autonomous_factory/releases/tag/v0.3.3)). In accordance with `FR-001`, `FR-002`, `FR-015`, `FR-022`, and `SC-009`, every prior audit claim and `evidence/` artifact is explicitly classified as **Current**, **Historical**, **Contradictory**, or **Unverified** against the inspected revisions.
 
 No capability is treated as `runtime_verified` based solely on source code, unit tests, static YAML manifests, or older commit-bound evidence.
 
 ---
 
-## 2. Final Inspected Repository Revisions (`2026-11-06T18:15:00Z`)
+## 2. Final Inspected Repository Revisions (`2026-11-09T21:15:00Z`)
 
 | Repository | Branch / PR | Full Commit SHA | Access Status | Review & Verification Outcome |
 |---|---|---|---|---|
-| `rust_CACD_autonomous_factory` | `011-verified-autonomous-execution` ([PR #675](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/675)) | `1b9a51f8b19169d0a302ea26cf47caa307280281` | `accessible` | All `US1`–`US6` code/test/contract gates passing (`cargo fmt`, `cargo clippy`, `cargo test --workspace`, `validate-evidence`). |
-| `gitops_internal_lgcorzo` | `011-sandbox-job-policy-alignment` ([PR #175](https://github.com/lgcorzo/gitops_internal_lgcorzo/pull/175)); live cluster at `main` | `8f655e5eca9f0b22c6f2c8b7f3d259e0d888eb1b` (live cluster: `48b9c0e333ce541fc741c056bd67e2932fdc50e9`) | `accessible` | `tests/test_sandbox_job_policy.sh` (`12/12` checks) and `kubectl kustomize infrastructure/agents` passing; live cluster inspected in `GITOPS_RUNTIME_VERIFICATION.md`. |
+| `rust_CACD_autonomous_factory` | `main` (`v0.3.3`, [PR #754](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/754), [PR #755](https://github.com/lgcorzo/rust_CACD_autonomous_factory/pull/755)) | `7ab32fa66b770761d559a55eb4ed01b3752eac16` | `accessible` | All `US1`–`US6` code/test/contract gates passing (`cargo fmt`, `cargo clippy`, `cargo test --workspace`, `validate-evidence`) plus live end-to-end mission `real-mission-e7-001-1794258497` (`e32a4202-2a30-44a4-b1dd-ef23f620e481`). |
+| `gitops_internal_lgcorzo` | `main` ([PR #202](https://github.com/lgcorzo/gitops_internal_lgcorzo/pull/202)) | `2716e548fa5bd7563ebfce232ee68a6a24bb11b2` | `accessible` | `tests/test_sandbox_job_policy.sh` (`12/12` checks) and `kubectl kustomize infrastructure/agents` passing; live cluster reconciled to `main@sha1:2716e548fa5bd7563ebfce232ee68a6a24bb11b2` in `GITOPS_RUNTIME_VERIFICATION.md`. |
 | `mlops-python-package` | `main` | `bf05a509b1e41597c823d030f2108c9e9c00ed83` | `accessible` | `poetry check --lock` and `poetry run pytest` (`98 passed, 3 xfailed`) verified in `docs/audit/reviews/mlops-python-package.md`. |
-| `fastapi-autogen-team` | `main` | `6b9c4513eea630a04255a68412f2042cd61dbea1` | `accessible` | `cargo test` (`12/12 unit`, `19/19 integration`) verified in `docs/audit/reviews/fastapi-autogen-team.md`; parallel test env race recorded as `AUD-011`. |
-| `lgcorzo.github.io` | `011-canonical-public-claims` ([PR #47](https://github.com/lgcorzo/lgcorzo.github.io/pull/47)) | `b1dc9311000d408b37425f49313574a248f8824f` (base `main`: `e69db33ccceb3e7fdfaaa7bca5d593dedb296f7c`) | `accessible` | `scripts/check_public_claims.py` and `pytest tests/test_public_claims.py` (`5/5 passed`) verified in `docs/audit/PUBLIC_SITE_REVIEW.md`. |
+| `fastapi-autogen-team` | `main` | `07a14f64e58b8498a38d0fa9866468eb5a24a459` | `accessible` | `cargo test` (`12/12 unit`, `19/19 integration`) verified in `docs/audit/reviews/fastapi-autogen-team.md`; parallel test env race recorded as `AUD-011`. |
+| `lgcorzo.github.io` | `main` ([PR #52](https://github.com/lgcorzo/lgcorzo.github.io/pull/52)) | `d64c432` | `accessible` | `scripts/check_public_claims.py` and `pytest tests/test_public_claims.py` (`5/5 passed`) verified in `docs/audit/PUBLIC_SITE_REVIEW.md`. |
 | `autonomous_factory` | `main` | `4a8f2f3eb0b4484c0627919a5e3020bc1beb02f7` | `accessible` | Historical GitLab predecessor repository inspected in `docs/audit/ECOSYSTEM_INVENTORY.md`. |
 | `lince-rs` | `N/A` | `N/A` | `not_accessible` | Explicitly marked `not_accessible`; zero findings inferred (`FR-002`, `SC-007`). |
 
@@ -55,5 +55,5 @@ No capability is treated as `runtime_verified` based solely on source code, unit
 | `AUD-007` | **P1** | Drift between `launch_sandbox_pod.rs` and `gitops_internal_lgcorzo/infrastructure/agents/sandbox-job.yaml` | Open | **Remediated & Verified (`unit`/`infrastructure`)** | `crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs` (`5/5 passed`), `../gitops_internal_lgcorzo/tests/test_sandbox_job_policy.sh` (`12/12 passed`), `docs/audit/GITOPS_RUNTIME_VERIFICATION.md` |
 | `AUD-008` | **P1** | Evidence pipeline lacked schema validation, transition-chain checks, and independent verifier enforcement | Open | **Remediated & Verified (`unit`/`integration`)** | `crates/factory-cli/src/evidence.rs`, `tests/evidence_contract_tests.rs` (`6/6 passed`), `docs/audit/VERIFICATION_EVIDENCE_REPORT.md` |
 | `AUD-009` | **P1** | Public website (`lgcorzo.github.io`) lacked dated canonical claims registry and automated contradiction checks | Open | **Remediated & Verified (`unit`/`integration`)** | `../lgcorzo.github.io/data/canonical-claims.json`, `scripts/check_public_claims.py`, `tests/test_public_claims.py` (`5/5 passed`), `docs/audit/PUBLIC_SITE_REVIEW.md` |
-| `AUD-010` | **P0 (Host Infra)** | Host node `server.internal.lgcorzo` configures `runsc` under `io.containerd.runc.v2` instead of `io.containerd.runsc.v1` in `/var/snap/microk8s/current/args/containerd-template.toml`, causing gVisor container exit signaling to hang until `activeDeadlineSeconds` (`60s`) | Discovered in `T028` | **Application Fail-Closed Verified; Host Node CRI Shim Change Pending Operator Action** | `GvisorK8sDriver` fails closed without host fallback (`gvisor_integration.rs`); `FR-008` and `CTRL-02` `runtime_verified` stage kept **open (`TESTED` / `NOT_VERIFIED`)** per `FR-015` and `T048` (`docs/audit/GITOPS_RUNTIME_VERIFICATION.md`). |
+| `AUD-010` | **P0 (Host Infra)** | Host node `server.internal.lgcorzo` configured `runsc` under `io.containerd.runc.v2` instead of `io.containerd.runsc.v1` in `/var/snap/microk8s/current/args/containerd-template.toml`, and `containerd-shim-runsc-v1` (`v2.1.5`) returned v2 JSON bootstrap output incompatible with `containerd v1.6.28` | Discovered in `T028` | **Remediated & Verified (`live_runtime`)** | `io.containerd.runsc.v1` and v1.6.28 compatibility wrapper verified via `audit-verify-gvisor-rust-013-mjv54` (`2s`, `exitCode: 0`), `audit-verify-gvisor-negative-013-4pkxz` (`3s`, `exitCode: 0`), and live end-to-end mission `real-mission-e7-001-1794258497` (`sandbox-job-a68ab421-mmzwz`, `exitCode: 0`); `FR-008` and `CTRL-02` promoted to `VERIFIED` / `RUNTIME_VERIFIED` (`docs/audit/GITOPS_RUNTIME_VERIFICATION.md`, `evidence/security/live-gvisor-isolation.json`). |
 | `AUD-011` | **P2** | `fastapi-autogen-team` `integration_tests` mutates process-global `ALLOWED_ORIGINS` env var concurrently across CORS tests | Discovered in `T036` | **Documented (`docs/audit/reviews/fastapi-autogen-team.md`)** | Passes `31/31` with `--test-threads=1`. |
