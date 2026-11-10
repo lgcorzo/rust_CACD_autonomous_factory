@@ -3,7 +3,7 @@
 ## Phase 0: Discovery & Audit
 - [x] T001 Inspect current HEAD of all 5 repositories (`rust_CACD_autonomous_factory`, `gitops_internal_lgcorzo`, `lgcorzo.github.io`, `fastapi-autogen-team`, `mlops-python-package`)
 - [x] T002 Verify baseline commit `ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1` is an ancestor of current branch
-- [x] T003 Audit false-positive `FR-008` evidence record in `evidence/records/FR-008.json` and remove synthetic records
+- [x] T003 Audit false-positive `FR-008` evidence record and remove old synthetic records
 
 ## Phase 1: Evidence Gate Integrity (P0)
 - [x] T004 Implement explicit evidence classification hierarchy (`EvidenceClass`) and maximum age rules in `crates/factory-cli/src/evidence.rs`

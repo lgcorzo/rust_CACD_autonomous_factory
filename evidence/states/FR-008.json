@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "requirement_id": "FR-008",
+  "status": "VERIFIED",
+  "implementation_agent_id": "antigravity-implementer",
+  "evidence_refs": [
+    "008e8b91-9c94-4d64-839e-d31a54101e08"
+  ],
+  "transitions": [
+    {
+      "from": null,
+      "to": "OPEN",
+      "at": "2026-11-10T00:10:10Z",
+      "actor_id": "spec-kit",
+      "reason": "Registered"
+    },
+    {
+      "from": "OPEN",
+      "to": "IMPLEMENTED",
+      "at": "2026-11-10T00:10:10Z",
+      "actor_id": "antigravity-implementer",
+      "reason": "Implementation present at 0a1918081ac6307051aee73ffadddb372e032db8"
+    },
+    {
+      "from": "IMPLEMENTED",
+      "to": "TESTED",
+      "at": "2026-11-10T07:10:00Z",
+      "actor_id": "dg-rvp-015-live-verifier",
+      "reason": "Live sandbox probes executed on server.internal.lgcorzo"
+    },
+    {
+      "from": "TESTED",
+      "to": "VERIFIED",
+      "at": "2026-11-10T07:15:30Z",
+      "actor_id": "dg-rvp-015-live-verifier",
+      "reason": "Corroborated live runtime containment under /usr/bin/runsc, kernel divergence 4.19.0-gvisor vs 6.17.0-14-generic, and OCI image digest match sha256:331cd9f24e23c8b280fd1ed643e2f6d6ff773211b6429a31baac48052bf60b3b"
+    }
+  ],
+  "verified_by": {
+    "id": "dg-rvp-015-live-verifier",
+    "role": "independent_verifier",
+    "verified_at": "2026-11-10T07:15:30Z",
+    "evidence_refs": [
+      "008e8b91-9c94-4d64-839e-d31a54101e08"
+    ]
+  },
+  "invalidated_at": null
+}

@@ -36,15 +36,7 @@ jobs:
           toolchain: stable
 
       - name: Verify Spec Artifacts
-        if: startsWith(github.head_ref, 'specs/') || startsWith(github.ref, 'refs/heads/specs/')
-        run: |
-          echo "Verifying Spec Artifacts for Spec-Driven Development..."
-          # Ensure there is at least one spec.md, plan.md, and tasks.md in the specs/ directory
-          if [ -z "$(find specs -name 'spec.md' 2>/dev/null)" ] || [ -z "$(find specs -name 'plan.md' 2>/dev/null)" ] || [ -z "$(find specs -name 'tasks.md' 2>/dev/null)" ]; then
-            echo "::error::Missing required spec artifacts (spec.md, plan.md, tasks.md) on a specs/ branch."
-            exit 1
-          fi
-          echo "Spec artifacts verified."
+        run: python3 scripts/verify_spec_artifacts.py
 
       - name: Verify Wiki Flat Export Integrity
         run: python3 scripts/test_prepare_wiki_for_github.py

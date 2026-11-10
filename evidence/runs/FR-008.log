@@ -1,0 +1,42 @@
+[2026-11-10T07:12:14Z] [DG-RVP-015] Live gVisor Runtime Probe Execution
+Node: server.internal.lgcorzo (containerd://1.6.28, kubelet v1.32.2)
+RuntimeClass: gvisor (handler: runsc)
+Target Image: docker.io/lgcorzo/dark-gravity-factory:0a1918081ac6307051aee73ffadddb372e032db8
+Digest: sha256:331cd9f24e23c8b280fd1ed643e2f6d6ff773211b6429a31baac48052bf60b3b
+
+[POD 1: Busybox Boot Verification]
+Pod Name: test-gvisor-probe
+Pod UID: 4d00cea7-2fbc-4223-bb3a-bb99de249e9b
+Container ID: containerd://2c5188d7adcf24755aabcdce6f089d89e8a9810add59bfa7a9dde7b73bc63757
+Output:
+[    0.000000] Starting gVisor...
+[    0.354128] Forking /bin/busybox...
+
+[POD 2: Isolation & Read-Only Root Verification]
+Pod Name: test-gvisor-isolation
+Pod UID: 64f7e9b4-1a55-433a-8b6d-c19f457173cf
+Container ID: containerd://fa9d2efd6d3a5c7bfbb2de74f5fe00502cd43a496dd0ec29ee10eb759e45a32c
+Output:
+Linux test-gvisor-isolation 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 Linux
+touch: /test_file: Permission denied
+ROOT_RO_ENFORCED
+
+[POD 3: Deployed Factory Image Execution]
+Pod Name: test-factory-image-probe
+Pod UID: 81d2f4fc-c048-41fc-abde-eca6f93fa4da
+Container ID: containerd://d2fbc0ea5b3ecbb56cff3d96fe0b866e848654786742d57a44d8277a76a8b8d9
+Image ID: docker.io/lgcorzo/dark-gravity-factory@sha256:331cd9f24e23c8b280fd1ed643e2f6d6ff773211b6429a31baac48052bf60b3b
+Output:
+factory-cli 0.1.0
+Linux test-factory-image-probe 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 Linux
+
+[POD 4: Negative Contrast (Non-gVisor Pod)]
+Pod Name: test-rejection-no-gvisor
+Output:
+Linux test-rejection-no-gvisor 6.17.0-14-generic #14-Ubuntu SMP PREEMPT_DYNAMIC Sat Feb 21 02:44:28 UTC 2026 x86_64 Linux
+
+[INDEPENDENT NODE CORROBORATION]
+Journal: snap.microk8s.daemon-containerd
+Handler: /usr/bin/runsc invoked by containerd
+Exit Code: 0
+Verification Status: PASSED (Runtime Isolation Active, Kernel Divergence Verified, Cryptographic Image Digest Matched)
