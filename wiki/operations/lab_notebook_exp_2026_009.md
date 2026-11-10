@@ -7,7 +7,8 @@ description: "Validation report for EXP-2026-009 evaluating token reduction, ret
 tags: ['iso42010', 'okf', 'operations', 'benchmarks', 'ast-graph', 'lab-notebook', 'r2r']
 timestamp: "2026-10-16T18:30:00Z"
 generated: "agent:jules"
-verified: "true"
+verified: "false"
+# 2026-11-10 DG-RVP-018 A2: auto-generated "true" withdrawn; pending human review
 last_verified_commit: "79c375a4"
 ---
 

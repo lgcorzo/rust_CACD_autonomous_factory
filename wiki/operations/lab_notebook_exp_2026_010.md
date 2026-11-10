@@ -7,7 +7,8 @@ description: "Validation report for EXP-2026-010 evaluating gVisor resource clam
 tags: ['iso42010', 'okf', 'operations', 'benchmarks', 'gvisor', 'lab-notebook', 'cgroups-v2', 'resource-governance']
 timestamp: "2026-10-18T10:00:00Z"
 generated: "agent:jules"
-verified: "true"
+verified: "false"
+# 2026-11-10 DG-RVP-018 A2: auto-generated "true" withdrawn; pending human review
 last_verified_commit: "79c375a4"
 ---
 

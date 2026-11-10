@@ -7,7 +7,8 @@ description: "ISO 42010 ArchitectureDescription / ISO 15289 Description document
 tags: ['iso42010', 'okf', 'architecture_description', 'c4']
 timestamp: "2026-10-01T14:00:00Z"
 generated: "agent:okf-professional-documenter"
-verified: "true"
+verified: "false"
+# 2026-11-10 DG-RVP-018 A2: auto-generated "true" withdrawn; pending human review
 last_verified_commit: "fbdc5848"
 ---
 
