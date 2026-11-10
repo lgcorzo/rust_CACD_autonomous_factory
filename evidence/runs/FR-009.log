@@ -1,0 +1,16 @@
+# command: cargo test -j 1 -p factory-infrastructure --test finops_concurrency_test
+# started_at: 2026-11-10T00:10:15Z
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.22s
+     Running tests/finops_concurrency_test.rs (/tmp/rust_target/debug/deps/finops_concurrency_test-f5e26ece530f8501)
+
+running 5 tests
+test finops_child_process_worker_entrypoint ... ok
+test test_finops_rejects_invalid_negative_nan_or_infinite_amounts ... ok
+test test_finops_fail_closed_on_corrupt_truncated_unavailable_and_recovers_after_restart ... ok
+test test_finops_concurrent_check_and_reserve_prevents_over_admission ... ok
+test test_finops_cross_process_concurrency_prevents_over_admission ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+# finished_at: 2026-11-10T00:10:15Z
+# exit_code: 0

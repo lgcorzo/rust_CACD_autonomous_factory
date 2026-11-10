@@ -1,34 +1,37 @@
 {
   "schema_version": "1.0",
-  "evidence_id": "576e73da-7983-5f74-bb20-9ab4a1d5f4eb",
+  "evidence_id": "4738c607-3e76-52b9-afcf-c2ab296cc273",
   "requirement_id": "FR-004",
-  "collected_at": "2026-11-09T21:40:00Z",
+  "collected_at": "2026-11-10T00:10:14Z",
+  "started_at": "2026-11-10T00:10:12Z",
+  "finished_at": "2026-11-10T00:10:14Z",
+  "generator_version": "dg-evidence-generator/2.0.0",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
     "branch": "main",
-    "commit": "ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
+    "commit": "4dfc12c4e82403dd217ffc95edc9741b6df48cf8"
   },
   "deployment_revision": null,
   "environment": {
     "kind": "local",
-    "identifier": "dark-gravity-audit-workstation"
+    "identifier": "server.internal.lgcorzo"
   },
   "verification_class": "integration",
   "method": {
-    "tool": "cargo-test",
-    "command_or_test": "cargo test -p factory-mcp-server --test sandbox_driver_tests"
+    "tool": "cargo",
+    "command_or_test": "cargo test -j 1 -p factory-mcp-server --test sandbox_driver_tests"
   },
   "outcome": "passed",
   "exit_code": 0,
   "artifacts": [
     {
-      "uri": "file://crates/factory-mcp-server/tests/sandbox_driver_tests.rs",
-      "sha256": "cc70a6482046867d2d46c0b22fed77ef9393b0df2fe31ce0e245b6406fb3c714",
+      "uri": "file://evidence/runs/FR-004.log",
+      "sha256": "e128dcebcaafe87ba32b6ae5a5031db5c0863fb683f03afaa1a2ddb059d1f8a0",
       "media_type": "text/plain"
     }
   ],
   "collector": {
-    "id": "ci-evidence-pipeline",
+    "id": "dg-evidence-generator/2.0.0",
     "role": "test_runner"
   },
   "limitations": []

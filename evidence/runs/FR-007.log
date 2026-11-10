@@ -1,0 +1,15 @@
+# command: cargo test -j 1 -p factory-mcp-server --test launch_sandbox_pod_tests
+# started_at: 2026-11-10T00:10:14Z
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.26s
+     Running tests/launch_sandbox_pod_tests.rs (/tmp/rust_target/debug/deps/launch_sandbox_pod_tests-f0cf0b5152359e4c)
+
+running 4 tests
+test test_attestation_fully_corroborated_is_verified ... ok
+test test_attestation_negative_cases_prevent_verified ... ok
+test test_sandbox_attestation_distinguishes_requested_spec_from_observed_runtime ... ok
+test test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+# finished_at: 2026-11-10T00:10:15Z
+# exit_code: 0

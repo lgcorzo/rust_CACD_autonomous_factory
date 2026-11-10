@@ -1,0 +1,16 @@
+# command: cargo test -j 1 -p factory-mcp-server --test webhook_security_tests
+# started_at: 2026-11-10T00:13:11Z
+   Compiling factory-mcp-server v0.1.0 (/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.84s
+     Running tests/webhook_security_tests.rs (/tmp/rust_target/debug/deps/webhook_security_tests-deb6a9dda3e79289)
+
+running 4 tests
+test test_webhook_rejects_missing_secret_in_protected_mode ... ok
+test test_webhook_returns_error_when_mission_dispatch_fails ... ok
+test test_webhook_replay_rejection_and_verifiable_mission_dispatch ... ok
+test test_webhook_rejects_invalid_signature_malformed_and_oversized_payload ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+# finished_at: 2026-11-10T00:13:13Z
+# exit_code: 0

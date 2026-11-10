@@ -1,34 +1,37 @@
 {
   "schema_version": "1.0",
-  "evidence_id": "6c1e996a-a0e7-5f14-91f2-ad64f3c54f2b",
+  "evidence_id": "59ab9aeb-c6f3-564c-9e8d-48d959679d24",
   "requirement_id": "FR-018",
-  "collected_at": "2026-11-09T21:40:00Z",
+  "collected_at": "2026-11-10T00:13:14Z",
+  "started_at": "2026-11-10T00:13:13Z",
+  "finished_at": "2026-11-10T00:13:14Z",
+  "generator_version": "dg-evidence-generator/2.0.0",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
     "branch": "main",
-    "commit": "ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
+    "commit": "4dfc12c4e82403dd217ffc95edc9741b6df48cf8"
   },
   "deployment_revision": null,
   "environment": {
     "kind": "local",
-    "identifier": "dark-gravity-audit-workstation"
+    "identifier": "server.internal.lgcorzo"
   },
   "verification_class": "unit",
   "method": {
-    "tool": "cargo-test",
-    "command_or_test": "cargo test -p factory-cli --test evidence_contract_tests"
+    "tool": "cargo",
+    "command_or_test": "cargo test -j 1 -p factory-cli --test evidence_contract_tests"
   },
   "outcome": "passed",
   "exit_code": 0,
   "artifacts": [
     {
-      "uri": "file://crates/factory-cli/src/evidence.rs",
-      "sha256": "44fb48ca31ccb6c661ee56089420ab55084ee744bd4e101aee79be69a77d44e1",
+      "uri": "file://evidence/runs/FR-018.log",
+      "sha256": "28918536f70cb6f687badcd6a82ef4879d28a3d834f5d511be2e24ab24eb1c5c",
       "media_type": "text/plain"
     }
   ],
   "collector": {
-    "id": "ci-evidence-pipeline",
+    "id": "dg-evidence-generator/2.0.0",
     "role": "test_runner"
   },
   "limitations": []

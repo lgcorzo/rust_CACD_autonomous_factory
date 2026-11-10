@@ -20,6 +20,27 @@
       "type": "string",
       "format": "date-time"
     },
+    "started_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "finished_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "release_version": {
+      "type": ["string", "null"]
+    },
+    "generator_version": {
+      "type": ["string", "null"]
+    },
+    "related_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
     "source_revision": {
       "$ref": "#/$defs/revision"
     },
@@ -53,12 +74,25 @@
       "enum": [
         "mock",
         "unit",
+        "component",
         "integration",
+        "kubernetes_admission",
         "infrastructure",
         "live_runtime",
+        "security_negative",
+        "chaos",
+        "manual_review",
         "documentation",
         "performance",
-        "accessibility"
+        "accessibility",
+        "UNIT",
+        "COMPONENT",
+        "INTEGRATION",
+        "KUBERNETES_ADMISSION",
+        "LIVE_RUNTIME",
+        "SECURITY_NEGATIVE",
+        "CHAOS",
+        "MANUAL_REVIEW"
       ]
     },
     "method": {

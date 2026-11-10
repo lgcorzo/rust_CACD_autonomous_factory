@@ -1,48 +1,34 @@
 {
   "schema_version": "1.0",
   "requirement_id": "FR-012",
-  "status": "VERIFIED",
+  "status": "TESTED",
   "implementation_agent_id": "antigravity-implementer",
   "evidence_refs": [
-    "bf1e89b8-34a4-5d55-affb-39ff4ff81e75"
+    "133adf07-d922-5fc9-ae3e-2b4bd60fc210"
   ],
   "transitions": [
     {
       "from": null,
       "to": "OPEN",
-      "at": "2026-11-09T21:40:00Z",
-      "actor_id": "spec-kit-011",
-      "reason": "Registered in 011-verified-autonomous-execution"
+      "at": "2026-11-10T00:13:11Z",
+      "actor_id": "spec-kit",
+      "reason": "Registered"
     },
     {
       "from": "OPEN",
       "to": "IMPLEMENTED",
-      "at": "2026-11-09T21:40:00Z",
+      "at": "2026-11-10T00:13:11Z",
       "actor_id": "antigravity-implementer",
-      "reason": "Implemented FR-012 at revision ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
+      "reason": "Implementation present at 4dfc12c4e82403dd217ffc95edc9741b6df48cf8"
     },
     {
       "from": "IMPLEMENTED",
       "to": "TESTED",
-      "at": "2026-11-09T21:40:00Z",
-      "actor_id": "ci-evidence-pipeline",
-      "reason": "Executed cargo test -p factory-mcp-server --test webhook_security_tests with exit_code=0"
-    },
-    {
-      "from": "TESTED",
-      "to": "VERIFIED",
-      "at": "2026-11-09T21:40:00Z",
-      "actor_id": "factory-cli-independent-verifier",
-      "reason": "Independently validated schema, artifact SHA-256, transition chain, and revision freshness"
+      "at": "2026-11-10T00:13:13Z",
+      "actor_id": "dg-evidence-generator/2.0.0",
+      "reason": "Executed 'cargo test -j 1 -p factory-mcp-server --test webhook_security_tests' exit_code=0 (log sha256 b54dd688e274ded1e8e9c156abba5ae1f56f62062632e8f1054e2fff28fcfa29)"
     }
   ],
-  "verified_by": {
-    "id": "factory-cli-independent-verifier",
-    "role": "independent_verifier",
-    "verified_at": "2026-11-09T21:40:00Z",
-    "evidence_refs": [
-      "bf1e89b8-34a4-5d55-affb-39ff4ff81e75"
-    ]
-  },
+  "verified_by": null,
   "invalidated_at": null
 }

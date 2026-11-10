@@ -1,0 +1,18 @@
+# command: cargo test -j 1 -p factory-mcp-server --test run_tests_security_tests
+# started_at: 2026-11-10T00:10:10Z
+   Compiling factory-mcp-server v0.1.0 (/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.67s
+     Running tests/run_tests_security_tests.rs (/tmp/rust_target/debug/deps/run_tests_security_tests-fdad884f91bf80c6)
+
+running 6 tests
+test test_run_tests_rejects_unsupported_runtime_language ... ok
+test test_run_tests_routes_through_injected_sandbox_driver_no_host_bypass ... ok
+test test_run_tests_mock_command_is_classified_as_mocked_not_passed ... ok
+test test_run_tests_rejects_shell_metacharacters_and_invalid_arguments ... ok
+test test_run_tests_rejects_missing_runner_without_simulated_pass ... ok
+test test_run_tests_fails_closed_when_sandbox_driver_unavailable ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+# finished_at: 2026-11-10T00:10:12Z
+# exit_code: 0

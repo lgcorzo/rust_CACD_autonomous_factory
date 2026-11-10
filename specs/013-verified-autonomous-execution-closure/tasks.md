@@ -63,22 +63,22 @@ description: "Task list for DG-RVP-013 Verified Autonomous Execution Closure"
 **Goal**: Transform `SandboxAttestation` to capture truthful, independently observed cluster facts queried directly from the Kubernetes Pod API rather than static configuration echoes.  
 **Independent Test**: Run a test mission inside Kubernetes; compare the generated attestation payload against Kubernetes API query results for the target Pod; verify non-null Pod UID, container ID, and image digest.
 
-- [x] [T015](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/734) (#734) [US3] Refactor `SandboxAttestation` in `crates/factory-mcp-server/src/sandbox.rs` to include `pod_uid`, `node_name`, `container_id`, `container_image_digest`, `runtime_type_observed`, and `command_hash`
-- [x] [T016](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/735) (#735) [US3] Update `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs` to query the Kubernetes Pod resource after completion via `kube::Client` and populate observed attestation facts
-- [x] [T017](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/736) (#736) [US3] Ensure mock drivers (`RecordingSandboxDriver`) set `attestation: None` or explicit mock indicator, failing validation when submitted for `LIVE_RUNTIME` certification
-- [x] [T018](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/737) (#737) [P] [US3] Add integration test in `crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs` asserting attestation truthfulness and rejection of mock runtime records
+- [x] [T015](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/734) (#734) [US3] Refactor `SandboxAttestation` in `crates/factory-mcp-server/src/sandbox.rs` to include `pod_uid`, `node_name`, `container_id`, `container_image_digest`, `runtime_type_observed`, and `command_hash`, explicitly separating `requested_spec: RequestedSandboxSpec` from `observed_runtime: ObservedRuntimeFacts`
+- [x] [T016](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/735) (#735) [US3] Update `crates/factory-mcp-server/src/tools/launch_sandbox_pod.rs` to query the Kubernetes Pod resource after completion via `kube::Client` and populate `requested_spec` vs `observed_runtime` attestation facts without fabricating unobserved host runtime strings
+- [x] [T017](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/736) (#736) [US3] Ensure mock drivers (`RecordingSandboxDriver`) set `attestation: None` or explicit mock indicator, failing validation when submitted for `LIVE_RUNTIME` certification (`test_live_runtime_rejects_unit_test_runner_and_markdown_only_artifacts` in `crates/factory-cli/tests/evidence_contract_tests.rs`)
+- [x] [T018](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/737) (#737) [P] [US3] Add integration test in `crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs` (`test_sandbox_attestation_distinguishes_requested_spec_from_observed_runtime` and `test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy`) asserting attestation truthfulness and rejection of mock runtime records
 
 ---
 
 ## Phase 6: User Story 4 - FinOps Concurrency & Distributed Consistency (Priority: P1)
 
 **Goal**: Eliminate lock target discrepancies in `FileFinOpsStopStore`, implement atomic `check_and_reserve_budget`, and ensure fail-closed budget enforcement under concurrent execution.  
-**Independent Test**: Run concurrent multi-threaded admission tests against a simulated budget ceiling; assert that once the limit is exhausted, no requests overspend or race past the latch.
+**Independent Test**: Run concurrent multi-threaded and multi-process admission tests against a simulated budget ceiling; assert that once the limit is exhausted, no requests overspend or race past the latch.
 
-- [x] [T019](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/738) (#738) [US4] Update `crates/factory-infrastructure/src/finops_stop_store.rs` so that `read_state()` locks `.lock` file with `lock_shared()` and `write_state()` locks `.lock` file with `lock_exclusive()`
-- [x] [T020](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/739) (#739) [US4] Implement `check_and_reserve_budget(mission_id, estimated_cost)` in `crates/factory-infrastructure/src/finops_stop_store.rs` performing atomic check-and-reserve under exclusive lock
+- [x] [T019](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/738) (#738) [US4] Update `crates/factory-infrastructure/src/finops_stop_store.rs` so that `read_state()` locks `.lock` file with `lock_shared()` and `write_state()` locks `.lock` file with `lock_exclusive()`, documenting the shared POSIX (`ReadWriteMany`) storage boundary
+- [x] [T020](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/739) (#739) [US4] Implement `check_and_reserve_budget(mission_id, estimated_cost)` in `crates/factory-infrastructure/src/finops_stop_store.rs` performing atomic check-and-reserve under exclusive lock and validating finite non-negative amounts (`test_finops_rejects_invalid_negative_nan_or_infinite_amounts`)
 - [x] [T021](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/740) (#740) [US4] Implement atomic file replacement via temporary file and rename in `FileFinOpsStopStore::write_state` to prevent torn reads
-- [x] [T022](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/741) (#741) [P] [US4] Create multi-threaded concurrency unit test in `crates/factory-infrastructure/tests/finops_concurrency_test.rs` validating zero budget over-admission under contention
+- [x] [T022](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/741) (#741) [P] [US4] Create multi-threaded and cross-process concurrency tests in `crates/factory-infrastructure/tests/finops_concurrency_test.rs` (`test_finops_concurrent_check_and_reserve_prevents_over_admission`, `test_finops_cross_process_concurrency_prevents_over_admission`, `test_finops_rejects_invalid_negative_nan_or_infinite_amounts`) validating zero budget over-admission under contention
 
 ---
 

@@ -99,8 +99,35 @@ jobs:
       - name: Run Evidence Contract Gate Tests
         run: cargo test -p factory-cli --test evidence_contract_tests
 
-      - name: Generate and Validate Evidence Artifacts
-        run: make evidence
+  evidence-integrity:
+    name: Evidence Integrity (ordinary CI — never proves live gVisor)
+    runs-on: ubuntu-latest
+    needs: [rust-ci]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1
+        with:
+          toolchain: stable
+      - name: Install Protoc
+        run: |
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends protobuf-compiler libprotobuf-dev libcurl4-openssl-dev
+      - name: Validate committed evidence (schema, SHA-256, outcomes, transitions, class hierarchy, age)
+        run: cargo run -p factory-cli -- validate-evidence --evidence-dir evidence
+      - name: Re-execute evidence commands and fail on any failure
+        env:
+          EVIDENCE_ENV_KIND: ci
+          EVIDENCE_COLLECT_LIVE: "false"
+        run: bash scripts/generate_evidence.sh
+      - name: Upload captured run logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: evidence-runs-${{ github.sha }}
+          path: evidence/runs/
 
   docker-publish:
     name: Docker Publish

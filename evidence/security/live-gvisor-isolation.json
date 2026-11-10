@@ -86,7 +86,7 @@
           "container_id": "containerd://eeaacc796e7b041a26a4303a40eef3eb390c7381b9e6839ebde9ad445b4917bb",
           "container_sha": "docker.io/library/rust@sha256:9f841bbe9e7d8e37ceb96ed907265a3a0df7f44e3737d0b100e7907a679acb36",
           "runtime_class": "gvisor",
-          "runtime_type": "io.containerd.runsc.v1",
+          "runtime_type": "unobserved_from_k8s_pod_api",
           "seccomp_profile": "RuntimeDefault",
           "is_root": false,
           "capabilities_dropped": [
@@ -94,7 +94,28 @@
           ],
           "exit_code": 0,
           "command_hash": "c528d5d4e06bf7ed7bc66aea454a70a39a60fadb9592334ffd13ea5d9acb290a",
-          "observed_at": "2026-11-09T21:12:04.070610577Z"
+          "observed_at": "2026-11-09T21:12:04.070610577Z",
+          "requested_spec": {
+            "runtime_class_name": "gvisor",
+            "seccomp_profile": "RuntimeDefault",
+            "run_as_non_root": true,
+            "run_as_user": 65534,
+            "read_only_root_filesystem": true,
+            "allow_privilege_escalation": false,
+            "capabilities_dropped": [
+              "ALL"
+            ]
+          },
+          "observed_runtime": {
+            "node_name": "server.internal.lgcorzo",
+            "pod_name": "sandbox-job-a68ab421-mmzwz",
+            "pod_uid": "af7316c2-e003-4110-b9f3-1117992cf4e3",
+            "pod_phase": "Succeeded",
+            "container_id": "containerd://eeaacc796e7b041a26a4303a40eef3eb390c7381b9e6839ebde9ad445b4917bb",
+            "container_image_digest": "docker.io/library/rust@sha256:9f841bbe9e7d8e37ceb96ed907265a3a0df7f44e3737d0b100e7907a679acb36",
+            "exit_code": 0,
+            "host_runtime_handler_observed": "io.containerd.runsc.v1 (verified via host containerd-env.toml and in-pod dmesg 'Starting gVisor...' in audit-verify-gvisor-negative-013-4pkxz)"
+          }
         }
       }
     }
