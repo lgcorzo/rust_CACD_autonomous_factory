@@ -1817,6 +1817,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap",
+ "ed25519-dalek",
  "factory-application",
  "factory-infrastructure",
  "hatchet-sdk",

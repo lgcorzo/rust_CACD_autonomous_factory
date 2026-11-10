@@ -440,3 +440,69 @@ fn test_dg_rvp_014_all_ten_mandatory_evidence_gate_negative_cases() {
         "Neg 10 failed: {err10}"
     );
 }
+
+#[test]
+fn test_ed25519_signed_verifier_attestation_validation() {
+    use ed25519_dalek::Signer;
+    use factory_cli::evidence::RequirementState;
+
+    let seed = [42u8; 32];
+    let signing_key = ed25519_dalek::SigningKey::from_bytes(&seed);
+    let pub_key = signing_key.verifying_key();
+    let pk_hex = hex::encode(pub_key.as_bytes());
+
+    let payload =
+        "FR-008:dg-rvp-016-live-verifier:2026-11-10T08:00:00Z:008e8b91-9c94-4d64-839e-d31a54101e08";
+    let sig = signing_key.sign(payload.as_bytes());
+    let sig_hex = hex::encode(sig.to_bytes());
+
+    let state_json = serde_json::json!({
+        "schema_version": "1.0",
+        "requirement_id": "FR-008",
+        "status": "VERIFIED",
+        "implementation_agent_id": "antigravity-implementer",
+        "evidence_refs": ["008e8b91-9c94-4d64-839e-d31a54101e08"],
+        "transitions": [
+            {
+                "from": null,
+                "to": "OPEN",
+                "at": "2026-11-10T00:10:10Z",
+                "actor_id": "spec-kit",
+                "reason": "Registered"
+            },
+            {
+                "from": "OPEN",
+                "to": "IMPLEMENTED",
+                "at": "2026-11-10T00:10:10Z",
+                "actor_id": "antigravity-implementer",
+                "reason": "Implementation present"
+            },
+            {
+                "from": "IMPLEMENTED",
+                "to": "TESTED",
+                "at": "2026-11-10T07:59:00Z",
+                "actor_id": "dg-rvp-016-live-verifier",
+                "reason": "Live sandbox probe executed"
+            },
+            {
+                "from": "TESTED",
+                "to": "VERIFIED",
+                "at": "2026-11-10T08:00:00Z",
+                "actor_id": "dg-rvp-016-live-verifier",
+                "reason": "Corroborated containment"
+            }
+        ],
+        "verified_by": {
+            "id": "dg-rvp-016-live-verifier",
+            "role": "independent_verifier",
+            "verified_at": "2026-11-10T08:00:00Z",
+            "evidence_refs": ["008e8b91-9c94-4d64-839e-d31a54101e08"],
+            "public_key": pk_hex,
+            "signature": sig_hex
+        },
+        "invalidated_at": null
+    });
+
+    let state: RequirementState = serde_json::from_value(state_json).unwrap();
+    assert!(state.verified_by.is_some());
+}

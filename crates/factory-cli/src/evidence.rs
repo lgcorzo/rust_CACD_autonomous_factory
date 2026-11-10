@@ -168,6 +168,10 @@ pub struct VerifierIdentity {
     pub role: String,
     pub verified_at: String,
     pub evidence_refs: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub public_key: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub signature: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -592,6 +596,46 @@ pub fn validate_requirement_state(
         if verifier.evidence_refs.is_empty() {
             bail!("verified_by.evidence_refs must not be empty");
         }
+
+        // Cryptographic verification if signature and public_key are provided
+        if let (Some(pk_hex), Some(sig_hex)) = (&verifier.public_key, &verifier.signature) {
+            use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+            let pk_bytes = hex::decode(pk_hex).map_err(|e| {
+                anyhow::anyhow!("Invalid hex encoding for verifier public_key: {}", e)
+            })?;
+            let pk_array: [u8; 32] = pk_bytes
+                .try_into()
+                .map_err(|_| anyhow::anyhow!("verifier public_key must be exactly 32 bytes"))?;
+            let verifying_key = VerifyingKey::from_bytes(&pk_array)
+                .map_err(|e| anyhow::anyhow!("Invalid Ed25519 public key: {}", e))?;
+
+            let sig_bytes = hex::decode(sig_hex).map_err(|e| {
+                anyhow::anyhow!("Invalid hex encoding for verifier signature: {}", e)
+            })?;
+            let sig_array: [u8; 64] = sig_bytes
+                .try_into()
+                .map_err(|_| anyhow::anyhow!("verifier signature must be exactly 64 bytes"))?;
+            let signature = Signature::from_bytes(&sig_array);
+
+            let canonical_payload = format!(
+                "{}:{}:{}:{}",
+                state.requirement_id,
+                verifier.id,
+                verifier.verified_at,
+                verifier.evidence_refs.join(",")
+            );
+
+            verifying_key
+                .verify(canonical_payload.as_bytes(), &signature)
+                .map_err(|e| {
+                    anyhow::anyhow!(
+                        "Cryptographic signature verification failed for verifier '{}': {}",
+                        verifier.id,
+                        e
+                    )
+                })?;
+        }
+
         if let Some(impl_id) = &state.implementation_agent_id
             && impl_id == &verifier.id
         {
