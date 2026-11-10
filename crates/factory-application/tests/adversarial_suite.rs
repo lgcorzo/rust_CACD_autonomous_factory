@@ -200,10 +200,12 @@ fn test_heldout_adversarial_corpus_eval() {
         .unwrap_or_else(|| Path::new("."));
 
     let heldout_path = repo_root.join("tests/adversarial/heldout/corpus.json");
-    if !heldout_path.exists() {
-        eprintln!("Held-out corpus not found at {:?}", heldout_path);
-        return;
-    }
+    // Fail closed (DG-RVP-018 A5): a missing corpus must not silently pass.
+    assert!(
+        heldout_path.exists(),
+        "Held-out corpus not found at {:?}",
+        heldout_path
+    );
 
     let content = fs::read_to_string(&heldout_path).expect("Failed to read heldout corpus.json");
     let fixtures: Vec<HeldoutFixture> =
@@ -308,5 +310,17 @@ fn test_heldout_adversarial_corpus_eval() {
     assert_eq!(
         ben_blocked, 0,
         "False positive rate on held-out benign samples must be 0%"
+    );
+
+    // Regression floor (DG-RVP-018 A5): measured 23/40 (57.5%) on 2026-11-10.
+    // This score may only rise. Do not lower it. This detector is a secondary
+    // control; the gVisor sandbox and egress policy are the primary controls.
+    const HELDOUT_MIN_BLOCKED: usize = 23;
+    assert!(
+        adv_blocked >= HELDOUT_MIN_BLOCKED,
+        "Held-out detection regressed: blocked {} of {} (floor {})",
+        adv_blocked,
+        adv_total,
+        HELDOUT_MIN_BLOCKED
     );
 }

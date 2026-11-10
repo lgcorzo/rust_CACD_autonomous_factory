@@ -8,7 +8,8 @@ description: "ISO 42010 ComponentView / ISO 15289 Specification documentation fo
 tags: ['iso42010', 'okf', 'component_view', 'rust', 'ast']
 timestamp: "2026-10-01T14:00:00Z"
 generated: "agent:okf-professional-documenter"
-verified: "true"
+verified: "false"
+# 2026-11-10 DG-RVP-018 A2: auto-generated "true" withdrawn; pending human review
 last_verified_commit: "fbdc5848"
 ---
 

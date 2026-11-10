@@ -7,7 +7,8 @@ description: "Validation report for EXP-2026-007 verifying gVisor hypervisor ker
 tags: ['iso42010', 'okf', 'operations', 'security', 'gvisor', 'lab-notebook', 'zero-trust']
 timestamp: "2026-10-15T14:00:00Z"
 generated: "agent:jules"
-verified: "true"
+verified: "false"
+# 2026-11-10 DG-RVP-018 A2: auto-generated "true" withdrawn; pending human review
 last_verified_commit: "a1b2c3d4"
 ---
 

@@ -7,7 +7,8 @@ description: "ISO 42010 QualityView / ISO 15289 Report documentation for Test Pl
 tags: ['iso42010', 'okf', 'quality_view', 'iso25010', 'testing']
 timestamp: "2026-10-01T14:00:00Z"
 generated: "agent:okf-professional-documenter"
-verified: "true"
+verified: "false"
+# 2026-11-10 DG-RVP-018 A2: auto-generated "true" withdrawn; pending human review
 last_verified_commit: "fbdc5848"
 ---
 

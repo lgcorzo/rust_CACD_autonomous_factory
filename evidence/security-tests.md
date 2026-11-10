@@ -1,3 +1,7 @@
+> [!NOTE]
+> **2026-11-10 (DG-RVP-018 A3):** This file contains two secret-redaction scenarios, a code inspection and a gVisor resource benchmark.
+> It is **not** SAST, DAST or penetration-testing evidence. The word "Certified" below is the original author's wording and is not an independent verification. Evidence class: `unit_test` / `mock`-grade until re-captured live (see `evidence/README.md`).
+
 # Phase 3: Security & Secret Sanitization Verification Report
 
 **Document Title:** Secret Sanitization, Non-Exfiltration & gVisor Benchmark Verification

@@ -7,7 +7,8 @@ description: "Validation report for EXP-2026-006 verifying Hatchet durable orche
 tags: ['iso42010', 'okf', 'operations', 'reliability', 'lab-notebook', 'idempotency']
 timestamp: "2026-10-15T12:00:00Z"
 generated: "agent:jules"
-verified: "true"
+verified: "false"
+# 2026-11-10 DG-RVP-018 A2: auto-generated "true" withdrawn; pending human review
 last_verified_commit: "a1b2c3d4"
 ---
 

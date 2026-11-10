@@ -1,3 +1,17 @@
+> [!CAUTION]
+> **STATUS: `UNVERIFIED: PENDING REGENERATION`** (quarantined 2026-11-10, DG-RVP-018 A1)
+>
+> This document is preserved as history only. It must not be cited as proof of any runtime property.
+> Reasons (to be confirmed against a live capture; see `scripts/capture_cluster_baseline.sh`):
+> - The same commit SHA `fbdc5848` is attached to third-party images (Hatchet, LiteLLM, R2R, Ollama).
+> - Pod names end in placeholder-like suffixes (`-a1b2c`, `-3d4e5`, `-d0e1f`).
+> - Image digests are truncated (e.g. `sha256:e8f9a01b...7a2d`) and cannot be checked.
+> - The RuntimeClass is named both `gvisor-sandbox` and `gvisor`.
+> - `runtimeclasses.node.k8s.io` is listed as a CRD, but RuntimeClass is a built-in Kubernetes type.
+> - It certifies everything `VERIFIED` for 2026-10-01, yet the 2026-11-07 audit found untrusted code running on the host.
+>
+> Superseded by `docs/audit/GITOPS_RUNTIME_VERIFICATION.md` (2026-11-06). Original text follows unchanged.
+
 # Phase 1: Cluster Workload & CRD Inventory Baseline
 
 **Document Title:** Live Cluster Workload, CRD Inventory & Zero-Trust Baseline Verification

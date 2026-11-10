@@ -233,7 +233,9 @@ description: "Detailed documentation for {file_name}"
 tags: ["documentation", "ast", "openwiki"]
 timestamp: "{now}"
 generated: "agent:okf-professional-documenter"
-verified: "true"
+verified: "false"
+reviewer: ""
+generated_from_commit: "{git_hash}"
 last_verified_commit: "{git_hash}"
 ---
 
