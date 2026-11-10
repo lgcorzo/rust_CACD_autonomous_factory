@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "008e8b91-9c94-4d64-839e-d31a54101e08",
+  "requirement_id": "FR-008",
+  "collected_at": "2026-11-10T07:15:30Z",
+  "started_at": "2026-11-10T07:10:00Z",
+  "finished_at": "2026-11-10T07:15:30Z",
+  "generator_version": "dg-evidence-generator/2.0.0",
+  "source_revision": {
+    "repository": "lgcorzo/rust_CACD_autonomous_factory",
+    "branch": "main",
+    "commit": "0a1918081ac6307051aee73ffadddb372e032db8"
+  },
+  "deployment_revision": {
+    "repository": "lgcorzo/gitops_internal_lgcorzo",
+    "branch": "main",
+    "commit": "4e6c01c7ce30483a4dfc8dd534c3adcb8b5c4fd7"
+  },
+  "environment": {
+    "kind": "cluster",
+    "identifier": "server.internal.lgcorzo"
+  },
+  "verification_class": "live_runtime",
+  "method": {
+    "tool": "kubectl",
+    "command_or_test": "kubectl apply -f sandbox-probe.yaml && kubectl wait --for=condition=Ready pod/test-factory-image-probe -n factory-sandboxes"
+  },
+  "outcome": "passed",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "uri": "file://evidence/runs/FR-008.log",
+      "sha256": "fa9ab2df1c28e18100cab37a5a19de1b60357515214173017039d53a918593d2",
+      "media_type": "text/plain"
+    },
+    {
+      "uri": "file://evidence/security/live-gvisor-isolation-015.json",
+      "sha256": "a5a2a7fb5d4a28a7533fc8a44629eac470de6d80a31d6f89fff41aacf7cdfb6d",
+      "media_type": "application/json"
+    }
+  ],
+  "collector": {
+    "id": "dg-rvp-015-live-verifier",
+    "role": "independent_verifier"
+  },
+  "limitations": [
+    "Observed on single-node MicroK8s cluster server.internal.lgcorzo; multi-node failover verification pending cluster expansion"
+  ]
+}
