@@ -51,3 +51,4 @@ flowchart TD
      ```
 2. **Deterministic Evidence Validation:**
    - Both `scripts/verify_spec_artifacts.py` and `pytest tests/test_verify_spec_artifacts.py` run on every PR and branch push without conditionality.
+
