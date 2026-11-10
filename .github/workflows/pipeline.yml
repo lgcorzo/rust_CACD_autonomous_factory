@@ -38,6 +38,11 @@ jobs:
       - name: Verify Spec Artifacts
         run: python3 scripts/verify_spec_artifacts.py
 
+      - name: Test Spec Artifacts Verification Engine
+        run: |
+          pip install --break-system-packages pytest 2>/dev/null || pip install pytest
+          PYTHONPATH=. pytest tests/test_verify_spec_artifacts.py
+
       - name: Verify Wiki Flat Export Integrity
         run: python3 scripts/test_prepare_wiki_for_github.py
 

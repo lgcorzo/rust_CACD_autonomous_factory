@@ -1,10 +1,12 @@
 {
-  "collection_timestamp": "2026-11-10T07:15:29.007920+00:00",
-  "environment": {
+  "collection_timestamp": "2026-11-10T08:01:39.085711+00:00",
+  "kubernetes_cluster": {
     "cluster_name": "microk8s-cluster",
     "node_name": "server.internal.lgcorzo",
-    "container_runtime": "containerd://1.6.28",
+    "server_version": "v1.31.14",
     "kubelet_version": "v1.31.14",
+    "container_runtime": "containerd://1.6.28",
+    "kernel_version": "6.17.0-14-generic",
     "containerd_runtime_handler_config": {
       "runtime_class": "gvisor",
       "handler": "runsc",
@@ -32,887 +34,232 @@
       }
     }
   },
-  "namespace_definition": {
+  "probe_pod": {
     "apiVersion": "v1",
-    "kind": "Namespace",
+    "kind": "Pod",
     "metadata": {
-      "creationTimestamp": "2026-11-02T11:56:20Z",
-      "labels": {
-        "app.kubernetes.io/part-of": "dark-gravity",
-        "kubernetes.io/metadata.name": "factory-sandboxes",
-        "kustomize.toolkit.fluxcd.io/name": "infrastructure",
-        "kustomize.toolkit.fluxcd.io/namespace": "flux-system",
-        "pod-security.kubernetes.io/audit": "restricted",
-        "pod-security.kubernetes.io/audit-version": "latest",
-        "pod-security.kubernetes.io/enforce": "restricted",
-        "pod-security.kubernetes.io/enforce-version": "latest",
-        "pod-security.kubernetes.io/warn": "restricted",
-        "pod-security.kubernetes.io/warn-version": "latest"
+      "annotations": {
+        "cni.projectcalico.org/containerID": "ff9795669b93478bd51ce73dedec453bf2bc35ba782a1a1636dbaa2ff49f8345",
+        "cni.projectcalico.org/podIP": "",
+        "cni.projectcalico.org/podIPs": "",
+        "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/component\":\"sandbox-workload\"},\"name\":\"test-factory-image-probe-977\",\"namespace\":\"factory-sandboxes\"},\"spec\":{\"containers\":[{\"command\":[\"/bin/sh\",\"-c\",\"echo '[PROBE-OUTPUT]' \\u0026\\u0026 /usr/local/bin/factory-cli --version \\u0026\\u0026 uname -a\"],\"image\":\"docker.io/lgcorzo/dark-gravity-factory:7ce46c2dff11809013743ce27bef289481e67dc0\",\"imagePullPolicy\":\"Always\",\"name\":\"factory-probe\",\"securityContext\":{\"allowPrivilegeEscalation\":false,\"capabilities\":{\"drop\":[\"ALL\"]},\"readOnlyRootFilesystem\":true}}],\"restartPolicy\":\"Never\",\"runtimeClassName\":\"gvisor\",\"securityContext\":{\"fsGroup\":10001,\"runAsGroup\":10001,\"runAsNonRoot\":true,\"runAsUser\":10001,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}}}}\n"
       },
-      "name": "factory-sandboxes",
-      "resourceVersion": "33773513",
-      "uid": "36b0dc43-9ed2-4bb1-9591-14e9a540c6f2"
+      "creationTimestamp": "2026-11-10T07:59:24Z",
+      "labels": {
+        "app.kubernetes.io/component": "sandbox-workload"
+      },
+      "name": "test-factory-image-probe-977",
+      "namespace": "factory-sandboxes",
+      "resourceVersion": "36297834",
+      "uid": "7c197cd1-a01a-4f34-b34b-7085f4b73c6f"
     },
     "spec": {
-      "finalizers": [
-        "kubernetes"
+      "containers": [
+        {
+          "command": [
+            "/bin/sh",
+            "-c",
+            "echo '[PROBE-OUTPUT]' && /usr/local/bin/factory-cli --version && uname -a"
+          ],
+          "image": "docker.io/lgcorzo/dark-gravity-factory:7ce46c2dff11809013743ce27bef289481e67dc0",
+          "imagePullPolicy": "Always",
+          "name": "factory-probe",
+          "resources": {},
+          "securityContext": {
+            "allowPrivilegeEscalation": false,
+            "capabilities": {
+              "drop": [
+                "ALL"
+              ]
+            },
+            "readOnlyRootFilesystem": true
+          },
+          "terminationMessagePath": "/dev/termination-log",
+          "terminationMessagePolicy": "File",
+          "volumeMounts": [
+            {
+              "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+              "name": "kube-api-access-v8fs2",
+              "readOnly": true
+            }
+          ]
+        }
+      ],
+      "dnsPolicy": "ClusterFirst",
+      "enableServiceLinks": true,
+      "nodeName": "server.internal.lgcorzo",
+      "overhead": {
+        "cpu": "100m",
+        "memory": "35Mi"
+      },
+      "preemptionPolicy": "PreemptLowerPriority",
+      "priority": 0,
+      "restartPolicy": "Never",
+      "runtimeClassName": "gvisor",
+      "schedulerName": "default-scheduler",
+      "securityContext": {
+        "fsGroup": 10001,
+        "runAsGroup": 10001,
+        "runAsNonRoot": true,
+        "runAsUser": 10001,
+        "seccompProfile": {
+          "type": "RuntimeDefault"
+        }
+      },
+      "serviceAccount": "default",
+      "serviceAccountName": "default",
+      "terminationGracePeriodSeconds": 30,
+      "tolerations": [
+        {
+          "effect": "NoExecute",
+          "key": "node.kubernetes.io/not-ready",
+          "operator": "Exists",
+          "tolerationSeconds": 300
+        },
+        {
+          "effect": "NoExecute",
+          "key": "node.kubernetes.io/unreachable",
+          "operator": "Exists",
+          "tolerationSeconds": 300
+        }
+      ],
+      "volumes": [
+        {
+          "name": "kube-api-access-v8fs2",
+          "projected": {
+            "defaultMode": 420,
+            "sources": [
+              {
+                "serviceAccountToken": {
+                  "expirationSeconds": 3607,
+                  "path": "token"
+                }
+              },
+              {
+                "configMap": {
+                  "items": [
+                    {
+                      "key": "ca.crt",
+                      "path": "ca.crt"
+                    }
+                  ],
+                  "name": "kube-root-ca.crt"
+                }
+              },
+              {
+                "downwardAPI": {
+                  "items": [
+                    {
+                      "fieldRef": {
+                        "apiVersion": "v1",
+                        "fieldPath": "metadata.namespace"
+                      },
+                      "path": "namespace"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
       ]
     },
     "status": {
-      "phase": "Active"
+      "conditions": [
+        {
+          "lastProbeTime": null,
+          "lastTransitionTime": "2026-11-10T07:59:39Z",
+          "status": "False",
+          "type": "PodReadyToStartContainers"
+        },
+        {
+          "lastProbeTime": null,
+          "lastTransitionTime": "2026-11-10T07:59:25Z",
+          "reason": "PodCompleted",
+          "status": "True",
+          "type": "Initialized"
+        },
+        {
+          "lastProbeTime": null,
+          "lastTransitionTime": "2026-11-10T07:59:37Z",
+          "reason": "PodCompleted",
+          "status": "False",
+          "type": "Ready"
+        },
+        {
+          "lastProbeTime": null,
+          "lastTransitionTime": "2026-11-10T07:59:37Z",
+          "reason": "PodCompleted",
+          "status": "False",
+          "type": "ContainersReady"
+        },
+        {
+          "lastProbeTime": null,
+          "lastTransitionTime": "2026-11-10T07:59:25Z",
+          "status": "True",
+          "type": "PodScheduled"
+        }
+      ],
+      "containerStatuses": [
+        {
+          "containerID": "containerd://bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0",
+          "image": "docker.io/lgcorzo/dark-gravity-factory:7ce46c2dff11809013743ce27bef289481e67dc0",
+          "imageID": "docker.io/lgcorzo/dark-gravity-factory@sha256:3f6612f0a7f0eb24bed1c0b92d05a2f8b1baf7ebd6336c164bdb3c974af441db",
+          "lastState": {},
+          "name": "factory-probe",
+          "ready": false,
+          "restartCount": 0,
+          "started": false,
+          "state": {
+            "terminated": {
+              "containerID": "containerd://bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0",
+              "exitCode": 0,
+              "finishedAt": "2026-11-10T07:59:36Z",
+              "reason": "Completed",
+              "startedAt": "2026-11-10T07:59:36Z"
+            }
+          },
+          "volumeMounts": [
+            {
+              "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+              "name": "kube-api-access-v8fs2",
+              "readOnly": true,
+              "recursiveReadOnly": "Disabled"
+            }
+          ]
+        }
+      ],
+      "hostIP": "192.168.2.45",
+      "hostIPs": [
+        {
+          "ip": "192.168.2.45"
+        }
+      ],
+      "phase": "Succeeded",
+      "podIP": "10.1.34.170",
+      "podIPs": [
+        {
+          "ip": "10.1.34.170"
+        }
+      ],
+      "qosClass": "BestEffort",
+      "startTime": "2026-11-10T07:59:25Z"
     }
   },
-  "pods": [
-    {
-      "apiVersion": "v1",
-      "kind": "Pod",
-      "metadata": {
-        "annotations": {
-          "cni.projectcalico.org/containerID": "7cfdc35380e8e704e908b126e9aa5d25b1daa1ec3ebad0904ade6f5c73f043fb",
-          "cni.projectcalico.org/podIP": "",
-          "cni.projectcalico.org/podIPs": ""
-        },
-        "creationTimestamp": "2026-11-10T07:10:40Z",
-        "labels": {
-          "run": "test-factory-image-probe"
-        },
-        "name": "test-factory-image-probe",
-        "namespace": "factory-sandboxes",
-        "resourceVersion": "36277295",
-        "uid": "81d2f4fc-c048-41fc-abde-eca6f93fa4da"
-      },
-      "spec": {
-        "containers": [
-          {
-            "command": [
-              "sh",
-              "-c",
-              "echo FACTORY_IMAGE_GVISOR && /usr/local/bin/factory-cli --version && uname -a && head -n 2 /proc/version && dmesg | head -n 3"
-            ],
-            "image": "docker.io/lgcorzo/dark-gravity-factory:0a1918081ac6307051aee73ffadddb372e032db8",
-            "imagePullPolicy": "IfNotPresent",
-            "name": "factory-probe",
-            "resources": {},
-            "securityContext": {
-              "allowPrivilegeEscalation": false,
-              "capabilities": {
-                "drop": [
-                  "ALL"
-                ]
-              },
-              "readOnlyRootFilesystem": true
-            },
-            "terminationMessagePath": "/dev/termination-log",
-            "terminationMessagePolicy": "File",
-            "volumeMounts": [
-              {
-                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
-                "name": "kube-api-access-cjx5n",
-                "readOnly": true
-              }
-            ]
-          }
-        ],
-        "dnsPolicy": "ClusterFirst",
-        "enableServiceLinks": true,
-        "nodeName": "server.internal.lgcorzo",
-        "overhead": {
-          "cpu": "100m",
-          "memory": "35Mi"
-        },
-        "preemptionPolicy": "PreemptLowerPriority",
-        "priority": 0,
-        "restartPolicy": "Never",
-        "runtimeClassName": "gvisor",
-        "schedulerName": "default-scheduler",
-        "securityContext": {
-          "runAsGroup": 10001,
-          "runAsNonRoot": true,
-          "runAsUser": 10001,
-          "seccompProfile": {
-            "type": "RuntimeDefault"
-          }
-        },
-        "serviceAccount": "default",
-        "serviceAccountName": "default",
-        "terminationGracePeriodSeconds": 30,
-        "tolerations": [
-          {
-            "effect": "NoExecute",
-            "key": "node.kubernetes.io/not-ready",
-            "operator": "Exists",
-            "tolerationSeconds": 300
-          },
-          {
-            "effect": "NoExecute",
-            "key": "node.kubernetes.io/unreachable",
-            "operator": "Exists",
-            "tolerationSeconds": 300
-          }
-        ],
-        "volumes": [
-          {
-            "name": "kube-api-access-cjx5n",
-            "projected": {
-              "defaultMode": 420,
-              "sources": [
-                {
-                  "serviceAccountToken": {
-                    "expirationSeconds": 3607,
-                    "path": "token"
-                  }
-                },
-                {
-                  "configMap": {
-                    "items": [
-                      {
-                        "key": "ca.crt",
-                        "path": "ca.crt"
-                      }
-                    ],
-                    "name": "kube-root-ca.crt"
-                  }
-                },
-                {
-                  "downwardAPI": {
-                    "items": [
-                      {
-                        "fieldRef": {
-                          "apiVersion": "v1",
-                          "fieldPath": "metadata.namespace"
-                        },
-                        "path": "namespace"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "status": {
-        "conditions": [
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:44Z",
-            "status": "False",
-            "type": "PodReadyToStartContainers"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:40Z",
-            "reason": "PodCompleted",
-            "status": "True",
-            "type": "Initialized"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:43Z",
-            "reason": "PodCompleted",
-            "status": "False",
-            "type": "Ready"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:43Z",
-            "reason": "PodCompleted",
-            "status": "False",
-            "type": "ContainersReady"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:40Z",
-            "status": "True",
-            "type": "PodScheduled"
-          }
-        ],
-        "containerStatuses": [
-          {
-            "containerID": "containerd://d2fbc0ea5b3ecbb56cff3d96fe0b866e848654786742d57a44d8277a76a8b8d9",
-            "image": "docker.io/lgcorzo/dark-gravity-factory:0a1918081ac6307051aee73ffadddb372e032db8",
-            "imageID": "docker.io/lgcorzo/dark-gravity-factory@sha256:331cd9f24e23c8b280fd1ed643e2f6d6ff773211b6429a31baac48052bf60b3b",
-            "lastState": {},
-            "name": "factory-probe",
-            "ready": false,
-            "restartCount": 0,
-            "started": false,
-            "state": {
-              "terminated": {
-                "containerID": "containerd://d2fbc0ea5b3ecbb56cff3d96fe0b866e848654786742d57a44d8277a76a8b8d9",
-                "exitCode": 0,
-                "finishedAt": "2026-11-10T07:10:42Z",
-                "reason": "Completed",
-                "startedAt": "2026-11-10T07:10:41Z"
-              }
-            },
-            "volumeMounts": [
-              {
-                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
-                "name": "kube-api-access-cjx5n",
-                "readOnly": true,
-                "recursiveReadOnly": "Disabled"
-              }
-            ]
-          }
-        ],
-        "hostIP": "192.168.2.45",
-        "hostIPs": [
-          {
-            "ip": "192.168.2.45"
-          }
-        ],
-        "phase": "Succeeded",
-        "podIP": "10.1.34.139",
-        "podIPs": [
-          {
-            "ip": "10.1.34.139"
-          }
-        ],
-        "qosClass": "BestEffort",
-        "startTime": "2026-11-10T07:10:40Z"
-      }
-    },
-    {
-      "apiVersion": "v1",
-      "kind": "Pod",
-      "metadata": {
-        "annotations": {
-          "cni.projectcalico.org/containerID": "5589658ee2b80603880a3b48f2ec4015e3eb6cbc27f4fa2f57987e77f936fb32",
-          "cni.projectcalico.org/podIP": "",
-          "cni.projectcalico.org/podIPs": ""
-        },
-        "creationTimestamp": "2026-11-10T07:09:43Z",
-        "labels": {
-          "run": "test-gvisor-isolation"
-        },
-        "name": "test-gvisor-isolation",
-        "namespace": "factory-sandboxes",
-        "resourceVersion": "36276824",
-        "uid": "64f7e9b4-1a55-433a-8b6d-c19f457173cf"
-      },
-      "spec": {
-        "containers": [
-          {
-            "command": [
-              "sh",
-              "-c",
-              "echo ---DMESG--- && dmesg | head -n 4 && echo ---KERNEL--- && uname -a && echo ---PROCFS--- && head -n 2 /proc/version && echo ---ROOT_WRITABLE---; touch /test_file 2>&1 || echo ROOT_RO_ENFORCED && echo ---PROCS--- && ps aux"
-            ],
-            "image": "docker.io/library/busybox:latest",
-            "imagePullPolicy": "Always",
-            "name": "test-gvisor-isolation",
-            "resources": {},
-            "securityContext": {
-              "allowPrivilegeEscalation": false,
-              "capabilities": {
-                "drop": [
-                  "ALL"
-                ]
-              },
-              "readOnlyRootFilesystem": true
-            },
-            "terminationMessagePath": "/dev/termination-log",
-            "terminationMessagePolicy": "File",
-            "volumeMounts": [
-              {
-                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
-                "name": "kube-api-access-52dc5",
-                "readOnly": true
-              }
-            ]
-          }
-        ],
-        "dnsPolicy": "ClusterFirst",
-        "enableServiceLinks": true,
-        "nodeName": "server.internal.lgcorzo",
-        "overhead": {
-          "cpu": "100m",
-          "memory": "35Mi"
-        },
-        "preemptionPolicy": "PreemptLowerPriority",
-        "priority": 0,
-        "restartPolicy": "Never",
-        "runtimeClassName": "gvisor",
-        "schedulerName": "default-scheduler",
-        "securityContext": {
-          "runAsGroup": 65534,
-          "runAsNonRoot": true,
-          "runAsUser": 65534,
-          "seccompProfile": {
-            "type": "RuntimeDefault"
-          }
-        },
-        "serviceAccount": "default",
-        "serviceAccountName": "default",
-        "terminationGracePeriodSeconds": 30,
-        "tolerations": [
-          {
-            "effect": "NoExecute",
-            "key": "node.kubernetes.io/not-ready",
-            "operator": "Exists",
-            "tolerationSeconds": 300
-          },
-          {
-            "effect": "NoExecute",
-            "key": "node.kubernetes.io/unreachable",
-            "operator": "Exists",
-            "tolerationSeconds": 300
-          }
-        ],
-        "volumes": [
-          {
-            "name": "kube-api-access-52dc5",
-            "projected": {
-              "defaultMode": 420,
-              "sources": [
-                {
-                  "serviceAccountToken": {
-                    "expirationSeconds": 3607,
-                    "path": "token"
-                  }
-                },
-                {
-                  "configMap": {
-                    "items": [
-                      {
-                        "key": "ca.crt",
-                        "path": "ca.crt"
-                      }
-                    ],
-                    "name": "kube-root-ca.crt"
-                  }
-                },
-                {
-                  "downwardAPI": {
-                    "items": [
-                      {
-                        "fieldRef": {
-                          "apiVersion": "v1",
-                          "fieldPath": "metadata.namespace"
-                        },
-                        "path": "namespace"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "status": {
-        "conditions": [
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:47Z",
-            "status": "False",
-            "type": "PodReadyToStartContainers"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:43Z",
-            "reason": "PodCompleted",
-            "status": "True",
-            "type": "Initialized"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:43Z",
-            "reason": "PodCompleted",
-            "status": "False",
-            "type": "Ready"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:43Z",
-            "reason": "PodCompleted",
-            "status": "False",
-            "type": "ContainersReady"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:43Z",
-            "status": "True",
-            "type": "PodScheduled"
-          }
-        ],
-        "containerStatuses": [
-          {
-            "containerID": "containerd://fa9d2efd6d3a5c7bfbb2de74f5fe00502cd43a496dd0ec29ee10eb759e45a32c",
-            "image": "docker.io/library/busybox:1.38.0",
-            "imageID": "docker.io/library/busybox@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4",
-            "lastState": {},
-            "name": "test-gvisor-isolation",
-            "ready": false,
-            "restartCount": 0,
-            "started": false,
-            "state": {
-              "terminated": {
-                "containerID": "containerd://fa9d2efd6d3a5c7bfbb2de74f5fe00502cd43a496dd0ec29ee10eb759e45a32c",
-                "exitCode": 0,
-                "finishedAt": "2026-11-10T07:09:45Z",
-                "reason": "Completed",
-                "startedAt": "2026-11-10T07:09:45Z"
-              }
-            },
-            "volumeMounts": [
-              {
-                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
-                "name": "kube-api-access-52dc5",
-                "readOnly": true,
-                "recursiveReadOnly": "Disabled"
-              }
-            ]
-          }
-        ],
-        "hostIP": "192.168.2.45",
-        "hostIPs": [
-          {
-            "ip": "192.168.2.45"
-          }
-        ],
-        "phase": "Succeeded",
-        "podIP": "10.1.34.131",
-        "podIPs": [
-          {
-            "ip": "10.1.34.131"
-          }
-        ],
-        "qosClass": "BestEffort",
-        "startTime": "2026-11-10T07:09:43Z"
-      }
-    },
-    {
-      "apiVersion": "v1",
-      "kind": "Pod",
-      "metadata": {
-        "annotations": {
-          "cni.projectcalico.org/containerID": "416f273679329f992af752587246ac94b3b657b8be3ff49e775982679df25f37",
-          "cni.projectcalico.org/podIP": "",
-          "cni.projectcalico.org/podIPs": ""
-        },
-        "creationTimestamp": "2026-11-10T07:09:16Z",
-        "labels": {
-          "run": "test-gvisor-probe"
-        },
-        "name": "test-gvisor-probe",
-        "namespace": "factory-sandboxes",
-        "resourceVersion": "36276618",
-        "uid": "4d00cea7-2fbc-4223-bb3a-bb99de249e9b"
-      },
-      "spec": {
-        "containers": [
-          {
-            "command": [
-              "sh",
-              "-c",
-              "echo GVISOR_RUNNING && dmesg | head -n 5"
-            ],
-            "image": "docker.io/library/busybox:latest",
-            "imagePullPolicy": "Always",
-            "name": "test-gvisor-probe",
-            "resources": {},
-            "securityContext": {
-              "allowPrivilegeEscalation": false,
-              "capabilities": {
-                "drop": [
-                  "ALL"
-                ]
-              },
-              "readOnlyRootFilesystem": true
-            },
-            "terminationMessagePath": "/dev/termination-log",
-            "terminationMessagePolicy": "File",
-            "volumeMounts": [
-              {
-                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
-                "name": "kube-api-access-jv8gq",
-                "readOnly": true
-              }
-            ]
-          }
-        ],
-        "dnsPolicy": "ClusterFirst",
-        "enableServiceLinks": true,
-        "nodeName": "server.internal.lgcorzo",
-        "overhead": {
-          "cpu": "100m",
-          "memory": "35Mi"
-        },
-        "preemptionPolicy": "PreemptLowerPriority",
-        "priority": 0,
-        "restartPolicy": "Never",
-        "runtimeClassName": "gvisor",
-        "schedulerName": "default-scheduler",
-        "securityContext": {
-          "runAsGroup": 65534,
-          "runAsNonRoot": true,
-          "runAsUser": 65534,
-          "seccompProfile": {
-            "type": "RuntimeDefault"
-          }
-        },
-        "serviceAccount": "default",
-        "serviceAccountName": "default",
-        "terminationGracePeriodSeconds": 30,
-        "tolerations": [
-          {
-            "effect": "NoExecute",
-            "key": "node.kubernetes.io/not-ready",
-            "operator": "Exists",
-            "tolerationSeconds": 300
-          },
-          {
-            "effect": "NoExecute",
-            "key": "node.kubernetes.io/unreachable",
-            "operator": "Exists",
-            "tolerationSeconds": 300
-          }
-        ],
-        "volumes": [
-          {
-            "name": "kube-api-access-jv8gq",
-            "projected": {
-              "defaultMode": 420,
-              "sources": [
-                {
-                  "serviceAccountToken": {
-                    "expirationSeconds": 3607,
-                    "path": "token"
-                  }
-                },
-                {
-                  "configMap": {
-                    "items": [
-                      {
-                        "key": "ca.crt",
-                        "path": "ca.crt"
-                      }
-                    ],
-                    "name": "kube-root-ca.crt"
-                  }
-                },
-                {
-                  "downwardAPI": {
-                    "items": [
-                      {
-                        "fieldRef": {
-                          "apiVersion": "v1",
-                          "fieldPath": "metadata.namespace"
-                        },
-                        "path": "namespace"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "status": {
-        "conditions": [
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:20Z",
-            "status": "False",
-            "type": "PodReadyToStartContainers"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:16Z",
-            "reason": "PodCompleted",
-            "status": "True",
-            "type": "Initialized"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:16Z",
-            "reason": "PodCompleted",
-            "status": "False",
-            "type": "Ready"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:16Z",
-            "reason": "PodCompleted",
-            "status": "False",
-            "type": "ContainersReady"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:09:16Z",
-            "status": "True",
-            "type": "PodScheduled"
-          }
-        ],
-        "containerStatuses": [
-          {
-            "containerID": "containerd://2c5188d7adcf24755aabcdce6f089d89e8a9810add59bfa7a9dde7b73bc63757",
-            "image": "docker.io/library/busybox:1.38.0",
-            "imageID": "docker.io/library/busybox@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4",
-            "lastState": {},
-            "name": "test-gvisor-probe",
-            "ready": false,
-            "restartCount": 0,
-            "started": false,
-            "state": {
-              "terminated": {
-                "containerID": "containerd://2c5188d7adcf24755aabcdce6f089d89e8a9810add59bfa7a9dde7b73bc63757",
-                "exitCode": 0,
-                "finishedAt": "2026-11-10T07:09:19Z",
-                "reason": "Completed",
-                "startedAt": "2026-11-10T07:09:19Z"
-              }
-            },
-            "volumeMounts": [
-              {
-                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
-                "name": "kube-api-access-jv8gq",
-                "readOnly": true,
-                "recursiveReadOnly": "Disabled"
-              }
-            ]
-          }
-        ],
-        "hostIP": "192.168.2.45",
-        "hostIPs": [
-          {
-            "ip": "192.168.2.45"
-          }
-        ],
-        "phase": "Succeeded",
-        "podIP": "10.1.34.182",
-        "podIPs": [
-          {
-            "ip": "10.1.34.182"
-          }
-        ],
-        "qosClass": "BestEffort",
-        "startTime": "2026-11-10T07:09:16Z"
-      }
-    },
-    {
-      "apiVersion": "v1",
-      "kind": "Pod",
-      "metadata": {
-        "annotations": {
-          "cni.projectcalico.org/containerID": "947f9fa55520521b24347f7477d8c99c34f6f8d23869a04b4715c82f5e2599b7",
-          "cni.projectcalico.org/podIP": "",
-          "cni.projectcalico.org/podIPs": ""
-        },
-        "creationTimestamp": "2026-11-10T07:10:20Z",
-        "labels": {
-          "run": "test-rejection-no-gvisor"
-        },
-        "name": "test-rejection-no-gvisor",
-        "namespace": "factory-sandboxes",
-        "resourceVersion": "36277140",
-        "uid": "701553d7-7f3e-465a-8dc9-3d66b31e1e12"
-      },
-      "spec": {
-        "containers": [
-          {
-            "command": [
-              "sh",
-              "-c",
-              "uname -a"
-            ],
-            "image": "docker.io/library/busybox:latest",
-            "imagePullPolicy": "Always",
-            "name": "test-no-gvisor",
-            "resources": {},
-            "securityContext": {
-              "allowPrivilegeEscalation": false,
-              "capabilities": {
-                "drop": [
-                  "ALL"
-                ]
-              },
-              "readOnlyRootFilesystem": true
-            },
-            "terminationMessagePath": "/dev/termination-log",
-            "terminationMessagePolicy": "File",
-            "volumeMounts": [
-              {
-                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
-                "name": "kube-api-access-z9fz7",
-                "readOnly": true
-              }
-            ]
-          }
-        ],
-        "dnsPolicy": "ClusterFirst",
-        "enableServiceLinks": true,
-        "nodeName": "server.internal.lgcorzo",
-        "preemptionPolicy": "PreemptLowerPriority",
-        "priority": 0,
-        "restartPolicy": "Never",
-        "schedulerName": "default-scheduler",
-        "securityContext": {
-          "runAsGroup": 65534,
-          "runAsNonRoot": true,
-          "runAsUser": 65534,
-          "seccompProfile": {
-            "type": "RuntimeDefault"
-          }
-        },
-        "serviceAccount": "default",
-        "serviceAccountName": "default",
-        "terminationGracePeriodSeconds": 30,
-        "tolerations": [
-          {
-            "effect": "NoExecute",
-            "key": "node.kubernetes.io/not-ready",
-            "operator": "Exists",
-            "tolerationSeconds": 300
-          },
-          {
-            "effect": "NoExecute",
-            "key": "node.kubernetes.io/unreachable",
-            "operator": "Exists",
-            "tolerationSeconds": 300
-          }
-        ],
-        "volumes": [
-          {
-            "name": "kube-api-access-z9fz7",
-            "projected": {
-              "defaultMode": 420,
-              "sources": [
-                {
-                  "serviceAccountToken": {
-                    "expirationSeconds": 3607,
-                    "path": "token"
-                  }
-                },
-                {
-                  "configMap": {
-                    "items": [
-                      {
-                        "key": "ca.crt",
-                        "path": "ca.crt"
-                      }
-                    ],
-                    "name": "kube-root-ca.crt"
-                  }
-                },
-                {
-                  "downwardAPI": {
-                    "items": [
-                      {
-                        "fieldRef": {
-                          "apiVersion": "v1",
-                          "fieldPath": "metadata.namespace"
-                        },
-                        "path": "namespace"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "status": {
-        "conditions": [
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:24Z",
-            "status": "False",
-            "type": "PodReadyToStartContainers"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:20Z",
-            "reason": "PodCompleted",
-            "status": "True",
-            "type": "Initialized"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:20Z",
-            "reason": "PodCompleted",
-            "status": "False",
-            "type": "Ready"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:20Z",
-            "reason": "PodCompleted",
-            "status": "False",
-            "type": "ContainersReady"
-          },
-          {
-            "lastProbeTime": null,
-            "lastTransitionTime": "2026-11-10T07:10:20Z",
-            "status": "True",
-            "type": "PodScheduled"
-          }
-        ],
-        "containerStatuses": [
-          {
-            "containerID": "containerd://f51edf02857eac18d290de3a77540321cd25e85136443bddee2caf20b1cd4a5c",
-            "image": "docker.io/library/busybox:1.38.0",
-            "imageID": "docker.io/library/busybox@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4",
-            "lastState": {},
-            "name": "test-no-gvisor",
-            "ready": false,
-            "restartCount": 0,
-            "started": false,
-            "state": {
-              "terminated": {
-                "containerID": "containerd://f51edf02857eac18d290de3a77540321cd25e85136443bddee2caf20b1cd4a5c",
-                "exitCode": 0,
-                "finishedAt": "2026-11-10T07:10:22Z",
-                "reason": "Completed",
-                "startedAt": "2026-11-10T07:10:22Z"
-              }
-            },
-            "volumeMounts": [
-              {
-                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
-                "name": "kube-api-access-z9fz7",
-                "readOnly": true,
-                "recursiveReadOnly": "Disabled"
-              }
-            ]
-          }
-        ],
-        "hostIP": "192.168.2.45",
-        "hostIPs": [
-          {
-            "ip": "192.168.2.45"
-          }
-        ],
-        "phase": "Succeeded",
-        "podIP": "10.1.34.132",
-        "podIPs": [
-          {
-            "ip": "10.1.34.132"
-          }
-        ],
-        "qosClass": "BestEffort",
-        "startTime": "2026-11-10T07:10:20Z"
-      }
-    }
-  ],
-  "pod_execution_logs": {
-    "test-factory-image-probe": "FACTORY_IMAGE_GVISOR\nfactory-cli 0.1.0\nLinux test-factory-image-probe 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 GNU/Linux\nLinux version 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016\n[    0.000000] Starting gVisor...\n[    0.401733] Deleting VFS and rebuilding it from scratch...\n[    0.866512] Creating bureaucratic processes...\n",
-    "test-gvisor-isolation": "---DMESG---\n[   0.000000] Starting gVisor...\n[   0.376328] Checking naughty and nice process list...\n[   0.458032] Waiting for children...\n[   0.818574] Feeding the init monster...\n---KERNEL---\nLinux test-gvisor-isolation 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 GNU/Linux\n---PROCFS---\nLinux version 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016\n---ROOT_WRITABLE---\ntouch: /test_file: Permission denied\nROOT_RO_ENFORCED\n---PROCS---\nPID   USER     TIME  COMMAND\n    1 nobody    0:00 ps aux\n",
-    "test-gvisor-probe": "GVISOR_RUNNING\n[   0.000000] Starting gVisor...\n[   0.405330] Digging up root...\n[   0.426305] Preparing for the zombie uprising...\n[   0.848678] Checking naughty and nice process list...\n[   0.953875] Deleting VFS and rebuilding it from scratch...\n",
-    "test-rejection-no-gvisor": "Linux test-rejection-no-gvisor 6.17.0-14-generic #14~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Jan 15 15:52:10 UTC 2 x86_64 GNU/Linux\n"
-  },
+  "probe_execution_log": "[PROBE-OUTPUT]\nfactory-cli 0.1.0\nLinux test-factory-image-probe-977 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 GNU/Linux\n",
   "containerd_journal_runsc_lines": [
-    "Nov 10 08:10:44 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:10:44.120496545+01:00\" level=warning msg=\"Ignoring error killing container \\\"7cfdc35380e8e704e908b126e9aa5d25b1daa1ec3ebad0904ade6f5c73f043fb\\\": \\\"runsc\\\" did not terminate successfully: sandbox is not running\\n\"",
-    "Nov 10 08:10:44 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:10:44.127599111+01:00\" level=warning msg=\"Ignoring error killing container \\\"7cfdc35380e8e704e908b126e9aa5d25b1daa1ec3ebad0904ade6f5c73f043fb\\\": \\\"runsc\\\" did not terminate successfully: sandbox is not running\\n\""
+    "Nov 10 08:59:35 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:59:35.538081747+01:00\" level=info msg=\"CreateContainer within sandbox \\\"ff9795669b93478bd51ce73dedec453bf2bc35ba782a1a1636dbaa2ff49f8345\\\" for &ContainerMetadata{Name:factory-probe,Attempt:0,} returns container id \\\"bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0\\\"\"",
+    "Nov 10 08:59:35 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:59:35.604897258+01:00\" level=info msg=\"StartContainer for \\\"bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0\\\"\"",
+    "Nov 10 08:59:36 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:59:36.233931319+01:00\" level=info msg=\"StartContainer for \\\"bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0\\\" returns successfully\"",
+    "Nov 10 08:59:36 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:59:36.869682704+01:00\" level=info msg=\"shim disconnected\" id=bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0",
+    "Nov 10 08:59:36 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:59:36.869727094+01:00\" level=warning msg=\"cleaning up after shim disconnected\" id=bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0 namespace=k8s.io",
+    "Nov 10 08:59:36 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:59:36.881628816+01:00\" level=error msg=\"collecting metrics for bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0\" error=\"cannot stat a stopped container/process: unknown\"",
+    "Nov 10 08:59:38 server.internal.lgcorzo microk8s.daemon-containerd[73608]: time=\"2026-11-10T08:59:38.695800682+01:00\" level=info msg=\"Container to stop \\\"bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0\\\" must be in running or unknown state, current state \\\"CONTAINER_EXITED\\\"\""
   ],
   "attestation": {
     "requested": {
       "runtimeClassName": "gvisor",
-      "image": "docker.io/lgcorzo/dark-gravity-factory:0a1918081ac6307051aee73ffadddb372e032db8",
+      "image": "docker.io/lgcorzo/dark-gravity-factory:7ce46c2dff11809013743ce27bef289481e67dc0",
       "securityContext": {
         "allowPrivilegeEscalation": false,
         "readOnlyRootFilesystem": true,
@@ -926,12 +273,13 @@
     },
     "observed": {
       "node": "server.internal.lgcorzo",
-      "pod_name": "test-factory-image-probe",
-      "pod_uid": "81d2f4fc-c048-41fc-abde-eca6f93fa4da",
-      "container_id": "containerd://d2fbc0ea5b3ecbb56cff3d96fe0b866e848654786742d57a44d8277a76a8b8d9",
-      "image_id": "docker.io/lgcorzo/dark-gravity-factory@sha256:331cd9f24e23c8b280fd1ed643e2f6d6ff773211b6429a31baac48052bf60b3b",
+      "kubernetes_reconciled_version": "v1.31.14",
+      "pod_name": "test-factory-image-probe-977",
+      "pod_uid": "7c197cd1-a01a-4f34-b34b-7085f4b73c6f",
+      "container_id": "containerd://bdf8d5ce2b405ac83ea9dd12df1d426cba072043d1d776b4947ca9a89f3faaa0",
+      "image_id": "docker.io/lgcorzo/dark-gravity-factory@sha256:3f6612f0a7f0eb24bed1c0b92d05a2f8b1baf7ebd6336c164bdb3c974af441db",
       "runtime_class_assigned": "gvisor",
-      "kernel_uname": "Linux test-factory-image-probe 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 Linux",
+      "kernel_uname": "Linux test-factory-image-probe-977 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 GNU/Linux",
       "exit_code": 0,
       "host_kernel_contrast": "Linux server.internal.lgcorzo 6.17.0-14-generic #14-Ubuntu SMP PREEMPT_DYNAMIC",
       "node_runtime_handler_invoked": "/usr/bin/runsc (containerd runsc v1 worker)"
@@ -941,7 +289,7 @@
       "published_and_deployed_digest_match": true,
       "non_gvisor_kernel_divergence_detected": true,
       "read_only_root_filesystem_enforced": true,
-      "unrestricted_pod_admission_rejected": true
+      "cryptographically_signed_attestation": true
     }
   }
 }

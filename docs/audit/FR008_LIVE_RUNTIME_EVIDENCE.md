@@ -3,7 +3,7 @@
 **Programme:** DG-RVP-015  
 **Requirement ID:** FR-008  
 **Verification Class:** `live_runtime`  
-**Target Node:** `server.internal.lgcorzo` (MicroK8s v1.32.2)  
+**Target Node:** `server.internal.lgcorzo` (MicroK8s v1.31.14)  
 **Container Runtime:** `containerd://1.6.28`  
 **Runtime Handler:** `/usr/bin/runsc` (`io.containerd.runsc.v1`)  
 **Timestamp:** `2026-11-10T07:15:30Z`  

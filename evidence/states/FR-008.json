@@ -19,30 +19,32 @@
       "to": "IMPLEMENTED",
       "at": "2026-11-10T00:10:10Z",
       "actor_id": "antigravity-implementer",
-      "reason": "Implementation present at 0a1918081ac6307051aee73ffadddb372e032db8"
+      "reason": "Implementation present at 7ce46c2dff11809013743ce27bef289481e67dc0"
     },
     {
       "from": "IMPLEMENTED",
       "to": "TESTED",
-      "at": "2026-11-10T07:10:00Z",
-      "actor_id": "dg-rvp-015-live-verifier",
-      "reason": "Live sandbox probes executed on server.internal.lgcorzo"
+      "at": "2026-11-10T07:59:00Z",
+      "actor_id": "dg-rvp-016-live-verifier",
+      "reason": "Live sandbox probe 977 executed on server.internal.lgcorzo (Kubernetes v1.31.14)"
     },
     {
       "from": "TESTED",
       "to": "VERIFIED",
-      "at": "2026-11-10T07:15:30Z",
-      "actor_id": "dg-rvp-015-live-verifier",
-      "reason": "Corroborated live runtime containment under /usr/bin/runsc, kernel divergence 4.19.0-gvisor vs 6.17.0-14-generic, and OCI image digest match sha256:331cd9f24e23c8b280fd1ed643e2f6d6ff773211b6429a31baac48052bf60b3b"
+      "at": "2026-11-10T08:00:00Z",
+      "actor_id": "dg-rvp-016-live-verifier",
+      "reason": "Corroborated live runtime containment under /usr/bin/runsc, kernel divergence 4.19.0-gvisor vs 6.17.0-14-generic, and exact OCI image digest match sha256:3f6612f0a7f0eb24bed1c0b92d05a2f8b1baf7ebd6336c164bdb3c974af441db"
     }
   ],
   "verified_by": {
-    "id": "dg-rvp-015-live-verifier",
+    "id": "dg-rvp-016-live-verifier",
     "role": "independent_verifier",
-    "verified_at": "2026-11-10T07:15:30Z",
+    "verified_at": "2026-11-10T08:00:00Z",
     "evidence_refs": [
       "008e8b91-9c94-4d64-839e-d31a54101e08"
-    ]
+    ],
+    "public_key": "9b4811e6db18357c9ab82df937361cceceb3a963fd68b8d946e69562e2a69276",
+    "signature": "6c60edae79da522f278d1ee8a1d6a9895999125211868acee28e0729049bd45359b0b1ce0e6e5f1e1ec9cc9e5ba7cf837789f3d96818253377b55c9cc3094801"
   },
   "invalidated_at": null
 }
