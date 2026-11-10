@@ -28,8 +28,8 @@ Every architectural claim and runtime isolation guarantee in Dark Gravity is bac
 evidence/
 ├── 📄 verified_status.json              # CI-generated test & clippy verification status
 ├── 📄 baseline.md                       # Phase 1 Live Cluster Workload & Architectural Baseline
-├── 📄 reliability-tests.md              # Long-haul Stability & Memory Clamping Reports
-├── 📄 security-tests.md                 # SAST/DAST & Memory Sanitization Reports
+├── 📄 reliability-tests.md              # Two resilience scenarios: interrupted-mission recovery and broken-test safe shutdown
+├── 📄 security-tests.md                 # Secret-redaction scenarios (2), code inspection, gVisor resource benchmark; not SAST/DAST or pen-testing
 ├── 📁 security/
 │   ├── 📄 heldout_results.json          # Independent held-out adversarial evaluation metrics
 │   ├── 📄 corpus_results.json           # Labeled diff scanner corpus evaluation metrics
@@ -49,7 +49,7 @@ evidence/
 - 📊 **[Cluster & Zero-Trust Baseline Verification (`evidence/baseline.md`)](evidence/baseline.md)** — Detailed workload snapshot, KEDA parameters, CRD inventory, and zero-trust sign-off.
 - 🎯 **[Mission 001 Evidence Bundle (`evidence/missions/mission-001/`)](evidence/missions/mission-001/)** — Live mission execution report ([`report.json`](evidence/missions/mission-001/report.json)), event timeline ([`timeline.md`](evidence/missions/mission-001/timeline.md)), and SHA-256 checksums ([`checksums.txt`](evidence/missions/mission-001/checksums.txt)).
 - 🛡️ **[Security Threat Model & Audits (`evidence/security/threat-model.md`)](evidence/security/threat-model.md)** — Comprehensive ZTA security audit, threat vectors, and mitigation matrices.
-- 🧪 **[Security Test Suite (`evidence/security-tests.md`)](evidence/security-tests.md)** & **[Reliability Test Suite (`evidence/reliability-tests.md`)](evidence/reliability-tests.md)** — SAST/DAST and long-haul stress benchmark test evidence.
+- 🧪 **[Security Test Suite (`evidence/security-tests.md`)](evidence/security-tests.md)** & **[Reliability Test Suite (`evidence/reliability-tests.md`)](evidence/reliability-tests.md)** — secret-redaction scenarios and a gVisor resource benchmark (security), and two resilience scenarios (reliability). These are not SAST/DAST, penetration tests or long-haul tests.
 - 🧩 **[Component Inventory Matrix (`evidence/architecture/component-inventory.md`)](evidence/architecture/component-inventory.md)** — Hardware, software, and agentic module component mapping.
 
 ---

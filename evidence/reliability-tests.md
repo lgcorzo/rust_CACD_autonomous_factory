@@ -1,3 +1,7 @@
+> [!NOTE]
+> **2026-11-10 (DG-RVP-018 A3):** This file contains two scenarios (interrupted-mission recovery, broken-test safe shutdown).
+> It is **not** a long-haul or soak test. "Certified" below is the original author's wording, not an independent verification (see `evidence/README.md`).
+
 # Phase 3: Resilience & Failure Recovery Verification Report
 
 **Document Title:** Sandbox Resilience, Failure Recovery & Safe Shutdown Verification
