@@ -1,11 +1,89 @@
 use anyhow::{Context, Result, bail};
-use chrono::DateTime;
+use chrono::{DateTime, Utc};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashSet;
 use std::path::Path;
 use uuid::Uuid;
+
+/// Explicit evidence classification hierarchy (DG-RVP-014 §3.2).
+/// Lower-level classes (e.g., `UNIT`) must never satisfy a higher-level requirement (e.g., `LIVE_RUNTIME`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum EvidenceClass {
+    Unit,
+    Component,
+    Integration,
+    KubernetesAdmission,
+    LiveRuntime,
+    SecurityNegative,
+    Chaos,
+    ManualReview,
+    Documentation,
+    Mock,
+}
+
+impl EvidenceClass {
+    pub fn from_str_canonical(s: &str) -> Option<Self> {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "unit" => Some(Self::Unit),
+            "component" => Some(Self::Component),
+            "integration" => Some(Self::Integration),
+            "kubernetes_admission" | "infrastructure" => Some(Self::KubernetesAdmission),
+            "live_runtime" => Some(Self::LiveRuntime),
+            "security_negative" => Some(Self::SecurityNegative),
+            "chaos" => Some(Self::Chaos),
+            "manual_review" => Some(Self::ManualReview),
+            "documentation" | "performance" | "accessibility" => Some(Self::Documentation),
+            "mock" => Some(Self::Mock),
+            _ => None,
+        }
+    }
+
+    /// Maximum allowed evidence age in days before it is considered stale (DG-RVP-014 §3.2).
+    pub fn max_age_days(&self) -> i64 {
+        match self {
+            Self::LiveRuntime | Self::KubernetesAdmission | Self::Chaos => 30,
+            Self::SecurityNegative | Self::Integration | Self::Component | Self::Unit => 90,
+            Self::ManualReview | Self::Documentation => 180,
+            Self::Mock => 0,
+        }
+    }
+
+    /// Returns whether `candidate` can satisfy a requirement demanding `required`.
+    /// A lower-level test must never satisfy a higher-level evidence requirement.
+    pub fn satisfies(&self, required: Self) -> bool {
+        if *self == Self::Mock {
+            return false;
+        }
+        if *self == required {
+            return true;
+        }
+        matches!(
+            (*self, required),
+            (Self::Component, Self::Unit)
+                | (Self::Integration, Self::Unit | Self::Component)
+                | (
+                    Self::LiveRuntime,
+                    Self::KubernetesAdmission | Self::Integration
+                )
+        )
+    }
+}
+
+/// Returns the mandatory evidence class for a given requirement ID (DG-RVP-014 §3.2 & §3.4).
+pub fn required_class_for_requirement(requirement_id: &str) -> Option<EvidenceClass> {
+    match requirement_id {
+        "FR-008" => Some(EvidenceClass::LiveRuntime),
+        "FR-016" => Some(EvidenceClass::KubernetesAdmission),
+        "FR-003" | "FR-004" | "FR-009" | "FR-010" | "FR-011" | "FR-012" | "FR-013" | "SC-001"
+        | "SC-002" | "SC-003" => Some(EvidenceClass::Integration),
+        "FR-005" | "FR-006" | "FR-007" | "FR-018" | "FR-019" | "FR-020" | "FR-021" | "SC-005"
+        | "SC-006" => Some(EvidenceClass::Unit),
+        "FR-014" | "FR-015" | "SC-004" => Some(EvidenceClass::Documentation),
+        _ => None,
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -51,6 +129,16 @@ pub struct EvidenceRecord {
     pub evidence_id: String,
     pub requirement_id: String,
     pub collected_at: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub finished_at: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub release_version: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub generator_version: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub related_evidence_refs: Vec<String>,
     pub source_revision: RevisionRef,
     pub deployment_revision: Option<RevisionRef>,
     pub environment: EnvironmentRef,
@@ -140,6 +228,21 @@ pub fn validate_evidence_record(record: &EvidenceRecord, repo_root: Option<&Path
             record.collected_at
         );
     }
+    if let Some(started) = &record.started_at
+        && DateTime::parse_from_rfc3339(started).is_err()
+    {
+        bail!("Invalid RFC3339 timestamp for started_at '{started}'");
+    }
+    if let Some(finished) = &record.finished_at
+        && DateTime::parse_from_rfc3339(finished).is_err()
+    {
+        bail!("Invalid RFC3339 timestamp for finished_at '{finished}'");
+    }
+    for rel in &record.related_evidence_refs {
+        if Uuid::parse_str(rel).is_err() {
+            bail!("Invalid UUID in related_evidence_refs: '{rel}'");
+        }
+    }
 
     validate_revision_ref(&record.source_revision, "source_revision")?;
     if let Some(dep) = &record.deployment_revision {
@@ -162,24 +265,80 @@ pub fn validate_evidence_record(record: &EvidenceRecord, repo_root: Option<&Path
         bail!("environment.identifier must not be empty");
     }
 
-    let valid_classes = [
-        "mock",
-        "unit",
-        "integration",
-        "infrastructure",
-        "live_runtime",
-        "documentation",
-        "performance",
-        "accessibility",
-    ];
-    if !valid_classes.contains(&record.verification_class.as_str()) {
+    let Some(parsed_class) = EvidenceClass::from_str_canonical(&record.verification_class) else {
         bail!("Invalid verification_class '{}'", record.verification_class);
-    }
-    if record.verification_class == "live_runtime" && record.deployment_revision.is_none() {
+    };
+
+    if matches!(
+        parsed_class,
+        EvidenceClass::LiveRuntime | EvidenceClass::KubernetesAdmission
+    ) && record.deployment_revision.is_none()
+    {
         bail!(
-            "live_runtime evidence '{}' must include a non-null deployment_revision",
+            "live_runtime / kubernetes_admission evidence '{}' must include a non-null deployment_revision",
             record.evidence_id
         );
+    }
+
+    if matches!(
+        parsed_class,
+        EvidenceClass::LiveRuntime | EvidenceClass::KubernetesAdmission | EvidenceClass::Chaos
+    ) {
+        if matches!(record.environment.kind.as_str(), "local" | "ci") {
+            bail!(
+                "live_runtime / kubernetes_admission evidence '{}' cannot have environment.kind='{}' (must be 'cluster', 'production', 'staging', or 'development')",
+                record.evidence_id,
+                record.environment.kind
+            );
+        }
+        let tool_lower = record.method.tool.trim().to_ascii_lowercase();
+        let cmd_lower = record.method.command_or_test.trim().to_ascii_lowercase();
+        if tool_lower == "cargo-test"
+            || tool_lower == "pytest"
+            || cmd_lower.starts_with("cargo test")
+            || cmd_lower.starts_with("pytest")
+            || cmd_lower.contains("mock")
+        {
+            bail!(
+                "live_runtime / kubernetes_admission evidence '{}' cannot be generated from unit/integration test runner or mock tool='{}' command='{}'",
+                record.evidence_id,
+                record.method.tool,
+                record.method.command_or_test
+            );
+        }
+    }
+
+    if parsed_class == EvidenceClass::LiveRuntime {
+        let has_structured_runtime_artifact = record.artifacts.iter().any(|a| {
+            let uri_lower = a.uri.to_ascii_lowercase();
+            let media_lower = a
+                .media_type
+                .as_deref()
+                .unwrap_or_default()
+                .to_ascii_lowercase();
+            !uri_lower.ends_with(".md")
+                && !uri_lower.ends_with(".rs")
+                && !uri_lower.ends_with(".py")
+                && (uri_lower.ends_with(".json")
+                    || uri_lower.ends_with(".log")
+                    || media_lower == "application/json")
+        });
+        if !has_structured_runtime_artifact {
+            bail!(
+                "live_runtime evidence '{}' cannot rely solely on Markdown or source files; it must include at least one structured runtime telemetry artifact (.json or .log)",
+                record.evidence_id
+            );
+        }
+    }
+
+    if parsed_class == EvidenceClass::SecurityNegative {
+        let cmd_lower = record.method.command_or_test.trim().to_ascii_lowercase();
+        if cmd_lower.contains("mock") || cmd_lower.contains("test_double") {
+            bail!(
+                "security_negative evidence '{}' cannot be certified by a mock or test double",
+                record.evidence_id
+            );
+        }
     }
 
     if record.method.tool.trim().is_empty() || record.method.command_or_test.trim().is_empty() {
@@ -198,9 +357,35 @@ pub fn validate_evidence_record(record: &EvidenceRecord, repo_root: Option<&Path
     if !valid_outcomes.contains(&record.outcome.as_str()) {
         bail!("Invalid outcome '{}'", record.outcome);
     }
-    if record.verification_class == "mock" && record.outcome == "passed" {
+    if parsed_class == EvidenceClass::Mock && record.outcome == "passed" {
         bail!(
             "Evidence '{}' with verification_class 'mock' cannot have outcome 'passed' (must be 'mocked')",
+            record.evidence_id
+        );
+    }
+
+    // Enforce exit_code / outcome coherence (DG-RVP-014 §3.4 & §3.5 #6, #10)
+    if record.outcome == "passed" {
+        match record.exit_code {
+            None => {
+                bail!(
+                    "Evidence '{}' has outcome='passed' but missing exit_code (missing test result must be 'not_executed', not 'passed')",
+                    record.evidence_id
+                );
+            }
+            Some(code) if code != 0 => {
+                bail!(
+                    "Evidence '{}' claims outcome='passed' but captured non-zero exit_code={}",
+                    record.evidence_id,
+                    code
+                );
+            }
+            Some(_) => {}
+        }
+    }
+    if record.outcome == "failed" && record.exit_code == Some(0) {
+        bail!(
+            "Evidence '{}' has outcome='failed' but exit_code=0",
             record.evidence_id
         );
     }
@@ -356,6 +541,29 @@ pub fn validate_requirement_state(
         bail!("Requirement in OPEN status must have verified_by = null");
     }
 
+    if matches!(state.status.as_str(), "IMPLEMENTED" | "TESTED" | "VERIFIED")
+        && state
+            .implementation_agent_id
+            .as_deref()
+            .unwrap_or_default()
+            .trim()
+            .is_empty()
+    {
+        bail!(
+            "Requirement '{}' in '{}' status requires non-empty implementation_agent_id",
+            state.requirement_id,
+            state.status
+        );
+    }
+
+    if matches!(state.status.as_str(), "TESTED" | "VERIFIED") && state.evidence_refs.is_empty() {
+        bail!(
+            "Requirement '{}' in '{}' status requires non-empty qualifying evidence_refs",
+            state.requirement_id,
+            state.status
+        );
+    }
+
     if state.status == "VERIFIED" {
         if state.invalidated_at.is_some() {
             bail!(
@@ -444,14 +652,64 @@ pub fn validate_requirement_state(
                     expected_sha
                 );
             }
+            // Enforce maximum evidence age (DG-RVP-014 §3.2 & §3.4)
+            let collected_dt = DateTime::parse_from_rfc3339(&ev.collected_at)
+                .map_err(|e| anyhow::anyhow!("Invalid collected_at '{}': {}", ev.collected_at, e))?
+                .with_timezone(&Utc);
+            let verified_dt = DateTime::parse_from_rfc3339(&verifier.verified_at)
+                .map_err(|e| {
+                    anyhow::anyhow!("Invalid verified_at '{}': {}", verifier.verified_at, e)
+                })?
+                .with_timezone(&Utc);
+            let ev_class = EvidenceClass::from_str_canonical(&ev.verification_class)
+                .ok_or_else(|| anyhow::anyhow!("Invalid class '{}'", ev.verification_class))?;
+            let age_days = (verified_dt - collected_dt).num_days();
+            if age_days > ev_class.max_age_days() {
+                bail!(
+                    "Stale evidence '{}': collected {} days before verification (max allowed for {:?} is {} days)",
+                    ev.evidence_id,
+                    age_days,
+                    ev_class,
+                    ev_class.max_age_days()
+                );
+            }
             matched_records.push(ev);
         }
 
+        // Enforce requirement-specific minimum evidence class hierarchy (DG-RVP-014 §3.2, §3.4, §3.5 #9)
+        if let Some(mandatory_class) = required_class_for_requirement(&state.requirement_id) {
+            let satisfied = matched_records.iter().any(|ev| {
+                ev.outcome == "passed"
+                    && EvidenceClass::from_str_canonical(&ev.verification_class)
+                        .map(|c| c.satisfies(mandatory_class))
+                        .unwrap_or(false)
+            });
+            if !satisfied {
+                bail!(
+                    "Requirement '{}' demands minimum evidence class '{:?}', which cannot be satisfied by lower-level evidence {:?}",
+                    state.requirement_id,
+                    mandatory_class,
+                    matched_records
+                        .iter()
+                        .map(|e| e.verification_class.as_str())
+                        .collect::<Vec<_>>()
+                );
+            }
+        }
+
         for req_class in &policy.required_classes {
-            if !matched_records
-                .iter()
-                .any(|ev| &ev.verification_class == req_class && ev.outcome == "passed")
-            {
+            let target_cls = EvidenceClass::from_str_canonical(req_class);
+            let has_match = matched_records.iter().any(|ev| {
+                ev.outcome == "passed"
+                    && match (
+                        EvidenceClass::from_str_canonical(&ev.verification_class),
+                        target_cls,
+                    ) {
+                        (Some(cand), Some(req)) => cand.satisfies(req),
+                        _ => &ev.verification_class == req_class,
+                    }
+            });
+            if !has_match {
                 bail!(
                     "Requirement '{}' is missing passing evidence for required verification_class '{}'",
                     state.requirement_id,

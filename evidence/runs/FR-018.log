@@ -1,0 +1,19 @@
+# command: cargo test -j 1 -p factory-cli --test evidence_contract_tests
+# started_at: 2026-11-10T00:13:13Z
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.29s
+     Running tests/evidence_contract_tests.rs (/tmp/rust_target/debug/deps/evidence_contract_tests-09297bf60483b893)
+
+running 8 tests
+test test_rejects_forbidden_implemented_to_verified_transition_jump ... ok
+test test_rejects_self_reported_verifier_matching_implementer ... ok
+test test_rejects_short_or_non_hex_commit_sha_and_invalid_requirement_id ... ok
+test test_live_runtime_requires_deployment_revision ... ok
+test test_valid_evidence_record_and_verified_state_pass ... ok
+test test_live_runtime_rejects_unit_test_runner_and_markdown_only_artifacts ... ok
+test test_rejects_mocked_failed_or_stale_evidence_for_verified_requirement ... ok
+test test_dg_rvp_014_all_ten_mandatory_evidence_gate_negative_cases ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+# finished_at: 2026-11-10T00:13:14Z
+# exit_code: 0

@@ -15,7 +15,8 @@ Prior to remediation, `AutonomousMissionWorkflow` constructed an isolated `FinOp
 1. **Shared Durable Store (`crates/factory-infrastructure/src/finops_stop_store.rs`)**:
    - `FinOpsStopStore` trait defines `read_state() -> Result<FinOpsStopState, String>` and `write_state(...) -> Result<FinOpsStopState, String>`.
    - `FinOpsStopState` persists `halted`, monotonically increasing `state_version` (`u64`), `reason`, `current_spend`, `max_daily_budget`, and `updated_at` (`DateTime<Utc>`).
-   - `FileFinOpsStopStore` writes updates via atomic rename (`*.json.tmp` -> `*.json`), ensuring cross-thread and cross-process visibility on shared storage (`FINOPS_STOP_STORE_PATH`).
+   - `FileFinOpsStopStore` writes updates via atomic rename (`*.json.tmp` -> `*.json`) under unified OS advisory locks (`fs2::FileExt::lock_shared()` / `lock_exclusive()`), and strictly validates that `current_spend` and `estimated_cost` are finite and `>= 0.0` and `max_daily_budget` is finite and `> 0.0` (rejecting negative, `NaN`, or infinite values fail-closed).
+   - **Shared-Storage Topology Constraint**: Because `FileFinOpsStopStore` relies on OS advisory file locking and POSIX `rename(2)`, cross-process visibility and concurrency guarantees apply only to workers running on the same node or pods mounting a shared POSIX-compliant `ReadWriteMany` (RWX) volume at `FINOPS_STOP_STORE_PATH`. Multi-node clusters without shared POSIX storage must back `FinOpsStopStore` with a centralized transactional database (e.g., PostgreSQL).
    - `FailingFinOpsStopStore` provides deterministic fault injection for read/write storage errors.
 2. **Fail-Closed Admission Gate (`admit_mission_with_store` & `FinOpsAgent::evaluate_admission`)**:
    - Every admission check reads the authoritative `FinOpsStopStore`.
@@ -60,7 +61,9 @@ Prior to remediation, `AutonomousMissionWorkflow` constructed an isolated `FinOp
     - `test_finops_hard_stop_blocks_mission_admission_across_workers_with_version` (8 concurrent admission requests across separate worker instances after monitor trips 90% hard stop; 100% rejected with `version=1`).
     - `test_finops_admission_fails_closed_on_store_read_error` (verifies fail-closed denial on store read error).
   - `crates/factory-infrastructure/tests/finops_concurrency_test.rs`:
-    - 10-thread concurrent `check_and_reserve_budget` stress test verifying unified `.lock` file acquisition and zero race conditions or partial writes (`DG-RVP-013` `US4`).
+    - `test_finops_concurrent_check_and_reserve_prevents_over_admission` (10-thread concurrent `check_and_reserve_budget` stress test).
+    - `test_finops_cross_process_concurrency_prevents_over_admission` (10 separate OS child processes concurrently invoking `check_and_reserve_budget`; exactly 3 succeed up to `$45.0` and 7 fail closed).
+    - `test_finops_rejects_invalid_negative_nan_or_infinite_amounts` (verifies fail-closed rejection of negative, `NaN`, and infinite amounts).
   - `crates/factory-application/tests/workflow_recovery_tests.rs`:
     - `test_duplicate_event_delivery_is_idempotent_without_duplicate_side_effects`
     - `test_retry_after_transient_failure_advances_once_without_advancing_incomplete_work`

@@ -1,34 +1,37 @@
 {
   "schema_version": "1.0",
-  "evidence_id": "b7a80708-c2b3-515e-8b9c-761c462af623",
+  "evidence_id": "bbea9a99-87a2-58e9-ae51-5e2e53c95306",
   "requirement_id": "FR-009",
-  "collected_at": "2026-11-09T21:40:00Z",
+  "collected_at": "2026-11-10T00:10:15Z",
+  "started_at": "2026-11-10T00:10:15Z",
+  "finished_at": "2026-11-10T00:10:15Z",
+  "generator_version": "dg-evidence-generator/2.0.0",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
     "branch": "main",
-    "commit": "ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
+    "commit": "4dfc12c4e82403dd217ffc95edc9741b6df48cf8"
   },
   "deployment_revision": null,
   "environment": {
     "kind": "local",
-    "identifier": "dark-gravity-audit-workstation"
+    "identifier": "server.internal.lgcorzo"
   },
   "verification_class": "integration",
   "method": {
-    "tool": "cargo-test",
-    "command_or_test": "cargo test -p factory-application --test finops_admission_tests"
+    "tool": "cargo",
+    "command_or_test": "cargo test -j 1 -p factory-infrastructure --test finops_concurrency_test"
   },
   "outcome": "passed",
   "exit_code": 0,
   "artifacts": [
     {
-      "uri": "file://crates/factory-application/tests/finops_admission_tests.rs",
-      "sha256": "e911d9c9d295462527e35b70cec1ea844b2539aae6376b109a5c213c18f393f2",
+      "uri": "file://evidence/runs/FR-009.log",
+      "sha256": "8cbd8c38c4a5b16b63b176a9759742a021305deaba1f03cdaa5f1d36aaad02b6",
       "media_type": "text/plain"
     }
   ],
   "collector": {
-    "id": "ci-evidence-pipeline",
+    "id": "dg-evidence-generator/2.0.0",
     "role": "test_runner"
   },
   "limitations": []

@@ -1,0 +1,14 @@
+# command: cargo test -j 1 -p factory-mcp-server --test route_boundary_tests
+# started_at: 2026-11-10T00:13:09Z
+   Compiling factory-mcp-server v0.1.0 (/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.11s
+     Running tests/route_boundary_tests.rs (/tmp/rust_target/debug/deps/route_boundary_tests-3c772556b7bf4d12)
+
+running 2 tests
+test test_privileged_routes_reject_unauthenticated_callers_and_cors_only_headers ... ok
+test test_sse_session_bounds_ownership_disconnect_cleanup_and_expiry ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+# finished_at: 2026-11-10T00:13:11Z
+# exit_code: 0

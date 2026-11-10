@@ -335,10 +335,47 @@ impl Tool for LaunchSandboxPodTool {
             }
         }
 
-        // Fetch logs and extract truthful observed pod facts
+        // Fetch logs and extract truthful observed pod facts (separating requested spec from observed runtime status)
         let pods: Api<k8s_openapi::api::core::v1::Pod> =
             Api::namespaced(client.clone(), &namespace);
         let lp = ListParams::default().labels(&format!("job-name={}", job_name));
+        let requested_image = job
+            .spec
+            .as_ref()
+            .and_then(|s| s.template.spec.as_ref())
+            .and_then(|s| s.containers.first())
+            .and_then(|c| c.image.clone());
+        let requested_spec = crate::sandbox::RequestedSandboxSpec {
+            runtime_class_name: if require_gvisor {
+                Some("gvisor".to_string())
+            } else {
+                None
+            },
+            runtime_handler: if require_gvisor {
+                Some("runsc".to_string())
+            } else {
+                None
+            },
+            seccomp_profile: "RuntimeDefault".to_string(),
+            run_as_non_root: true,
+            run_as_user: Some(65534),
+            run_as_group: Some(65534),
+            read_only_root_filesystem: true,
+            allow_privilege_escalation: false,
+            capabilities_dropped: vec!["ALL".to_string()],
+            image_digest: requested_image,
+            memory_limit: std::env::var("SANDBOX_MEMORY_LIMIT")
+                .ok()
+                .or_else(|| Some("512Mi".to_string())),
+            cpu_limit: Some("500m".to_string()),
+        };
+        let mut observed_runtime = crate::sandbox::ObservedRuntimeFacts {
+            job_name: Some(job_name.clone()),
+            ..Default::default()
+        };
+        if let Ok(Some(j)) = jobs.get_opt(&job_name).await {
+            observed_runtime.job_uid = j.metadata.uid.clone();
+        }
         let mut observed_attestation = crate::sandbox::SandboxAttestation {
             cluster_id: std::env::var("CLUSTER_ID")
                 .ok()
@@ -354,43 +391,78 @@ impl Tool for LaunchSandboxPodTool {
             } else {
                 "runc".to_string()
             },
-            runtime_type: if require_gvisor {
-                "io.containerd.runsc.v1".to_string()
-            } else {
-                "io.containerd.runc.v2".to_string()
-            },
+            runtime_type: "unobserved_from_k8s_pod_api".to_string(),
             seccomp_profile: "RuntimeDefault".to_string(),
             is_root: false,
             capabilities_dropped: vec!["ALL".to_string()],
-            exit_code: if success { Some(0) } else { Some(1) },
+            // Only set from observed container termination state below; never inferred.
+            exit_code: None,
             command_hash: {
                 use sha2::Digest;
                 let hash = sha2::Sha256::digest(cmd.as_bytes());
                 Some(hash.iter().map(|b| format!("{:02x}", b)).collect())
             },
             observed_at: Some(chrono::Utc::now()),
+            requested_spec,
+            observed_runtime: observed_runtime.clone(),
+            verified_checks: Default::default(),
         };
 
         if let Ok(pod_list) = pods.list(&lp).await {
             if let Some(pod) = pod_list.items.first() {
-                observed_attestation.node_name =
-                    pod.spec.as_ref().and_then(|s| s.node_name.clone());
-                observed_attestation.pod_uid = pod.metadata.uid.clone();
+                let node_name = pod.spec.as_ref().and_then(|s| s.node_name.clone());
+                let pod_uid = pod.metadata.uid.clone();
+                observed_attestation.node_name = node_name.clone();
+                observed_attestation.pod_uid = pod_uid.clone();
+                observed_runtime.node_name = node_name;
+                observed_runtime.pod_uid = pod_uid;
+
+                // Observed (admitted) Pod spec as persisted by the API server — never copied from requested values.
+                if let Some(spec) = &pod.spec {
+                    observed_runtime.observed_runtime_class_name = spec.runtime_class_name.clone();
+                    if let Some(psc) = &spec.security_context {
+                        observed_runtime.observed_run_as_non_root = psc.run_as_non_root;
+                        observed_runtime.observed_run_as_user = psc.run_as_user;
+                        observed_runtime.observed_seccomp_profile =
+                            psc.seccomp_profile.as_ref().map(|s| s.type_.clone());
+                    }
+                    if let Some(csc) = spec
+                        .containers
+                        .first()
+                        .and_then(|c| c.security_context.as_ref())
+                    {
+                        observed_runtime.observed_read_only_root_filesystem =
+                            csc.read_only_root_filesystem;
+                        observed_runtime.observed_capabilities_dropped = csc
+                            .capabilities
+                            .as_ref()
+                            .and_then(|caps| caps.drop.clone())
+                            .unwrap_or_default();
+                    }
+                }
+
                 if let Some(pod_name) = &pod.metadata.name {
                     observed_attestation.pod_name = Some(pod_name.clone());
+                    observed_runtime.pod_name = Some(pod_name.clone());
                     let log_params = kube::api::LogParams::default();
                     if let Ok(pod_logs) = pods.logs(pod_name, &log_params).await {
                         logs = pod_logs;
                     }
                 }
                 if let Some(status) = &pod.status {
+                    observed_runtime.pod_phase = status.phase.clone();
                     if let Some(container_statuses) = &status.container_statuses {
                         if let Some(first_cs) = container_statuses.first() {
                             observed_attestation.container_id = first_cs.container_id.clone();
                             observed_attestation.container_sha = Some(first_cs.image_id.clone());
+                            observed_runtime.container_id = first_cs.container_id.clone();
+                            observed_runtime.container_image_digest =
+                                Some(first_cs.image_id.clone());
                             if let Some(state) = &first_cs.state {
                                 if let Some(terminated) = &state.terminated {
                                     observed_attestation.exit_code = Some(terminated.exit_code);
+                                    observed_runtime.exit_code = Some(terminated.exit_code);
+                                    observed_runtime.termination_reason = terminated.reason.clone();
                                 }
                             }
                         }
@@ -398,6 +470,11 @@ impl Tool for LaunchSandboxPodTool {
                 }
             }
         }
+        observed_attestation.observed_runtime = observed_runtime;
+        // Host runtime handler is not observable from the K8s Pod API; evaluation therefore
+        // records UNVERIFIED unless an independent node-level probe supplies it.
+        observed_attestation.verified_checks =
+            observed_attestation.evaluate_verification(Some(&job_name), 600);
 
         // Cleanup job
         let _ = jobs.delete(&job_name, &DeleteParams::background()).await;

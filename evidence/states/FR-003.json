@@ -1,48 +1,34 @@
 {
   "schema_version": "1.0",
   "requirement_id": "FR-003",
-  "status": "VERIFIED",
+  "status": "TESTED",
   "implementation_agent_id": "antigravity-implementer",
   "evidence_refs": [
-    "2ef2120b-b100-5391-a114-4c024ecdc67d"
+    "ef43617b-b244-53cd-9171-5e0cd8fe0fc6"
   ],
   "transitions": [
     {
       "from": null,
       "to": "OPEN",
-      "at": "2026-11-09T21:40:00Z",
-      "actor_id": "spec-kit-011",
-      "reason": "Registered in 011-verified-autonomous-execution"
+      "at": "2026-11-10T00:10:10Z",
+      "actor_id": "spec-kit",
+      "reason": "Registered"
     },
     {
       "from": "OPEN",
       "to": "IMPLEMENTED",
-      "at": "2026-11-09T21:40:00Z",
+      "at": "2026-11-10T00:10:10Z",
       "actor_id": "antigravity-implementer",
-      "reason": "Implemented FR-003 at revision ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
+      "reason": "Implementation present at 4dfc12c4e82403dd217ffc95edc9741b6df48cf8"
     },
     {
       "from": "IMPLEMENTED",
       "to": "TESTED",
-      "at": "2026-11-09T21:40:00Z",
-      "actor_id": "ci-evidence-pipeline",
-      "reason": "Executed cargo test -p factory-mcp-server --test run_tests_security_tests with exit_code=0"
-    },
-    {
-      "from": "TESTED",
-      "to": "VERIFIED",
-      "at": "2026-11-09T21:40:00Z",
-      "actor_id": "factory-cli-independent-verifier",
-      "reason": "Independently validated schema, artifact SHA-256, transition chain, and revision freshness"
+      "at": "2026-11-10T00:10:12Z",
+      "actor_id": "dg-evidence-generator/2.0.0",
+      "reason": "Executed 'cargo test -j 1 -p factory-mcp-server --test run_tests_security_tests' exit_code=0 (log sha256 e609052e6b243b7d454384ba54e89eed150d3b7d304c0168455647d2d0a3d061)"
     }
   ],
-  "verified_by": {
-    "id": "factory-cli-independent-verifier",
-    "role": "independent_verifier",
-    "verified_at": "2026-11-09T21:40:00Z",
-    "evidence_refs": [
-      "2ef2120b-b100-5391-a114-4c024ecdc67d"
-    ]
-  },
+  "verified_by": null,
   "invalidated_at": null
 }

@@ -49,7 +49,13 @@ pub trait FinOpsStopStore: Send + Sync {
 }
 
 /// Durable file-backed FinOps stop store enabling cross-worker visibility across OS processes
-/// or threads sharing the same state path.
+/// or threads sharing the same state path on a single node or a shared POSIX `ReadWriteMany` volume.
+///
+/// **Deployment Boundary Note**: Because `FileFinOpsStopStore` relies on OS-level advisory file
+/// locking (`fs2::FileExt::lock_exclusive` / `lock_shared`) and atomic POSIX `rename(2)`, cross-process
+/// serialization and state visibility only cover workers running on the same node or pods mounting a
+/// shared POSIX-compliant `ReadWriteMany` (RWX) volume with advisory locking support. Multi-node
+/// deployments without shared POSIX storage require a centralized transactional store (e.g., PostgreSQL).
 pub struct FileFinOpsStopStore {
     path: PathBuf,
     lock: Mutex<()>,
@@ -134,6 +140,19 @@ impl FinOpsStopStore for FileFinOpsStopStore {
         current_spend: f64,
         max_daily_budget: f64,
     ) -> Result<FinOpsStopState, String> {
+        if !current_spend.is_finite() || current_spend < 0.0 {
+            return Err(format!(
+                "Invalid FinOps current_spend '{}': must be finite and >= 0.0",
+                current_spend
+            ));
+        }
+        if !max_daily_budget.is_finite() || max_daily_budget <= 0.0 {
+            return Err(format!(
+                "Invalid FinOps max_daily_budget '{}': must be finite and > 0.0",
+                max_daily_budget
+            ));
+        }
+
         let _guard = self
             .lock
             .lock()
@@ -221,6 +240,13 @@ impl FinOpsStopStore for FileFinOpsStopStore {
         mission_id: &str,
         estimated_cost: f64,
     ) -> Result<FinOpsStopState, String> {
+        if !estimated_cost.is_finite() || estimated_cost < 0.0 {
+            return Err(format!(
+                "Invalid FinOps estimated_cost '{}' for mission '{}': must be finite and >= 0.0",
+                estimated_cost, mission_id
+            ));
+        }
+
         let _guard = self
             .lock
             .lock()
@@ -273,6 +299,20 @@ impl FinOpsStopStore for FileFinOpsStopStore {
         } else {
             FinOpsStopState::default()
         };
+
+        if !current.current_spend.is_finite()
+            || current.current_spend < 0.0
+            || !current.max_daily_budget.is_finite()
+            || current.max_daily_budget <= 0.0
+        {
+            let _ = lock_file.unlock();
+            return Err(format!(
+                "Invalid persisted FinOps state at '{}' (current_spend={}, max_daily_budget={})",
+                self.path.display(),
+                current.current_spend,
+                current.max_daily_budget
+            ));
+        }
 
         let hard_stop_threshold = current.max_daily_budget * 0.90;
         let projected_spend = current.current_spend + estimated_cost;

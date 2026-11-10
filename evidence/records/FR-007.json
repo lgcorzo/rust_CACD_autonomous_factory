@@ -1,34 +1,37 @@
 {
   "schema_version": "1.0",
-  "evidence_id": "f0b6072e-58de-5710-b1bb-08ecd6b61acb",
+  "evidence_id": "8f9389ae-f599-557f-b916-cfc5d365415b",
   "requirement_id": "FR-007",
-  "collected_at": "2026-11-09T21:40:00Z",
+  "collected_at": "2026-11-10T00:10:15Z",
+  "started_at": "2026-11-10T00:10:14Z",
+  "finished_at": "2026-11-10T00:10:15Z",
+  "generator_version": "dg-evidence-generator/2.0.0",
   "source_revision": {
     "repository": "lgcorzo/rust_CACD_autonomous_factory",
     "branch": "main",
-    "commit": "ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1"
+    "commit": "4dfc12c4e82403dd217ffc95edc9741b6df48cf8"
   },
   "deployment_revision": null,
   "environment": {
     "kind": "local",
-    "identifier": "dark-gravity-audit-workstation"
+    "identifier": "server.internal.lgcorzo"
   },
   "verification_class": "unit",
   "method": {
-    "tool": "cargo-test",
-    "command_or_test": "cargo test -p factory-mcp-server --test launch_sandbox_pod_tests"
+    "tool": "cargo",
+    "command_or_test": "cargo test -j 1 -p factory-mcp-server --test launch_sandbox_pod_tests"
   },
   "outcome": "passed",
   "exit_code": 0,
   "artifacts": [
     {
-      "uri": "file://crates/factory-mcp-server/tests/launch_sandbox_pod_tests.rs",
-      "sha256": "f47aebb4f1df5b6446947096dd8a900892013c15b21ef7f6ee3a5bce1ee5f1ce",
+      "uri": "file://evidence/runs/FR-007.log",
+      "sha256": "d6da8a54e6b3b6234de04e652f6f8c6eaa4aafb91b9aad679c5b13ffa7a1f640",
       "media_type": "text/plain"
     }
   ],
   "collector": {
-    "id": "ci-evidence-pipeline",
+    "id": "dg-evidence-generator/2.0.0",
     "role": "test_runner"
   },
   "limitations": []

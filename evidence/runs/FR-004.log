@@ -1,0 +1,18 @@
+# command: cargo test -j 1 -p factory-mcp-server --test sandbox_driver_tests
+# started_at: 2026-11-10T00:10:12Z
+   Compiling factory-mcp-server v0.1.0 (/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory/crates/factory-mcp-server)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.53s
+     Running tests/sandbox_driver_tests.rs (/tmp/rust_target/debug/deps/sandbox_driver_tests-77205e349033abd2)
+
+running 6 tests
+test test_subprocess_driver_fails_closed_in_production ... ok
+test test_subprocess_driver_fails_closed_in_all_envs_without_explicit_override ... ok
+test test_subprocess_driver_rejects_unsupported_runtime_and_stubbed_languages ... ok
+test test_subprocess_driver_reports_actual_nonzero_exit_result ... ok
+test test_subprocess_driver_allowed_only_with_explicit_insecure_override ... ok
+test test_subprocess_driver_enforces_timeout ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+# finished_at: 2026-11-10T00:10:14Z
+# exit_code: 0
