@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical report and its linked evidence describe an earlier observation; they do not establish current deployment status. Do not cite them as current proof. Use the [documentation fact register](DOC_FACT_REGISTER.md) and [evidence classes](../../evidence/README.md); live state is **TO CONFIRM**.
+
 # FR-008 Live Runtime Evidence & Container Isolation Report
 
 **Programme:** DG-RVP-015  

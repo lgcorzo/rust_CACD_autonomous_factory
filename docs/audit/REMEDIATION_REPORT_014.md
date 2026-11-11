@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical report does not establish current implementation or runtime status. Do not cite it as current proof. Use the [documentation fact register](DOC_FACT_REGISTER.md) and [evidence classes](../../evidence/README.md); runtime state is **TO CONFIRM**.
+
 # DG-RVP-014: Evidence Integrity & Independent Verification Closure — Remediation Report
 
 **Mission ID**: `DG-RVP-014`  
@@ -5,7 +7,7 @@
 **Target Repository**: `lgcorzo/rust_CACD_autonomous_factory`  
 **Baseline Commit**: `ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1`  
 **Evaluation Date (UTC)**: `2026-11-09T23:40:00Z`  
-**Status**: `VERIFIED`
+**Status**: `Implemented (evidence pending regeneration)`
 
 ---
 
@@ -81,4 +83,3 @@ This remediation programme addresses the remaining audit defects identified in t
 ## 4. Limitations & Remaining Operational Risks
 1. **Multi-Node FinOps Storage**: `FileFinOpsStopStore` relies on POSIX advisory locking (`fs2`) and atomic `rename(2)`. In multi-node Kubernetes clusters where pods do not share a `ReadWriteMany` (RWX) volume, budget state must be backed by a distributed database (e.g. PostgreSQL).
 2. **Cluster Access in Ordinary CI**: Live runtime isolation tests (`EVIDENCE_COLLECT_LIVE=true`) require access to a real cluster with RuntimeClass `gvisor` and are separated from ordinary CI.
-

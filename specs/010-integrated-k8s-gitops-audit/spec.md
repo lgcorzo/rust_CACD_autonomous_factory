@@ -63,7 +63,7 @@ The objective is to establish that Dark Gravity cannot execute untrusted code on
 ### 3.3 Kubernetes Job Hardening (`launch_sandbox_pod.rs`, GitOps Job manifests)
 - **Requirements**:
   - Explicit `runtimeClassName: gvisor`.
-  - Dedicated sandbox execution namespace (e.g., `factory-sandboxes`).
+  - The live sandbox namespace is **TO CONFIRM**. Checked-in `deploy/` contains no Namespace objects; admission bindings select `development`, and sandbox configuration refers to `factory-sandbox`.
   - Dedicated ServiceAccount with `automountServiceAccountToken: false`.
   - SecurityContext: `allowPrivilegeEscalation: false`, `capabilities.drop: ["ALL"]`, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` (where compatible), non-root UID.
   - CPU, memory, ephemeral storage limits, execution timeouts, and `ttlSecondsAfterFinished` for automatic cleanup.
@@ -97,4 +97,3 @@ The objective is to establish that Dark Gravity cannot execute untrusted code on
 4. `docs/audit/REMEDIATION_PLAN.md`: Implementation tasks and dependency graph.
 5. `docs/audit/SECURITY_TEST_PLAN.md`: Reproducible security test commands and assertions.
 6. Passing automated quality gates in both repositories.
-

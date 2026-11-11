@@ -1,22 +1,24 @@
 # Evidence classes
 
-Every evidence file must declare one class. A claim is only as strong as its class.
+Evidence class names describe the kind of artifact. They do not establish a general assurance level. Read each artifact's source, scope, and limitations before relying on it.
 
-| Class | Meaning | Can support `VERIFIED`? |
+| Class | What it can show | What it cannot show |
 |---|---|---|
-| `unit_test` | Result of a unit test run in CI or locally. | No |
-| `integration_test` | Result of a test spanning several components, not a live cluster. | No |
-| `ci_execution` | Log or artifact of a CI workflow run, linked by run ID and commit. | No (build/test facts only) |
-| `live_runtime` | Raw observation captured from a running cluster (`kubectl ... -o json`), with timestamp and SHA-256. | Yes, with an independent verifier |
-| `external_verification` | Checked by a party other than the author (reviewer, third-party scan). | Yes |
-| `mock` | Simulated or hand-written data. | Never |
+| `unit_test` | The behavior asserted by a unit test in the recorded run and code revision. | Integration behavior, live deployment state, or behavior outside the tested cases. |
+| `integration_test` | The behavior exercised across the components and environment named by the test. | Live cluster behavior unless the recorded test actually ran against that cluster. |
+| `ci_execution` | The commands and outcomes in a continuous integration (CI) run when its workflow, run, and commit are identified. | Deployment or runtime state not observed by those commands. |
+| `live_runtime` | The state directly captured from a running system at the recorded time, when raw output and provenance are available. | State at other times, unobserved components, or behavior beyond the captured operations. |
+| `external_verification` | The specific material independently examined by a named party and the result they recorded. | A broader certification or assurance beyond that examination's stated scope. |
+| `mock` | Simulated inputs and behavior in the named mock or fixture. | Production behavior, a live system, or external effects. |
 
 ## Rules
-1. Authors mark work `IMPLEMENTED` or `TESTED`. Only a human reviewer sets anything higher.
-2. Never copy a *requested* value into an *observed* field.
-3. Old evidence is not deleted. A dated note records what supersedes it and why.
-4. Live captures come from `scripts/capture_cluster_baseline.sh`, run by a human.
-5. `evidence/baseline.md` is `UNVERIFIED: PENDING REGENERATION` until such a capture replaces it.
+
+1. Use `Designed`, `Implemented`, or `Tested` for project status. Do not treat generated stamps or authored narratives as independent review.
+2. Keep requested values separate from observed values.
+3. Keep historical evidence. Add a dated superseded note that identifies the replacement or explains what remains unconfirmed.
+4. A live capture must include enough raw output and provenance to identify what was observed and when.
+5. The existing `evidence/baseline.md` is unverified and pending regeneration. It is historical material, not proof of current runtime state.
 
 ## Known limits
-- **Secret-leak / diff detector:** blocks 23 of 40 held-out adversarial samples (57.5%), 0 of 20 benign samples (measured 2026-11-10, `crates/factory-application/tests/adversarial_suite.rs`). CI enforces this as a floor that may only rise. It is a **secondary control**. The primary controls are the gVisor sandbox and the egress policy.
+
+The security and reliability reports in this directory are authored scenario descriptions. Their contents do not by themselves establish a reproducible CI run or current live-cluster state. The repository does not include benchmark output or the machine details for the zeroization benchmark.

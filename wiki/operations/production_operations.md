@@ -14,7 +14,7 @@ last_verified_commit: "fbdc5848"
 
 # Production Operations — Dark Gravity CA/CD Autonomous Factory
 
-> **Purpose**: FluxCD deployment topology, K8s namespace layout, LiteLLM routing, and troubleshooting runbook.
+> **Purpose**: Checked-in configuration references, LiteLLM settings, and troubleshooting notes. This page does not establish a live cluster topology.
 
 ---
 
@@ -27,52 +27,34 @@ graph TB
         KUST["Kustomizations"]
         HELM["HelmReleases"]
     end
-    subgraph "Kubernetes Cluster"
-        subgraph "dark-gravity NS"
-            MCP["factory-mcp-server"]
-            POLLER["poller-daemon"]
-            CLI["factory-cli"]
-        end
-        subgraph "orchestrators NS"
-            HATCHET["Hatchet Engine"]
-            KAFKA["Kafka (KRaft)"]
-        end
-        subgraph "llm-apps NS"
-            LITELLM["LiteLLM Proxy"]
-            R2R["R2R GraphRAG"]
-        end
-        subgraph "sandbox-exec NS"
-            GVISOR["gVisor Agent Pods"]
-        end
-        subgraph "observability NS"
-            SENTRY["Sentry"]
-            GRAFANA["Grafana"]
-        end
+    subgraph "Repository configuration"
+        MCP["MCP server source"]
+        GVISOR["gVisor RuntimeClass: gvisor"]
+        POLICY["NetworkPolicy and CiliumNetworkPolicy objects"]
+        KAFKA["Kafka client configuration"]
     end
 
     FLUX --> MCP
-    FLUX --> HATCHET
-    FLUX --> LITELLM
     MCP --> GVISOR
+    FLUX --> POLICY
+    MCP --> KAFKA
 
     style FLUX fill:#2196F3,stroke:#1565C0,color:#fff
 ```
 
 ---
 
-## 2. Kubernetes Namespace Layout
+## 2. Namespace references in checked-in manifests
 
-| Namespace | Purpose | Key Workloads | Node Affinity |
-|:---|:---|:---|:---|
-| `dark-gravity` | Core factory services | MCP server, Poller, CLI | `factory-core` nodes |
-| `orchestrators` | Workflow orchestration | Hatchet, Kafka | `orchestrator` nodes |
-| `llm-apps` | AI/ML inference | LiteLLM, R2R | GPU-capable nodes |
-| `sandbox-exec` | Isolated agent execution | gVisor pods | `sandbox` nodes (tainted) |
-| `observability` | Monitoring & alerting | Sentry, Grafana, Prometheus | `monitoring` nodes |
+The checked-in manifests reference `development` in admission-policy bindings, `factory-sandbox` for sandbox resources, and `openziti` in a namespace selector. They do not define a complete namespace inventory or establish that these namespaces exist in a running cluster. The full namespace list is **TO CONFIRM**.
+
+The `RuntimeClass` is named `gvisor` and uses the `runsc` handler. Its fixed overhead is `35Mi` memory and `100m` CPU. The repository does not establish the active CNI or a live pod's resource usage.
 
 ---
 
 ## 3. LiteLLM Routing Configuration
+
+The endpoint below is an example, not a deployment record. The MCP server source default uses the `llm-apps` service name; the active endpoint and namespace are **TO CONFIRM**.
 
 ```yaml
 # LiteLLM config.yaml
@@ -80,6 +62,7 @@ model_list:
   - model_name: ollama/qwen2.5:7b
     litellm_params:
       model: ollama/qwen2.5:7b
+      # Example only; live endpoint is TO CONFIRM.
       api_base: http://ollama.llm-apps:11434
   - model_name: gpt-oss-120b
     litellm_params:

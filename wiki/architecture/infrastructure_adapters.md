@@ -14,7 +14,7 @@ last_verified_commit: "fbdc5848"
 
 # Infrastructure Adapters — Dark Gravity Factory
 
-> **Purpose**: Comprehensive documentation of all infrastructure adapters with UML diagrams.
+> **Purpose**: Documentation of checked-in infrastructure adapter interfaces. The active Kafka broker provider and deployment are **TO CONFIRM**.
 
 ---
 
@@ -23,7 +23,7 @@ last_verified_commit: "fbdc5848"
 ```mermaid
 graph TB
     subgraph "Event Bus"
-        KAFKA["Kafka KRaft<br/>Event streaming"]
+        KAFKA["Kafka client<br/>broker provider TO CONFIRM"]
     end
     subgraph "Knowledge"
         R2R["R2R GraphRAG<br/>Code retrieval"]
@@ -44,7 +44,9 @@ graph TB
     style VAULT fill:#FF9800,stroke:#E65100,color:#fff
 ```
 
-## Kafka KRaft Architecture
+## Kafka event-flow documentation
+
+The application and CLI configure Kafka clients through `KAFKA_BROKERS`. The checked-in `deploy/` files do not declare a Kafka broker. The broker provider, mode, and active endpoint are **TO CONFIRM**.
 
 | Topic | Producer | Consumer | Purpose |
 |:---|:---|:---|:---|

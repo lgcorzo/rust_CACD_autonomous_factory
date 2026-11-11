@@ -88,12 +88,14 @@ impl MissionAdmissionGate for FinOpsAgent {
 
 ## 2. Kubernetes GitOps Workload Specification (`gitops_internal_lgcorzo`)
 
+This example uses `development`, the namespace name selected by the checked-in admission-policy binding. The repository defines no `Namespace` object, so existence is **TO CONFIRM**.
+
 ```yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: sandbox-job-example
-  namespace: factory-sandboxes
+  namespace: development
 spec:
   ttlSecondsAfterFinished: 300
   backoffLimit: 0
@@ -133,4 +135,3 @@ spec:
             cpu: "50m"
             ephemeral-storage: "50Mi"
 ```
-

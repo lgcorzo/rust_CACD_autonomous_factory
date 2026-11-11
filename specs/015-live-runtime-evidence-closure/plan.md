@@ -7,7 +7,7 @@
 ## 1. Approach
 
 ### Phase 1: Live Runtime Corroboration (FR-008)
-- Execute authorized live gVisor isolation probes on the local MicroK8s cluster in namespace `factory-sandboxes`.
+- Execute authorized live gVisor isolation probes on the local MicroK8s cluster. The namespace is **TO CONFIRM** before execution: `deploy/` defines no `Namespace` objects, and checked-in configuration refers to different namespace names.
 - Capture:
   - Pod spec admitted by K8s API server
   - Container runtime logs from `snap.microk8s.daemon-containerd` correlating container ID with `/usr/bin/runsc`
@@ -25,4 +25,3 @@
 - Create `docs/audit/FR008_LIVE_RUNTIME_EVIDENCE.md`
 - Create `docs/audit/GOVERNANCE_GATES_VERIFICATION.md`
 - Create `docs/audit/DEPLOYMENT_PROVENANCE.md`
-

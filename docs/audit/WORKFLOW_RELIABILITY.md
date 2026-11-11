@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical report does not establish current runtime status. Do not cite it as current runtime proof. Use the [documentation fact register](DOC_FACT_REGISTER.md) and [evidence classes](../../evidence/README.md); current runtime state is **TO CONFIRM**.
+
 # Workflow Reliability & Authoritative FinOps Hard-Stop Review
 
 **Feature**: `011-verified-autonomous-execution`  
@@ -72,4 +74,3 @@ Prior to remediation, `AutonomousMissionWorkflow` constructed an isolated `FinOp
     - Executed on `server.internal.lgcorzo` (`v0.3.3` / `7ab32fa66b770761d559a55eb4ed01b3752eac16`); all 5 Hatchet steps (`rustant-plan`, `zeroclaw-execute`, `zeroclaw-validate`, `rustant-review`, `factory-deliver`) completed with `status: Succeeded` in `3m 47s`.
 - **Remaining Limitations**:
   - Multi-node Kubernetes deployments where worker pods do not share a ReadWriteMany PVC or Redis/PostgreSQL backend for `FINOPS_STOP_STORE_PATH` require mounting a shared volume or backing `FinOpsStopStore` with PostgreSQL/Redis in cluster production. Multi-node Chaos Mesh failover drills remain `Designed`.
-

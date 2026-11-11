@@ -37,7 +37,7 @@ As a cluster administrator, I want the Kubernetes containerd runtime shim on the
 **Acceptance Scenarios**:
 
 1. **Given** a Kubernetes node configured for sandboxing, **When** a pod specifying `runtimeClassName: gvisor` is scheduled, **Then** the pod starts under the `runsc` containerd shim.
-2. **Given** an isolated Rust compilation workload, **When** executed inside the gVisor sandbox pod, **Then** standard library linking, compilation, and test execution succeed within resource bounds (512Mi RAM / ephemeral storage limits).
+2. **Given** an isolated Rust compilation workload, **When** submitted through the checked-in sandbox configuration, **Then** the documentation records the current conflict: the builder defaults to `512Mi`/`500m`, while the admission policy caps workload limits at `30Mi`/`250m`. The profile and RuntimeClass overhead sum to `85Mi`/`450m` limits and `60Mi`/`250m` requests; actual admission and runtime behavior are **TO CONFIRM**.
 
 ---
 
@@ -125,4 +125,3 @@ As a public observer and stakeholder, I want public claims, READMEs, and canonic
 - MicroK8s or target Kubernetes cluster has the gVisor (`runsc`) addon/shim installed and configured in containerd.
 - Shared storage or network-accessible persistent storage is available for distributed worker pods in the cluster.
 - Repository CI/CD and verification tooling have access to Git metadata to compute commit SHAs and artifact checksums.
-

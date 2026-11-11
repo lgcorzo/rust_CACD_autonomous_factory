@@ -10,7 +10,7 @@ Restrict Dark Gravity's pipeline failure polling and autonomous remediation engi
 
 ## Technical Context
 
-**Language/Version**: Rust 1.80+ (stable 2021 edition)
+**Language/Version**: Rust 1.85+ for the workspace because it includes edition 2024 crates; this feature's code uses edition 2021. Exact tested patch is **TO CONFIRM**.
 
 **Primary Dependencies**:
 - `reqwest` 0.12 (HTTP client for GitHub/GitLab REST APIs)

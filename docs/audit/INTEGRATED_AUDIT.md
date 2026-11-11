@@ -1,10 +1,12 @@
+> **Superseded 2026-11-11:** This historical audit report includes live-cluster claims that are not established by the current checked-in deployment manifests. Use [the documentation fact register](DOC_FACT_REGISTER.md) for repository-backed facts; current cluster state remains **TO CONFIRM**.
+
 # Integrated Security, Kubernetes & GitOps Audit Report
 
 **Audit Target**: Dark Gravity CA/CD Autonomous Software Factory & Supporting Ecosystem  
 **Feature**: `013-verified-autonomous-execution-closure` (closing `011-verified-autonomous-execution` & `012-verified-remediation-closure`)  
 **Finalized At (UTC)**: `2026-11-09T21:15:00Z`  
 **Auditor**: Antigravity Autonomous Security & Assurance Engineer  
-**Status**: `All Source, Integration, Manifest & Live Cluster gVisor Runtime Remediations Verified (v0.3.3)`
+**Status**: `Superseded; historical claims are not current deployment proof`
 
 ---
 

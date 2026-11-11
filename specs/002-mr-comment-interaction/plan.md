@@ -17,14 +17,14 @@ Enable developers to communicate with the Dark Gravity autonomous agent directly
 
 ## Technical Context
 
-**Language/Version**: Rust 1.80+ (2021 Edition)  
+**Language/Version**: Rust 1.85+ for the workspace because it includes edition 2024 crates; this feature's code uses edition 2021. Exact tested patch is **TO CONFIRM**.
 **Primary Dependencies**: `reqwest` (with `json`), `serde`, `serde_json`, `tokio`, `async-trait`, `hatchet-sdk`, `tracing`, `mockall` (test-utils)  
 **Storage**: Ephemeral stateless execution in worker pods; cursor and processed comment tracking via `CursorStore` (`InMemoryCursorStore` / `PostgresCursorStore`)  
 **Testing**: `cargo test --workspace`, mock HTTP unit tests (`wiremock` / `mockito`), integration tests for poller and reaction flows  
 **Target Platform**: Linux (gVisor containerized workloads in Kubernetes)  
 **Project Type**: Autonomous CA/CD Agent Factory (Multi-crate Cargo workspace)  
 **Performance Goals**: Comment acknowledgment reaction applied within 1 polling interval ($\le 10$s); conversation reply posted within 30s for standard queries  
-**Constraints**: Zero-trust air-gapped outbound-only communication (no inbound webhooks or exposed public ingress ports); zero self-triggering loops; thread cleanliness (no ephemeral placeholder comments)  
+**Constraints**: External platform polling is outbound-only. The application also defines `POST /webhooks/github`; no Service or Ingress is declared in checked-in `deploy/` or `config/`, and external exposure is **TO CONFIRM**. Zero self-triggering loops; thread cleanliness (no ephemeral placeholder comments)
 **Scale/Scope**: Operates across configured GitLab projects and GitHub repositories with active MRs/PRs  
 
 ---

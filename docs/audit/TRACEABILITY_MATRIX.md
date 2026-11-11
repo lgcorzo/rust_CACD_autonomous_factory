@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical matrix contains live-cluster and verification claims that are not established by the current checked-in deployment manifests. Use [the documentation fact register](DOC_FACT_REGISTER.md) for repository-backed facts; current cluster state remains **TO CONFIRM**.
+
 # Dark Gravity Architecture & Requirement Traceability Matrix
 
 **Specification**: `013-verified-autonomous-execution-closure` (updating `011-verified-autonomous-execution`)  

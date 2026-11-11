@@ -69,7 +69,7 @@ C4Context
 
 ## 2. C4 Level 2: Container Diagram
 
-The Container diagram decomposes the factory into its 5 Rust crates (deployable containers) and their Kubernetes namespace topology.
+The Container diagram decomposes the factory into its five Rust crates and external interfaces. It does not assert which components are deployed or where.
 
 ```mermaid
 C4Container
@@ -106,45 +106,9 @@ C4Container
     Rel(app, litellm, "LLM inference with FinOps tags")
 ```
 
-### Kubernetes Namespace Topology
+### Namespace references in checked-in manifests
 
-```mermaid
-graph TB
-    subgraph "K8s Cluster"
-        subgraph "ns: agents"
-            MCP["factory-mcp-server Pod"]
-            CLI["factory-cli Jobs"]
-            Sandbox["gVisor Sandbox Pods"]
-        end
-        subgraph "ns: orchestrators"
-            Hatchet["Hatchet Engine"]
-            Poller["Poller Daemon"]
-        end
-        subgraph "ns: llm-apps"
-            LiteLLM["LiteLLM Proxy"]
-            R2R["R2R GraphRAG"]
-        end
-        subgraph "ns: confluent"
-            Kafka["Kafka KRaft Broker"]
-        end
-        subgraph "ns: networking"
-            Ziti["OpenZiti Controller + Router"]
-        end
-        subgraph "ns: secrets"
-            Vault["HashiCorp Vault"]
-            SealedSecrets["Bitnami Sealed Secrets"]
-        end
-    end
-
-    MCP --> Hatchet
-    MCP --> Sandbox
-    Poller --> Kafka
-    Hatchet --> Kafka
-    MCP --> LiteLLM
-    MCP --> R2R
-    MCP --> Ziti
-    MCP --> Vault
-```
+The `deploy/` admission-policy bindings select `development`; no `Namespace` objects are declared there. Checked-in configuration also refers to `factory-sandbox` and uses `openziti` as a namespace selector. This is not a complete cluster namespace inventory. The full namespace list is **TO CONFIRM**.
 
 ---
 

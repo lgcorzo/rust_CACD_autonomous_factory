@@ -10,7 +10,7 @@ Dark Gravity currently polls GitHub and GitLab for **issues** and **PR/MR commen
 
 ## Technical Context
 
-**Language/Version**: Rust (stable 1.75+, Edition 2024)
+**Language/Version**: Rust 1.85+ for edition 2024; exact tested patch is **TO CONFIRM**.
 
 **Primary Dependencies**: `reqwest` (HTTP), `serde`/`serde_json` (serialization), `tokio` (async runtime), `chrono` (time), `uuid` (identifiers), `thiserror`/`anyhow` (error handling), `tracing` (logging), `mockall` (test mocking), `wiremock` (HTTP test mocking), `rdkafka` (Kafka), `regex` (log parsing)
 

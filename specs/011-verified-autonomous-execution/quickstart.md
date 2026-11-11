@@ -6,7 +6,7 @@ This guide is the validation path for implementation and review. A passing build
 
 ## Prerequisites
 
-- Rust toolchain compatible with the repository's `rust-toolchain.toml`/CI.
+- Rust 1.85+ for edition 2024 crates; no `rust-toolchain.toml` or `rust-version` pin is checked in, so the exact tested patch is **TO CONFIRM**.
 - `cargo` and access to the locked dependencies.
 - For GitOps checks: `kustomize`; for live checks: authorized read-only `kubectl` access to the target cluster.
 - For tests requiring Kubernetes, Hatchet, PostgreSQL, Kafka, or external services: the test-specific environment and credentials documented by the owning repository. Do not point destructive smoke tests at shared infrastructure.

@@ -15,7 +15,7 @@ Remediate security vulnerabilities and verify architectural claims highlighted d
 
 ## Technical Context
 
-**Language/Version**: Rust 1.80+ (Workspace edition 2021)
+**Language/Version**: Rust 1.85+ for the workspace because it includes edition 2024 crates; exact tested patch is **TO CONFIRM**.
 
 **Primary Dependencies**: `tokio` (1.x), `serde`, `zeroize` (1.8+), `ed25519-dalek` (2.x), `syn` (2.x), `reqwest` (0.12+)
 

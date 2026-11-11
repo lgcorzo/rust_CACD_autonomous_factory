@@ -1,22 +1,20 @@
-> [!NOTE]
-> **2026-11-10 (DG-RVP-018 A3):** This file contains two scenarios (interrupted-mission recovery, broken-test safe shutdown).
-> It is **not** a long-haul or soak test. "Certified" below is the original author's wording, not an independent verification (see `evidence/README.md`).
+> **Superseded 2026-11-11:** This authored report describes two scenarios: interrupted-mission recovery and broken-test safe shutdown. It contains no long-haul or soak-test record and has no linked test run or raw runtime capture. See [Evidence classes](README.md) and [the fact register](../docs/audit/DOC_FACT_REGISTER.md).
 
-# Phase 3: Resilience & Failure Recovery Verification Report
+# Phase 3: Resilience & Failure Recovery Report
 
-**Document Title:** Sandbox Resilience, Failure Recovery & Safe Shutdown Verification
+**Document Title:** Sandbox Resilience, Failure Recovery & Safe Shutdown
 **File Path:** `evidence/reliability-tests.md`
 **Classification:** Operational Security & Reliability Engineering Report
 **Verification Date:** 2026-10-15
-**Status:** Certified — Resilience & Recovery Verification Passed
+**Status:** Implemented (evidence pending regeneration)
 
 ---
 
 ## 1. Executive Summary & Objective
 
-This report details the empirical results from Phase 3 resilience, crash recovery, and failure mode testing conducted in the sandbox environment. The primary objective is to validate that the Dark Gravity autonomous software engineering factory maintains idempotency, prevents duplicate side-effects during ungraceful step terminations, safely halts PR delivery upon test or validation failures, and cleanly tears down ephemeral sandbox workloads.
+This authored report describes two scenarios: interrupted-mission recovery and broken-test safe shutdown. It contains no linked test run or raw runtime capture; execution and outcomes are **TO CONFIRM**.
 
-Two critical failure recovery scenarios were executed and verified:
+The report describes these two failure-recovery scenarios:
 1. **Test 1: Interrupted Mission Recovery** — Unplanned worker pod SIGKILL mid-step execution; verification of Hatchet engine state persistence, step re-dispatch, and zero duplicate side-effects via idempotent cursor management.
 2. **Test 2: Broken Test & Validation Failure** — Injection of unit test regressions and SAST security violations; verification of automated circuit breaker triggering, PR creation blockage, and clean sandbox pod teardown.
 
@@ -54,7 +52,7 @@ Two critical failure recovery scenarios were executed and verified:
 
 ### 2.3 Side-Effect & Idempotency Analysis
 
-| Event / Side-Effect | Attempt 1 (Interrupted) | Attempt 2 (Resumed) | Verification Result |
+| Event / Side-Effect | Attempt 1 (Interrupted) | Attempt 2 (Resumed) | Result recorded in this report |
 | :--- | :--- | :--- | :--- |
 | **Kafka Event Emission** | Event initialized; withheld until step commit | Re-emitted upon step success | **1 Event total** (Zero duplicates) |
 | **Git Commit Creation** | Uncommitted working tree state discarded | Applied on fresh volume checkout | **Clean Git History** (No orphan commits) |
@@ -109,11 +107,11 @@ thread 'config::tests::test_yaml_parsing' panicked at 'Injected synthetic failur
 
 ---
 
-## 4. Summary Matrix of Resilience Verification Results
+## 4. Summary matrix of outcomes recorded in this report
 
-| Resilience Test | Scenario Executed | Target Mechanism | Outcome | Status |
+| Resilience Test | Scenario Described | Target Mechanism | Outcome recorded in this report | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **Test 1: Worker Interruption** | SIGKILL mid-task (T002) | Hatchet DAG Checkpoint + CursorStore | Resumed T002 retry on worker-2; 0 duplicate side-effects | **PASSED** |
-| **Test 2: Test Failure Injection** | Unit assertion failure (1 == 2) | CircuitBreakerGuard + LaunchSandboxPodTool | Delivery halted; PR blocked; pod torn down in $300\text{ms}$ | **PASSED** |
+| **Test 1: Worker Interruption** | SIGKILL mid-task (T002) | Hatchet DAG Checkpoint + CursorStore | This report records a resumed retry with no duplicate side-effects | **TO CONFIRM** |
+| **Test 2: Test Failure Injection** | Unit assertion failure (1 == 2) | CircuitBreakerGuard + LaunchSandboxPodTool | This report records delivery halt, PR block, and pod teardown in $300\text{ms}$ | **TO CONFIRM** |
 
 **Conclusion:** The Dark Gravity factory architecture demonstrates robust resilience, crash recovery, and deterministic safety controls in sandbox environments.

@@ -90,12 +90,14 @@ A `ValidatingAdmissionPolicy` (or Kyverno) evaluates `AgentWorkspace` CRDs and s
 
 ## 7. Declarative Specification (v3 example)
 
+The example uses `development`, the namespace name selected by the checked-in admission-policy binding. The repository defines no `Namespace` object, so existence is **TO CONFIRM**.
+
 ```yaml
 apiVersion: darkgravity.io/v1alpha1
 kind: AgentWorkspace
 metadata:
   name: workspace-lince-rs
-  namespace: agents
+  namespace: development
   finalizers:
     - darkgravity.io/workspace-finalizer
 spec:

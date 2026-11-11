@@ -136,9 +136,9 @@ classDiagram
   - `environment: String` (e.g., `"production"`).
   - `cost_center: String` (e.g., `"eu-rd-grants"`).
 - **`FinOpsSpendState`**:
-  - `total_spend: f64` — Current cumulative spend in USD.
+  - `total_spend: f64` — Current cumulative spend; currency is **TO CONFIRM**.
   - `previous_spend: f64` — Spend at last 60-second polling interval.
   - `spend_velocity: f64` — Delta spend over 60s window ($\Delta\text{spend}/\Delta t$). Alert trips if $> \$1.00/60\text{s}$.
-  - `max_daily_budget: f64` (default: $\$50.00$).
-  - `hardstop_threshold: f64` ($90\%$ of daily budget = $\$45.00$).
+  - `max_daily_budget: f64` (default: 50.0 budget units).
+  - `hardstop_threshold: f64` (90% of daily budget = 45.0 budget units; currency is **TO CONFIRM**).
   - `is_halted: bool` — Flag indicating whether DAG is paused due to budget breach.

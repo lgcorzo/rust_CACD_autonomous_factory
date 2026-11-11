@@ -9,7 +9,7 @@ This guide outlines runnable scenarios to validate all 5 cryptographic hardening
 
 ## Prerequisites
 
-- **Rust Toolchain**: Rust 1.80+ (`cargo`) with Tokio async runtime.
+- **Rust Toolchain**: Rust 1.85+ (`cargo`) with Tokio async runtime; exact tested patch is **TO CONFIRM**.
 - **Environment Variables**:
   ```bash
   export FINOPS_TEAM="dark-gravity-ops"
@@ -24,19 +24,19 @@ This guide outlines runnable scenarios to validate all 5 cryptographic hardening
 
 ## Validation Scenario 1: Memory Zeroization & RAM Hygiene
 
-Verify that session tokens and credentials derive `Zeroize` and wipe from memory upon drop in $< 4.33\,\mu\text{s}$.
+Run the zeroization test and benchmark. The benchmark calls `JitToken::zeroize()` on a token constructed from a 36-character ASCII string. The repository records no timing output or machine, so the timing is **TO CONFIRM**.
 
 ```bash
 # Run unit tests validating zeroize on drop
 cargo test --package factory-core test_zeroize -- --nocapture
 
-# Run Criterion memory wipe benchmarks (target < 4.33 µs)
+# Run Criterion zeroization benchmark
 cargo bench --bench zeroize_benchmark
 ```
 
 **Expected Outcome**:
 - Credentials overwritten with null bytes.
-- Benchmark records wipe latency $< 4.33\,\mu\text{s}$ (typically $0.045\,\mu\text{s}$ to $0.20\,\mu\text{s}$).
+- Record the benchmark output and machine details; timing is **TO CONFIRM** until those results are checked in.
 
 ---
 
@@ -87,7 +87,7 @@ cargo test --package factory-application --lib workflows::circuit_breaker::tests
 
 ## Validation Scenario 5: FinOps Vtag Header Injection & HardStop Guardrails
 
-Verify that `FinOpsAgent` injects virtual tags, detects spend acceleration $> +\$1.00 / 60\text{s}$, and halts at $90\%$ daily budget.
+Check that `FinOpsAgent` injects virtual tags, detects spend acceleration, and calculates the 90% daily threshold. Runtime results and currency are **TO CONFIRM**.
 
 ```bash
 cargo test --package factory-application --lib agents::finops -- --nocapture
@@ -96,4 +96,4 @@ cargo test --package factory-application --lib agents::finops -- --nocapture
 **Expected Outcome**:
 - `FinOpsTag` headers (`x-vtags-*`) are formatted properly.
 - Velocity alerts trigger upon rapid budget consumption.
-- HardStop logs emergency halt when cumulative spend reaches $\$45.00$ ($90\%$ of $\$50.00$).
+- HardStop threshold is 45.0 budget units (90% of 50.0); runtime behavior and currency are **TO CONFIRM**.

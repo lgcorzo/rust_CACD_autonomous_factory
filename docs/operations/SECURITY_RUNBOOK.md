@@ -3,6 +3,8 @@
 **Specification**: `010-integrated-k8s-gitops-audit`  
 **Date**: `2026-11-02`
 
+> **Namespace note:** `deploy/` contains no `Namespace` objects. Admission bindings select `development`; sandbox configuration refers to `factory-sandbox` and the `openziti` namespace label. The live sandbox namespace is **TO CONFIRM**. Set `SANDBOX_NAMESPACE` only after confirming the target cluster.
+
 ---
 
 ## 1. Deployment & Verification Procedures
@@ -22,11 +24,11 @@ handler: runsc
 ```
 
 ### 1.2 Verifying Sandbox Pod Security Profile
-Ensure the `factory-sandboxes` namespace enforces restricted pod security:
+Check restricted pod security on the namespace confirmed for the target cluster:
 ```bash
-kubectl get namespace factory-sandboxes -o jsonpath='{.metadata.labels}'
+kubectl get namespace "$SANDBOX_NAMESPACE" -o jsonpath='{.metadata.labels}'
 ```
-Expected labels:
+Expected labels for this check (live values are **TO CONFIRM**):
 - `pod-security.kubernetes.io/enforce: restricted`
 - `pod-security.kubernetes.io/audit: restricted`
 - `pod-security.kubernetes.io/warn: restricted`
@@ -60,4 +62,3 @@ Expected labels:
      ```bash
      gitleaks git --verbose
      ```
-

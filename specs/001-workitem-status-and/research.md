@@ -41,7 +41,7 @@ Currently, two severe operational deficiencies exist:
   - Eliminates reliance on host shell `git` binary and SSH/HTTPS credential helper configuration inside worker pods.
   - Prevents credential leaks in shell process tables or temporary disk footprints.
   - Supports atomic multi-file commit actions directly in GitLab REST API in a single HTTP request.
-  - Fully compliant with gVisor sandbox memory clamps (`RAM <= 30Mi`).
+  - Targets the configured gVisor workload memory cap (`RAM <= 30Mi`); actual runtime behavior is **TO CONFIRM**.
 - **Alternatives Considered**:
   - *Raw `git push` via shell*: Requires git CLI installed, disk workspace cloning, personal access token embedded in URL (security risk), and SSH key mounting.
 

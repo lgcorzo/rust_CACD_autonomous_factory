@@ -2,7 +2,7 @@
 
 **Feature Name**: `014-evidence-integrity-closure`  
 **Program**: DG-RVP-014  
-**Target Outcome**: Evidence Integrity Verified  
+**Target Outcome**: Evidence integrity controls implemented; independent assessment is not claimed.
 **Baseline Commit**: `ec07add0b8ff778ccde04b2bd4459b7a8cc0a3d1`  
 **Target Repository**: `lgcorzo/rust_CACD_autonomous_factory`  
 

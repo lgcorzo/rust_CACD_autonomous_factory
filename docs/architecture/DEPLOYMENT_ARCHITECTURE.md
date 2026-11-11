@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical architecture document describes a target topology, not a live deployment inventory. `deploy/` defines no `Namespace` objects, and the repository does not establish active CNI enforcement or live workload placement. See [the documentation fact register](../audit/DOC_FACT_REGISTER.md); deployed namespace inventory and enforcement are **TO CONFIRM**.
+
 # Deployment Architecture & Plane Boundaries
 
 **Specification**: `010-integrated-k8s-gitops-audit`  
@@ -10,7 +12,7 @@
 Dark Gravity separates responsibilities into four distinct planes:
 1. **Control Plane**: Workflow dispatchers, Hatchet scheduler, FinOps monitors, and the MCP server.
 2. **Security & Identity Plane**: HashiCorp Vault, Keycloak, and Ed25519 NHI credential issuers.
-3. **Execution Plane (Isolated Sandboxes)**: Ephemeral Kubernetes Jobs running under gVisor (`runsc`) inside the dedicated `factory-sandboxes` namespace.
+3. **Execution Plane (Isolated Sandboxes)**: Ephemeral Kubernetes Jobs configured for gVisor (`runsc`). Their deployed namespace is **TO CONFIRM**.
 4. **GitOps & Reconciliation Plane**: FluxCD controllers synchronizing manifests from `gitops_internal_lgcorzo`.
 
 ---
@@ -25,7 +27,7 @@ flowchart TD
         GitRepo -->|Reconcile| FluxKustomize
     end
 
-    subgraph ControlPlane ["Control Plane (agents namespace)"]
+    subgraph ControlPlane ["Control Plane (namespace TO CONFIRM)"]
         MCPServer["Factory MCP Server"]
         Hatchet["Hatchet Workflow Engine"]
         FinOps["FinOps Budget Monitor"]
@@ -35,13 +37,13 @@ flowchart TD
         Hatchet -->|Dispatch tasks| MCPServer
     end
 
-    subgraph SecurityPlane ["Security Plane (security namespace)"]
+    subgraph SecurityPlane ["Security Plane (namespace TO CONFIRM)"]
         Vault["HashiCorp Vault (ACL Policies)"]
         Keycloak["Keycloak OIDC"]
         SealedSecrets["Bitnami SealedSecrets"]
     end
 
-    subgraph IsolatedExecutionPlane ["Execution Plane (factory-sandboxes namespace)"]
+    subgraph IsolatedExecutionPlane ["Execution Plane (namespace TO CONFIRM)"]
         SandboxJob["Sandbox Job (python/rust)"]
         gVisor["gVisor Sandbox Boundary (runsc)"]
         NetPolicy["Default-Deny NetworkPolicy"]
@@ -63,9 +65,9 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    SandboxWorkload["Sandbox Pod (factory-sandboxes)"]
+    SandboxWorkload["Sandbox Pod (namespace TO CONFIRM)"]
     
-    subgraph DeniedEndpoints ["Blocked by Default-Deny NetworkPolicy"]
+    subgraph DeniedEndpoints ["Targets of the configured deny-all egress policy"]
         KubeAPI["Kubernetes API Server (443)"]
         Metadata["Metadata Service (169.254.169.254)"]
         VaultAdmin["Vault Cluster Admin (8200)"]
@@ -82,4 +84,3 @@ flowchart LR
     SandboxWorkload -.-x|DENIED| InternalDBs
     SandboxWorkload -->|RESTRICTED HTTPS| GitHost
 ```
-

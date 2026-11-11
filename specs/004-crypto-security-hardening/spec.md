@@ -15,8 +15,8 @@
 - Q: ¿Cuáles son las métricas cuantitativas y condiciones del disyuntor adaptativo por velocidad (VULN-01) para congelar el DAG? → A: El agente FinOps (`FinOpsAgent`) sondea `/spend/logs` cada 60s; se dispara alerta de velocidad si el consumo supera un delta de $+\$1.00 / 60\text{s}$ ($\Delta\text{consumo}/\Delta t$); `CircuitBreakerGuard` congela el Hatchet DAG tras 3 fallos consecutivos en Aethelgard o al detectar hashes de *diff* idénticos consecutivos (deadlock de alucinación), revocando credenciales JIT y transitando la misión a `Agent-Stuck` con escalado a HITL Vértice 3.
 - Q: ¿Qué modelos específicos y reglas de aislamiento aplican al juez SAST vs. ZeroClaw en LiteLLM (VULN-02)? → A: `ZeroClaw` opera con modelos locales o pesos ternarios (`Bonsai 27B Ternario`, `Qwen 2.5 Coder 7B` u `Ollama`); el juez SAST (`security_review`) se enruta imperativamente a través de LiteLLM hacia una familia de modelos de frontera independiente y heterogénea (o pasarelas de respaldo como Azure AI Foundry vía mTLS); umbral mínimo innegociable de $8.0 / 10.0$ con rechazo automático ante RCE, inyecciones SQL, credenciales hardcodeadas o recursiones no acotadas.
 - Q: ¿Cuáles son los límites explícitos de recursos para el sidecar OpenZiti y la estrategia de migración nativa (VULN-03)? → A: El sidecar `ziti-edge-tunnel` se acota en manifiestos GitOps de Kubernetes con `requests`/`limits` explícitos de $20\text{ MiB}$ RAM y $100\text{m}$ CPU para salvaguardar el límite estricto de $\le 30\text{ MiB}$ RAM del contenedor primario en gVisor; se define la transición técnica hacia el crate nativo Rust `openziti-rs` / FFI en `crates/factory-infrastructure/src/ziti.rs` para embeber mTLS 1.3 directamente en el binario del worker.
-- Q: ¿Cómo se implementa el aislamiento en HashiCorp Vault y la firma Ed25519 de identidades no humanas (VULN-04)? → A: `VaultSecurityBounds` en `crates/factory-infrastructure/src/vault.rs` estructura secretos aislados por repositorio y agente (`secret/data/repos/<repo>/*`); tokens JIT emitidos con TTL estricto no renovable de 5 minutos (300 segundos); firmas digitales generadas con `ed25519-dalek` v2 bajo estándar W3C Verifiable Credentials (`Ed25519Signature2020` / JWS); borrado forense de memoria RAM con `#[derive(Zeroize, ZeroizeOnDrop)]` garantizado en $< 4.33\,\mu\text{s}$.
-- Q: ¿Cómo se configuran los Virtual Tags (Vtags) y la política de corte duro (HardStop) de FinOps al 90% (VULN-05)? → A: Inyección obligatoria de cabeceras HTTP `x-vtags-team: dark-gravity-ops`, `x-vtags-epic`, `x-vtags-microservice: factory-application`, y `x-vtags-cost_center: eu-rd-grants` en todas las llamadas a LiteLLM; agregación en tiempo real por el interceptor StackSpend/Finout; presupuesto diario predeterminado `FINOPS_MAX_DAILY_BUDGET` de $\$50.0\text{ USD}$; corte duro (`HardStop`) al alcanzar el 90% del presupuesto diario asignado ($\$45.00$), congelando el DAG, revocando credenciales JIT y emitiendo el evento `budget-exceeded` en Kafka.
+- Q: ¿Cómo se implementa el aislamiento en HashiCorp Vault y la firma Ed25519 de identidades no humanas (VULN-04)? → A: `VaultSecurityBounds` en `crates/factory-infrastructure/src/vault.rs` estructura secretos aislados por repositorio y agente (`secret/data/repos/<repo>/*`); tokens JIT emitidos con TTL estricto no renovable de 5 minutos (300 segundos); firmas digitales generadas con `ed25519-dalek` v2 bajo estándar W3C Verifiable Credentials (`Ed25519Signature2020` / JWS). El benchmark llama a `JitToken::zeroize()` sobre un token inicializado con una cadena ASCII de 36 caracteres; no se registra su salida ni la máquina usada, por lo que la latencia es **TO CONFIRM**.
+- Q: ¿Cómo se configuran los Virtual Tags (Vtags) y la política de corte duro (HardStop) de FinOps al 90% (VULN-05)? → A: Inyección obligatoria de cabeceras HTTP `x-vtags-team: dark-gravity-ops`, `x-vtags-epic`, `x-vtags-microservice: factory-application`, y `x-vtags-cost_center: eu-rd-grants` en todas las llamadas a LiteLLM; agregación en tiempo real por el interceptor StackSpend/Finout; presupuesto diario predeterminado `FINOPS_MAX_DAILY_BUDGET` de 50.0 unidades; la moneda es **TO CONFIRM**; corte duro (`HardStop`) al alcanzar el 90% (45.0 unidades), congelando el DAG, revocando credenciales JIT y emitiendo el evento `budget-exceeded` en Kafka.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -30,7 +30,7 @@ So that malicious or runaway code cannot escape containers, compromise host kern
 Runtime isolation is the first defense line against untrusted AI-generated code. Unclamped resources or container breakout vulnerabilities represent immediate catastrophic risks to sovereign infrastructure.
 
 **Independent Test**:
-Can be fully tested by attempting to execute untrusted code constructs (e.g. system calls outside user space, high memory consumption scripts, and inspecting dropped memory buffers); verifies that system calls are trapped in user space via gVisor, memory usage is terminated upon exceeding 30 MiB RAM for the application container, OpenZiti sidecar is bounded to 20 MiB RAM, and secrets are zeroized in RAM immediately on task termination in $< 4.33\,\mu\text{s}$.
+The test plan calls for untrusted-code, resource-bound, and zeroization checks. The benchmark's timing and machine are **TO CONFIRM**; the repository contains no benchmark output.
 
 **Acceptance Scenarios**:
 1. **Given** an untrusted code patch or command generated by an autonomous agent (`ZeroClaw`),
@@ -41,7 +41,7 @@ Can be fully tested by attempting to execute untrusted code constructs (e.g. sys
    **Then** the application container is strictly bounded to $\le 30\text{ MiB}$ of RAM and $\le 250\text{m}$ of CPU, while the OpenZiti sidecar is bounded to $\le 20\text{ MiB}$ RAM and $\le 100\text{m}$ CPU, terminating tasks that attempt to breach memory quotas before host degradation can occur.
 3. **Given** session secrets or temporary credentials loaded into memory,
    **When** the agent task finishes or aborts,
-   **Then** all memory buffers holding secrets are forensically overwritten with null bytes via `#[derive(Zeroize, ZeroizeOnDrop)]` within benchmarked microsecond thresholds ($< 4.33\,\mu\text{s}$).
+   **Then** the implementation uses `Zeroize` where defined. A benchmarked timing threshold is **TO CONFIRM** because no result or machine is recorded.
 
 ---
 
@@ -105,14 +105,14 @@ So that indirect prompt injections or malicious network requests cannot exfiltra
 Mitigates VULN-05 (Inference Loops & FinOps Inflation) and hardens network boundaries. Autonomous agents exposed to external issue inputs must not be weaponized for wallet-draining or data exfiltration.
 
 **Independent Test**:
-Can be tested by simulating external egress network requests from inside a sandbox pod, and issuing high-volume reasoning prompts; verifies that egress traffic to the public internet is dropped (allowing only OpenZiti dark overlay traffic) and that token consumption terminates at 90% of daily budget ($\$45.00$ of $\$50.00$ baseline) with a `budget-exceeded` event published to Kafka.
+Can be tested by simulating external egress network requests from inside a sandbox pod, and issuing high-volume reasoning prompts; the egress result is **TO CONFIRM**, as are the exact currency and runtime behavior. The configured budget amount is 50.0 units per day, with a 90% threshold of 45.0 units.
 
 **Acceptance Scenarios**:
 1. **Given** a worker container running in Kubernetes,
    **When** attempting outbound network connections,
    **Then** Kubernetes NetworkPolicies enforce a Deny-All egress posture, dropping all non-OpenZiti overlay traffic.
 2. **Given** inference consumption tracked via Virtual Tags (`x-vtags-team: dark-gravity-ops`, `x-vtags-epic`, `x-vtags-microservice`, `x-vtags-cost_center: eu-rd-grants`) in the LiteLLM Gateway,
-   **When** an agent or task reaches 90% of its daily budget (default `FINOPS_MAX_DAILY_BUDGET` = $\$50.00$),
+   **When** an agent or task reaches 90% of its daily budget (default `FINOPS_MAX_DAILY_BUDGET` = 50.0 budget units; currency **TO CONFIRM**),
    **Then** a hard cut-off (`HardStop`) immediately pauses inference requests, publishes a `budget-exceeded` event to Kafka, revokes JIT credentials, and notifies platform administrators.
 
 ---
@@ -152,9 +152,9 @@ Can be tested by executing a high-volume batch of Agent-to-Agent (A2A) message e
 
 - **FR-001**: System MUST execute all untrusted code, tests, and agent shell commands exclusively within gVisor (`runsc`) user-space sandbox environments.
 - **FR-002**: System MUST enforce container resource clamping with limits of $\le 30\text{ MiB}$ RAM and $\le 250\text{m}$ CPU for the application container, and $\le 20\text{ MiB}$ RAM and $\le 100\text{m}$ CPU for the OpenZiti sidecar in Kubernetes manifests, maintaining an architectural path toward embedded `openziti-rs` transport in `crates/factory-infrastructure/src/ziti.rs`.
-- **FR-003**: System MUST implement in-memory secret zeroization (`#[derive(Zeroize, ZeroizeOnDrop)]`) ensuring credentials and session keys are wiped in $< 4.33\,\mu\text{s}$ upon task completion or abort.
+- **FR-003**: System MUST implement in-memory secret zeroization (`#[derive(Zeroize, ZeroizeOnDrop)]`) for credentials and session keys upon task completion or abort. A timing threshold is **TO CONFIRM**.
 - **FR-004**: System MUST isolate microservice communication across agents, Kafka, LiteLLM, and vector storage through an OpenZiti mTLS 1.3 dark network overlay with zero public ingress ports.
-- **FR-005**: System MUST perform external platform synchronization (GitLab/GitHub) solely via outbound-only polling (`factory-cli poller`) every 30–60 seconds, rejecting open HTTP inbound webhooks.
+- **FR-005**: System MUST perform external platform synchronization (GitLab/GitHub) via outbound-only polling (`factory-cli poller`). The router also defines `POST /webhooks/github`; no Service or Ingress is declared in checked-in `deploy/` or `config/`, and external exposure is **TO CONFIRM**. Open HTTP webhook access is not an established deployment fact.
 - **FR-006**: System MUST assign each autonomous agent a unique Non-Human Identity (NHI) backed by Ed25519 cryptographic key pairs managed in HashiCorp Vault under isolated repository paths (`secret/data/repos/<repo>/*`).
 - **FR-007**: System MUST sign all Git commits, database operations, and agent-to-agent transactions with W3C Verifiable Credential JWS tokens (`ed25519-dalek` v2).
 - **FR-008**: System MUST issue ephemeral Just-In-Time (JIT) access credentials via `VaultSecurityBounds` with a strict non-renewable TTL of 5 minutes (300 seconds).
@@ -163,7 +163,7 @@ Can be tested by executing a high-volume batch of Agent-to-Agent (A2A) message e
 - **FR-011**: System MUST provide an active circuit breaker in Hatchet that freezes the execution DAG, revokes JIT tokens, marks status as `Agent-Stuck`, and escalates to human oversight (HITL Vertex 3) after 3 consecutive failures or upon detecting identical diff hash deadlocks.
 - **FR-012**: System MUST implement an adaptive velocity-based circuit breaker where `FinOpsAgent` queries spend logs every 60 seconds and trips alerts if spend delta exceeds $+\$1.00 / 60\text{s}$ ($\Delta\text{consumo} / \Delta t$).
 - **FR-013**: System MUST enforce a Deny-All egress Kubernetes NetworkPolicy for all sandbox pods, prohibiting direct public internet connectivity outside the OpenZiti overlay.
-- **FR-014**: System MUST inject Virtual Tags (`x-vtags-team: dark-gravity-ops`, `x-vtags-epic`, `x-vtags-microservice: factory-application`, `x-vtags-cost_center: eu-rd-grants`) into LiteLLM requests, tracking against `FINOPS_MAX_DAILY_BUDGET` (default $\$50.00$), and trigger an immediate hard cut-off (`HardStop`) with a Kafka `budget-exceeded` event upon reaching 90% of the daily budget ($\$45.00$).
+- **FR-014**: System MUST inject Virtual Tags (`x-vtags-team: dark-gravity-ops`, `x-vtags-epic`, `x-vtags-microservice: factory-application`, `x-vtags-cost_center: eu-rd-grants`) into LiteLLM requests, tracking against `FINOPS_MAX_DAILY_BUDGET` (default 50.0 budget units; currency **TO CONFIRM**), and trigger an immediate hard cut-off (`HardStop`) with a Kafka `budget-exceeded` event upon reaching 90% of the daily budget (45.0 units).
 - **FR-015**: System MUST support asynchronous batching for Ed25519 cryptographic signing and verification queues to prevent latency bottlenecks in A2A messaging.
 
 ### Key Entities *(include if feature involves data)*
@@ -181,16 +181,16 @@ Can be tested by executing a high-volume batch of Agent-to-Agent (A2A) message e
 
 - **SC-001**: 100% of untrusted agent code runs inside gVisor sandboxes with zero unhandled host syscalls.
 - **SC-002**: Zero container escapes or memory leaks exceeding $30\text{ MiB}$ RAM for application containers and $20\text{ MiB}$ RAM for sidecars; out-of-bounds attempts terminate within 500 milliseconds.
-- **SC-003**: 100% of ephemeral credentials zeroized from RAM upon task termination within $< 4.33\,\mu\text{s}$.
+- **SC-003**: Timing for ephemeral-credential zeroization is **TO CONFIRM**; no benchmark result is recorded in the repository.
 - **SC-004**: 100% of commits and agent transactions are cryptographically signed with valid Ed25519 NHI credentials; 0% static long-lived credentials in use.
-- **SC-005**: 100% of code merged into repository branches achieves a verified SAST score $\ge 8.0/10.0$ evaluated by an independent model family.
+- **SC-005**: SAST score threshold is $\ge 8.0/10.0$ in this specification; independent model family and evaluation evidence are **TO CONFIRM**.
 - **SC-006**: Circuit breaker triggers within 1 second upon reaching 3 consecutive failures, duplicate diff hash deadlocks, or spend acceleration $> +\$1.00/60\text{s}$, revoking 100% of active JIT tokens.
 - **SC-007**: 100% of unauthorized egress network attempts from sandbox pods are dropped by network policies.
-- **SC-008**: Inference costs never exceed 100% of daily budget; hard stop is guaranteed at or before 90% threshold ($\$45.00$ on $\$50.00$ budget), with `budget-exceeded` event published to Kafka.
+- **SC-008**: Inference costs never exceed 100% of daily budget; hard stop is required at or before the 90% threshold (45.0 of 50.0 budget units; currency **TO CONFIRM**), with `budget-exceeded` event published to Kafka.
 
 ## Assumptions
 
-- **Cluster Infrastructure**: Kubernetes cluster supports gVisor (`runsc`) RuntimeClass and Cilium/Calico CNI with NetworkPolicy support.
+- **Cluster Infrastructure**: Kubernetes configuration includes Kubernetes and Cilium network policy objects. The installed CNI and enforcement behavior are **TO CONFIRM**.
 - **Cryptographic Engine**: HashiCorp Vault is deployed and accessible over OpenZiti overlay for Ed25519 key operations and JIT credential generation.
 - **Model Gateway**: LiteLLM Gateway is configured with multi-model routing capabilities allowing distinct model providers for generation (`ZeroClaw`: Bonsai 27B / Qwen 2.5) and review (`security_review`: frontier model / Azure AI Foundry).
 - **Regulatory Targets**: Alignment follows EU AI Act Article 14 (Human Oversight / HITL) and Article 15 (Cybersecurity & Robustness), SOC 2 Type II Trust Services Criteria (Security & Confidentiality), and ISO/IEC 25059 (AI System Quality).

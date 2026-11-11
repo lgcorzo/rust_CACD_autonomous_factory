@@ -1,20 +1,18 @@
-> [!NOTE]
-> **2026-11-10 (DG-RVP-018 A3):** This file contains two secret-redaction scenarios, a code inspection and a gVisor resource benchmark.
-> It is **not** SAST, DAST or penetration-testing evidence. The word "Certified" below is the original author's wording and is not an independent verification. Evidence class: `unit_test` / `mock`-grade until re-captured live (see `evidence/README.md`).
+> **Superseded 2026-11-11:** This authored report contains secret-redaction scenario descriptions, code inspection notes, and a gVisor resource benchmark table. It has no linked test run or raw runtime capture. See [Evidence classes](README.md) and [the fact register](../docs/audit/DOC_FACT_REGISTER.md).
 
-# Phase 3: Security & Secret Sanitization Verification Report
+# Phase 3: Security & Secret Sanitization Report
 
-**Document Title:** Secret Sanitization, Non-Exfiltration & gVisor Benchmark Verification
+**Document Title:** Secret Sanitization, Non-Exfiltration & gVisor Benchmark
 **File Path:** `evidence/security-tests.md`
 **Classification:** Operational Security & Isolation Benchmark Report
 **Verification Date:** 2026-10-15
-**Status:** Certified — Secret Redaction & Isolation Benchmarks Passed
+**Status:** Implemented (evidence pending regeneration)
 
 ---
 
 ## 1. Executive Summary & Objective
 
-This report documents the verification of Test 3 (Secret Sanitization & Non-Exfiltration) and gVisor sandbox resource isolation limits within the Dark Gravity autonomous engineering factory.
+This authored report contains secret-redaction scenarios, code-inspection notes, and a gVisor resource table. It does not include a linked test run or raw runtime capture, so the described execution results are **TO CONFIRM**.
 
 The primary objectives are:
 1. **Secret Redaction & Non-Exfiltration Verification:** Ensure that credentials, JIT Vault tokens, API keys, private keys, and cluster secrets are scrubbed and replaced with `[REDACTED]` across all stdout/stderr streams, mission history files, and error logs.
@@ -27,7 +25,7 @@ The primary objectives are:
 ### 2.1 Threat Model & Attack Surface
 During mission planning or automated code execution, agents handle ephemeral credentials (e.g. HashiCorp Vault 5-minute tokens, GitLab `glpat-*` tokens, GitHub OAuth tokens, and OpenZiti mTLS certs). If an agent attempts to log raw environment variables, echo secret values, or if a tool output captures an error containing sensitive parameters, the factory's sanitization layer must strip all secret patterns before writing to persistent storage or stdout.
 
-### 2.2 Adversarial Injection Scenarios Tested
+### 2.2 Adversarial Injection Scenarios Described
 
 #### Scenario 3.1: Environment Secret Dumping Attempt
 - **Adversarial Code Executed:**
@@ -81,7 +79,7 @@ Resource clamping parameters enforced on all sandbox pod manifests (`launch_sand
 - **CPU Request:** `100m`
 - **PIDs Limit:** `32` processes
 
-#### Empirical Isolation Benchmarks
+#### Benchmark values stated in this report
 
 | Metric / Test Case | Enforced Limit | Peak Measured Value | Behavior / Result |
 | :--- | :--- | :--- | :--- |
@@ -105,11 +103,11 @@ Allocated Sandbox Memory Profile:
 
 ## 4. Summary Matrix of Security & Non-Exfiltration Verification
 
-| Security Domain | Target Mechanism | Scenario Executed | Verification Result | Status |
+| Security Domain | Target Mechanism | Scenario Described | Result recorded in this report | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **Secret Sanitization** | `sanitize_markdown_table_field` & MCP filter | Dump `VAULT_TOKEN` & `GITLAB_TOKEN` | Redacted to `[REDACTED_*]`; stdout/stderr clean | **PASSED** |
-| **Exfiltration Guard** | SAST Security Review (`Aethelgard`) | Diff with hardcoded API keys | Score 0.0, rejected; PR creation blocked | **PASSED** |
-| **gVisor RAM Clamping** | `cgroups v2` + `runsc` Sentry | Allocate $35\text{ MiB}$ memory buffer | OOM-Killed at $30\text{ MiB}$ cap; zero host leakage | **PASSED** |
-| **Network Non-Exfiltration** | Cilium NetworkPolicy | Attempt HTTP POST to public endpoint | Connection timed out / blocked by policy | **PASSED** |
+| **Secret Sanitization** | `sanitize_markdown_table_field` & MCP filter | Dump `VAULT_TOKEN` & `GITLAB_TOKEN` | This report records redaction to `[REDACTED_*]` | **TO CONFIRM** |
+| **Exfiltration Guard** | SAST Security Review (`Aethelgard`) | Diff with hardcoded API keys | This report records rejection with score 0.0 | **TO CONFIRM** |
+| **gVisor RAM Clamping** | `cgroups v2` + `runsc` Sentry | Allocate $35\text{ MiB}$ memory buffer | This report records OOM at $30\text{ MiB}$ | **TO CONFIRM** |
+| **Network Non-Exfiltration** | Cilium NetworkPolicy | Attempt HTTP POST to public endpoint | This report records a timeout | **TO CONFIRM** |
 
-**Conclusion:** The Dark Gravity sandbox environment effectively prevents credential exfiltration, enforces secret redaction across all output channels, and maintains strict gVisor resource boundaries ($\le 30\text{ MiB}$ memory cap).
+**Conclusion:** This document records the scenarios and outcomes listed above. It does not establish that they ran or that the reported outcomes occurred.

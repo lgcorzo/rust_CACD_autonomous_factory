@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical threat model includes cluster and enforcement assumptions. The checked-in configuration contains Kubernetes and Cilium network policy objects, but does not identify the installed CNI or establish active enforcement. See [the documentation fact register](DOC_FACT_REGISTER.md); installed CNI is **TO CONFIRM**.
+
 # Threat Model: Dark Gravity Execution & Control Plane
 
 **Specification**: `010-integrated-k8s-gitops-audit`  
@@ -61,8 +63,7 @@ flowchart TD
 |---|---|---|---|
 | **THREAT-1** | Host filesystem access via `SubprocessDriver` | Fail-closed production mode; deny host process spawn | `crates/factory-mcp-server/src/sandbox.rs` |
 | **THREAT-2** | Container breakout to host kernel via standard `runc` | Mandatory `RuntimeClass: gvisor` | MicroK8s `runsc` virtualized kernel |
-| **THREAT-3** | Unauthorized lateral movement to Kube API or Vault | Default-deny Ingress and Egress NetworkPolicy | Calico / CNI NetworkPolicy |
+| **THREAT-3** | Unauthorized lateral movement to Kube API or Vault | Kubernetes and Cilium network policy objects are checked in; active enforcement is **TO CONFIRM** | Installed CNI is **TO CONFIRM** |
 | **THREAT-4** | Ingestion of fabricated test results | Require sandboxed test execution; typed `TestExecutionReport` | `crates/factory-mcp-server/src/tools/run_tests.rs` |
 | **THREAT-5** | Runaway LLM spend exceeding budget | FinOps budget latch integrated into mission admission | `factory-application/src/agents/finops.rs` |
 | **THREAT-6** | Sandbox pod resource exhaustion | Strict CPU (250m), memory (30Mi), and TTL (300s) cleanup | Kubernetes Job Spec |
-

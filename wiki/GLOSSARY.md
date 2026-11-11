@@ -100,7 +100,7 @@ last_verified_commit: "fbdc5848"
 
 | Term | Definition |
 |:---|:---|
-| **Kafka KRaft** | Apache Kafka running in KRaft mode (no ZooKeeper) for event streaming between factory subsystems |
+| **Kafka KRaft** | A Kafka broker mode referenced by older documentation. The repository does not establish whether the active broker uses it. |
 | **kube-rs** | Rust Kubernetes client library used for pod management, sandbox orchestration, and cluster introspection |
 
 ## L

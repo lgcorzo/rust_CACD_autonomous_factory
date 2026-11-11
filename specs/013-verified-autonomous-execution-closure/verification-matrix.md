@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical matrix records prior evidence claims, not current deployment state. See [the documentation fact register](../../docs/audit/DOC_FACT_REGISTER.md); current live state is **TO CONFIRM**.
+
 # Verification Matrix: DG-RVP-013: Verified Autonomous Execution Closure
 
 | Req ID | Control / Requirement | Classification | Target Component / Repo | Verification Command | Observed Outcome | Status |

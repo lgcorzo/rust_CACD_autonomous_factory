@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This report records a cluster observation collected on 2026-11-09; it does not establish current deployment state. Use [the documentation fact register](DOC_FACT_REGISTER.md) for checked-in source facts. Current cluster state is **TO CONFIRM**.
+
 # GitOps Manifest vs. Live Cluster Runtime Verification Report
 
 **Feature**: `013-verified-autonomous-execution-closure` (updating `011` / `012`)  

@@ -1,11 +1,13 @@
-# Phase 3: Adversarial Security & gVisor Sandbox Isolation Verification Report
+> **Superseded 2026-11-11:** This authored report is historical and has no raw runtime capture attached. Its Calico and runtime outcome claims are not established by the checked-in deployment manifests. See [Evidence classes](../README.md) and [the fact register](../../docs/audit/DOC_FACT_REGISTER.md); the installed CNI is **TO CONFIRM**.
 
-**Document Title:** Adversarial Security, gVisor Hypervisor Isolation & Network Boundary Benchmark Report
+# Phase 3: Adversarial Security & gVisor Sandbox Isolation Report
+
+**Document Title:** Adversarial Security, gVisor Isolation & Network Boundary Report
 **File Path:** `evidence/security/adversarial-tests.md`
 **Experiment ID:** `EXP-2026-007`
-**Classification:** Operational Security & Hypervisor Isolation Report
+**Classification:** Authored security scenario report
 **Verification Date:** 2026-10-15
-**Status:** Certified — Hard OS/Kernel & Network Isolation Barriers Verified
+**Status:** TO CONFIRM
 
 ---
 

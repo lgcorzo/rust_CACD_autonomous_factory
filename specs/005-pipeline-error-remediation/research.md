@@ -17,7 +17,7 @@
 **Rate Limits**: 5,000 requests/hour with bearer token. Polling 4 repos every 5 minutes = 48 requests/hour (well within limits). Add `If-Modified-Since` header for efficiency.
 
 **Alternatives Considered**:
-- GitHub Webhooks: Would require public endpoint exposure; rejected because the factory is a polling-based system by design (no inbound webhook receiver)
+- The application router also defines `POST /webhooks/github`. No Service or Ingress is declared in checked-in `deploy/` or `config/`; external exposure is **TO CONFIRM**. Polling remains the documented synchronization path.
 - GitHub GraphQL API: More efficient but doesn't expose Actions workflow run logs; rejected
 
 ---

@@ -16,15 +16,17 @@ last_verified_commit: "fbdc5848"
 
 > **Purpose**: R&D grant compliance framework documentation covering Hazitek 2026, EU AI Act, and automated telemetry audit trail packaging.
 
+Readiness controls aligned to these frameworks; no third-party certification claimed. The frameworks discussed here are the EU AI Act and SOC 2 Type II.
+
 ---
 
 ## 1. Regulatory Framework
 
-| Regulation | Scope | Factory Compliance |
+| Framework | Scope | Readiness controls described |
 |:---|:---|:---|
-| **Hazitek 2026 (SPRI)** | Basque Country R&D innovation grant | AST code deltas, compute hours, innovation output metrics |
-| **EU AI Act Art. 12** | Transparency: logging of AI system operations | Mission event logging, agent action audit trail |
-| **EU AI Act Art. 14** | Human oversight of high-risk AI systems | 4-Vertex HITL governance mesh, merge prohibition |
+| **EU AI Act Art. 12** | Transparency: logging of AI system operations | The documentation describes mission event logging and agent action records. |
+| **EU AI Act Art. 14** | Human oversight of high-risk AI systems | The documentation describes human review controls for merge decisions. |
+| **SOC 2 Type II** | Trust services control framework | Readiness controls are not independently assessed in this repository. |
 
 ---
 

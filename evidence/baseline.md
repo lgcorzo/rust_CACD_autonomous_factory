@@ -1,3 +1,7 @@
+> **Status: UNVERIFIED, pending regeneration.** Written before the 2026-11-07 audit. It contains internal inconsistencies (RuntimeClass name, truncated image digests, one commit SHA repeated across unrelated images). Do not cite it as proof. Superseded when regenerated from raw cluster output.
+
+> **Superseded 2026-11-11:** The checked-in configuration facts for this documentation review are indexed in [DOC_FACT_REGISTER.md](../docs/audit/DOC_FACT_REGISTER.md). That register does not replace a raw live-cluster capture.
+
 > [!CAUTION]
 > **STATUS: `UNVERIFIED: PENDING REGENERATION`** (quarantined 2026-11-10, DG-RVP-018 A1)
 >
@@ -10,7 +14,7 @@
 > - `runtimeclasses.node.k8s.io` is listed as a CRD, but RuntimeClass is a built-in Kubernetes type.
 > - It certifies everything `VERIFIED` for 2026-10-01, yet the 2026-11-07 audit found untrusted code running on the host.
 >
-> Superseded by `docs/audit/GITOPS_RUNTIME_VERIFICATION.md` (2026-11-06). Original text follows unchanged.
+> Current repository-backed facts are indexed in [DOC_FACT_REGISTER.md](../docs/audit/DOC_FACT_REGISTER.md). The historical cluster output remains superseded pending regeneration. Original text follows unchanged.
 
 # Phase 1: Cluster Workload & CRD Inventory Baseline
 
@@ -18,7 +22,7 @@
 **File Path:** `evidence/baseline.md`
 **Classification:** Operational Security & Architecture Baseline
 **Verification Date:** 2026-10-01
-**Status:** Certified — Zero-Trust Baseline Established
+**Status:** UNVERIFIED, pending regeneration
 
 ---
 

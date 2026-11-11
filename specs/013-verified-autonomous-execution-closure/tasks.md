@@ -2,6 +2,10 @@
 description: "Task list for DG-RVP-013 Verified Autonomous Execution Closure"
 ---
 
+> **Superseded 2026-11-11:** This task file contains historical cluster observations, including namespace names. They do not establish current deployment state. See [the documentation fact register](../../docs/audit/DOC_FACT_REGISTER.md).
+
+> **Historical status note (2026-11-11):** This task file records earlier completion claims. Those records do not establish current runtime or deployment state, which is **TO CONFIRM**. See the [evidence classes](../../evidence/README.md) and [documentation fact register](../../docs/audit/DOC_FACT_REGISTER.md).
+
 # Tasks: DG-RVP-013: Verified Autonomous Execution Closure
 
 **Input**: Design documents from `specs/013-verified-autonomous-execution-closure/` (`spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`, `verification-matrix.md`)  
@@ -53,8 +57,8 @@ description: "Task list for DG-RVP-013 Verified Autonomous Execution Closure"
 
 - [x] [T011](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/730) (#730) [US2] Update `/var/snap/microk8s/current/args/containerd-template.toml` and `/var/snap/microk8s/current/args/containerd.toml` to bind `runsc` runtime handler to `runtime_type = "io.containerd.runsc.v1"`
 - [x] [T012](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/731) (#731) [US2] Restart MicroK8s containerd service (`snap restart microk8s.daemon-containerd`) and verify containerd socket readiness *(Config updated on disk, containerd restarted, and containerd v1.6.28 compatibility wrapper installed at `/usr/bin/containerd-shim-runsc-v1`)*
-- [x] [T013](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/732) (#732) [US2] Execute disposable probe Pod in `factory-sandboxes` with `runtimeClassName: gvisor` executing `rustc --version` and capture runtime logs *(Verified via `job/audit-verify-gvisor-rust-013` / `pod/audit-verify-gvisor-rust-013-mjv54`, `uid: 4631d53c-095d-4699-a3dc-8c06de3b2f02`, `exitCode: 0`, stdout `[DG-RVP-013] gVisor Rust Execution Verified OK`)*
-- [x] [T014](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/733) (#733) [US2] Execute live negative isolation tests in `factory-sandboxes` (network egress block, host path mount denial) and record results in `evidence/security/live-gvisor-isolation.json` *(PSA `restricted` admission denial verified; in-pod negative probe `job/audit-verify-gvisor-negative-013` / `pod/audit-verify-gvisor-negative-013-4pkxz`, `uid: 36d4ae1e-20c3-4e11-89c4-4c0a88dd5e0f`, `exitCode: 0`, confirmed `ro_rootfs: BLOCKED`, `etc_shadow: BLOCKED`, `imds_egress: BLOCKED`, `sa_token_exists: false`)*
+- [x] [T013](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/732) (#732) [US2] Execute a disposable probe Pod with `runtimeClassName: gvisor`, run `rustc --version`, and capture runtime logs *(Tested: the historical evidence record lists namespace `factory-sandboxes`, job `audit-verify-gvisor-rust-013`, pod `audit-verify-gvisor-rust-013-mjv54`, and exit code 0. See [`live-gvisor-isolation.json`](../../evidence/security/live-gvisor-isolation.json); current namespace inventory is **TO CONFIRM**.)*
+- [x] [T014](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/733) (#733) [US2] Execute live negative isolation tests (network egress block, host path mount denial) and record results in `evidence/security/live-gvisor-isolation.json` *(Tested: the historical evidence record lists namespace `factory-sandboxes`, job `audit-verify-gvisor-negative-013`, pod `audit-verify-gvisor-negative-013-4pkxz`, and the reported negative checks. See [`live-gvisor-isolation.json`](../../evidence/security/live-gvisor-isolation.json); current namespace inventory is **TO CONFIRM**.)*
 
 ---
 
@@ -87,8 +91,8 @@ description: "Task list for DG-RVP-013 Verified Autonomous Execution Closure"
 **Goal**: Align the Evidence Gate with exact repository commit SHAs, update all evidence artifacts, and verify 100% claim consistency on `lgcorzo.github.io`.  
 **Independent Test**: Run `scripts/validate_evidence.py` and `pytest tests/test_public_claims.py`; confirm zero discrepancies between evidence ledger, site HTML, and public claims.
 
-- [x] [T023](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/742) (#742) [US5] Update evidence ledger records in `evidence/` to reference the final Git commit SHA, classifications (`LIVE_RUNTIME`, `SECURITY_NEGATIVE`, etc.), and verified attestations
-- [x] [T024](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/743) (#743) [US5] Update `gitops_internal_lgcorzo` manifests in `infrastructure/agents/` to reflect verified container digests and runtime configurations
+- [x] [T023](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/742) (#742) [US5] Update evidence ledger records in `evidence/` to reference the final Git commit SHA, classifications (`LIVE_RUNTIME`, `SECURITY_NEGATIVE`, etc.), and attestation records
+- [x] [T024](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/743) (#743) [US5] Update `gitops_internal_lgcorzo` manifests in `infrastructure/agents/` to reference recorded container digests and runtime configurations
 - [x] [T025](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/744) (#744) [US5] Run `flux reconcile kustomization infrastructure -n flux-system` and verify cluster reconciliation status
 - [x] [T026](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/745) (#745) [US5] Validate `data/canonical-claims.json` and footer references in `lgcorzo.github.io`, ensuring `FACT-SANDBOX-ISOLATION` is backed by valid live runtime evidence
 - [x] [T027](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/746) (#746) [P] [US5] Execute test suite in `lgcorzo.github.io` (`pytest tests/test_public_claims.py`) and verify all 5 claim tests pass
@@ -100,7 +104,7 @@ description: "Task list for DG-RVP-013 Verified Autonomous Execution Closure"
 **Purpose**: Final comprehensive verification, audit documentation, and full end-to-end mission check on the live cluster.
 
 - [x] [T028](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/747) (#747) Execute full workspace linter and test suite (`cargo fmt --check`, `cargo clippy --all-targets -j 1`, `cargo test --workspace -j 1`)
-- [x] [T029](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/748) (#748) Trigger and monitor a real autonomous mission on the Kubernetes cluster using `trigger_mission` and verify all 5 DAG stages complete successfully *(Verified via `real-mission-e7-001-1794258497` / Hatchet run `e32a4202-2a30-44a4-b1dd-ef23f620e481` / UI run `darkgravitymission-dev-lgcorzo-1794258497071`: all 5 steps `rustant-plan`, `zeroclaw-execute`, `zeroclaw-validate` in gVisor Pod `sandbox-job-a68ab421-mmzwz`, `rustant-review`, and `factory-deliver` completed with `status: Succeeded` in `3m 47s`)*
+- [x] [T029](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/748) (#748) Trigger and monitor a real autonomous mission on the Kubernetes cluster using `trigger_mission` and record the DAG stages *(Tested: the historical evidence record lists mission `real-mission-e7-001-1794258497`, Hatchet run `e32a4202-2a30-44a4-b1dd-ef23f620e481`, and five workflow stages. See [`live-gvisor-isolation.json`](../../evidence/security/live-gvisor-isolation.json); current runtime state is **TO CONFIRM**.)*
 - [x] [T030](https://github.com/lgcorzo/rust_CACD_autonomous_factory/issues/749) (#749) Compile and finalize `docs/audit/REMEDIATION_REPORT_013.md`, `docs/audit/VERIFICATION_EVIDENCE_REPORT.md`, and `docs/audit/GITOPS_RUNTIME_VERIFICATION.md`
 
 ---
@@ -129,4 +133,3 @@ flowchart TD
 3. **Step 3 (Attestation & FinOps)**: Implement observed Pod telemetry capture (T015-T018) and unified FinOps locking (T019-T022).
 4. **Step 4 (Evidence & Public Claims)**: Bind evidence to exact commit SHAs (T023-T027) and reconcile GitOps.
 5. **Step 5 (Full End-to-End Mission)**: Run live Hatchet DAG mission across all 5 stages, record logs, and finalize remediation reports.
-

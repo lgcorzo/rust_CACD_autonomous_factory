@@ -14,7 +14,7 @@
   - Eliminates external image rendering dependencies and binary asset drift.
   - Mermaid renders natively in GitHub, GitLab, and local IDE markdown previewers.
   - C1 (Context) captures human actors (PO, Tech Lead, Architect, Reviewer) and external infrastructure (GitHub, GitLab, Jira, FluxCD, Kafka, Ziti, Hatchet).
-  - C2 (Container) captures the 5 physical Rust crates and Kubernetes namespaces (`agents`, `orchestrators`, `llm-apps`, `confluent`).
+  - C2 (Container) captures the 5 Rust crates and checked-in namespace facts: admission bindings select `development`; configuration refers to `factory-sandbox` and the `openziti` namespace label; `deploy/` contains no Namespace objects. The live namespace inventory is **TO CONFIRM**.
   - C3 (Component) details the internal agent modules (`Rustant`, `ZeroClaw`, etc.) and MCP tools (`launch_sandbox_pod`, `run_tests`, `spec_kit_tool`).
   - C4 (Code) details UML 2.0 class/trait diagrams and state machines.
 - **Alternatives Considered**:

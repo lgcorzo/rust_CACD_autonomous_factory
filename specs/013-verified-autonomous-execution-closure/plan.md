@@ -16,7 +16,7 @@ The engineering approach:
 
 ## Technical Context
 
-**Language/Version**: Rust 1.85.1 (2024 edition) / Python 3.12  
+**Language/Version**: Rust 1.85 or newer for edition 2024 crates; the exact tested patch is **TO CONFIRM**. Python 3.12 is referenced by this plan.
 **Primary Dependencies**: `kube 5.0.0`, `k8s-openapi 0.29.0`, `axum 0.8`, `tokio 1.0`, `fs2 0.4`, `serde_json`, `chrono`  
 **Storage**: Kubernetes API (`Job`/`Pod` status), MinIO S3, Local atomic JSON stop store with fs2 mutual exclusion  
 **Testing**: `cargo test --workspace` (with `-j 1`), `pytest`, live disposable Kubernetes sandbox probes  

@@ -1,23 +1,25 @@
-# Dark Gravity V7.2 — Threat Model & Zero-Trust Audit Matrix
+> **Superseded 2026-11-11:** This authored threat model is a design document, not evidence of live enforcement. See [the documentation fact register](../../docs/audit/DOC_FACT_REGISTER.md); current runtime and network enforcement are **TO CONFIRM**.
+
+# Dark Gravity V7.2 — Threat Model & Zero-Trust Design
 
 **Document Reference**: `evidence/security/threat-model.md`
-**Classification**: Defensive Security Architecture & Zero-Trust Compliance
+**Classification**: Defensive Security Architecture & Readiness Controls
 **Applicable Standards**: OWASP Top 10 for LLMs (2025/2026), MITRE ATT&CK for Enterprise & Containers, NIST AI RMF, ISO/IEC 27001, EU AI Act
 **Target Platform**: Dark Gravity Autonomous Software Engineering Factory
 **Last Updated**: October 2026
-**Status**: APPROVED & SIGNED OFF
+**Status**: Designed
 
 ---
 
 ## 1. Executive Summary & Zero-Trust Architecture Overview
 
-The **Dark Gravity** autonomous coding factory operates autonomous AI agents (e.g., `ZeroClaw`, `RustAnt`, `QAObserver`) capable of ingesting requirements, analyzing source repositories, writing code patches, and triggering verification pipelines. Because autonomous agents possess the agency to execute code and generate software artifacts, they represent both a target and a vector for complex adversarial attacks.
+This document describes the intended security architecture for the **Dark Gravity** autonomous coding factory. The repository does not establish that all described controls are active in a deployment.
 
-Dark Gravity enforces a strict **Zero-Trust Architecture (ZTA)**. Zero-Trust dictates: *Never Trust, Always Verify*. In Dark Gravity, this principle applies to:
+The design applies a **Zero-Trust Architecture (ZTA)** principle to:
 1. **Inputs**: Untrusted user prompts, GitHub/GitLab issue descriptions, MR comments, and pull request diffs.
-2. **Execution Runtimes**: Agent worker environments isolated via gVisor (`runsc`) / Firecracker microVMs with read-only root filesystems and strict memory/CPU clamping.
-3. **Identities & Access**: Non-Human Identities (NHI) backed by Ed25519 signatures and HashiCorp Vault Just-In-Time (JIT) short-lived credentials (5-minute TTL, zeroized on drop).
-4. **Network & Communications**: OpenZiti overlay networks with zero egress allowed to public internet and zero implicit cross-tenant access.
+2. **Execution runtime**: Checked-in configuration names gVisor (`runsc`).
+3. **Identities & Access**: The design proposes Non-Human Identity (NHI) credentials and HashiCorp Vault Just-In-Time (JIT) secrets. The repository does not establish that every action is signed or that these controls are active in a deployment.
+4. **Network & Communications**: Checked-in configuration includes Kubernetes and Cilium network policy objects. The installed container network interface (CNI) and active enforcement are **TO CONFIRM**.
 5. **Code Delivery**: Independent heterogeneous SAST gates (score $\ge 8.0/10.0$), anti-deadlock circuit breakers, and mandatory Human-in-the-Loop (HITL) approval before merge.
 
 ---
@@ -35,7 +37,7 @@ Dark Gravity enforces a strict **Zero-Trust Architecture (ZTA)**. Zero-Trust dic
   Poller / Webhook Listener  ──►  Ed25519 NHI Credential Verification (W3C VC)
                                    │
                                    ▼
-                            Kafka Event Bus (Signed Payloads)
+                            Kafka Event Bus (signing scope TO CONFIRM)
 ═════════════════════════════════════════════════════════════════════════════════
  TRUST BOUNDARY 2: GATEWAY & EVALUATION (LITELLM GATEWAY)
 ─────────────────────────────────────────────────────────────────────────────────
@@ -51,11 +53,11 @@ Dark Gravity enforces a strict **Zero-Trust Architecture (ZTA)**. Zero-Trust dic
 ═════════════════════════════════════════════════════════════════════════════════
  TRUST BOUNDARY 4: EXECUTION & ISOLATION (ZERO-TRUST SANDBOX PODS)
 ─────────────────────────────────────────────────────────────────────────────────
-  Kubernetes Sandbox (RuntimeClass: gvisor / runsc / Firecracker)
+  Kubernetes Sandbox (RuntimeClass: gvisor / runsc)
    ├── Read-Only Root Filesystem + /tmp emptyDir
-   ├── Strict Resource Clamping (App <= 30 MiB RAM, Sidecar <= 20 MiB RAM)
+   ├── Profile limits: worker 30Mi/250m, sidecar 20Mi/100m; builder defaults 512Mi/500m
    ├── Syscall Interception (dmesg / klogctl blocked)
-   └── Network Policy / Cilium: Total Network Egress Drop (No Public Internet)
+   └── Kubernetes and Cilium policy objects; installed CNI and enforcement TO CONFIRM
 ═════════════════════════════════════════════════════════════════════════════════
  TRUST BOUNDARY 5: GOVERNANCE & MERGE CONTROL (HUMAN IN THE LOOP)
 ─────────────────────────────────────────────────────────────────────────────────
@@ -88,7 +90,7 @@ Dark Gravity enforces a strict **Zero-Trust Architecture (ZTA)**. Zero-Trust dic
   * **T1068**: Exploitation for Privilege Escalation
 * **Attack Surface**: Container runtime, Linux syscall interface (`sys_ptrace`, `klogctl`, `unshare`, eBPF).
 * **Zero-Trust Mitigations**:
-  1. **gVisor (`runsc`) / Firecracker Isolation**: Worker pods execute under `RuntimeClass=gvisor` or Firecracker microVMs. Kernel syscalls are intercepted in user-space by gVisor Sentry.
+  1. **gVisor (`runsc`) isolation**: The checked-in configuration uses `RuntimeClass=gvisor`. Kernel syscalls are handled by the gVisor user-space runtime.
   2. **Read-Only Root Filesystem**: Immutability enforced (`touch /test.txt` yields `Read-only file system`).
   3. **Memory & CPU Clamping**: Hard limits enforced ($30\text{ MiB}$ RAM for app container, $20\text{ MiB}$ RAM for sidecars). Overallocations trigger immediate `OOMKilled` (Code 137) without host degradation.
   4. **Blocked Syscalls**: `dmesg` / `klogctl` fail with `Operation not permitted`.
@@ -113,9 +115,9 @@ Dark Gravity enforces a strict **Zero-Trust Architecture (ZTA)**. Zero-Trust dic
   * **T1071.001**: Application Layer Protocol: Web Protocols (HTTP/HTTPS)
 * **Attack Surface**: Outbound sockets (`curl`, `reqwest`, `urllib`), DNS resolution.
 * **Zero-Trust Mitigations**:
-  1. **Default Deny Network Policy**: Cilium / K8s NetworkPolicy drops all outbound egress from `factory-sandbox` namespace.
-  2. **Egress Probing Verification**: Public egress calls (e.g. `curl https://api.openai.com` or `curl 1.1.1.1`) result in `Connection timed out`.
-  3. **mTLS OpenZiti Overlay**: Allow-listed communication strictly restricted to internal OpenZiti router (`10.96.0.10:1280`) and Kafka broker (`10.96.0.12:9092`).
+  1. **Network Policy Configuration**: Checked-in files contain Kubernetes `NetworkPolicy` and Cilium `CiliumNetworkPolicy` objects. The installed CNI and active enforcement are **TO CONFIRM**.
+  2. **Egress Probing**: The historical experiment reports blocked egress. Current enforcement is **TO CONFIRM**.
+  3. **mTLS OpenZiti Overlay**: This design proposes allow-listed OpenZiti communication. The active router and Kafka endpoints are **TO CONFIRM**.
 
 ### Threat Vector 5: Non-Human Identity (NHI) Impersonation & Audit Trail Forgery (STRIDE: Spoofing, Repudiation)
 * **Description**: An attacker or rogue process attempts to impersonate an autonomous agent or fabricate task completion events in the Kafka message bus.
@@ -132,7 +134,7 @@ Dark Gravity enforces a strict **Zero-Trust Architecture (ZTA)**. Zero-Trust dic
 * **MITRE ATT&CK Mapping**:
   * **T1499.001**: Endpoint Denial of Service: OS Exhaustion
   * **T1496**: Resource Hijacking
-* **Attack Surface**: Hatchet DAG orchestrator, LiteLLM inference gateway.
+* **Attack Surface**: Hatchet directed acyclic graph (DAG) orchestrator, LiteLLM inference gateway.
 * **Zero-Trust Mitigations**:
   1. **Aethelgard Circuit Breaker**: Computes SHA-256 hashes of generated diffs. If consecutive attempts produce identical/stagnant diffs or exceed 3 retries, the circuit breaker trips `AgentStuck`, freezes the DAG, revokes Vault tokens, and alerts human operators.
   2. **FinOps Emergency HardStop**: LiteLLM enforces mandatory budget tags (`x-vtags-*`). When session/daily spending reaches $90\%$ of the threshold (e.g. $\$45.00$ of $\$50.00$), LiteLLM immediately triggers a `429 HardStop Budget Exceeded`, cutting off inference.
@@ -152,25 +154,25 @@ Dark Gravity enforces a strict **Zero-Trust Architecture (ZTA)**. Zero-Trust dic
 
 ## 4. Zero-Trust Audit Matrix
 
-The following matrix formally documents each identified threat vector, associated risk level, MITRE & STRIDE categories, technical controls, zero-trust verification boundaries, and sign-off status.
+The following matrix summarizes design-level threats and checked-in configuration. It does not record independent sign-off or prove live enforcement.
 
-| ID | Threat Vector | Risk Level | STRIDE Category | MITRE ATT&CK ID | Technical Control & Mitigation | Zero-Trust Verification Boundary | Sign-off Status |
+| ID | Threat Vector | Risk Level | STRIDE Category | MITRE ATT&CK ID | Technical Control & Mitigation | Evidence Boundary | Status |
 |:---|:---|:---:|:---|:---|:---|:---|:---:|
-| **TV-01** | Prompt Injection via Issue / MR Comment | **HIGH** | Tampering, Elevation of Privilege | T1059.006, T1565.001 | Structural delimiter sanitization + Heterogeneous SAST Judge inspection (`score >= 8.0`) | LiteLLM SAST Gate evaluates code diff independently before execution | **APPROVED** |
-| **TV-02** | Sandbox Kernel Escape / Privilege Escalation | **CRITICAL** | Elevation of Privilege, Tampering | T1611, T1068 | gVisor `runsc` / Firecracker microVM isolation + Syscall interception (`dmesg` blocked) | `kubectl exec -- dmesg` returns `Operation not permitted` | **APPROVED** |
-| **TV-03** | Sandbox Resource Exhaustion / Host DoS | **MEDIUM** | Denial of Service | T1499.001 | Memory clamping ($\le 30\text{ MiB}$ app, $\le 20\text{ MiB}$ sidecar) + Read-only root filesystem | Allocating $>30\text{ MiB}$ triggers immediate `OOMKilled (137)` | **APPROVED** |
-| **TV-04** | Cluster Secret Access & Credential Dumping | **CRITICAL** | Information Disclosure, Spoofing | T1552.006, T1003 | JIT Vault tokens (TTL $\le 300\text{s}$, non-renewable) + RAM zeroization on drop + Path ACLs | `vault token lookup` fails after 300s; Cross-repo KV read returns `403` | **APPROVED** |
-| **TV-05** | Unauthorized Network Egress & Data Exfiltration | **CRITICAL** | Information Disclosure | T1041, T1071.001 | Cilium Default Egress Drop policy + OpenZiti mTLS overlay network | `curl https://api.openai.com` yields `Connection timed out` | **APPROVED** |
-| **TV-06** | NHI Impersonation & Audit Payload Tampering | **HIGH** | Spoofing, Repudiation | T1036, T1565.002 | W3C Verifiable Credentials signed via Ed25519 (`ed25519-dalek`) | `SecurityValidator::validate_signature` validates all Kafka events | **APPROVED** |
-| **TV-07** | Stagnant Diff Deadlock / Infinite LLM Loop | **MEDIUM** | Denial of Service, Resource Hijacking | T1496 | Aethelgard Circuit Breaker with SHA-256 diff hash tracking & max 3 retries | Duplicate diff on attempt 2 trips `AgentStuck` and revokes tokens | **APPROVED** |
-| **TV-08** | Inference Budget Exhaustion / FinOps Spikes | **HIGH** | Denial of Service | T1496 | LiteLLM mandatory FinOps vTags + 90% HardStop Emergency Cutoff | Reaching $90\%$ budget triggers HTTP `429 HardStop Budget Exceeded` | **APPROVED** |
-| **TV-09** | Direct Push / Auto-Merge to Protected Branches | **CRITICAL** | Elevation of Privilege, Tampering | T1565.001, T1078 | Protected branch rules requiring human Code Owner approval (HITL mesh) | Git push to `main` by bot account returns `403 Forbidden` | **APPROVED** |
+| **TV-01** | Prompt Injection via Issue / MR Comment | **HIGH** | Tampering, Elevation of Privilege | T1059.006, T1565.001 | Input sanitization and code-review controls are design claims; coverage is **TO CONFIRM**. | No independent SAST, DAST, or penetration-test result is established here. | **Designed** |
+| **TV-02** | Sandbox kernel escape / privilege escalation | **CRITICAL** | Elevation of privilege, tampering | T1611, T1068 | Configuration names gVisor (`runsc`); live syscall behavior is **TO CONFIRM**. | Live `dmesg` behavior is **TO CONFIRM**. | **Designed** |
+| **TV-03** | Sandbox Resource Exhaustion / Host DoS | **MEDIUM** | Denial of Service | T1499.001 | Custom Resource Definition (CRD)/admission cap: `30Mi`/`250m`; profile plus overhead: `85Mi`/`450m` limits; builder default: `512Mi`/`500m` (conflict). | Admission and runtime behavior are **TO CONFIRM**. | **TO CONFIRM** |
+| **TV-04** | Cluster Secret Access & Credential Dumping | **CRITICAL** | Information Disclosure, Spoofing | T1552.006, T1003 | JIT secret handling and path ACLs are design controls; live TTL and enforcement are **TO CONFIRM**. | No live Vault check is recorded here. | **Designed** |
+| **TV-05** | Unauthorized Network Egress & Data Exfiltration | **CRITICAL** | Information Disclosure | T1041, T1071.001 | Kubernetes and Cilium policy objects are checked in; installed CNI and enforcement are **TO CONFIRM**. | Historical egress observations do not establish current enforcement. | **TO CONFIRM** |
+| **TV-06** | NHI Impersonation & Audit Payload Tampering | **HIGH** | Spoofing, Repudiation | T1036, T1565.002 | Ed25519 identity code is present; signing of all Kafka events is **TO CONFIRM**. | No event-wide signature evidence is recorded here. | **Designed** |
+| **TV-07** | Stagnant Diff Deadlock / Infinite LLM Loop | **MEDIUM** | Denial of Service, Resource Hijacking | T1496 | Circuit-breaker behavior is described in the design; deployed retry behavior is **TO CONFIRM**. | No current runtime observation is recorded here. | **Designed** |
+| **TV-08** | Inference Budget Exhaustion / FinOps Spikes | **HIGH** | Denial of Service | T1496 | The configured maximum is a daily budget of 50; code sets the hard stop at 90%. | Live budget enforcement is **TO CONFIRM**. | **Implemented** |
+| **TV-09** | Direct Push / Auto-Merge to Protected Branches | **CRITICAL** | Elevation of Privilege, Tampering | T1565.001, T1078 | Human review is described as a design gate; repository branch-protection settings are **TO CONFIRM**. | No live GitHub enforcement observation is recorded here. | **Designed** |
 
 ---
 
 ## 5. Zero-Trust Policy Review & Sign-Off
 
-The security architecture, threat vector mappings, and zero-trust verification boundaries documented in this Threat Model & Zero-Trust Audit Matrix have been formally reviewed, empirically verified, and approved by the security governance board.
+This document records a security design. It does not record formal review, sign-off, or independent certification. Those decisions are **TO CONFIRM**.
 
 ### Sign-off Details
 

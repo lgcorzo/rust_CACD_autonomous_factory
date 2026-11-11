@@ -14,13 +14,13 @@ last_verified_commit: "fbdc5848"
 
 # Master Documentation Index — Dark Gravity CA/CD Autonomous Factory
 
-> **Standards Compliance**: [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74428.html) (Architecture Descriptions) & [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/72242.html) (Life Cycle Information Items).
+> **Standards referenced**: [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74428.html) (Architecture Descriptions) and [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/72242.html) (Life Cycle Information Items). This reference is not a certification claim.
 
 ---
 
 ## Navigation & Entry Points
 
-- [Home](Home.md) · [Glossary](GLOSSARY.md) · [Sidebar](_Sidebar.md) · [🎬 Screencast Demonstration Walkthrough](../docs/screencast_walkthrough.md)
+- [Home](Home.md) · [Glossary](GLOSSARY.md) · [Sidebar](_Sidebar.md) · Walkthrough source: `docs/screencast_walkthrough.md` (video asset not present in this checkout)
 
 ---
 
@@ -30,7 +30,7 @@ last_verified_commit: "fbdc5848"
 |:---|:---|:---|
 | **ContextView** | [Business Context](architecture/business_context.md) | Problem statement, ROI, KPIs, autonomous paradigm |
 | **ContextView** | [Strategic Design](architecture/strategic_design.md) | C4 Level 1-2, Onion Architecture, Bounded Contexts |
-| **ComponentView** | [Tactical Design](architecture/tactical_design.md) | C4 Level 3, Hatchet DAG mapping, tool registry |
+| **ComponentView** | [Tactical Design](architecture/tactical_design.md) | C4 Level 3, Hatchet directed acyclic graph (DAG) mapping, tool registry |
 | **ComponentView** | [Agent Specifications](architecture/agent_specifications.md) | Specification of all 6 agents, shared trait, tool matrix |
 | **SequenceView** | [Runtime Sequences](architecture/runtime_sequences.md) | 6-Phase Hatchet DAG execution, agent thought streaming |
 | **ComponentView** | [Infrastructure Adapters](architecture/infrastructure_adapters.md) | Kafka, R2R GraphRAG, OpenZiti, Vault, Sentry, S3, Semantica |
@@ -42,10 +42,10 @@ last_verified_commit: "fbdc5848"
 
 | Topic | Document | Description |
 |:---|:---|:---|
-| **SecurityView** | [Security Architecture](security/security_architecture.md) | Zero Trust, NHI Ed25519, gVisor isolation, STRIDE threat model |
-| **Policy** | [HITL Governance](security/hitl_governance.md) | 4-Vertex Human-in-the-Loop governance mesh & enforcement |
+| **SecurityView** | [Security Architecture](security/security_architecture.md) | Zero Trust, non-human identity (NHI) with Ed25519, gVisor isolation, STRIDE threat model |
+| **Policy** | [HITL Governance](security/hitl_governance.md) | Four-vertex human-in-the-loop (HITL) governance description |
 | **Policy** | [Verification Triad](security/verification_triad.md) | Logical, Architectural, and Security quality gates |
-| **Report** | [Compliance & Audit](security/compliance_audit.md) | Hazitek 2026, EU AI Act conformity assessment |
+| **Report** | [Compliance & Audit](security/compliance_audit.md) | Readiness controls aligned to the EU AI Act and SOC 2 Type II; no third-party certification claimed |
 
 ---
 
@@ -54,12 +54,12 @@ last_verified_commit: "fbdc5848"
 | Topic | Document | Description |
 |:---|:---|:---|
 | **Procedure** | [User Manual](operations/user_manual.md) | Step-by-step guides for mission creation, PR directives, CLI |
-| **DeploymentView** | [Production Operations](operations/production_operations.md) | FluxCD GitOps, K8s namespace topology, LiteLLM proxy, runbook |
+| **DeploymentView** | [Production Operations](operations/production_operations.md) | Checked-in namespace references, LiteLLM settings, runbook |
 | **Report** | [Experiment Logs](operations/experiment_logs.md) | Telemetry schema, Kafka event topics, Prometheus metrics |
 | **Lab Notebook** | [EXP-2026-006 Recovery](operations/lab_notebook_exp_2026_006.md) | Interrupted mission recovery & side-effect idempotency validation |
-| **Lab Notebook** | [EXP-2026-007 Security](operations/lab_notebook_exp_2026_007.md) | Adversarial security & gVisor sandbox isolation validation |
+| **Lab Notebook** | [EXP-2026-007 Security](operations/lab_notebook_exp_2026_007.md) | Authored security scenarios; network policy CNI is TO CONFIRM |
 | **Lab Notebook** | [EXP-2026-009 AST Graph](operations/lab_notebook_exp_2026_009.md) | AST context efficiency benchmark (Graphify/R2R vs Grep) |
-| **Lab Notebook** | [EXP-2026-010 Memory Bounding](operations/lab_notebook_exp_2026_010.md) | Resource governance & gVisor memory bounding (512Mi) validation |
+| **Lab Notebook** | [EXP-2026-010 Memory Bounding](operations/lab_notebook_exp_2026_010.md) | Historical resource figures; current pod usage is TO CONFIRM |
 
 ---
 

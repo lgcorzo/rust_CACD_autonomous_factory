@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This report records a 2026-11-09 deployment snapshot and does not establish current state. Use [the documentation fact register](DOC_FACT_REGISTER.md) for checked-in source facts; current deployment and namespace inventory are **TO CONFIRM**.
+
 # DG-RVP-013: Verified Autonomous Execution Closure — Remediation Report
 
 **Target Repository**: `lgcorzo/rust_CACD_autonomous_factory` (`v0.3.3`)  

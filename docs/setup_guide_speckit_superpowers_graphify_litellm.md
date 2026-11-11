@@ -1,5 +1,7 @@
 # Comprehensive Setup Guide: Spec Kit, Superpowers, Graphify, and LiteLLM Gateway Integration
 
+> **External configuration note:** The GitOps paths, service DNS names, and namespace examples below refer to another repository or environment not included in this checkout. Treat their current values as **TO CONFIRM** before use.
+
 This document provides a step-by-step installation, configuration, and operational guide for integrating **Spec Kit**, **Superpowers**, and **Graphify**, powered by an internal **LiteLLM Gateway** (with models such as `ollama/qwen2.5:7b` and `ollama/qwen2.5-coder:7b`).
 
 ---

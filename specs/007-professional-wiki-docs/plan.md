@@ -12,7 +12,7 @@ Generate a comprehensive, professional-grade enterprise wiki in `wiki/` for the 
 
 ## Technical Context
 
-**Language/Version**: Rust 1.75+ (workspace with 5 crates), Mermaid.js (documentation diagrams)
+**Language/Version**: Rust 1.85 or newer for the crates using edition 2024; the exact tested patch release is **TO CONFIRM** because the workspace has no `rust-version` or `rust-toolchain.toml` pin. The workspace has 5 crates. Mermaid.js (documentation diagrams)
 
 **Primary Dependencies**: `kube-rs`, `hatchet-sdk`, `rdkafka`, `openssl` (Ed25519), `tokio`, `serde`, `tracing`
 

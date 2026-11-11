@@ -109,11 +109,11 @@ sequenceDiagram
 
 ## 3. Sandbox Containment Architecture
 
-Agent code execution is isolated in gVisor-sandboxed Kubernetes pods with strict resource constraints.
+The checked-in configuration names the gVisor `RuntimeClass` `gvisor` with handler `runsc`. The sandbox profile sets worker limits to `30Mi`/`250m` and sidecar limits to `20Mi`/`100m`; RuntimeClass overhead brings the configured limit sum to `85Mi`/`450m`. The job builder defaults to `512Mi`/`500m`, which conflicts with the admission cap. These are configuration values, not measured usage. The active container network interface (CNI) and live enforcement are **TO CONFIRM**.
 
 ```mermaid
 graph TB
-    subgraph "K8s Pod: Sandbox"
+    subgraph "Kubernetes Pod: Sandbox"
         subgraph "gVisor Runtime"
             APP["Application Container"]
             SIDE["Sidecar Container"]
@@ -123,9 +123,9 @@ graph TB
     end
     
     MCP["factory-mcp-server"] --> |"launch_sandbox_pod"| APP
-    APP --> |"max 30 MiB RAM, 0.25 CPU"| RES
-    SIDE --> |"max 20 MiB RAM, 0.10 CPU"| RES
-    NET --> |"network_egress_allowed: false"| APP
+    APP --> |"profile: 30Mi, 250m"| RES
+    SIDE --> |"profile: 20Mi, 100m"| RES
+    NET --> |"policy config; active CNI TO CONFIRM"| APP
 
     style APP fill:#FF9800,stroke:#E65100,color:#fff
     style NET fill:#f44336,stroke:#c62828,color:#fff

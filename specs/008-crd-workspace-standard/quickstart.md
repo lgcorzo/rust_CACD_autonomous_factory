@@ -31,7 +31,7 @@ apiVersion: darkgravity.io/v1alpha1
 kind: AgentWorkspace
 metadata:
   name: test-over-limit
-  namespace: agents
+  namespace: development
 spec:
   repositoryUrl: "https://github.com/lgcorzo/lince-rs.git"
   targetBranch: "main"
@@ -83,7 +83,7 @@ EOF
    kind: AgentWorkspace
    metadata:
      name: workspace-lince-rs
-     namespace: agents
+     namespace: development
    spec:
      repositoryUrl: "https://github.com/lgcorzo/lince-rs.git"
      targetBranch: "main"
@@ -100,7 +100,7 @@ EOF
    ```
 3. Verify status with `kubectl get agws`:
    ```bash
-   kubectl get agws -n agents
+   kubectl get agws -n development
    ```
    **Expected Output Columns**:
    ```text
@@ -123,7 +123,7 @@ EOF
 
 1. Delete workspace:
    ```bash
-   kubectl delete agws workspace-lince-rs -n agents
+   kubectl delete agws workspace-lince-rs -n development
    ```
 2. Observe logs:
    - Cancel sent to Hatchet workflow `wf-run-1092834`.
@@ -132,3 +132,4 @@ EOF
    - Finalizer `darkgravity.io/workspace-finalizer` removed.
    - Resource purged with 0 orphaned active jobs.
 
+The examples use `development`, which the checked-in admission-policy binding selects. The repository does not declare a `Namespace` object, so the namespace's existence is **TO CONFIRM**.

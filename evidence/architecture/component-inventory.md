@@ -1,10 +1,12 @@
+> **Superseded 2026-11-11:** This historical inventory is not proof of current cluster state. Its namespace, Kafka, digest, and workload claims are not established by the checked-in `deploy/` manifests. See [the fact register](../../docs/audit/DOC_FACT_REGISTER.md).
+
 # Cluster Workload & CRD Component Inventory
 
-**Document Title:** Comprehensive Cluster Workload, CRD, and RBAC Component Inventory
+**Document Title:** Historical Cluster Workload, CRD, and RBAC Component Inventory
 **File Path:** `evidence/architecture/component-inventory.md`
 **Classification:** Operational Security & Architecture Documentation
-**Verification Commit:** `fbdc5848`
-**Status:** Complete & Certified
+**Recorded Commit:** `fbdc5848`
+**Status:** TO CONFIRM
 
 ---
 

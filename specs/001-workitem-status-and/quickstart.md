@@ -7,7 +7,7 @@
 
 ## 1. Prerequisites
 
-- Rust toolchain: 1.80+ / 1.85+ (`cargo`, `clippy`, `rustfmt`)
+- Rust 1.85+ (`cargo`, `clippy`, `rustfmt`); exact tested patch is **TO CONFIRM**.
 - Local or test environment credentials (or mock environment for offline testing):
   - `GITLAB_API_TOKEN` (or mock HTTP server via `wiremock` / `mockall`)
   - `GITHUB_API_TOKEN`

@@ -15,7 +15,7 @@ last_verified_commit: "fbdc5848"
 # User Manual — Dark Gravity CA/CD Autonomous Factory
 
 > **Purpose**: Comprehensive step-by-step guides for all operational scenarios.
-> 🎬 **[Watch the 5-Minute Technical Demonstration Screencast](../../docs/screencast_walkthrough.md)** (`docs/assets/screencast_dark_gravity_walkthrough.mp4`) for a visual step-by-step walkthrough of live factory execution and governance.
+> The generated local walkthrough source is `docs/screencast_walkthrough.md`. The referenced video asset is not present in this checkout.
 
 ---
 
@@ -34,8 +34,10 @@ Body:
 This issue requests an autonomous fix for the compilation error
 in the `config.rs` module caused by a missing `Default` implementation.
 
-Resource limits: CPU: 500m, RAM: 512Mi, Timeout: 300s
+Resource limits: CPU: 250m, RAM: 30Mi, Timeout: 300s
 ```
+
+The example uses the `30Mi`/`250m` declared workload cap in the Custom Resource Definition (CRD) and admission policies. The sandbox job builder currently defaults to `512Mi` memory and `500m` CPU; this conflicts with that cap.
 
 **Required labels** (at least one): `autonomous-mission`, `dark-gravity`
 
@@ -52,10 +54,10 @@ Resource limits: CPU: <millicores>, RAM: <memory>, Timeout: <seconds>
 The factory will:
 1. **Ingest** the issue via PollerDaemonService
 2. **Plan** the mission via RustantAgent
-3. **Code** the fix via ZeroClawAgent in a gVisor sandbox
-4. **Validate** tests and SAST gate
+3. **Code** the fix via ZeroClawAgent in a gVisor user-space sandbox runtime
+4. **Validate** tests. The repository does not establish a SAST gate for this flow.
 5. **Review** the changes
-6. **Deliver** a PR for human review (HITL Vertex 4)
+6. **Deliver** a PR for human review (human-in-the-loop, or HITL, Vertex 4)
 
 ---
 
@@ -65,10 +67,10 @@ Tag the bot in any PR comment:
 
 | Command | Example | Description |
 |:---|:---|:---|
-| `/status` | `@darkgravity /status` | Query factory health and DAG state |
+| `/status` | `@darkgravity /status` | Query factory health and directed acyclic graph (DAG) state |
 | `/interact` | `@darkgravity /interact How does the config module work?` | Natural-language query |
 | `/refine` | `@darkgravity /refine Fix the off-by-one error in line 42` | Request code edits |
-| `/validate` | `@darkgravity /validate` | Run full test + SAST verification |
+| `/validate` | `@darkgravity /validate` | Request validation; a SAST scanner and its results are not established here |
 
 Also accepts `@dark-gravity` prefix.
 
@@ -103,7 +105,7 @@ export LITELLM_MODEL="ollama/qwen2.5:7b"
 # Planner model (higher capability)
 export LITELLM_PLANNER_MODEL="gemini-3.8-flash-low"
 
-# LiteLLM API endpoint
+# LiteLLM API endpoint. The active deployment endpoint is TO CONFIRM.
 export LITELLM_API_BASE="http://litellm.llm-apps.svc.cluster.local:4000/v1"
 
 # FinOps configuration
@@ -118,33 +120,16 @@ export FINOPS_EPIC="HAZITEK-2026"
 |:---|:---|:---|
 | `LITELLM_MODEL` | `ollama/qwen2.5:7b` | Default LLM for agents |
 | `LITELLM_PLANNER_MODEL` | `gemini-3.8-flash-low` | High-capability planner LLM |
-| `LITELLM_API_BASE` | `http://litellm:4000/v1` | LiteLLM proxy endpoint |
+| `LITELLM_API_BASE` | `http://litellm.llm-apps.svc.cluster.local:4000` in the MCP server | API base; deployment endpoint is **TO CONFIRM** |
 | `HATCHET_API_URL` | `http://hatchet:8080` | Hatchet orchestrator |
-| `FINOPS_MAX_DAILY_BUDGET` | `50` | Daily spend limit (USD) |
+| `FINOPS_MAX_DAILY_BUDGET` | `50` | Daily budget limit; currency is **TO CONFIRM** |
 | `FACTORY_MODELS_CONFIG` | — | Custom model config path |
 
 ---
 
 ## 5. Kubernetes Manifest Setup
 
-Deploy via FluxCD GitOps:
-
-```yaml
-# K8s namespace layout
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: dark-gravity
-  labels:
-    app.kubernetes.io/part-of: dark-gravity
----
-# Core namespaces:
-# - dark-gravity: Factory services
-# - orchestrators: Hatchet, Kafka
-# - llm-apps: LiteLLM, R2R
-# - sandbox-exec: gVisor agent pods
-# - observability: Sentry, Grafana
-```
+The checked-in `deploy/` manifests define no `Namespace` objects. Their admission-policy bindings select the namespace name `development`. Other checked-in configuration refers to `factory-sandbox` and the `openziti` namespace label. Whether these namespaces exist in a deployment, and the complete deployed namespace inventory, are **TO CONFIRM**.
 
 ---
 

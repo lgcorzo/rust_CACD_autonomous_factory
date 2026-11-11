@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical report does not establish current deployment status. Do not cite it as current deployment proof. Use the [documentation fact register](DOC_FACT_REGISTER.md) and [evidence classes](../../evidence/README.md); live state is **TO CONFIRM**.
+
 # Deployment Provenance & End-to-End Traceability Matrix
 
 **Programme:** DG-RVP-015  

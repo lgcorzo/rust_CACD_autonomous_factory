@@ -17,7 +17,9 @@ last_verified_commit: "fbdc5848"
 
 > **Source**: `crates/factory-mcp-server/src/github_webhook.rs`  
 > **Layer**: Interface  
-> **Role**: HMAC-SHA256 authenticated Axum webhook endpoint listening for GitHub issue and PR comment events to dispatch into the autonomous factory.
+> **Role**: Axum route for GitHub webhook events. The router registers `POST /webhooks/github` unconditionally, so it is enabled at the application level by default. No `Service` or `Ingress` manifest is present in `deploy/` or `config/`, so external exposure is **TO CONFIRM**.
+
+The route is included when the application router is built. Protected mode is enabled when `FACTORY_ENV=production`, the production feature is active, or `MCP_API_BEARER_TOKEN` is configured. In protected mode, a webhook secret is required. In unprotected mode, an empty webhook secret does not require signature validation. The default local configuration is therefore not a signed-webhook requirement; this is a code issue to resolve separately.
 
 ---
 
@@ -31,7 +33,7 @@ sequenceDiagram
     participant HMAC as HMAC-SHA256 Verification
     participant DAG as Hatchet Mission / Poller
 
-    GH->>Route: POST /webhook/github (X-Hub-Signature-256)
+    GH->>Route: POST /webhooks/github (X-Hub-Signature-256)
     Route->>HMAC: verify_github_signature(secret, sig, body)
     alt Signature Invalid
         HMAC-->>Route: false
@@ -42,6 +44,8 @@ sequenceDiagram
         Route-->>GH: 200 OK {"status": "accepted"}
     end
 ```
+
+The HTTP server binds to `0.0.0.0`; that bind address does not itself establish that a Kubernetes Service, Ingress, or external route exposes the endpoint.
 
 ---
 

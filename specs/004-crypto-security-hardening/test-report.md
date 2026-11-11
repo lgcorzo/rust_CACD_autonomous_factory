@@ -30,7 +30,7 @@ Feature 004 implements a defense-in-depth cryptographic and runtime governance s
 4. **FinOps Token Guardrails & Network Egress Confinement (User Story 4)**:
    - **Virtual Tag (vTag) Injection**: Automatic HTTP header injection (`x-vtags-team`, `x-vtags-epic`, `x-vtags-microservice`, `x-vtags-cost_center`, `x-vtags-budget-threshold`) into every inference request.
    - **Spend Velocity Anomaly Tripping**: Detects and alerts on sudden spending surges ($> +\$1.00 / 60\text{s}$).
-   - **HardStop Budget Cutoff**: Halts agent execution at 90% of daily cap ($45.00$ of $\$50.00$) and dispatches a signed `budget-exceeded` event to Kafka.
+   - **HardStop Budget Cutoff**: The report records a 90% threshold (45.0 of 50.0 daily budget units); currency and runtime evidence are **TO CONFIRM**.
    - **Egress Isolation**: Deny-all egress Kubernetes and Cilium network policies restricting agent network egress solely to OpenZiti overlay controllers and internal Kafka ingress.
 
 5. **High-Throughput Batch Cryptographic Pipeline (User Story 5)**:
@@ -41,11 +41,11 @@ Feature 004 implements a defense-in-depth cryptographic and runtime governance s
 
 ## 2. Benchmark Performance vs Enterprise SLA Thresholds
 
-Criterion benchmarks were executed under `crates/factory-core` and the root workspace:
+This authored report contains benchmark figures, but the repository includes no Criterion output or machine record for them. The zeroization timing is **TO CONFIRM**. The checked-in benchmark calls `JitToken::zeroize()` on a token constructed from a 36-character ASCII string.
 
 | Benchmark Suite | Metric Measured | Target SLA | Measured Performance | Margin vs SLA | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`zeroize_benchmark.rs`** | In-RAM credential memory wipe latency | $< 4.33\,\mu\text{s}$ | **$54.2\text{ ns}$** ($0.0542\,\mu\text{s}$) | **~80x faster** than target | **PASSED (✓)** |
+| **`zeroize_benchmark.rs`** | `JitToken::zeroize()` on a token constructed from a 36-character ASCII string | **TO CONFIRM** | **TO CONFIRM**; no output or machine is recorded | **TO CONFIRM** | **TO CONFIRM** |
 | **`crypto_benchmark.rs`** | Ed25519 Batch Signing Throughput | $\ge 100\text{ ops/sec}$ | **$177.89\,\mu\text{s}$ / 10 VCs** ($\approx 56,180\text{ ops/sec}$) | **~560x higher** than target | **PASSED (✓)** |
 
 ---

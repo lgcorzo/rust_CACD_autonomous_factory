@@ -12,7 +12,7 @@ Implement and consolidate the enterprise Zero-Trust cryptographic security archi
 1. **Kernel Sandboxing & Resource Clamping (VULN-03)**:
    - Restrict `ZeroClaw` execution containers to gVisor (`runsc`) user-space syscall containment with $\le 30\text{ MiB}$ RAM and $\le 250\text{m}$ CPU.
    - Constrain OpenZiti mTLS sidecars in GitOps manifests to $\le 20\text{ MiB}$ RAM / $100\text{m}$ CPU, paving the architectural path toward embedded `openziti-rs` transport.
-   - Enforce memory sanitization (`#[derive(Zeroize, ZeroizeOnDrop)]`) ensuring secrets are wiped from RAM in $< 4.33\,\mu\text{s}$.
+   - Use `#[derive(Zeroize, ZeroizeOnDrop)]` where defined; benchmark timing is **TO CONFIRM** because no output or machine is recorded.
 2. **Dark Network & Outbound Synchronization**:
    - Zero public ingress ports; all microservice traffic operates across OpenZiti mTLS 1.3 encrypted tunnels.
    - Outbound-only polling (`factory-cli poller`) every 30–60 seconds for VCS events (GitLab/GitHub), eliminating vulnerable webhooks.
@@ -25,19 +25,19 @@ Implement and consolidate the enterprise Zero-Trust cryptographic security archi
    - 3 consecutive failures freeze the Hatchet DAG, revoke JIT tokens, transition to `Agent-Stuck`, and escalate to human architects (HITL Vertex 3).
 5. **FinOps Virtual Tags & HardStop Guardrails (VULN-05)**:
    - HTTP header injection (`x-vtags-team: dark-gravity-ops`, `x-vtags-epic`, `x-vtags-microservice: factory-application`, `x-vtags-cost_center: eu-rd-grants`).
-   - HardStop triggered at $90\%$ of daily budget ($\$45.00$ on $\$50.00$ default `FINOPS_MAX_DAILY_BUDGET`), publishing `budget-exceeded` to Kafka and pausing DAG execution.
+   - Configure the code's daily budget default of 50.0 units and 90% threshold (45.0 units); currency and runtime behavior are **TO CONFIRM**.
 
 ---
 
 ## Technical Context
 
-**Language/Version**: Rust 1.80+ (2024 Edition, Cargo workspace)  
+**Language/Version**: Rust 1.85+ (2024 Edition); the exact tested patch minimum is **TO CONFIRM**
 **Primary Dependencies**: `ed25519-dalek` v2, `zeroize` 1.7+, `reqwest` (json), `serde`, `serde_json`, `tokio` (full), `async-trait`, `chrono`, `tracing`, `wiremock`, `criterion`  
 **Storage**: HashiCorp Vault (JIT tokens, Ed25519 NHI keys), Kafka (topics: `agent-thought`, `mission-input`, `budget-exceeded`), pgvector (R2R GraphRAG)  
 **Testing**: `cargo test --workspace`, `cargo bench --bench zeroize_benchmark`  
-**Target Platform**: Linux Kubernetes cluster with gVisor (`runsc`), Cilium CNI (Deny-All egress), and OpenZiti dark overlay  
+**Target Platform**: Linux Kubernetes cluster with gVisor (`runsc`) and OpenZiti dark overlay. Checked-in configuration includes Kubernetes and Cilium policy objects; installed container network interface (CNI) is **TO CONFIRM**.
 **Project Type**: Autonomous CA/CD Multi-Agent Software Factory  
-**Performance Goals**: Forensic memory zeroization $< 4.33\,\mu\text{s}$; async Ed25519 batch signing $> 100\text{ ops/sec}$; circuit breaker tripping $\le 1\text{s}$  
+**Performance Goals**: Zeroization timing is **TO CONFIRM**; async Ed25519 batch signing target $> 100\text{ ops/sec}$; circuit breaker target $\le 1\text{s}$
 **Constraints**: Application RAM $\le 30\text{ MiB}$, sidecar RAM $\le 20\text{ MiB}$, JIT TTL $\le 300\text{s}$, SAST pass score $\ge 8.0/10.0$, FinOps HardStop at $90\%$ budget  
 **Scale/Scope**: Covers all autonomous agent lifecycles (Rustant, ZeroClaw, Auditor, DocAgent, FinOps) across repositories  
 
@@ -129,7 +129,7 @@ crates/
 - **`crates/factory-application/src/agents/finops.rs`**:
   - `FinOpsAgent`: Query `/spend/logs` every 60 seconds with Vtags (`x-vtags-*`).
   - Trip spend velocity anomaly alert when delta $> +\$1.00 / 60\text{s}$.
-  - Enforce HardStop when spend $\ge 90\%$ of `FINOPS_MAX_DAILY_BUDGET` ($\$45.00$), triggering Kafka `budget-exceeded` event and freezing active DAG runs.
+  - Enforce HardStop when spend $\ge 90\%$ of `FINOPS_MAX_DAILY_BUDGET` (45.0 of 50.0 budget units); currency and runtime behavior are **TO CONFIRM**.
 
 ---
 
@@ -137,7 +137,7 @@ crates/
 
 | Pillar / Mitigation | Test Method | Target Metric | Command |
 | :--- | :--- | :--- | :--- |
-| **RAM Zeroize** | Criterion Benchmark | $< 4.33\,\mu\text{s}$ | `cargo bench --bench zeroize_benchmark` |
+| **RAM Zeroize** | Criterion Benchmark | **TO CONFIRM**; no benchmark output or machine is recorded | `cargo bench --bench zeroize_benchmark` |
 | **Async Ed25519 Signing** | Tokio Unit Test | $> 100\text{ ops/sec}$ | `cargo test --package factory-core test_vc_async_signing_and_batch` |
 | **SAST $\ge 8.0$ Gate** | Unit Test Diff Audit | Score $\ge 8.0$, 0 Critical | `cargo test --package factory-application test_circuit_breaker_pass` |
 | **Circuit Breaker & Deadlock** | State Machine Test | Trips on 3 retries or duplicate hash | `cargo test --package factory-application test_circuit_breaker_retries_and_stuck` |

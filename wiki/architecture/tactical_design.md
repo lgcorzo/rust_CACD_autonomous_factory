@@ -29,7 +29,7 @@ graph TB
         ERR["error.rs: FactoryError"]
         EXEC["executor.rs: CodeSurgeryExecutor trait"]
         SEC["security.rs: SecurityValidator, SandboxConstraint, SastScanResult, JitToken"]
-        NHI["security/nhi.rs: Ed25519 NHI Credential Manager"]
+        NHI["crates/factory-core/src/security/nhi.rs: Ed25519 identity module"]
         CFG["config.rs: AgentModelConfig"]
         PROTO["proto/v1: gRPC Protobuf definitions"]
     end
@@ -136,7 +136,7 @@ graph TB
         
         subgraph "Security"
             ZT["ziti.rs: OpenZiti Client"]
-            VT["vault.rs: Vault Secret Manager"]
+            VT["crates/factory-infrastructure/src/vault.rs: Vault adapter"]
             SV["security_validator.rs: Ed25519 Validator"]
         end
         

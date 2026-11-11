@@ -18,7 +18,7 @@ This guide provides end-to-end verification steps for the Merge Request Comment 
 
 ## Prerequisites
 
-- Rust 1.80+ installed (`rustc --version`).
+- Rust 1.85+ installed (`rustc --version`); exact tested patch is **TO CONFIRM**.
 - GitLab API Token (`GITLAB_API_TOKEN`) or GitHub API Token (`GITHUB_API_TOKEN`) configured in environment or `.env`.
 
 ---

@@ -1,24 +1,28 @@
-# Plan de Pruebas de Auditoría de Seguridad para el Entorno Desplegado (Dark Gravity CA/CD V7.2)
+> **Estado: Designed.** Este documento es un plan, no un registro de pruebas ejecutadas. El inventario de namespaces, endpoints y la interfaz de red de contenedor (CNI) activa es **TO CONFIRM**. En `deploy/` no hay objetos `Namespace`; los bindings de admisión seleccionan `development`, y la configuración refiere `factory-sandbox` y la etiqueta de namespace `openziti`. Los nombres y resultados de ejemplo siguientes no acreditan el estado actual. No se afirma una certificación externa.
+
+# Plan de inspección de seguridad del entorno (Dark Gravity CA/CD V7.2)
 
 **Documento:** Plan de Auditoría Operacional y Validación en Producción  
 **Clasificación:** Seguridad Defensiva en Profundidad (Zero-Trust), Sandboxing y Gobernanza de Agentes IA  
 **Estándares de Referencia:** EU AI Act, SOC 2 Type II, ISO/IEC 25059, OWASP Top 10 for LLMs (2025/2026), NIST AI RMF  
-**Objetivo:** Guía técnica y procedimental paso a paso con comandos ejecutables para verificar empíricamente sobre el clúster en vivo que la factoría cumple con todos los controles de seguridad sin confiar en declaraciones estáticas.
+**Objetivo:** Proponer pasos para recopilar observaciones sobre los controles de seguridad. Este documento no registra resultados de ejecución.
 
 ---
 
 ## 1. Topología del Entorno Desplegado y Arquitectura de Control
 
+En este documento, DAG significa grafo acíclico dirigido.
+
 ```
-                      INTERFAZ DE CONTROL / OPERADOR HUMANO (HITL)
+                      INTERFAZ DE CONTROL / OPERADOR HUMANO
                                             │
                ┌────────────────────────────┼────────────────────────────┐
                ▼                            ▼                            ▼
       GitLab / GitHub MRs             Hatchet Console             Grafana / Sentry
-      (Merge Protegido HITL)      (Orquestador de DAGs)         (Telemetría y Alertas)
+      (Revisión humana)        (Orquestador DAG)                  (Telemetría y Alertas)
                │                            │                            │
  ══════════════╪════════════════════════════╪════════════════════════════╪════════════════
- CLÚSTER K8S   │                            │                            │
+ CLÚSTER KUBERNETES │                         │                            │
                ▼                            ▼                            ▼
    ┌──────────────────────┐     ┌──────────────────────┐     ┌──────────────────────┐
    │ LiteLLM Proxy Gate   │◄────┤ Worker Pod (ZeroClaw)│────►│ HashiCorp Vault      │
@@ -35,18 +39,17 @@
                                └──────────────────────┘
 ```
 
+Los límites del diagrama corresponden al perfil configurado. El perfil más overhead suma `85Mi`/`450m` en límites; el builder por defecto usa `512Mi`/`500m`, en conflicto con el límite de admisión `30Mi`/`250m`. Estos son valores de configuración, no mediciones de uso.
+
 ---
 
 ## 2. Pre-requisitos y Herramientas del Auditor
 
-Para ejecutar esta auditoría sobre el entorno en producción, el auditor debe contar con:
-1. Acceso `kubectl` con rol de solo lectura o inspector en los namespaces:
-   - `factory-sandbox` (donde corren los agentes)
-   - `llm-apps` (LiteLLM, R2R GraphRAG)
-   - `orchestrators` (Hatchet)
-   - `vault` (HashiCorp Vault)
+Antes de ejecutar los ejemplos, confirma los nombres de los namespaces y servicios en el entorno objetivo. El repositorio no establece el inventario desplegado. En los archivos disponibles, `deploy/` no declara objetos `Namespace`; los bindings de admisión seleccionan `development`, mientras que la configuración menciona `factory-sandbox` y la etiqueta `openziti`.
+Define `SANDBOX_NAMESPACE` con el nombre observado antes de ejecutar los comandos; su valor en un clúster activo es **TO CONFIRM**.
+1. Acceso `kubectl` de solo lectura para los namespaces confirmados. Sus nombres están **TO CONFIRM**.
 2. Binario `vault` CLI autenticado con rol de auditoría.
-3. Herramientas CLI: `curl`, `jq`, `cilium` (o `kubectl-cilium`).
+3. Herramientas CLI: `curl`, `jq`. Usa herramientas Cilium solo si el CNI activo es Cilium; el CNI está **TO CONFIRM**.
 4. Binario de prueba sintética: `factory-cli` (ubicado en `crates/factory-cli`).
 
 ---
@@ -62,33 +65,29 @@ Para ejecutar esta auditoría sobre el entorno en producción, el auditor debe c
 #### Prueba 1.1: Verificación de RuntimeClass gVisor (`runsc`)
 * **Comando:**
   ```bash
-  kubectl get pods -n factory-sandbox -o jsonpath='{range .items[*]}{.metadata.name}{"\tRuntimeClass="}{.spec.runtimeClassName}{"\n"}{end}'
+  kubectl get pods -n "$SANDBOX_NAMESPACE" -o jsonpath='{range .items[*]}{.metadata.name}{"\tRuntimeClass="}{.spec.runtimeClassName}{"\n"}{end}'
   ```
 * **Criterio de Aprobación:** Todos los pods de ejecución deben retornar `RuntimeClass=gvisor`.
-* **Resultado Inaceptable:** Cualquier valor vacío o `runc` invalida inmediatamente la certificación.
+* **Resultado a registrar:** Un valor vacío o `runc` no satisface este criterio. Registra la salida observada; no infieras un resultado de certificación.
 
 #### Prueba 1.2: Sonda de Intercepción de Syscalls de Kernel
 * **Comando:**
   ```bash
   # Seleccionar un pod de sandbox activo y verificar intercepción de dmesg
-  TARGET_POD=$(kubectl get pods -n factory-sandbox -l app=zeroclaw-worker -o jsonpath='{.items[0].metadata.name}')
-  kubectl exec -n factory-sandbox "$TARGET_POD" -- dmesg
+  TARGET_POD=$(kubectl get pods -n "$SANDBOX_NAMESPACE" -l app=zeroclaw-worker -o jsonpath='{.items[0].metadata.name}')
+  kubectl exec -n "$SANDBOX_NAMESPACE" "$TARGET_POD" -- dmesg
   ```
 * **Criterio de Aprobación:** El comando debe fallar con `dmesg: klogctl: Operation not permitted` (bloqueado en espacio de usuario por el Sentry de gVisor).
 
 #### Prueba 1.3: Verificación de Sistema de Archivos Inmutable (Read-Only Root)
 * **Comando:**
   ```bash
-  kubectl exec -n factory-sandbox "$TARGET_POD" -- touch /test_file.txt
+  kubectl exec -n "$SANDBOX_NAMESPACE" "$TARGET_POD" -- touch /test_file.txt
   ```
 * **Criterio de Aprobación:** Debe devolver `touch: cannot touch '/test_file.txt': Read-only file system`. Únicamente se permite escritura en `/tmp` volátil tipo `emptyDir`.
 
-#### Prueba 1.4: Contención de Memoria (Clamping OOM-Kill $\le 30\text{ MiB}$)
-* **Procedimiento:** Ejecutar un script de alocación de $35\text{ MiB}$ dentro del contenedor de la aplicación:
-  ```bash
-  kubectl exec -n factory-sandbox "$TARGET_POD" -- python3 -c 'bytearray(35 * 1024 * 1024)'
-  ```
-* **Criterio de Aprobación:** El proceso debe ser terminado inmediatamente con código `137 (OOMKilled)`. El nodo host y los pods vecinos no deben experimentar incremento en presión de memoria (`MemoryPressure`).
+#### Prueba 1.4: Comparación de límites declarados y política
+El manifiesto de admisión limita la carga declarada a `30Mi`/`250m`; el builder usa por defecto `512Mi`/`500m`. Registra los valores del Pod y el resultado de admisión. La causa del conflicto debe resolverse antes de interpretar una prueba de OOM. El comportamiento de admisión y el uso real son **TO CONFIRM**.
 
 ---
 
@@ -99,20 +98,19 @@ Para ejecutar esta auditoría sobre el entorno en producción, el auditor debe c
 #### Prueba 2.1: Sonda de Egress hacia Internet Público
 * **Comando:**
   ```bash
-  kubectl exec -n factory-sandbox "$TARGET_POD" -- curl -I -m 5 https://api.openai.com
-  kubectl exec -n factory-sandbox "$TARGET_POD" -- curl -I -m 5 https://1.1.1.1
+  kubectl exec -n "$SANDBOX_NAMESPACE" "$TARGET_POD" -- curl -I -m 5 https://api.openai.com
+  kubectl exec -n "$SANDBOX_NAMESPACE" "$TARGET_POD" -- curl -I -m 5 https://1.1.1.1
   ```
-* **Criterio de Aprobación:** Todos los intentos deben terminar en `Connection timed out` (cero paquetes transmitidos fuera del clúster).
+* **Resultado a registrar:** Anota la salida de cada intento. El CNI activo y el comportamiento de egreso son **TO CONFIRM**.
 
-#### Prueba 2.2: Inspección de Políticas de Red (NetworkPolicy / Cilium)
+#### Prueba 2.2: Inspección de políticas de red
 * **Comando:**
   ```bash
-  kubectl get networkpolicies -n factory-sandbox
-  kubectl describe networkpolicy deny-all-egress -n factory-sandbox
+  kubectl get networkpolicies -n "$SANDBOX_NAMESPACE"
+  kubectl get ciliumnetworkpolicies -n "$SANDBOX_NAMESPACE"
   ```
-* **Criterio de Aprobación:** La política debe especificar `Policy Types: Egress` con regla por defecto `Deny` y allow-list restrictivo limitado exclusivamente a:
-  - OpenZiti Router (`10.96.0.10:1280` mTLS)
-  - Kafka Cluster (`10.96.0.12:9092` SASL/Plain)
+* La configuración incluye objetos Kubernetes `NetworkPolicy` y Cilium `CiliumNetworkPolicy`; el CNI instalado y la aplicación efectiva son **TO CONFIRM**.
+* El perfil de sandbox separado permite tráfico al namespace con etiqueta `openziti` en TCP `8443` y `10080`. El endpoint activo es **TO CONFIRM**.
 
 ---
 
@@ -240,49 +238,24 @@ El clúster dispone de una misión canario automatizada que ejecuta todas las fa
 cargo run --bin run_functional_suite
 ```
 
-**Salida esperada en clúster conforme:**
-```
-============================================================
-   DARK GRAVITY AUTONOMOUS FACTORY - FUNCTIONAL TEST SUITE  
-============================================================
-
-[Phase 1] Pre-flight Infrastructure & Resource Clamping Probe...
-  [✓] Hatchet Orchestration Service: OK (200)
-  [✓] R2R GraphRAG Semantic Memory: OK (200)
-  [✓] LiteLLM Gateway & mTLS: OK (200)
-  [✓] Kafka Event Bus Connectivity: OK (200)
-
-[Phase 2] Zero-Trust Micro-Sandboxing Validation...
-  [✓] gVisor Kernel Isolation Active: OK
-  [✓] Application Container RAM Clamping (<= 30 MiB): ENFORCED
-  [✓] OpenZiti Sidecar RAM Clamping (<= 20 MiB): ENFORCED
-  [✓] Network Egress Drop Policy: ENFORCED
-
-[Phase 3] Cryptographic Governance & Circuit Breaker...
-  [✓] HashiCorp Vault 5-min TTL & Path Isolation: COMPLIANT
-  [✓] Heterogeneous SAST Judge Threshold (>= 8.0/10.0): ENFORCED
-  [✓] Deadlock Detection on Duplicate Diffs: VERIFIED
-  [✓] FinOps 90% HardStop Emergency Cutoff: VERIFIED
-
-STATUS: 100% PASS - CLUSTER CERTIFIED FOR PRODUCTION
-```
+**Resultados de ejecución: TO CONFIRM.** No se incluye aquí una salida de ejecución registrada. Complete una fila de la matriz siguiente solo después de ejecutar la prueba y guardar su evidencia.
 
 ---
 
-## 5. Acta de Conformidad y Plantilla de Dictamen
+## 5. Matriz de resultados y plantilla de informe
 
-| Control Auditado | Veredicto | Observaciones / Evidencia |
-| :--- | :---: | :--- |
-| **1. Kernel gVisor (`runsc`)** | `PASS / FAIL` | `kubectl get pod -o jsonpath='{.spec.runtimeClassName}'` = `gvisor` |
-| **2. Clamping RAM $\le 30\text{ MiB}$** | `PASS / FAIL` | OOM-Kill verificado en espacio de usuario sin degradación de nodo |
-| **3. Aislamiento de Red (Egress)** | `PASS / FAIL` | Paquetes salientes a Internet descartados por Cilium / NetPol |
-| **4. Vault JIT TTL 5 minutos** | `PASS / FAIL` | Token expira a los 300s, renovación rechazada |
-| **5. Firmas NHI Ed25519** | `PASS / FAIL` | Verificable Credential W3C validado en Kafka |
-| **6. SAST Juez Heterogéneo** | `PASS / FAIL` | Modelo independiente Claude 3.5 Sonnet evaluó con umbral $\ge 8.0$ |
-| **7. Disyuntor Deadlock Trip** | `PASS / FAIL` | Misión detenida en intento 2 ante diff hash duplicado |
-| **8. FinOps HardStop al 90%** | `PASS / FAIL` | Inferencia abortada al alcanzar $\$45.00$ de $\$50.00$ |
-| **9. Gobernanza HITL** | `PASS / FAIL` | Auto-merge prohibido; revisión humana manual obligatoria |
+| Control propuesto | Resultado | Evidencia y alcance |
+| :--- | :--- | :--- |
+| RuntimeClass gVisor (`runsc`) | **TO CONFIRM** | Registrar el valor observado y el namespace objetivo. |
+| Límites de recursos | **TO CONFIRM** | Registrar requests, limits, overhead y resultado de admisión. |
+| Política de red | **TO CONFIRM** | Registrar el objeto, CNI activo y resultado de la prueba. |
+| Secretos Vault | **TO CONFIRM** | Registrar TTL y alcance observados. |
+| Identidad Ed25519 | **TO CONFIRM** | Registrar qué payload se inspeccionó y qué firma se comprobó. |
+| Análisis de código | **TO CONFIRM** | Registrar herramienta, alcance y salida. |
+| Circuit breaker | **TO CONFIRM** | Registrar el caso ejecutado y su salida. |
+| FinOps | **TO CONFIRM** | Registrar periodo, umbral y resultado observado. |
+| Revisión humana | **TO CONFIRM** | Registrar la configuración del proveedor y su alcance. |
 
-**Dictamen Final:** `APROBADO PARA OPERACIÓN EN PRODUCCIÓN SOBERANA` / `NO CONFORME`  
+**Dictamen final:** **TO CONFIRM**. Este plan no emite una conclusión de certificación.
 **Firma del Auditor / CISO:** _____________________________  
 **Fecha de Inspección:** ___________________________________

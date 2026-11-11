@@ -53,7 +53,7 @@
 
 - [X] T010 [US1] Rewrite wiki/BUSINESS-CONTEXT.md with CA/CD vision, Hazitek 2026 innovation objectives, ROI metrics, KPI matrix, and autonomous workforce value proposition
 - [X] T011 [US1] Rewrite wiki/STRATEGIC-DESIGN.md with C4 Level 1 (System Context) Mermaid diagram showing human actors (PO, Tech Lead, Architect, Reviewer), external systems (GitHub, GitLab, Jira, FluxCD, Kafka, Hatchet, OpenZiti, LiteLLM), and system boundary
-- [X] T012 [US1] Add C4 Level 2 (Container) Mermaid diagram to wiki/STRATEGIC-DESIGN.md showing the 5 Rust crates as containers, Kubernetes namespaces (agents, orchestrators, llm-apps, confluent), and inter-container communication
+- [X] T012 [US1] Add C4 Level 2 (Container) Mermaid diagram to wiki/STRATEGIC-DESIGN.md showing the 5 Rust crates, checked-in namespace facts (`development` admission binding, `factory-sandbox` configuration, `openziti` namespace label, and no Namespace objects in `deploy/`), inter-container communication, and the live namespace inventory as **TO CONFIRM**
 - [X] T013 [US1] Rewrite wiki/TACTICAL-DESIGN.md with C4 Level 3 (Component) Mermaid diagrams showing internal components per crate — agent modules, MCP tools, infrastructure adapters, workflow engines
 - [X] T014 [US1] Add Onion Architecture layer diagram to wiki/STRATEGIC-DESIGN.md mapping factory-core (Domain) → factory-application (Application) → factory-infrastructure (Infrastructure) → factory-mcp-server (Interface) → factory-cli (CLI)
 - [X] T015 [US1] Add Bounded Context Map Mermaid diagram to wiki/STRATEGIC-DESIGN.md delineating Agent Execution, Mission Orchestration, Infrastructure Integration, and Security/Identity contexts

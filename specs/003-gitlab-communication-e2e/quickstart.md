@@ -10,7 +10,7 @@ This guide details how to execute and validate the end-to-end GitLab communicati
 
 ## Prerequisites
 
-1. **Rust Toolchain**: `rustc` and `cargo` 1.80+ installed.
+1. **Rust Toolchain**: `rustc` and `cargo` 1.85+ installed; exact tested patch is **TO CONFIRM**.
 2. **Repository Workspace**: `/mnt/F024B17C24B145FE/Repos/rust_CACD_autonomous_factory`.
 3. **For Live Verification (Optional)**:
    - `GITLAB_API_TOKEN`: Valid personal or project access token with `api` or `read_api` scopes.

@@ -15,14 +15,14 @@ Remediate the 5 key audit findings from the 2026-11-07 review:
 
 ## Technical Context
 
-**Language/Version**: Rust 1.80+ (2021 Edition)  
+**Language/Version**: Rust 1.85+ for the workspace because it includes edition 2024 crates; exact tested patch is **TO CONFIRM**.
 **Primary Dependencies**: `tokio`, `axum`, `kube`, `k8s-openapi`, `serde`, `serde_json`, `fs2` (or file locking primitives), `sha2`  
 **Storage**: JSON-backed state store with atomic file locking (`fs2`) or Kubernetes shared volumes  
 **Testing**: `cargo test -p factory-mcp-server`, `cargo test -p factory-application`, `cargo test -p factory-cli`  
 **Target Platform**: Linux (Ubuntu 22.04 LTS x86_64), Kubernetes (MicroK8s v1.31 with containerd + gVisor `runsc`)  
 **Project Type**: Microservices architecture with CLI, MCP server (`factory-mcp-server`), background workers (`factory-worker`), and orchestration workflows (`Hatchet`)  
 **Performance Goals**: Sandbox container boot < 10s, compilation < 20s, zero OOM kill on standard library tests  
-**Constraints**: Single compilation jobs restricted to `cargo -j 1` on local host; memory limit >= 512Mi on sandbox pods; zero tolerance for host execution of untrusted code  
+**Constraints**: The sandbox job builder defaults to `512Mi`/`500m`, which conflicts with the admission-policy cap of `30Mi`/`250m`. The profile plus RuntimeClass overhead accounts for `85Mi`/`450m` in limits and `60Mi`/`250m` in requests. These are configuration sums, not measured usage. Actual admission and runtime behavior are **TO CONFIRM**.
 **Scale/Scope**: 5 core audit workstreams touching `factory-mcp-server`, `factory-application`, `factory-cli`, and documentation  
 
 ## Constitution Check

@@ -21,7 +21,7 @@ Deliver a comprehensive End-to-End (E2E) testing harness and verification suite 
 
 ## Technical Context
 
-**Language/Version**: Rust 1.80+ (2021 Edition)  
+**Language/Version**: Rust 1.85+ for the workspace because it includes edition 2024 crates; this feature's code uses edition 2021. Exact tested patch is **TO CONFIRM**.
 **Primary Dependencies**: `reqwest` (with `json`), `serde`, `serde_json`, `tokio`, `async-trait`, `wiremock`, `chrono`, `tracing`, `clap`  
 **Storage**: Ephemeral state in test runners; `CursorStore` (`InMemoryCursorStore` / `PostgresCursorStore`) for synchronization tracking  
 **Testing**: `cargo test --package factory-application --test gitlab_e2e_integration_test`, `cargo test --workspace`  

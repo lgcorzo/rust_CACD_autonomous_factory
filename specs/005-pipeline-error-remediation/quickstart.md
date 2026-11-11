@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-- Rust toolchain (stable 1.75+)
+- Rust toolchain 1.85+; exact tested patch is **TO CONFIRM**.
 - System packages: `protobuf-compiler`, `libprotobuf-dev`, `libcurl4-openssl-dev`
 - Environment variables configured in `.env`:
   - `GITHUB_TOKEN` — GitHub API token with `actions:read`, `repo` scopes

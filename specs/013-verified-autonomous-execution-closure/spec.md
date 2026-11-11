@@ -1,10 +1,12 @@
+> **Superseded 2026-11-11:** This closure specification records prior implementation and runtime claims. The current checked-in manifests do not establish live deployment state. See [the documentation fact register](../../docs/audit/DOC_FACT_REGISTER.md); current runtime and namespace inventory are **TO CONFIRM**.
+
 # Feature Specification: DG-RVP-013: Verified Autonomous Execution Closure
 
 **Feature Branch**: `013-verified-autonomous-execution-closure`
 
 **Created**: 2026-11-09
 
-**Status**: Verified (`v0.3.3`)
+**Status**: Implemented (evidence pending regeneration)
 
 **Input**: User description: "DG-RVP-013: Verified Autonomous Execution Closure - Close all remaining critical security, runtime, FinOps and evidence-governance gaps identified in the latest independent audit."
 
@@ -133,4 +135,3 @@ As a Compliance and Verification Auditor, I want the Evidence Gate state machine
 - The `gvisork8s` driver in `crates/factory-mcp-server` communicates with the local Kubernetes API via the cluster service account or standard kubeconfig.
 - Autonomous factory workers operate in namespace `agents` and launch ephemeral sandboxes in namespace `factory-sandboxes`.
 - Public portfolio changes are published via `lgcorzo.github.io` on GitHub Pages subject to human-in-the-loop merge review.
-

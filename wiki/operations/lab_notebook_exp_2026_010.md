@@ -2,8 +2,8 @@
 iso_doc_type: "Description"
 iso_viewpoint: "DeploymentView"
 type: "operations"
-title: "Engineering Lab Notebook — EXP-2026-010: Resource Governance & Memory Bounding in gVisor (512Mi)"
-description: "Validation report for EXP-2026-010 evaluating gVisor resource clamping, cgroups v2 memory limits (512Mi), CPU throttling (500m), and safe OOM termination."
+title: "Engineering Lab Notebook — EXP-2026-010: Resource Governance & Memory Bounding"
+description: "Authored report of EXP-2026-010 resource figures recorded in the repository's benchmark JSON."
 tags: ['iso42010', 'okf', 'operations', 'benchmarks', 'gvisor', 'lab-notebook', 'cgroups-v2', 'resource-governance']
 timestamp: "2026-10-18T10:00:00Z"
 generated: "agent:jules"
@@ -12,7 +12,9 @@ verified: "false"
 last_verified_commit: "79c375a4"
 ---
 
-# Engineering Lab Notebook — EXP-2026-010: Resource Governance & Memory Bounding in gVisor (512Mi)
+# Engineering Lab Notebook — EXP-2026-010: Resource Governance & Memory Bounding
+
+> **Superseded 2026-11-11:** The figures below are the values recorded in `evidence/benchmarks/resource-profiling-512mi.json`, not a current deployment contract. The source does not identify a machine or attach raw telemetry. The separate CRD and admission-policy cap is `30Mi`/`250m`; the sandbox job builder defaults to `512Mi`/`500m`. Actual pod usage is **TO CONFIRM**. See `docs/audit/DOC_FACT_REGISTER.md` in the repository.
 
 > **Source Path**: `evidence/benchmarks/resource-profiling-512mi.json`
 
@@ -20,7 +22,7 @@ last_verified_commit: "79c375a4"
 
 ## 1. Intent & Objective
 
-The objective of experiment **EXP-2026-010** is to prove strict resource clamping and safe pod termination under memory pressure via Linux `cgroups v2` and the `gVisor` (`runsc`) sandbox runtime. The autonomous software factory must strictly respect declared resource budgets (`CPU: 500m`, `RAM: 512Mi`, `Timeout: 300s`), profiling real memory consumption during standard agent execution and verifying graceful Out-Of-Memory (OOM) handling without causing host node pressure or swap thrashing.
+The repository's EXP-2026-010 report records resource figures for a `500m` CPU / `512Mi` memory test profile and describes standard and memory-exhaustion scenarios using Linux `cgroups v2` and the `gVisor` (`runsc`) runtime. These recorded figures do not change the separate `30Mi`/`250m` CRD and admission-policy cap.
 
 ---
 

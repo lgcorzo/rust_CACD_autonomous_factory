@@ -1,4 +1,6 @@
-# Dark Gravity Audit & Verification Evidence Rules
+> **Superseded 2026-11-11:** This historical reporting guide contains self-verification lifecycle labels. For this documentation audit, use `Designed`, `Implemented`, or `Tested`; use `TO CONFIRM` when repository files do not establish a fact. See [the documentation fact register](DOC_FACT_REGISTER.md) and [evidence classes](../../evidence/README.md).
+
+# Dark Gravity Audit & Evidence Rules
 
 **Feature**: `011-verified-autonomous-execution`  
 **Contract Schemas**:
@@ -71,4 +73,3 @@ Every record MUST classify its `outcome` as one of:
 2. **Unavailable Repositories or Environments**:
    - When a repository (such as `lince-rs`) or live cluster (`server.internal.lgcorzo`) is unreachable or unauthorized, record `access_status: not_accessible` or `outcome: unavailable` with explicit `limitations`.
    - Never infer code contents, silently skip a required stage, or substitute a mocked pass for an unavailable environment.
-

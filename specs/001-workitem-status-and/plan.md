@@ -16,7 +16,7 @@ Implement real-time work item milestone commenting and remote GitOps branch/MR d
 
 ## Technical Context
 
-**Language/Version**: Rust 1.80+ (2021 Edition)  
+**Language/Version**: Rust 1.85+ for the workspace because it includes edition 2024 crates; this feature's code uses edition 2021. Exact tested patch is **TO CONFIRM**.
 **Primary Dependencies**: `reqwest` (with `json`), `serde`, `serde_json`, `tokio`, `async-trait`, `hatchet-sdk`, `tracing`, `mockall` (test-utils)  
 **Storage**: Ephemeral / stateless execution in worker pods; High-watermark persistence via `PostgresCursorStore` / `InMemoryCursorStore`  
 **Testing**: `cargo test --workspace`, unit tests with Mock clients (`MockGitlabClient`, `MockGithubClient`), integration test suites  

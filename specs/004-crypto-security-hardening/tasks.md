@@ -38,14 +38,14 @@
 
 ## Phase 3: User Story 1 - Zero-Trust Kernel Sandboxing & Resource Clamping (Priority: P1) 🎯 MVP
 
-**Goal**: Confine all untrusted agent execution within gVisor (`runsc`) user-space sandboxes clamped to $\le 30\text{ MiB}$ RAM / $250\text{m}$ CPU, restrict OpenZiti sidecars to $\le 20\text{ MiB}$ RAM / $100\text{m}$ CPU, and forensically wipe secrets in RAM in $< 4.33\,\mu\text{s}$.
+**Goal**: Confine all untrusted agent execution within gVisor (`runsc`) user-space sandboxes clamped to $\le 30\text{ MiB}$ RAM / $250\text{m}$ CPU, restrict OpenZiti sidecars to $\le 20\text{ MiB}$ RAM / $100\text{m}$ CPU, and zeroize secrets in memory. Benchmark timing is **TO CONFIRM**.
 
-**Independent Test**: Execute `cargo test --package factory-core test_zeroize` and `cargo bench --bench zeroize_benchmark`; confirms credential null-byte overwrite in RAM in $< 4.33\,\mu\text{s}$ and verifies gVisor pod spec resource bounds.
+**Independent Test**: Execute `cargo test --package factory-core test_zeroize` and `cargo bench --bench zeroize_benchmark`; confirm the code's zeroization behavior and record timing and machine details. No timing result is currently recorded (**TO CONFIRM**).
 
 ### Implementation for User Story 1
 
 - [x] T006 [P] [US1] Implement memory zeroization unit test verifying Zeroize on drop for JitToken in crates/factory-core/src/security.rs
-- [x] T007 [P] [US1] Configure Criterion memory wipe benchmark verifying < 4.33 µs wipe latency in benches/zeroize_benchmark.rs
+- [x] T007 [P] [US1] Configure Criterion benchmark for JitToken zeroization in benches/zeroize_benchmark.rs; measured timing is **TO CONFIRM**
 - [x] T008 [US1] Add validation logic to enforce gVisor runtime constraints (<= 30 MiB RAM for app, <= 20 MiB RAM for sidecar) in crates/factory-application/src/agents/zeroclaw.rs
 - [x] T009 [P] [US1] Create Kubernetes gVisor Pod sandbox profile and NetworkPolicy manifests in config/sandbox-gvisor-profile.yaml
 
@@ -89,7 +89,7 @@
 
 ## Phase 6: User Story 4 - FinOps Token Guardrails & Network Egress Confinement (Priority: P2)
 
-**Goal**: Inject Virtual Tags (`x-vtags-*`) into inference requests, monitor spend velocity ($> +\$1.00/60\text{s}$), and trigger HardStop at 90% daily budget ($\$45.00$ of $\$50.00$).
+**Goal**: Inject Virtual Tags (`x-vtags-*`) into inference requests, monitor spend velocity, and configure the 90% daily HardStop threshold (45.0 of 50.0 budget units; currency **TO CONFIRM**).
 
 **Independent Test**: Execute `cargo test --package factory-application --lib agents::finops`; verifies header injection, spend velocity alerting, and HardStop threshold tripping with `budget-exceeded` event publishing.
 

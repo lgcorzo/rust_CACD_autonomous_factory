@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** This historical provenance report does not establish current deployment status. Do not cite it as current deployment proof. Use the [documentation fact register](DOC_FACT_REGISTER.md) and [evidence classes](../../evidence/README.md); live state is **TO CONFIRM**.
+
 # Provenance & Verification Matrix — DG-RVP-016
 ## Unified Cryptographic Chain of Custody & Reproducibility
 
@@ -51,4 +53,3 @@ flowchart TD
      ```
 2. **Deterministic Evidence Validation:**
    - Both `scripts/verify_spec_artifacts.py` and `pytest tests/test_verify_spec_artifacts.py` run on every PR and branch push without conditionality.
-

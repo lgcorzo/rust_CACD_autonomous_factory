@@ -16,7 +16,9 @@ last_verified_commit: "fbdc5848"
 
 Welcome to the official documentation for the **Dark Gravity Autonomous Agent Factory**. This project implements a **Continuous Agentic / Continuous Deployment (CA/CD)** pipeline following **Domain-Driven Design (DDD)** and **Onion Architecture** standards.
 
-> 🎬 **[Live Factory Demonstration Screencast Walkthrough](../docs/screencast_walkthrough.md)** (`docs/assets/screencast_dark_gravity_walkthrough.mp4`) — 5-minute HD technical demonstration video showcasing live cluster orchestration, gVisor sandboxing, PR directive interaction, and governance.
+The project-generation labels `V7.2` and `V7.3` are distinct from release tags such as `v0.3.0`. Cargo package manifests currently state version `0.1.0`; the active project-generation label and release-tag mapping are **TO CONFIRM**.
+
+> The generated local walkthrough source is `docs/screencast_walkthrough.md`. The referenced video asset is not present in this checkout.
 
 ---
 
@@ -47,9 +49,9 @@ Welcome to the official documentation for the **Dark Gravity Autonomous Agent Fa
 | **MCP Protocol** | JSON-RPC over SSE |
 | **LLM Gateway** | LiteLLM (OpenAI-compatible) |
 | **Vector Store** | R2R GraphRAG + pgvector |
-| **Event Bus** | Confluent Kafka (rdkafka) |
+| **Event Bus** | Kafka client (`rdkafka`); broker provider and endpoint are **TO CONFIRM** |
 | **Zero Trust** | OpenZiti (mTLS 1.3) |
-| **Sandbox** | gVisor (runsc) user-space sandbox |
+| **Sandbox** | gVisor user-space sandbox runtime (`runsc`) |
 | **Container Orchestration** | Kubernetes + KEDA |
 | **Secrets** | Bitnami SealedSecrets |
 | **CI/CD** | GitHub Actions |
@@ -92,7 +94,7 @@ Based on `code-review-graph` analysis of the codebase:
 
 ## Getting Started
 
-1. **Prerequisites**: Rust 1.75+, Hatchet server, LiteLLM gateway
+1. **Prerequisites**: Rust 1.85 or newer for the crates that use edition 2024; the workspace does not pin an exact patch release, so the tested minimum patch is **TO CONFIRM**. Also requires a Hatchet server and LiteLLM gateway.
 2. **Build**: `cargo build --release --workspace`
 3. **Run Worker**: `cargo run -p factory-cli -- worker --mcp-url http://localhost:8100`
 

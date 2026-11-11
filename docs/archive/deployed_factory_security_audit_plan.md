@@ -1,3 +1,5 @@
+> **Superseded 2026-11-11:** Copia archivada de un plan de auditoría anterior con namespaces, endpoints y resultados no confirmados. Usa el [plan de inspección actual](../deployed_factory_security_audit_plan.md) para el procedimiento diseñado y el [registro de hechos](../audit/DOC_FACT_REGISTER.md) para los hechos del repositorio. Los detalles actuales del entorno están **TO CONFIRM**.
+
 # Plan de Pruebas de Auditoría de Seguridad para el Entorno Desplegado (Dark Gravity CA/CD V7.2)
 
 **Documento:** Plan de Auditoría Operacional y Validación en Producción  

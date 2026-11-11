@@ -1,4 +1,6 @@
-# Final Remediation & Verification Summary (`FR-022`, `SC-009`, `SC-010`)
+> **Superseded 2026-11-11:** This historical summary records findings and runtime claims from 2026-11-09; it does not establish current deployment state. Use [the documentation fact register](DOC_FACT_REGISTER.md) for checked-in source facts. Current cluster state and external webhook exposure are **TO CONFIRM**.
+
+# Final Remediation & Evidence Summary (`FR-022`, `SC-009`, `SC-010`)
 
 **Feature**: `013-verified-autonomous-execution-closure` (closing `011-verified-autonomous-execution` & `012-verified-remediation-closure`)  
 **Finalized At (UTC)**: `2026-11-09T21:15:00Z`  
@@ -48,4 +50,3 @@
 7. `(cd ../mlops-python-package && poetry check --lock && poetry run pytest -q)` -> `PASSED` (`98 passed, 3 xfailed`, exit code `0`)
 8. `(cd ../fastapi-autogen-team && cargo test --test unit_tests --test integration_tests -- --test-threads=1)` -> `PASSED` (`12/12 unit`, `19/19 integration`, exit code `0`)
 9. `python3 ../lgcorzo.github.io/scripts/check_public_claims.py && pytest -q ../lgcorzo.github.io/tests/test_public_claims.py` -> `PASSED` (`5/5 passed`, exit code `0`)
-

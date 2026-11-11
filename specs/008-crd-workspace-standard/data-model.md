@@ -15,7 +15,7 @@
 - **Plural**: `agentworkspaces`
 - **Singular**: `agentworkspace`
 - **ShortNames**: `[agws, aws]`
-- **Scope**: `Namespaced` (default target namespace: `agents`)
+- **Scope**: `Namespaced`; the CRD does not declare a default target namespace. The checked-in admission-policy binding selects namespace name `development`; namespace existence is **TO CONFIRM**.
 
 ### Rust Type Definition (`kube::CustomResource`)
 
@@ -149,4 +149,3 @@ stateDiagram-v2
     Failed --> Initializing: New spec.missionRef Dispatched
     Running --> [*]: DeletionTimestamp set -> Finalizer Teardown -> Purged
 ```
-

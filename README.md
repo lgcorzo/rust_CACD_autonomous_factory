@@ -2,40 +2,38 @@
 
 [![CI/CD Pipeline](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/pipeline.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/pipeline.yml)
 [![Wiki Content Sync](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml)
-[![Screencast Walkthrough](https://img.shields.io/badge/Demo_Video-Script--Rendered-blueviolet.svg)](docs/screencast_walkthrough.md)
+[![Walkthrough source](https://img.shields.io/badge/Walkthrough-Source-blueviolet.svg)](docs/screencast_walkthrough.md)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lgcorzo/dark-gravity-factory.svg)](https://hub.docker.com/r/lgcorzo/dark-gravity-factory)
-[![Empirical Evidence Tree](https://img.shields.io/badge/Evidence_Tree-Verified-emerald.svg)](evidence/baseline.md)
-[![Demo Video](https://img.shields.io/badge/Demo_Video-Watch_Now-blueviolet.svg)](#-demo-video--empirical-evidence)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lgcorzo/rust_CACD_autonomous_factory)
 
 **Dark Gravity** is a high-performance, long-term agentic system serving as the core intelligence for the **CA/CD Autonomous Agent Factory**. Rebuilt from the ground up in **Rust**, it orchestrates complex multi-agent workflows with zero-trust security and durable task execution.
 
-> 🎬 **[Watch the 5-Minute Screencast Walkthrough](docs/screencast_walkthrough.md)** (`docs/assets/screencast_dark_gravity_walkthrough.mp4`) — *Technical demonstration renderizada programáticamente a partir de un guión de ejecución (`scripts/render_screencast.py`) basado en trazas de auditoría.* Demostrando outbound issue polling, Hatchet 6-phase DAG orchestration, gVisor container sandboxing (clamped up to 500m CPU / 512Mi RAM for worker compilation, ≤30MiB for micro-sandboxes), interactive PR directives (`@darkgravity /status`, `@darkgravity /refine`), y mandatory Human-in-the-Loop (HITL) merge blocking.
+> **[Walkthrough source](docs/screencast_walkthrough.md)** — This local Markdown artifact is rendered by a script. It describes issue polling, Hatchet orchestration, gVisor (`RuntimeClass` `gvisor`, handler `runsc`), PR directives, and Human-in-the-Loop (HITL) review.
+>
+> The sandbox profile sets worker limits to `30Mi`/`250m` and sidecar limits to `20Mi`/`100m`. RuntimeClass overhead adds `35Mi`/`100m`. The configured sums are `85Mi`/`450m` in limits and `60Mi`/`250m` in requests. These are configuration values, not measured usage. The job builder separately defaults to `512Mi`/`500m`, which conflicts with the admission-policy cap of `30Mi`/`250m`. Actual cluster usage is **TO CONFIRM**.
 
 ---
 
-## 🎬 Demo Video & Empirical Evidence Tree
+## Walkthrough source and evidence
 
-### 📹 Video Demo & Walkthrough
-Watch the end-to-end autonomous mission execution, Zero-Trust verification loop, and gVisor sandbox memory clamping in action:
-- 🎬 **[Dark Gravity V7 Autonomous Factory - Mission Walkthrough](docs/screencast_walkthrough.md)** *(Demostración renderizada a partir de un guión programático disponible en [`docs/assets/screencast_dark_gravity_walkthrough.mp4`](docs/assets/screencast_dark_gravity_walkthrough.mp4))*.
+### Walkthrough source
+The [local walkthrough](docs/screencast_walkthrough.md) is rendered from a script. It is not proof of current runtime behavior.
 
-### 🌳 Empirical Evidence Tree Navigation
-Every architectural claim and runtime isolation guarantee in Dark Gravity is backed by reproducible, empirical evidence artifacts stored in the repository:
+### Evidence artifacts
+Evidence files have different scopes and limits. Read [evidence/README.md](evidence/README.md) before relying on an artifact. The historical baseline is pending regeneration and is not proof of current runtime state.
 
 ```
 evidence/
-├── 📄 verified_status.json              # CI-generated test & clippy verification status
-├── 📄 baseline.md                       # Phase 1 Live Cluster Workload & Architectural Baseline
+├── 📄 baseline.md                       # Historical baseline, pending regeneration
 ├── 📄 reliability-tests.md              # Two resilience scenarios: interrupted-mission recovery and broken-test safe shutdown
 ├── 📄 security-tests.md                 # Secret-redaction scenarios (2), code inspection, gVisor resource benchmark; not SAST/DAST or pen-testing
 ├── 📁 security/
-│   ├── 📄 heldout_results.json          # Independent held-out adversarial evaluation metrics
+│   ├── 📄 heldout_results.json          # Held-out adversarial evaluation metrics
 │   ├── 📄 corpus_results.json           # Labeled diff scanner corpus evaluation metrics
 │   └── 📄 threat-model.md               # Dark Gravity V7.2 Threat Model & Zero-Trust Audit Matrix
 ├── 📁 followup/
-│   └── 📄 verification_report.md        # Empirical verification and audit report
+│   └── 📄 verification_report.md        # Follow-up report; see its stated scope
 ├── 📁 benchmarks/
 │   └── 📄 benchmark_summary.json        # Double-blind evaluation protocol status (status: not_run)
 └── 📁 missions/
@@ -45,10 +43,10 @@ evidence/
         └── 📄 timeline.md               # Chronological Event Log of Mission Operations
 ```
 
-#### Quick Direct Links to Key Artifacts
-- 📊 **[Cluster & Zero-Trust Baseline Verification (`evidence/baseline.md`)](evidence/baseline.md)** — Detailed workload snapshot, KEDA parameters, CRD inventory, and zero-trust sign-off.
-- 🎯 **[Mission 001 Evidence Bundle (`evidence/missions/mission-001/`)](evidence/missions/mission-001/)** — Live mission execution report ([`report.json`](evidence/missions/mission-001/report.json)), event timeline ([`timeline.md`](evidence/missions/mission-001/timeline.md)), and SHA-256 checksums ([`checksums.txt`](evidence/missions/mission-001/checksums.txt)).
-- 🛡️ **[Security Threat Model & Audits (`evidence/security/threat-model.md`)](evidence/security/threat-model.md)** — Comprehensive ZTA security audit, threat vectors, and mitigation matrices.
+#### Quick links to evidence
+- 📊 **[Historical cluster baseline (`evidence/baseline.md`)](evidence/baseline.md)** — Unverified historical material pending regeneration; do not cite it as proof.
+- 🎯 **[Mission 001 Evidence Bundle (`evidence/missions/mission-001/`)](evidence/missions/mission-001/)** — Mission report ([`report.json`](evidence/missions/mission-001/report.json)), event timeline ([`timeline.md`](evidence/missions/mission-001/timeline.md)), and SHA-256 checksums ([`checksums.txt`](evidence/missions/mission-001/checksums.txt)).
+- 🛡️ **[Security threat model (`evidence/security/threat-model.md`)](evidence/security/threat-model.md)** — Threat descriptions and mitigation proposals.
 - 🧪 **[Security Test Suite (`evidence/security-tests.md`)](evidence/security-tests.md)** & **[Reliability Test Suite (`evidence/reliability-tests.md`)](evidence/reliability-tests.md)** — secret-redaction scenarios and a gVisor resource benchmark (security), and two resilience scenarios (reliability). These are not SAST/DAST, penetration tests or long-haul tests.
 - 🧩 **[Component Inventory Matrix (`evidence/architecture/component-inventory.md`)](evidence/architecture/component-inventory.md)** — Hardware, software, and agentic module component mapping.
 
@@ -56,7 +54,7 @@ evidence/
 
 ## 🏗 Standards & Architecture
 
-This project strictly adheres to **LLMOps** and **Domain-Driven Design (DDD)** standards, elevated to the production-grade **Version 7 (V7) Architecture** for autonomous operations.
+This project uses **LLMOps** and **Domain-Driven Design (DDD)** concepts. `V7.2` and `V7.3` are project-generation labels in existing documentation; release tags use a separate `v0.3.x` form. Cargo package manifests currently say `0.1.0`. The active project-generation label and its release-tag mapping are **TO CONFIRM**.
 
 - **LLMOps Lifecycle**: We follow a robust LLM application lifecycle, including automated prompt engineering, retrieval-augmented generation (RAG) evaluation, and model-in-the-loop security audits to ensure production-grade reliability and observability.
 - **DDD-based Structure**: The codebase is architected using DDD principles to maintain a clear separation of concerns. This ensures that the core domain logic remains isolated from infrastructure details and external service adapters (like Jira or R2R), allowing the system to scale and evolve without regression.
@@ -68,37 +66,37 @@ The codebase is organized as a unified Rust workspace for maximum modularity and
 - **`factory-core`**: Innermost domain layer. Manages domain entities (`Mission`, `Task`), a `SecurityValidator` trait for agent output auditing, and unified error handling via `FactoryError`.
 - **`factory-application`**: Workflow orchestration layer. Leverages **Rustant** (Planner) and **ZeroClaw** (Executor) to process task workflows. Maintains durably checkpointed state via `StepCheckpoint`s using Hatchet's PostgreSQL backend.
 - **`factory-mcp-server`**: Presentation layer. Axum-based Model Context Protocol server exposing tools over Server-Sent Events (SSE) transport with isolated gVisor execution interfaces.
-- **`factory-infrastructure`**: Adapter layer. Concrete clients for Jira, R2R (RAG), MinIO/AWS S3, OpenZiti (Zero Trust overlay networks), and Confluent Cloud Kafka (via `rdkafka` client).
+- **`factory-infrastructure`**: Adapter layer. Concrete clients for Jira, R2R (RAG), MinIO/AWS S3, OpenZiti (Zero Trust overlay networks), and Kafka (via `rdkafka`; broker provider is **TO CONFIRM**).
 - **`factory-cli`**: Interface entry point. Contains the Hatchet worker initializer and Kafka telemetry querying utilities.
 
 ### 2. Durable Orchestration (Phase 12 State-Loop)
 
-Missions are orchestrated using a robust **6-phase DAG** in **Hatchet** with database-backed `StepCheckpoint` recovery:
+Missions are orchestrated using a documented six-phase directed acyclic graph (DAG) in **Hatchet** with database-backed `StepCheckpoint` recovery:
 `Ingestion` → `Plan (Rustant)` → `Code (ZeroClaw)` → `Validation (ZeroClaw)` → `Review (Rustant)` → `Delivery (GitOps)`.
 
 ### 3. Architecture & System Status Matrix
 
-To maintain absolute operational transparency, capabilities across Dark Gravity are strictly classified into four lifecycle status tiers:
+This status matrix reports checked-in design and implementation facts. Repository files do not establish which workloads are currently deployed:
 - **Designed**: Specification, architecture contract, or policy defined in `specs/` or `wiki/`.
-- **Implemented**: Source code written, compiled, and validated via local unit/integration tests.
-- **Deployed**: Active workload running in target Kubernetes cluster namespaces (`orchestrators`, `agents`, `jules-remediator`, `ml-apps`).
-- **Verified**: Production runtime behavior empirically validated via automated benchmarks, eBPF inspection, or zero-trust evidence logs.
+- **Implemented**: Source code or configuration is present in the repository.
+- **Tested**: A test result is recorded for the identified scope and revision.
 
 | Component / Feature | Category | Status Tier | Source & Policy Reference | Operational Details & Evidence Link |
 | :--- | :--- | :--- | :--- | :--- |
-| **gVisor (`runsc`) Sandbox** | Infrastructure | **Implemented** | `config/sandbox-gvisor-profile.yaml` | `RuntimeClass=gvisor-sandbox` configured for `sandbox-exec` pods. [Evidence: `baseline.md`](evidence/baseline.md) |
-| **RAM Resource Clamping** | Kernel Isolation | **Implemented** | `crates/factory-core/src/security.rs` | Micro-sandbox clamped to $\le 30\text{ MiB}$ RAM / $250\text{m}$ CPU; worker compilation clamped up to $512\text{ MiB}$ / $500\text{m}$ CPU. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
-| **OpenZiti mTLS Overlay** | Zero-Trust Network | **Implemented** | `crates/factory-infrastructure/src/ziti.rs` | Sidecar configured for agent pods; memory bounded $\le 20\text{ MiB}$. [Evidence: `baseline.md`](evidence/baseline.md) |
-| **Egress Deny-All NetworkPolicy** | Security Policy | **Designed** | `config/deny-all-egress-networkpolicy.yaml` | Egress restriction specification via Calico / Kubernetes NetworkPolicy rules. [Evidence: `security-tests.md`](evidence/security-tests.md) |
-| **Hatchet 6-Phase DAG Engine** | Orchestration | **Implemented** | `crates/factory-application/src/workflows/` | Engine configured on port 8080/7077 with PostgreSQL checkpointing. [Evidence: `baseline.md`](evidence/baseline.md) |
-| **LiteLLM Proxy & FinOps Headers** | AI Inference | **Implemented** | `config/litellm_proxy_config.yaml` | Configured in `ml-apps` NS; passes `x-vtags-*` virtual headers. [Evidence: `baseline.md`](evidence/baseline.md) |
+| **gVisor (`runsc`) Sandbox** | Infrastructure | **Implemented** | `config/sandbox-gvisor-profile.yaml`; `deploy/policies/runtimeclass-gvisor.yaml` | The RuntimeClass name is `gvisor`. No live deployment is established by these files. |
+| **Sandbox resource accounting** | Kernel isolation | **Implemented** | `deploy/crds/agentworkspaces.darkgravity.io.yaml`; `deploy/policies/validating-admission-policies.yaml`; `config/sandbox-gvisor-profile.yaml` | The declared workload cap is `30Mi`/`250m`; the profile's two containers plus `35Mi`/`100m` RuntimeClass overhead account for `85Mi`/`450m` limits and `60Mi`/`250m` requests. The job builder defaults to `512Mi`/`500m`; this conflicts with the cap. |
+| **Namespace references** | Deployment configuration | **Designed** | `deploy/policies/validating-admission-policies.yaml`; `config/sandbox-gvisor-profile.yaml`; `config/deny-all-egress-networkpolicy.yaml` | `deploy/` contains no `Namespace` objects; its admission bindings select the namespace name `development`. Other checked-in configuration refers to `factory-sandbox` and the `openziti` namespace label. The deployed namespace inventory is **TO CONFIRM**. |
+| **OpenZiti sidecar profile** | Zero-Trust network | **Implemented** | `config/sandbox-gvisor-profile.yaml` | The profile declares sidecar limits of `20Mi`/`100m`; actual runtime usage is **TO CONFIRM**. |
+| **Network policy configuration** | Security policy | **Designed** | `config/deny-all-egress-networkpolicy.yaml` | The file contains Kubernetes and Cilium policy objects. The installed container network interface (CNI) is **TO CONFIRM**. |
+| **Hatchet 6-phase DAG workflow** | Orchestration | **Implemented** | `crates/factory-application/src/workflows/` | Workflow source is checked in; deployment state is not established by the repository. |
+| **LiteLLM Proxy & FinOps Headers** | AI inference | **Implemented** | `config/litellm_proxy_config.yaml` | The configuration includes virtual-key budget settings. A deployed namespace is not established by this file. |
 | **CircuitBreakerGuard (Diff Hashing)** | Application Logic | **Implemented** | `crates/factory-application/src/workflows/circuit_breaker.rs` | Prevents infinite retry loops via diff normalization and A-B-A-B oscillation tracking. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
 | **Pipeline Error Classifier** | Application Logic | **Implemented** | `crates/factory-application/src/poller_service.rs` | Parses CI logs into 7 canonical error categories. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
-| **Vault JIT 5-Min Ephemeral Tokens** | Security Adapter | **Implemented** | `crates/factory-infrastructure/src/vault.rs` | Ephemeral repository tokens expire in 300s; zeroize on drop. [Evidence: `security-tests.md`](evidence/security-tests.md) |
-| **Ed25519 Verifiable Credentials** | Non-Human Identity | **Implemented** | `crates/factory-core/src/security/nhi.rs` | RFC 8785 JSON Canonicalization Scheme (JCS) and Ed25519 signatures with W3C `camelCase` structure. [Evidence: `threat-model.md`](evidence/security/threat-model.md) |
-| **FinOps 90% HardStop Cutoff** | Governance Gate | **Implemented** | `crates/factory-application/src/agents/finops.rs` | Daily spend evaluation with velocity anomaly suppression and Kafka event dispatch. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
+| **Vault adapter** | Security adapter | **Implemented** | `crates/factory-infrastructure/src/vault.rs` | Source path for Vault handling. |
+| **Ed25519 credentials for non-human identity (NHI)** | Identity | **Implemented** | `crates/factory-core/src/security/nhi.rs` | Source path for identity credential handling. |
+| **FinOps hard-stop threshold** | Governance gate | **Implemented** | `crates/factory-application/src/agents/finops.rs` | The default maximum is a daily budget of 50; code computes a hard-stop threshold at 90%. |
 | **Multi-Region GPU Failover** | Resiliency | **Designed** | `wiki/architecture/infrastructure_adapters.md` | Multi-region cluster failover spec defined for high availability. [Docs: `wiki/architecture/`](wiki/architecture/) |
-| **Autonomous Direct Main Merges** | Governance Policy | **Designed** | `AGENTS.md` & `wiki/security/hitl_governance.md` | Prohibited by policy; strict Human-in-the-Loop (HITL) gate required. [Docs: `hitl_governance.md`](wiki/security/hitl_governance.md) |
+| **Autonomous direct main merges** | Governance policy | **Designed** | `AGENTS.md` & `wiki/security/hitl_governance.md` | The documentation describes a human review gate. |
 
 ### 4. Integrated Target Repositories
 
@@ -109,7 +107,7 @@ Dark Gravity continuously polls and autonomously executes missions across config
 | [`lgcorzo/rust_CACD_autonomous_factory`](https://github.com/lgcorzo/rust_CACD_autonomous_factory) | Autonomous Multi-Agent Engine | Self-evolution, DAG workflows & MCP servers |
 | [`lgcorzo/lince-rs`](https://gitlab.com/lgcorzo/lince-rs) | Otimization process | Algorithmic optimization to control agents costs |
 | [`lgcorzo-lab/autonomous_factory`](https://gitlab.com/lgcorzo-lab/autonomous_factory) | Architecture & Knowledge Base | Spec-Kit SDD contracts, C4 diagrams, OSR audits |
-| [`lgcorzo/fastapi-autogen-team`](https://github.com/lgcorzo/fastapi-autogen-team) | Agentic Access Layer | R2R/Confluent document services |
+| [`lgcorzo/fastapi-autogen-team`](https://github.com/lgcorzo/fastapi-autogen-team) | Agentic Access Layer | R2R and document services |
 | [`lgcorzo/mlops-python-package`](https://github.com/lgcorzo/mlops-python-package) | MLOps & ML Pipelines | Automated testing, DVC/Poetry dependency validation, CI/CD error remediation & HITL governance ([`mlops-python-package/README.md`](mlops-python-package/README.md)) |
 
 ### 5. Integrated Intelligence & Security
@@ -117,27 +115,27 @@ Dark Gravity continuously polls and autonomously executes missions across config
 - **Rustant**: Leverages **R2rClient** for semantic code search and context retrieval to inform specification design and planning.
 - **ZeroClaw**: Compiles and executes code in secure **gVisor (runsc) user-space sandboxes** via a sandboxed executor driver.
 - **Zero Trust Mesh**: Agent-to-agent communication is fully encrypted and bound to identity namespaces using **OpenZiti mTLS 1.3** overlays.
-- **Telemetry**: Reasoning logs are published to **Confluent Cloud Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`) for real-time observability.
+- **Telemetry**: Kafka clients use `KAFKA_BROKERS`. The CLI and example default to `localhost:9092`; the MCP server uses a different service-style default. The active broker provider and endpoint are **TO CONFIRM**.
 
 ---
 
 ## 🛡️ Technological Sovereignty, Zero-Trust Security & Sovereign Dependency Policy
 
-The **Dark Gravity Autonomous CA/CD Software Factory (V7.2 / V7.3)** is designed for regulatory readiness (**EU AI Act** Articles 12 & 14 Human Oversight, **Hazitek / SPRI**, and **SOC 2 Type II** controls), requiring architectural and supply-chain sovereignty.
+The project describes readiness controls aligned to these frameworks; no third-party certification claimed. The frameworks are the **EU AI Act** and **SOC 2 Type II**. `V7.2`/`V7.3` are project-generation labels, not Cargo versions or release tags. Their current mapping is **TO CONFIRM**.
 
 *(For detailed architectural specifications and design records, refer to the [Dark Gravity Multi-Agent Architecture Knowledge Base](https://notebook.google.com/notebook/116d5f03-2fb0-4fa7-bd7c-1c9849920abc))*.
 
 ### 1. The Technological Sovereignty Imperative (Why Sovereign Forks?)
 In an autonomous software factory where AI agents autonomously synthesize, compile, and deliver production software, relying blindly on third-party commercial cloud services or unmaintained open-source dependencies poses existential operational risks:
 - **Mitigation of Upstream Licensing Closures:** When foundational projects alter their licensing model, close public distributions, or abandon open-source governance (as occurred with MinIO), Dark Gravity prevents vendor lock-in and supply-chain disruption by maintaining **semantic mirrors and sovereign forks** under `@lgcorzo`.
-- **Autonomous Security Verification & Dependency Auditing:** Third-party libraries are not trusted implicitly. Dark Gravity continuously scans, audits, and patches its sovereign dependency tree independently via automated `cargo audit` and container vulnerability scanning rather than awaiting upstream commercial release cycles.
+- **Dependency auditing:** The GitHub Actions pipeline runs `cargo audit -D warnings` on pushes to `main` or `feature/**`, pull requests to `main`, manual dispatches, and published or edited releases. This does not establish a zero-vulnerability result. No container scanner is identified in that workflow.
 - **Air-Gapped Operational Continuity:** The factory operates on private, sovereign Kubernetes infrastructure. Proprietary source code, AST surgical mutations, and causal corporate memory remain strictly within sovereign boundaries.
 
 ### 2. Core Sovereignty & Security Architecture
-- **Zero Public Ingress Ports (Air-Gapped Outbound Polling):** Dark Gravity does not expose public HTTP webhooks or third-party ingress tunnels. The native Rust `GitPlatformPoller` daemon (`factory-cli poller`) executes outbound polling loops every 30–60 seconds across GitHub and GitLab APIs.
-- **Non-Human Identity (NHI) & Cryptographic Proof-of-Lineage:** Every agent action, commit, and Kafka event is cryptographically signed using **JWS EdDSA over RFC 8785 JCS** in [`crates/factory-core/src/security/nhi.rs`](crates/factory-core/src/security/nhi.rs) via `ed25519-dalek` v2.
-- **Ephemeral JIT Credentials & Forensic RAM Sanitization:** Repository tokens are provisioned Just-In-Time by HashiCorp Vault with an unrenewable 5-minute (300s) TTL. All in-memory secrets implement `#[derive(Zeroize, ZeroizeOnDrop)]`, wiping memory with null bytes upon task completion (benchmarked via `cargo bench --bench zeroize_benchmark`).
-- **Kernel-Level Sandboxing (gVisor `runsc`):** Code synthesis and surgical edits run in ephemeral containers strictly clamped to $\text{RAM} \le 30\text{ MiB}$ and $\text{CPU} \le 250\text{m}$ for micro-sandboxes, and up to $512\text{ MiB}$ RAM / $500\text{m}$ CPU for worker compilation workloads.
+- **Webhook route and exposure:** The router registers `POST /webhooks/github` unconditionally, so the route is enabled at the application level by default. In the default local mode, an empty webhook secret does not require signature validation; protected mode requires a secret. The server binds to `0.0.0.0`, but no Service or Ingress is declared in `deploy/` or `config/`. External exposure is **TO CONFIRM**.
+- **Non-human identity (NHI):** The identity module is at [`crates/factory-core/src/security/nhi.rs`](crates/factory-core/src/security/nhi.rs). The repository does not establish that every agent action, commit, or Kafka event is signed.
+- **Ephemeral credentials and zeroization:** The benchmark source measures `JitToken::zeroize()` on a 36-character ASCII value. The repository does not record benchmark output or machine details; timing is **TO CONFIRM**.
+- **Sandbox resource accounting:** The Custom Resource Definition (CRD) and admission policies cap declared workload limits at `30Mi`/`250m`. The profile plus RuntimeClass overhead accounts for `85Mi`/`450m` in limits and `60Mi`/`250m` in requests. The job builder defaults to `512Mi`/`500m`, which conflicts with the policy cap. These are configured values, not measured usage.
 - **Hardware-Accelerated SIMD Primitives:** Sovereign Go/Rust cryptographic and parsing libraries (`sha256-simd`, `simdjson-go`, `highwayhash`, `md5-simd`, `blake2b-simd`) leverage AVX-512 and ARM64 vectorization, enabling high-throughput execution without exceeding hard memory ceilings.
 - **Sovereign S3 Storage Tier & Isolated Buckets:** Artifacts are persisted in decoupled S3 storage (`factory-artifacts`, `factory-artifacts/compliance/`, `dg-factory-checkpoints`, `semantica-provenance`, `r2r-documents`, `mlflow`) protected by strict whitelist validation against path traversal.
 
@@ -158,8 +156,10 @@ To trigger an autonomous mission, create an issue or work item in any integrated
 - **Resource Limits Definition**:
   Include an explicit resource limit block within the issue description. The poller automatically parses these constraints using regex:
   ```markdown
-  Resource limits: CPU: 500m, RAM: 512Mi, Timeout: 300s
+    Resource limits: CPU: 250m, RAM: 30Mi, Timeout: 300s
   ```
+
+  The example stays within the Custom Resource Definition (CRD) and admission-policy limits. The sandbox job builder currently defaults to `500m` CPU and `512Mi` memory; this conflicts with those limits. See the [fact register](docs/audit/DOC_FACT_REGISTER.md).
 - **Autonomous Ingestion & Zero-Trust Identity**:
   1. The poller extracts title, description, labels, and resource limits.
   2. Generates a cryptographic **Ed25519-signed Verifiable Credential (VC)** for Non-Human Identity (NHI) under `did:factory:dark-gravity-euskadi`.
@@ -183,7 +183,7 @@ Dark Gravity actively listens to comments on active GitHub Pull Requests (PRs) a
 | `@darkgravity /interact <prompt>` | Natural-language query or technical instruction. | Triggers Rustant (PO) to analyze the query with contextual knowledge and reply directly in the thread. |
 | `@darkgravity /spec <prompt>` | Requests a specification review or modification. | Triggers Rustant (PO) to re-evaluate `spec.md` against provided requirements and stage revisions. |
 | `@darkgravity /refine <instruction>` | Requests localized code edits or targeted bugfixes. | Triggers ZeroClaw (Dev) to apply surgical code mutations in the gVisor sandbox (≤30MiB RAM). |
-| `@darkgravity /validate` | Requests full test and security verification. | Executes automated test suites and SAST security gates within the sandbox, reporting CVE and pass/fail status. |
+| `@darkgravity /validate` | Requests validation. | The repository does not establish that this directive runs a SAST scanner or reports vulnerability results. |
 | `@darkgravity /retry` | Forces a restart of the execution loop. | Restarts the Aethelgard verification loop and re-runs failed test suites. |
 
 > **Security & Governance Note on Directives:**
@@ -216,7 +216,7 @@ cargo run --bin factory-cli -- gitlab-verify --json
 
 - Autonomous agents create isolated feature branches, commit code, and open Pull Requests (GitHub) or Merge Requests (GitLab).
 - **Strict Manual Merge Requirement**: Dark Gravity **never** automatically merges PRs or MRs into `main` or default production branches.
-- Once all automated CI/CD and CodeQL checks pass, the agent hands off the PR/MR link to the human developer for final manual review and merge.
+- Once configured CI checks finish, the agent hands off the PR/MR link to a human developer for review. The checked-in workflow does not establish a CodeQL check.
 
 ### 6. Autonomous Pipeline Error Remediation
 
@@ -244,7 +244,7 @@ Dark Gravity continuously monitors CI/CD pipelines across GitHub and GitLab repo
 
 ### Prerequisites
 
-- [Rust Toolchain](https://rustup.rs/) (Stable 1.85+ / Edition 2024 compatible)
+- [Rust Toolchain](https://rustup.rs/) (two crates use edition 2024, which requires Rust 1.85 or newer; the workspace does not pin an exact patch release, so the tested minimum patch is **TO CONFIRM**)
 - [Hatchet Server](https://github.com/hatchet-dev/hatchet)
 - [MCP Connection](https://modelcontextprotocol.io/)
 
@@ -265,9 +265,9 @@ Dark Gravity continuously monitors CI/CD pipelines across GitHub and GitLab repo
 
 ### Running the Factory Worker
 
-Ensure your `.env` file contains the live Kafka broker endpoint:
+Set `KAFKA_BROKERS` to the broker endpoint for your environment. The repository does not establish an active broker provider or endpoint. The CLI and example default to `localhost:9092`; the MCP server has a separate default:
 ```env
-KAFKA_BROKERS=my-kafka-cluster-bootstrap.confluent.svc.cluster.local:9092
+KAFKA_BROKERS=localhost:9092
 ```
 
 Start the unified worker to begin processing autonomous missions:
@@ -359,7 +359,9 @@ The following automated checks are active in this repository to maintain high en
 ### 1. CI/CD Pipeline (`pipeline.yml`)
 
 - **Linting**: Enforces strict `rustfmt` and `clippy` (warnings-as-errors) across the entire workspace.
-- **Testing**: Executes all unit and integration tests (excluding heavy smoke tests).
+- **Testing**: Runs `cargo test --workspace -- --skip smoke` and the evidence-contract test target.
+- **Dependency audit**: Runs `cargo audit -D warnings` when the workflow is triggered by a push to `main` or `feature/**`, a pull request to `main`, manual dispatch, or a published/edited release.
+- **Results**: The workflow configuration does not establish a zero-vulnerability result.
 - **Protoc Build**: Automated Protocol Buffers compilation verification for all service definitions.
 - **Docker Build**: Validates that a production-ready image can be built and pushed to Docker Hub upon merge to `main`.
 
