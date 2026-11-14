@@ -1,4 +1,5 @@
 use factory_mcp_server::sandbox::{SandboxDriver, SubprocessDriver};
+#[cfg(feature = "test-insecure-host")]
 use std::time::Duration;
 
 #[tokio::test]
@@ -33,6 +34,7 @@ async fn test_subprocess_driver_rejects_unsupported_runtime_and_stubbed_language
     }
 }
 
+#[cfg(feature = "test-insecure-host")]
 #[tokio::test]
 async fn test_subprocess_driver_enforces_timeout() {
     let driver = SubprocessDriver::new()
@@ -51,6 +53,7 @@ async fn test_subprocess_driver_enforces_timeout() {
     );
 }
 
+#[cfg(feature = "test-insecure-host")]
 #[tokio::test]
 async fn test_subprocess_driver_reports_actual_nonzero_exit_result() {
     let driver = SubprocessDriver::new()
@@ -93,6 +96,7 @@ async fn test_subprocess_driver_fails_closed_in_all_envs_without_explicit_overri
     );
 }
 
+#[cfg(feature = "test-insecure-host")]
 #[tokio::test]
 async fn test_subprocess_driver_allowed_only_with_explicit_insecure_override() {
     let driver = SubprocessDriver::new()

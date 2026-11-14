@@ -1,6 +1,8 @@
 use async_trait::async_trait;
+#[cfg(any(test, feature = "test-insecure-host"))]
+use factory_core::security_policy::WorkloadTrustLevel;
 use factory_core::security_policy::{
-    ExecutionEnvironment, ExecutionSecurityPolicy, SandboxIsolationType, WorkloadTrustLevel,
+    ExecutionEnvironment, ExecutionSecurityPolicy, SandboxIsolationType,
 };
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
@@ -338,11 +340,18 @@ impl SubprocessDriver {
         self
     }
 
+    #[cfg(any(test, feature = "test-insecure-host"))]
     pub fn with_allow_insecure_host_execution(mut self, allow: bool) -> Self {
         if allow && self.policy.environment != ExecutionEnvironment::Production {
             self.policy.trust_level = WorkloadTrustLevel::TrustedInternal;
             self.policy.isolation = SandboxIsolationType::HostSubprocessAllowedOnlyForTrustedDev;
         }
+        self
+    }
+
+    #[cfg(not(any(test, feature = "test-insecure-host")))]
+    pub fn with_allow_insecure_host_execution(self, _allow: bool) -> Self {
+        // B1 (DG-RVP-018): Host execution override is disabled in non-test builds.
         self
     }
 

@@ -38,6 +38,7 @@ hex = "0.4"
 [features]
 default = []
 production = ["factory-infrastructure/production"]
+test-insecure-host = []
 
 [dev-dependencies]
 rustls = { version = "0.23.41", features = ["ring"] }

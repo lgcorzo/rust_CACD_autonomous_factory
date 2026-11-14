@@ -84,6 +84,13 @@ jobs:
           sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout="15"
           sudo apt-get install -y --no-install-recommends protobuf-compiler libprotobuf-dev libcurl4-openssl-dev
 
+      - name: Check No Insecure Host Execution Override
+        run: |
+          if grep -rnE --exclude=pipeline.yml "ALLOW_INSECURE_HOST_EXECUTION=true|USE_GVISOR=false" deploy/ .github/ Dockerfile* 2>/dev/null; then
+            echo "ERROR: Insecure host execution override detected in deploy/, workflows, or Dockerfiles"
+            exit 1
+          fi
+
       - name: Check Formatting
         run: cargo fmt --all -- --check
         
