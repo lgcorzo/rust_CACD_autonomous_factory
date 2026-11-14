@@ -401,6 +401,24 @@ impl VerifiableCredential {
         }
     }
 
+    /// Strict production verification: requires both an `IssuerTrustStore` and a `NonceReplayCache`
+    /// (non-optional). Fails closed if the proof or nonce is missing, untrusted, or replayed.
+    pub fn verify_strict_production(
+        &self,
+        now: DateTime<Utc>,
+        verifying_key: &ed25519_dalek::VerifyingKey,
+        trust_store: &dyn IssuerTrustStore,
+        replay_cache: &NonceReplayCache,
+    ) -> crate::error::Result<VerificationOutcome> {
+        let Some(proof) = &self.proof else {
+            return Ok(VerificationOutcome::Malformed);
+        };
+        if proof.nonce.as_deref().unwrap_or("").is_empty() {
+            return Ok(VerificationOutcome::Malformed);
+        }
+        self.verify_with_trust_and_replay(now, verifying_key, Some(trust_store), Some(replay_cache))
+    }
+
     /// Verifies the cryptographic proof and temporal validity against the given timestamp and key,
     /// with optional issuer trust store and replay prevention.
     pub fn verify_with_trust_and_replay(
