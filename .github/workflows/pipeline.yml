@@ -86,7 +86,7 @@ jobs:
 
       - name: Check No Insecure Host Execution Override
         run: |
-          if grep -rnE "ALLOW_INSECURE_HOST_EXECUTION=true|USE_GVISOR=false" deploy/ .github/ Dockerfile* 2>/dev/null; then
+          if grep -rnE --exclude=pipeline.yml "ALLOW_INSECURE_HOST_EXECUTION=true|USE_GVISOR=false" deploy/ .github/ Dockerfile* 2>/dev/null; then
             echo "ERROR: Insecure host execution override detected in deploy/, workflows, or Dockerfiles"
             exit 1
           fi

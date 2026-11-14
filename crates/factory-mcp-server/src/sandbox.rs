@@ -1,6 +1,8 @@
 use async_trait::async_trait;
+#[cfg(any(test, feature = "test-insecure-host"))]
+use factory_core::security_policy::WorkloadTrustLevel;
 use factory_core::security_policy::{
-    ExecutionEnvironment, ExecutionSecurityPolicy, SandboxIsolationType, WorkloadTrustLevel,
+    ExecutionEnvironment, ExecutionSecurityPolicy, SandboxIsolationType,
 };
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
