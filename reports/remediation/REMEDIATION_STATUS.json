@@ -1,0 +1,16 @@
+{
+  "baseline_commit": "a667a90cfc432457e3c748ee5945af2b2e6f4646",
+  "findings": [
+    {"finding_id": "F-SUP-01", "repository": "lgcorzo/llmops-python-package", "status": "OPEN", "severity": "High", "priority": "P0", "pr": "PR-1", "estimated_effort": "XS"},
+    {"finding_id": "F-K8S-01", "repository": "lgcorzo/rust_CACD_autonomous_factory", "status": "BLOCKED", "severity": "High", "priority": "P0", "pr": "PR-10", "estimated_effort": "M"},
+    {"finding_id": "F-SUP-02", "repository": "lgcorzo/rust_CACD_autonomous_factory", "status": "OPEN", "severity": "Medium", "priority": "P1", "pr": "PR-2", "estimated_effort": "S"},
+    {"finding_id": "F-SCAN-01", "repository": "lgcorzo/rust_CACD_autonomous_factory", "status": "OPEN", "severity": "High", "priority": "P1", "pr": "PR-3", "estimated_effort": "M"},
+    {"finding_id": "F-NHI-01", "repository": "lgcorzo/rust_CACD_autonomous_factory", "status": "OPEN", "severity": "High", "priority": "P1", "pr": "PR-4", "estimated_effort": "M"},
+    {"finding_id": "F-EVID-01", "repository": "lgcorzo/rust_CACD_autonomous_factory", "status": "OPEN", "severity": "High", "priority": "P1", "pr": "PR-5", "estimated_effort": "M"},
+    {"finding_id": "F-GIT-01", "repository": "lgcorzo/rust_CACD_autonomous_factory", "status": "OPEN", "severity": "High", "priority": "P1", "pr": "PR-6", "estimated_effort": "S"},
+    {"finding_id": "F-KES-01", "repository": "lgcorzo/kes", "status": "OPEN", "severity": "Medium", "priority": "P1", "pr": "PR-7", "estimated_effort": "S"},
+    {"finding_id": "F-PORTAL-01", "repository": "lgcorzo/lgcorzo.github.io", "status": "OPEN", "severity": "Low", "priority": "P2", "pr": "PR-8", "estimated_effort": "S"},
+    {"finding_id": "F-OPS-01", "repository": "lgcorzo/gitops_internal_lgcorzo", "status": "OPEN", "severity": "Medium", "priority": "P1", "pr": "PR-9", "estimated_effort": "M"},
+    {"finding_id": "F-BAK-01", "repository": "lgcorzo/gitops_internal_lgcorzo", "status": "OPEN", "severity": "Medium", "priority": "P1", "pr": "PR-9", "estimated_effort": "M"}
+  ]
+}
