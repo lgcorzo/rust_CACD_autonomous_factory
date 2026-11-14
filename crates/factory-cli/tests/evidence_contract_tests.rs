@@ -43,6 +43,12 @@ fn valid_evidence_json() -> serde_json::Value {
 }
 
 fn valid_verified_state_json() -> serde_json::Value {
+    use ed25519_dalek::Signer;
+    let signing_key = ed25519_dalek::SigningKey::from_bytes(&[7u8; 32]);
+    let pk_hex = hex::encode(signing_key.verifying_key().as_bytes());
+    let payload =
+        "FR-003:independent-auditor-01:2026-11-06T17:35:00Z:550e8400-e29b-41d4-a716-446655440000";
+    let sig_hex = hex::encode(signing_key.sign(payload.as_bytes()).to_bytes());
     json!({
         "schema_version": "1.0",
         "requirement_id": "FR-003",
@@ -87,7 +93,9 @@ fn valid_verified_state_json() -> serde_json::Value {
             "verified_at": "2026-11-06T17:35:00Z",
             "evidence_refs": [
                 "550e8400-e29b-41d4-a716-446655440000"
-            ]
+            ],
+            "public_key": pk_hex,
+            "signature": sig_hex
         },
         "invalidated_at": null
     })
