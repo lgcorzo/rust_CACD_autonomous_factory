@@ -38,8 +38,8 @@ During mission planning or automated code execution, agents handle ephemeral cre
   ```
 - **Raw Execution Output:**
   ```
-  Vault Token: s.v1.7a8b9c0d1e2f3a4b5c6d
-  GitLab Token: glpat-8f9e0d1c2b3a4f5e6d7c
+  Vault Token: s.v1.7a8b9c0d1e2f3a4b5c6d <!-- gitleaks:allow -->
+  GitLab Token: glpat-8f9e0d1c2b3a4f5e6d7c <!-- gitleaks:allow -->
   ```
 - **Sanitized Log & History Capture (`update_mission_status` / `launch_sandbox_pod`):**
   ```

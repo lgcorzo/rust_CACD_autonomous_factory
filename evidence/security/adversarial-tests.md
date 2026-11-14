@@ -128,7 +128,7 @@ All stdout/stderr logs produced during code execution, mission execution history
 
 ```text
 Raw Log Stream Captured:
-[DEBUG] Config dump: API_KEY="sk-proj-998877665544332211" VAULT_TOKEN="s.v1.8f9e0d1c2b3a"
+[DEBUG] Config dump: API_KEY="sk-proj-998877665544332211" VAULT_TOKEN="s.v1.8f9e0d1c2b3a" <!-- gitleaks:allow -->
 
 Sanitized Output Log (Post-DLP Filter):
 [DEBUG] Config dump: API_KEY="[REDACTED_OPENAI_KEY]" VAULT_TOKEN="[REDACTED_VAULT_TOKEN]"

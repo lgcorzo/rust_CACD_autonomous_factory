@@ -1098,7 +1098,10 @@ mod tests {
         // Test 10KB truncation
         let mock_server2 = MockServer::start().await;
         let client2 = HttpGitlabClient::new(mock_server2.uri(), "test_token".to_string());
-        let large_trace = format!("{}error[E0308]: mismatched types\ntest foo ... FAILED\n", "x".repeat(20 * 1024));
+        let large_trace = format!(
+            "{}error[E0308]: mismatched types\ntest foo ... FAILED\n",
+            "x".repeat(20 * 1024)
+        );
         Mock::given(method("GET"))
             .and(path("/api/v4/projects/my-org%2Fmy-project/jobs/99/trace"))
             .and(header("PRIVATE-TOKEN", "test_token"))
