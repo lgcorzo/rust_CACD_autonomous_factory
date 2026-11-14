@@ -88,7 +88,7 @@ impl Default for ScanPolicy {
 }
 
 static SECRET_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"(?i)\b(pass|db_pass|password|passwd|secret|api[_-]?key|private[_-]?key|token)\s*[:=]\s*["'][^"'\s]{6,}["']|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|sk_live_[0-9a-zA-Z]{16,}|sk-proj-[0-9a-zA-Z_-]{16,}|-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----|Bearer\s+ey[A-Za-z0-9_-]{10,}"#)
+    regex::Regex::new(r#"(?i)\b(pass|db_pass|password|passwd|secret|api[_-]?key|private[_-]?key|token|auth[_-]?token|access[_-]?key)\s*(?::\s*[^=\n]{1,32})?\s*[:=]\s*["'][^"'\s]{6,}["']|ghp_[A-Za-z0-9]{20,}|glpat-[A-Za-z0-9_-]{16,}|xox[baprs]-[A-Za-z0-9-]{10,}|s\.v1\.[A-Za-z0-9]{10,}|AKIA[0-9A-Z]{16}|sk_live_[0-9a-zA-Z]{16,}|sk-proj-[0-9a-zA-Z_-]{16,}|-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----|Bearer\s+ey[A-Za-z0-9_-]{10,}"#)
         .expect("valid secret regex")
 });
 
