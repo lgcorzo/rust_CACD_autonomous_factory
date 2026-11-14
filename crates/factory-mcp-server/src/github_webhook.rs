@@ -123,29 +123,27 @@ pub async fn handle_github_webhook(
         .webhook_secret()
         .unwrap_or_else(|| env::var("GITHUB_WEBHOOK_SECRET").unwrap_or_default());
 
-    if server.is_protected_mode() && webhook_secret.trim().is_empty() {
-        tracing::error!("GitHub webhook rejected: missing GITHUB_WEBHOOK_SECRET in protected mode");
+    if webhook_secret.trim().is_empty() {
+        tracing::error!("GitHub webhook rejected: missing GITHUB_WEBHOOK_SECRET (fail-closed)");
         return (
             StatusCode::UNAUTHORIZED,
-            Json(json!({"error": "Webhook authentication secret is not configured in protected environment"})),
+            Json(json!({"error": "Webhook authentication secret is not configured"})),
         )
             .into_response();
     }
 
-    if !webhook_secret.is_empty() {
-        let sig_header = headers
-            .get("x-hub-signature-256")
-            .and_then(|v| v.to_str().ok())
-            .unwrap_or("");
+    let sig_header = headers
+        .get("x-hub-signature-256")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
 
-        if !verify_github_signature(&webhook_secret, sig_header, &body_bytes) {
-            tracing::warn!("GitHub webhook signature verification failed");
-            return (
-                StatusCode::UNAUTHORIZED,
-                Json(json!({"error": "Invalid GitHub webhook signature"})),
-            )
-                .into_response();
-        }
+    if !verify_github_signature(&webhook_secret, sig_header, &body_bytes) {
+        tracing::warn!("GitHub webhook signature verification failed");
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({"error": "Invalid GitHub webhook signature"})),
+        )
+            .into_response();
     }
 
     let delivery_id = headers
