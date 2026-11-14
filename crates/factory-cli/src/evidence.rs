@@ -597,8 +597,14 @@ pub fn validate_requirement_state(
             bail!("verified_by.evidence_refs must not be empty");
         }
 
-        // Cryptographic verification if signature and public_key are provided
-        if let (Some(pk_hex), Some(sig_hex)) = (&verifier.public_key, &verifier.signature) {
+        // Cryptographic verification is mandatory for VERIFIED status
+        let (Some(pk_hex), Some(sig_hex)) = (&verifier.public_key, &verifier.signature) else {
+            bail!(
+                "Requirement '{}' in VERIFIED status requires Ed25519 public_key and signature",
+                state.requirement_id
+            );
+        };
+        {
             use ed25519_dalek::{Signature, Verifier, VerifyingKey};
             let pk_bytes = hex::decode(pk_hex).map_err(|e| {
                 anyhow::anyhow!("Invalid hex encoding for verifier public_key: {}", e)
