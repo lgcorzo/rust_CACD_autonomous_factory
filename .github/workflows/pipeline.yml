@@ -64,6 +64,19 @@ jobs:
           export PATH="$HOME/.cargo/bin:$PATH"
           cargo audit -D warnings
 
+      - name: Cargo Deny
+        run: |
+          if ! command -v cargo-deny &> /dev/null; then
+            $HOME/.cargo/bin/cargo-binstall -y --force cargo-deny
+          fi
+          export PATH="$HOME/.cargo/bin:$PATH"
+          cargo deny check
+
+      - name: Gitleaks Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   rust-ci:
     name: Rust CI (Lint & Test)
     runs-on: ubuntu-latest

@@ -732,10 +732,14 @@ impl GitlabClient for HttpGitlabClient {
         }
 
         let trace = res.text().await?;
-        // Truncate to 10KB
+        // Truncate to the last 10KB (tail) so failure diagnostics are preserved
         let max_len = 10 * 1024;
         if trace.len() > max_len {
-            Ok(trace[..max_len].to_string())
+            let mut start = trace.len() - max_len;
+            while !trace.is_char_boundary(start) {
+                start += 1;
+            }
+            Ok(trace[start..].to_string())
         } else {
             Ok(trace)
         }
@@ -1094,7 +1098,7 @@ mod tests {
         // Test 10KB truncation
         let mock_server2 = MockServer::start().await;
         let client2 = HttpGitlabClient::new(mock_server2.uri(), "test_token".to_string());
-        let large_trace = "x".repeat(20 * 1024); // 20KB
+        let large_trace = format!("{}error[E0308]: mismatched types\ntest foo ... FAILED\n", "x".repeat(20 * 1024));
         Mock::given(method("GET"))
             .and(path("/api/v4/projects/my-org%2Fmy-project/jobs/99/trace"))
             .and(header("PRIVATE-TOKEN", "test_token"))
@@ -1107,6 +1111,7 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(truncated.len(), 10 * 1024);
+        assert!(truncated.contains("FAILED"));
     }
 
     #[tokio::test]
