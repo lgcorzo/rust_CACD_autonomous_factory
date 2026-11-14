@@ -82,12 +82,12 @@ To maintain absolute operational transparency, capabilities across Dark Gravity 
 - **Designed**: Specification, architecture contract, or policy defined in `specs/` or `wiki/`.
 - **Implemented**: Source code written, compiled, and validated via local unit/integration tests.
 - **Deployed**: Active workload running in target Kubernetes cluster namespaces (`orchestrators`, `agents`, `jules-remediator`, `ml-apps`).
-- **Verified**: Production runtime behavior empirically validated via automated benchmarks, eBPF inspection, or zero-trust evidence logs.
+- **Verified**: Production runtime behavior empirically validated via automated benchmarks, Calico/NetworkPolicy inspection, or zero-trust evidence logs.
 
 | Component / Feature | Category | Status Tier | Source & Policy Reference | Operational Details & Evidence Link |
 | :--- | :--- | :--- | :--- | :--- |
 | **gVisor (`runsc`) Sandbox** | Infrastructure | **Implemented** | `config/sandbox-gvisor-profile.yaml` | `RuntimeClass=gvisor-sandbox` configured for `sandbox-exec` pods. [Evidence: `baseline.md`](evidence/baseline.md) |
-| **RAM Resource Clamping** | Kernel Isolation | **Implemented** | `crates/factory-core/src/security.rs` | Micro-sandbox clamped to $\le 30\text{ MiB}$ RAM / $250\text{m}$ CPU; worker compilation clamped up to $512\text{ MiB}$ / $500\text{m}$ CPU. [Evidence: `reliability-tests.md`](evidence/reliability-tests.md) |
+| **RAM Resource Clamping** | Kernel Isolation | **Implemented** | `crates/factory-core/src/security.rs` | Micro-sandbox workload capped at $\le 30\text{ MiB}$ RAM / $250\text{m}$ CPU (plus $35\text{ MiB}$ / $100\text{m}$ gVisor `RuntimeClass` fixed pod overhead = $65\text{ MiB}$ total per pod); worker compilation clamped up to $512\text{ MiB}$ / $500\text{m}$ CPU (measured on `standard_test_run` peaking at $285\text{ MiB}$). [Evidence: `resource-profiling-512mi.json`](evidence/benchmarks/resource-profiling-512mi.json) |
 | **OpenZiti mTLS Overlay** | Zero-Trust Network | **Implemented** | `crates/factory-infrastructure/src/ziti.rs` | Sidecar configured for agent pods; memory bounded $\le 20\text{ MiB}$. [Evidence: `baseline.md`](evidence/baseline.md) |
 | **Egress Deny-All NetworkPolicy** | Security Policy | **Designed** | `config/deny-all-egress-networkpolicy.yaml` | Egress restriction specification via Calico / Kubernetes NetworkPolicy rules. [Evidence: `security-tests.md`](evidence/security-tests.md) |
 | **Hatchet 6-Phase DAG Engine** | Orchestration | **Implemented** | `crates/factory-application/src/workflows/` | Engine configured on port 8080/7077 with PostgreSQL checkpointing. [Evidence: `baseline.md`](evidence/baseline.md) |
