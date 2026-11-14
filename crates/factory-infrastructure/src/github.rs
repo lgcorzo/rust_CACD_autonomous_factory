@@ -933,7 +933,10 @@ mod tests {
         // Test 10KB truncation
         let mock_server2 = MockServer::start().await;
         let client2 = HttpGithubClient::with_url(mock_server2.uri(), "test-token".to_string());
-        let large_log = format!("{}error[E0308]: mismatched types\ntest foo ... FAILED\n", "y".repeat(20 * 1024));
+        let large_log = format!(
+            "{}error[E0308]: mismatched types\ntest foo ... FAILED\n",
+            "y".repeat(20 * 1024)
+        );
 
         Mock::given(method("GET"))
             .and(path("/repos/my-org/my-repo/actions/jobs/99/logs"))
