@@ -597,51 +597,6 @@ pub fn validate_requirement_state(
             bail!("verified_by.evidence_refs must not be empty");
         }
 
-        // Cryptographic verification is mandatory for VERIFIED status
-        let (Some(pk_hex), Some(sig_hex)) = (&verifier.public_key, &verifier.signature) else {
-            bail!(
-                "Requirement '{}' in VERIFIED status requires Ed25519 public_key and signature",
-                state.requirement_id
-            );
-        };
-        {
-            use ed25519_dalek::{Signature, Verifier, VerifyingKey};
-            let pk_bytes = hex::decode(pk_hex).map_err(|e| {
-                anyhow::anyhow!("Invalid hex encoding for verifier public_key: {}", e)
-            })?;
-            let pk_array: [u8; 32] = pk_bytes
-                .try_into()
-                .map_err(|_| anyhow::anyhow!("verifier public_key must be exactly 32 bytes"))?;
-            let verifying_key = VerifyingKey::from_bytes(&pk_array)
-                .map_err(|e| anyhow::anyhow!("Invalid Ed25519 public key: {}", e))?;
-
-            let sig_bytes = hex::decode(sig_hex).map_err(|e| {
-                anyhow::anyhow!("Invalid hex encoding for verifier signature: {}", e)
-            })?;
-            let sig_array: [u8; 64] = sig_bytes
-                .try_into()
-                .map_err(|_| anyhow::anyhow!("verifier signature must be exactly 64 bytes"))?;
-            let signature = Signature::from_bytes(&sig_array);
-
-            let canonical_payload = format!(
-                "{}:{}:{}:{}",
-                state.requirement_id,
-                verifier.id,
-                verifier.verified_at,
-                verifier.evidence_refs.join(",")
-            );
-
-            verifying_key
-                .verify(canonical_payload.as_bytes(), &signature)
-                .map_err(|e| {
-                    anyhow::anyhow!(
-                        "Cryptographic signature verification failed for verifier '{}': {}",
-                        verifier.id,
-                        e
-                    )
-                })?;
-        }
-
         if let Some(impl_id) = &state.implementation_agent_id
             && impl_id == &verifier.id
         {
@@ -766,6 +721,51 @@ pub fn validate_requirement_state(
                     req_class
                 );
             }
+        }
+
+        // Cryptographic verification is mandatory for VERIFIED status
+        let (Some(pk_hex), Some(sig_hex)) = (&verifier.public_key, &verifier.signature) else {
+            bail!(
+                "Requirement '{}' in VERIFIED status requires Ed25519 public_key and signature",
+                state.requirement_id
+            );
+        };
+        {
+            use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+            let pk_bytes = hex::decode(pk_hex).map_err(|e| {
+                anyhow::anyhow!("Invalid hex encoding for verifier public_key: {}", e)
+            })?;
+            let pk_array: [u8; 32] = pk_bytes
+                .try_into()
+                .map_err(|_| anyhow::anyhow!("verifier public_key must be exactly 32 bytes"))?;
+            let verifying_key = VerifyingKey::from_bytes(&pk_array)
+                .map_err(|e| anyhow::anyhow!("Invalid Ed25519 public key: {}", e))?;
+
+            let sig_bytes = hex::decode(sig_hex).map_err(|e| {
+                anyhow::anyhow!("Invalid hex encoding for verifier signature: {}", e)
+            })?;
+            let sig_array: [u8; 64] = sig_bytes
+                .try_into()
+                .map_err(|_| anyhow::anyhow!("verifier signature must be exactly 64 bytes"))?;
+            let signature = Signature::from_bytes(&sig_array);
+
+            let canonical_payload = format!(
+                "{}:{}:{}:{}",
+                state.requirement_id,
+                verifier.id,
+                verifier.verified_at,
+                verifier.evidence_refs.join(",")
+            );
+
+            verifying_key
+                .verify(canonical_payload.as_bytes(), &signature)
+                .map_err(|e| {
+                    anyhow::anyhow!(
+                        "Cryptographic signature verification failed for verifier '{}': {}",
+                        verifier.id,
+                        e
+                    )
+                })?;
         }
     }
 
