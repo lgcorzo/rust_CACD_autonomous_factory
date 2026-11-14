@@ -4,7 +4,7 @@
 [![Wiki Content Sync](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml/badge.svg)](https://github.com/lgcorzo/rust_CACD_autonomous_factory/actions/workflows/docs-to-wiki.yml)
 [![Screencast Walkthrough](https://img.shields.io/badge/Demo_Video-Script--Rendered-blueviolet.svg)](docs/screencast_walkthrough.md)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lgcorzo/dark-gravity-factory.svg)](https://hub.docker.com/r/lgcorzo/dark-gravity-factory)
-[![Empirical Evidence Tree](https://img.shields.io/badge/Evidence_Tree-Verified-emerald.svg)](evidence/baseline.md)
+[![Empirical Evidence Tree](https://img.shields.io/badge/Evidence_Tree-Pending_Regeneration-yellow.svg)](evidence/baseline.md)
 [![Demo Video](https://img.shields.io/badge/Demo_Video-Watch_Now-blueviolet.svg)](#-demo-video--empirical-evidence)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lgcorzo/rust_CACD_autonomous_factory)
@@ -68,7 +68,7 @@ The codebase is organized as a unified Rust workspace for maximum modularity and
 - **`factory-core`**: Innermost domain layer. Manages domain entities (`Mission`, `Task`), a `SecurityValidator` trait for agent output auditing, and unified error handling via `FactoryError`.
 - **`factory-application`**: Workflow orchestration layer. Leverages **Rustant** (Planner) and **ZeroClaw** (Executor) to process task workflows. Maintains durably checkpointed state via `StepCheckpoint`s using Hatchet's PostgreSQL backend.
 - **`factory-mcp-server`**: Presentation layer. Axum-based Model Context Protocol server exposing tools over Server-Sent Events (SSE) transport with isolated gVisor execution interfaces.
-- **`factory-infrastructure`**: Adapter layer. Concrete clients for Jira, R2R (RAG), MinIO/AWS S3, OpenZiti (Zero Trust overlay networks), and Confluent Cloud Kafka (via `rdkafka` client).
+- **`factory-infrastructure`**: Adapter layer. Concrete clients for Jira, R2R (RAG), MinIO/AWS S3, OpenZiti (Zero Trust overlay networks), and Kafka (via `rdkafka` client).
 - **`factory-cli`**: Interface entry point. Contains the Hatchet worker initializer and Kafka telemetry querying utilities.
 
 ### 2. Durable Orchestration (Phase 12 State-Loop)
@@ -117,7 +117,7 @@ Dark Gravity continuously polls and autonomously executes missions across config
 - **Rustant**: Leverages **R2rClient** for semantic code search and context retrieval to inform specification design and planning.
 - **ZeroClaw**: Compiles and executes code in secure **gVisor (runsc) user-space sandboxes** via a sandboxed executor driver.
 - **Zero Trust Mesh**: Agent-to-agent communication is fully encrypted and bound to identity namespaces using **OpenZiti mTLS 1.3** overlays.
-- **Telemetry**: Reasoning logs are published to **Confluent Cloud Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`) for real-time observability.
+- **Telemetry**: Reasoning logs are published to **Kafka** topics (`mission-input`, `agent-thought`, `mission-artifact`) for real-time observability.
 
 ---
 
