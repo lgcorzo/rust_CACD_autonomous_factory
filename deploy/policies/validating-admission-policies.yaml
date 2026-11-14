@@ -60,6 +60,29 @@ spec:
         (variables.cpuApp + variables.cpuSide <= 250 &&
          variables.cpuInitMax + variables.cpuSide <= 250)
       message: "pod workload cpu (steady or init peak, upper bound) exceeds 250m (ADR-008 §9.2.4)"
+    - expression: "has(variables.s.runtimeClassName) && variables.s.runtimeClassName == 'gvisor'"
+      message: "pod must use runtimeClassName: gvisor (DG-RVP-018 B3)"
+    - expression: "!has(variables.s.automountServiceAccountToken) || variables.s.automountServiceAccountToken == false"
+      message: "pod must set automountServiceAccountToken: false (DG-RVP-018 B3)"
+    - expression: >-
+        has(variables.s.securityContext) &&
+        has(variables.s.securityContext.runAsNonRoot) &&
+        variables.s.securityContext.runAsNonRoot == true &&
+        has(variables.s.securityContext.seccompProfile) &&
+        has(variables.s.securityContext.seccompProfile.type) &&
+        variables.s.securityContext.seccompProfile.type == 'RuntimeDefault'
+      message: "pod must enforce runAsNonRoot: true and seccompProfile.type: RuntimeDefault (DG-RVP-018 B3)"
+    - expression: >-
+        variables.all.all(c,
+          has(c.securityContext) &&
+          has(c.securityContext.allowPrivilegeEscalation) &&
+          c.securityContext.allowPrivilegeEscalation == false &&
+          has(c.securityContext.readOnlyRootFilesystem) &&
+          c.securityContext.readOnlyRootFilesystem == true &&
+          has(c.securityContext.capabilities) &&
+          has(c.securityContext.capabilities.drop) &&
+          'ALL' in c.securityContext.capabilities.drop)
+      message: "every container must set allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, and drop ALL capabilities (DG-RVP-018 B3)"
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicyBinding
@@ -133,6 +156,29 @@ spec:
         (variables.cpuApp + variables.cpuSide <= 250 &&
          variables.cpuInitMax + variables.cpuSide <= 250)
       message: "job template workload cpu (steady or init peak, upper bound) exceeds 250m (ADR-008 §9.2.4)"
+    - expression: "has(variables.s.runtimeClassName) && variables.s.runtimeClassName == 'gvisor'"
+      message: "job template pod must use runtimeClassName: gvisor (DG-RVP-018 B3)"
+    - expression: "!has(variables.s.automountServiceAccountToken) || variables.s.automountServiceAccountToken == false"
+      message: "job template pod must set automountServiceAccountToken: false (DG-RVP-018 B3)"
+    - expression: >-
+        has(variables.s.securityContext) &&
+        has(variables.s.securityContext.runAsNonRoot) &&
+        variables.s.securityContext.runAsNonRoot == true &&
+        has(variables.s.securityContext.seccompProfile) &&
+        has(variables.s.securityContext.seccompProfile.type) &&
+        variables.s.securityContext.seccompProfile.type == 'RuntimeDefault'
+      message: "job template pod must enforce runAsNonRoot: true and seccompProfile.type: RuntimeDefault (DG-RVP-018 B3)"
+    - expression: >-
+        variables.all.all(c,
+          has(c.securityContext) &&
+          has(c.securityContext.allowPrivilegeEscalation) &&
+          c.securityContext.allowPrivilegeEscalation == false &&
+          has(c.securityContext.readOnlyRootFilesystem) &&
+          c.securityContext.readOnlyRootFilesystem == true &&
+          has(c.securityContext.capabilities) &&
+          has(c.securityContext.capabilities.drop) &&
+          'ALL' in c.securityContext.capabilities.drop)
+      message: "every container in job template must set allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, and drop ALL capabilities (DG-RVP-018 B3)"
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicyBinding
