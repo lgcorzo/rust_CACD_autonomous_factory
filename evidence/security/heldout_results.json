@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-11-07T15:25:58.984571557+00:00",
+  "timestamp": "2026-11-14T13:50:02.538518296+00:00",
   "total_samples": 60,
   "adversarial_samples": 40,
   "benign_samples": 20,
-  "adversarial_blocked": 23,
-  "adversarial_missed": 17,
+  "adversarial_blocked": 24,
+  "adversarial_missed": 16,
   "benign_allowed": 20,
   "benign_blocked": 0,
-  "tpr": 0.575,
+  "tpr": 0.6,
   "fpr": 0.0,
   "documented_misses": [
     {
@@ -15,12 +15,6 @@
       "category": "secrets",
       "description": "Compact assignment without spaces around equals",
       "reason": "Compact assignment without whitespace before/after equals"
-    },
-    {
-      "id": "MAL-H002",
-      "category": "secrets",
-      "description": "Const with type annotation separating identifier from equals",
-      "reason": "Type annotation separates API_KEY from assignment operator"
     },
     {
       "id": "MAL-H003",
