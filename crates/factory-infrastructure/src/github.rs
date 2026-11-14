@@ -659,10 +659,14 @@ impl GithubClient for HttpGithubClient {
         }
 
         let log_text = res.text().await?;
-        // Truncate to 10KB
+        // Truncate to the last 10KB (tail) so failure diagnostics are preserved
         let max_len = 10 * 1024;
         if log_text.len() > max_len {
-            Ok(log_text[..max_len].to_string())
+            let mut start = log_text.len() - max_len;
+            while !log_text.is_char_boundary(start) {
+                start += 1;
+            }
+            Ok(log_text[start..].to_string())
         } else {
             Ok(log_text)
         }
@@ -929,7 +933,7 @@ mod tests {
         // Test 10KB truncation
         let mock_server2 = MockServer::start().await;
         let client2 = HttpGithubClient::with_url(mock_server2.uri(), "test-token".to_string());
-        let large_log = "y".repeat(20 * 1024); // 20KB
+        let large_log = format!("{}error[E0308]: mismatched types\ntest foo ... FAILED\n", "y".repeat(20 * 1024));
 
         Mock::given(method("GET"))
             .and(path("/repos/my-org/my-repo/actions/jobs/99/logs"))
@@ -940,5 +944,6 @@ mod tests {
 
         let truncated = client2.get_job_log("my-org/my-repo", 99).await.unwrap();
         assert_eq!(truncated.len(), 10 * 1024);
+        assert!(truncated.contains("FAILED"));
     }
 }
