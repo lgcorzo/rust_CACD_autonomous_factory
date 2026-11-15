@@ -114,12 +114,12 @@ rust_CACD_autonomous_factory/
 
 ---
 
-### 2.2 GitOps Control Plane: `gitops_internal_lgcorzo` (Private Infrastructure Repository)
+### 2.2 GitOps Control Plane: Private GitOps Control-Plane Repository (Private Infrastructure Repository)
 
 *(Note: In public documentation, this repository is referred to generically as the **Internal GitOps Control Plane** to preserve private repository boundaries per `DOC-011`.)*
 
 ```text
-gitops_internal_lgcorzo/
+private-gitops-control-plane/
 ├── README.md                            # Cluster architecture, 10-namespace map & operations guide
 ├── DOCUMENTATION_ECOSYSTEM_AUDIT.md     # Full 72-repository audit report
 ├── DOCUMENTATION_REMEDIATION_PLAN.md    # Prioritized P0-P3 remediation plan
