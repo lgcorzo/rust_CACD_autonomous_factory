@@ -12,19 +12,19 @@ verified: "false"
 last_verified_commit: "fbdc5848"
 ---
 
-# Compliance & Audit — Dark Gravity CA/CD Autonomous Factory
+# Auditability & Traceability Roadmap — Dark Gravity CA/CD Autonomous Factory
 
-> **Purpose**: R&D grant compliance framework documentation covering Hazitek 2026, EU AI Act, and automated telemetry audit trail packaging.
+> **Purpose**: Technical design for auditability and telemetry packaging. Alignment with frameworks such as Hazitek 2026, the EU AI Act, and SOC 2 is the **long-term target objective**; this repository does not claim formal regulatory certification.
 
 ---
 
-## 1. Regulatory Framework
+## 1. Target Regulatory Objectives (Roadmap Goal)
 
-| Regulation | Scope | Factory Compliance |
+| Target Framework | Scope | Technical Design Mechanism (Facilitates Future Auditing) |
 |:---|:---|:---|
 | **Hazitek 2026 (SPRI)** | Basque Country R&D innovation grant | AST code deltas, compute hours, innovation output metrics |
-| **EU AI Act Art. 12** | Transparency: logging of AI system operations | Mission event logging, agent action audit trail |
-| **EU AI Act Art. 14** | Human oversight of high-risk AI systems | 4-Vertex HITL governance mesh, merge prohibition |
+| **EU AI Act Art. 12 (Target)** | Transparency: logging of AI system operations | Mission event logging, agent action audit trail |
+| **EU AI Act Art. 14 (Target)** | Human oversight of high-risk AI systems | 4-Vertex HITL governance mesh, merge prohibition |
 
 ---
 

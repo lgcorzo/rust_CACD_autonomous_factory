@@ -35,7 +35,7 @@ Welcome to the **Dark Gravity Autonomous Factory** professional enterprise wiki.
 | [📖 User Manual](operations/user_manual.md) | CLI usage, environment config, interactive directives |
 | [🔒 Security Architecture](security/security_architecture.md) | Zero Trust, Ed25519 NHI, gVisor sandbox isolation |
 | [🏛️ HITL Governance](security/hitl_governance.md) | 4-Vertex governance mesh, human oversight model |
-| [📜 Compliance & Audit](security/compliance_audit.md) | Hazitek 2026, EU AI Act, R&D telemetry packaging |
+| [📜 Auditability & Traceability Roadmap](security/compliance_audit.md) | Audit trail packaging & long-term regulatory target (EU AI Act / Hazitek) |
 | [📚 Glossary](GLOSSARY.md) | DDD ubiquitous language, acronyms, domain terms |
 | [📑 Master Index](index.md) | Complete file listing with categories |
 
