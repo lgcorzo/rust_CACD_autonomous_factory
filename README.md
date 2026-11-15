@@ -123,7 +123,7 @@ Dark Gravity continuously polls and autonomously executes missions across config
 
 ## 🛡️ Technological Sovereignty, Zero-Trust Security & Sovereign Dependency Policy
 
-The **Dark Gravity Autonomous CA/CD Software Factory (V7.2 / V7.3)** is designed for regulatory readiness (**EU AI Act** Articles 12 & 14 Human Oversight, **Hazitek / SPRI**, and **SOC 2 Type II** controls), requiring architectural and supply-chain sovereignty.
+The **Dark Gravity Autonomous CA/CD Software Factory (V7.2 / V7.3)** is designed to facilitate auditing and end-to-end traceability, with alignment to frameworks such as the **EU AI Act** (Articles 12 & 14 human oversight), **SOC 2 Type II**, and **ISO/IEC 25059** defined as the **long-term roadmap objective** (no formal certification is claimed).
 
 *(For detailed architectural specifications and design records, refer to the [Dark Gravity Multi-Agent Architecture Knowledge Base](https://notebook.google.com/notebook/116d5f03-2fb0-4fa7-bd7c-1c9849920abc))*.
 

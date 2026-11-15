@@ -45,7 +45,7 @@ last_verified_commit: "fbdc5848"
 | **SecurityView** | [Security Architecture](security/security_architecture.md) | Zero Trust, NHI Ed25519, gVisor isolation, STRIDE threat model |
 | **Policy** | [HITL Governance](security/hitl_governance.md) | 4-Vertex Human-in-the-Loop governance mesh & enforcement |
 | **Policy** | [Verification Triad](security/verification_triad.md) | Logical, Architectural, and Security quality gates |
-| **Report** | [Compliance & Audit](security/compliance_audit.md) | Hazitek 2026, EU AI Act conformity assessment |
+| **Report** | [Auditability & Traceability Roadmap](security/compliance_audit.md) | Audit trail packaging & long-term regulatory objective (no certification claimed) |
 
 ---
 
