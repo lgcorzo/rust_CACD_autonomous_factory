@@ -5,6 +5,7 @@ ignore = [
     { id = "RUSTSEC-2021-0141", reason = "dotenv 0.15.0 used in factory-mcp-server; no safe upgrade" },
     { id = "RUSTSEC-2025-0134", reason = "rustls-pemfile 2.2.0 transitive via ziti-sdk 0.3.0" },
     { id = "RUSTSEC-2024-0449", reason = "unsafe-libyaml 0.2.11 transitive via serde_yaml" },
+    { id = "RUSTSEC-2026-0543", reason = "chrono 0.4.45 unmaintained; transitive via cron/hatchet-sdk and factory crates" },
 ]
 
 [licenses]

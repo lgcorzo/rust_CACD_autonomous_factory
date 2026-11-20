@@ -21,4 +21,5 @@ ignore = [
     "RUSTSEC-2026-0381", # webpki-roots
     "RUSTSEC-2026-0386", # tokio
     "RUSTSEC-2026-0441", # pin-utils unmaintained (transitive via aws-smithy-http)
+    "RUSTSEC-2026-0543", # chrono unmaintained
 ]
