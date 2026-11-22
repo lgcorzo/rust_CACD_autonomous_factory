@@ -906,7 +906,10 @@ pub fn create_mission_workflow_with_clients(
                         description: task_desc,
                         is_parallel: false,
                         dependencies: vec![],
-                        target_files: vec![],
+                        target_files: vec![
+                            "openwiki/Home.md".to_string(),
+                            "SECURITY.md".to_string(),
+                        ],
                     });
                 }
 
