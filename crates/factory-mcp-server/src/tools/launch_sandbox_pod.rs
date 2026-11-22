@@ -320,7 +320,12 @@ impl Tool for LaunchSandboxPodTool {
         let mut success = false;
         let mut logs = String::new();
 
-        for _ in 0..60 {
+        let timeout_secs: u64 = std::env::var("SANDBOX_TIMEOUT_SECS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(600);
+
+        for _ in 0..timeout_secs {
             sleep(Duration::from_secs(1)).await;
             if let Ok(Some(j)) = jobs.get_opt(&job_name).await {
                 if let Some(status) = j.status {
