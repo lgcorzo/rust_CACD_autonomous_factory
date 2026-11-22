@@ -265,8 +265,9 @@ impl GithubClient for HttpGithubClient {
             "branch": branch,
         });
         let mut req = self.client.put(&url).json(&payload);
-        if !self.token.is_empty() {
-            req = req.header("Authorization", format!("Bearer {}", self.token));
+        if !self.api_token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.api_token));
+            req = req.header("Accept", "application/vnd.github.v3+json");
         }
         let res = req.send().await?;
         if !res.status().is_success() {
