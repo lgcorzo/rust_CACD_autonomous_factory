@@ -1395,6 +1395,24 @@ pub fn create_mission_workflow_with_clients(
                                     tracing::warn!("Branch {} may already exist or error: {}", branch_name, e);
                                 }
 
+                                let mission_doc = format!(
+                                    "# Dark Gravity Mission `{}`\n\n- **Issue**: #{}\n- **Status**: Validated in gVisor & Aethelgard SAST\n",
+                                    mission_id, issue_number
+                                );
+                                if let Err(e) = gh
+                                    .commit_file(
+                                        repo,
+                                        &format!("evidence/missions/{}.md", mission_id),
+                                        &branch_name,
+                                        &format!("[agent] deliver mission {} for #{}", mission_id, issue_number),
+                                        &mission_doc,
+                                    )
+                                    .await
+                                {
+                                    tracing::warn!("Failed to commit mission evidence file: {}", e);
+                                    let _ = ctx.log(&format!("Failed to commit mission file: {}", e)).await;
+                                }
+
                                 let pr_title = format!(
                                     "feat: [Dark Gravity] autonomous mission for issue #{}",
                                     issue_number

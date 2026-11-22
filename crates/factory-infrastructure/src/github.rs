@@ -206,6 +206,16 @@ pub trait GithubClient: Send + Sync {
 
     /// Download the log for a specific job (truncated to 10KB).
     async fn get_job_log(&self, repo: &str, job_id: u64) -> anyhow::Result<String>;
+    async fn commit_file(
+        &self,
+        _repo: &str,
+        _path: &str,
+        _branch: &str,
+        _message: &str,
+        _content: &str,
+    ) -> anyhow::Result<()> {
+        Ok(())
+    }
 }
 
 pub struct HttpGithubClient {
@@ -233,6 +243,43 @@ impl HttpGithubClient {
 
 #[async_trait]
 impl GithubClient for HttpGithubClient {
+    async fn commit_file(
+        &self,
+        repo: &str,
+        path: &str,
+        branch: &str,
+        message: &str,
+        content: &str,
+    ) -> anyhow::Result<()> {
+        use base64::Engine as _;
+        let url = format!(
+            "{}/repos/{}/contents/{}",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            path
+        );
+        let encoded = base64::engine::general_purpose::STANDARD.encode(content.as_bytes());
+        let payload = serde_json::json!({
+            "message": message,
+            "content": encoded,
+            "branch": branch,
+        });
+        let mut req = self.client.put(&url).json(&payload);
+        if !self.token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.token));
+        }
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            let status = res.status();
+            let text = res.text().await.unwrap_or_default();
+            return Err(anyhow::anyhow!(
+                "GitHub commit_file failed ({}): {}",
+                status,
+                text
+            ));
+        }
+        Ok(())
+    }
     async fn create_issue(
         &self,
         repo: &str,
