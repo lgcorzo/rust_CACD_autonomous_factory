@@ -1276,7 +1276,7 @@ pub fn create_mission_workflow_with_clients(
     let gl_client_deliv = gl_client.clone();
     let gh_client_deliv = gh_client.clone();
     let delivery_task = hatchet
-        .task("factory-deliver", move |input: MissionInput, _ctx| {
+        .task("factory-deliver", move |input: MissionInput, ctx| {
             let mcp_client = mcp_client_clone.clone();
             let kafka_client = kafka_client_clone.clone();
             let gl_client = gl_client_deliv.clone();
