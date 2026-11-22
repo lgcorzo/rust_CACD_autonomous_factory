@@ -918,6 +918,7 @@ pub fn create_mission_workflow_with_clients(
                     mission_id,
                     sdd_tasks.len()
                 );
+                let _ = ctx.log(&format!("Executing {} SDD tasks for {}", sdd_tasks.len(), mission_id)).await;
 
                 let mut completed_task_ids = std::collections::HashSet::new();
                 let mut task_results = Vec::new();
@@ -1420,6 +1421,7 @@ pub fn create_mission_workflow_with_clients(
                                     }
                                     Err(e) => {
                                         tracing::error!("Failed to create GitHub PR: {}", e);
+                                        let _ = ctx.log(&format!("Failed to create GitHub PR: {}", e)).await;
                                     }
                                 }
                             }
