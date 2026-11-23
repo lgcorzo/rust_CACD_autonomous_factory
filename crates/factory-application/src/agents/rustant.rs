@@ -111,6 +111,56 @@ impl RustantAgent {
             }
         }
 
+        if sdd_tasks.is_empty() {
+            let goal_summary = goal.lines().next().unwrap_or(goal).trim();
+            if parsed_spec.is_null() {
+                parsed_spec = json!(format!(
+                    "# Specification: {}\n\nMission ID: {}\nGoal: {}",
+                    goal_summary, mission_id, goal
+                ));
+            }
+            if parsed_plan.is_null() {
+                parsed_plan = json!(format!(
+                    "# Implementation Plan: {}\n\n1. Run AST/CRG comprehension\n2. Standardize SDD layout (.specify/, specs/, tests/)\n3. Generate ISO 42010 / OKF openwiki/Home.md & evidence/",
+                    goal_summary
+                ));
+            }
+            sdd_tasks = vec![
+                factory_core::SddTaskItem {
+                    id: "T001".to_string(),
+                    description: format!(
+                        "Standardize SDD & security baseline for {}",
+                        goal_summary
+                    ),
+                    is_parallel: false,
+                    dependencies: vec![],
+                    target_files: vec![
+                        ".specify/integration.json".to_string(),
+                        "SECURITY.md".to_string(),
+                    ],
+                },
+                factory_core::SddTaskItem {
+                    id: "T002".to_string(),
+                    description: "Generate ISO 42010 / OKF living Wiki (openwiki/Home.md)"
+                        .to_string(),
+                    is_parallel: false,
+                    dependencies: vec!["T001".to_string()],
+                    target_files: vec!["openwiki/Home.md".to_string()],
+                },
+                factory_core::SddTaskItem {
+                    id: "T003".to_string(),
+                    description: "Verify tests in gVisor sandbox and package mission evidence"
+                        .to_string(),
+                    is_parallel: false,
+                    dependencies: vec!["T002".to_string()],
+                    target_files: vec![format!("evidence/missions/{}.md", mission_id)],
+                },
+            ];
+            if parsed_tasks.is_null() {
+                parsed_tasks = json!(sdd_tasks);
+            }
+        }
+
         let sdd_plan = factory_core::SddMissionPlan {
             mission_id: mission_id.to_string(),
             spec_version: "1.0.0".to_string(),
