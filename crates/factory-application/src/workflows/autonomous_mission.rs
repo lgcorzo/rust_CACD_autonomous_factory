@@ -824,12 +824,20 @@ pub fn create_mission_workflow_with_clients(
                     .publish_thought(&mission_id, "Plan generated successfully", "rustant")
                     .await?;
 
+                let plan_preview = serde_json::to_string_pretty(&plan)
+                    .unwrap_or_else(|_| plan.to_string());
+                let plan_truncated: String = plan_preview.chars().take(2500).collect();
+                let plan_msg = format!(
+                    "Architecture blueprint formulated and verified against system constraints.\n\n<details>\n<summary>Spec-Kit Specification, Plan & Tasks</summary>\n\n```json\n{}\n```\n</details>",
+                    plan_truncated
+                );
+
                 post_mission_milestone(
                     &gl_client,
                     &gh_client,
                     &input,
                     "✅ Planning Completed",
-                    "Architecture blueprint formulated and verified against system constraints.",
+                    &plan_msg,
                 )
                 .await;
 
@@ -988,14 +996,21 @@ pub fn create_mission_workflow_with_clients(
                         .await?;
                 }
 
+                let task_summary: String = sdd_tasks
+                    .iter()
+                    .map(|t| format!("- **{}**: {} (targets: `{:?}`)", t.id, t.description, t.target_files))
+                    .collect::<Vec<_>>()
+                    .join("\n");
+
                 post_mission_milestone(
                     &gl_client,
                     &gh_client,
                     &input,
                     "⚡ Execution Completed",
                     &format!(
-                        "ZeroClawAgent executed all {} SDD tasks in planned order within isolated gVisor sandbox.",
-                        sdd_tasks.len()
+                        "ZeroClawAgent executed all {} SDD tasks in planned order within isolated gVisor sandbox:\n\n{}",
+                        sdd_tasks.len(),
+                        task_summary
                     ),
                 )
                 .await;
