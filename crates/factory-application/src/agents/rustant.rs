@@ -128,21 +128,29 @@ impl RustantAgent {
             sdd_tasks = vec![
                 factory_core::SddTaskItem {
                     id: "T001".to_string(),
-                    description: format!("Standardize SDD & security baseline for {}", goal_summary),
+                    description: format!(
+                        "Standardize SDD & security baseline for {}",
+                        goal_summary
+                    ),
                     is_parallel: false,
                     dependencies: vec![],
-                    target_files: vec![".specify/integration.json".to_string(), "SECURITY.md".to_string()],
+                    target_files: vec![
+                        ".specify/integration.json".to_string(),
+                        "SECURITY.md".to_string(),
+                    ],
                 },
                 factory_core::SddTaskItem {
                     id: "T002".to_string(),
-                    description: "Generate ISO 42010 / OKF living Wiki (openwiki/Home.md)".to_string(),
+                    description: "Generate ISO 42010 / OKF living Wiki (openwiki/Home.md)"
+                        .to_string(),
                     is_parallel: false,
                     dependencies: vec!["T001".to_string()],
                     target_files: vec!["openwiki/Home.md".to_string()],
                 },
                 factory_core::SddTaskItem {
                     id: "T003".to_string(),
-                    description: "Verify tests in gVisor sandbox and package mission evidence".to_string(),
+                    description: "Verify tests in gVisor sandbox and package mission evidence"
+                        .to_string(),
                     is_parallel: false,
                     dependencies: vec!["T002".to_string()],
                     target_files: vec![format!("evidence/missions/{}.md", mission_id)],
