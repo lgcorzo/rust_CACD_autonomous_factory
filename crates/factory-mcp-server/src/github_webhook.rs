@@ -14,11 +14,48 @@ use std::sync::Arc;
 
 type HmacSha256 = Hmac<Sha256>;
 
+const MAX_WEBHOOK_STRING_LEN: usize = 65536;
+
+fn sanitize_bounded_string<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    if s.len() > MAX_WEBHOOK_STRING_LEN {
+        return Err(serde::de::Error::custom(format!(
+            "string field exceeds maximum allowed size of {} bytes",
+            MAX_WEBHOOK_STRING_LEN
+        )));
+    }
+    Ok(s)
+}
+
+fn sanitize_bounded_opt_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let opt = Option::<String>::deserialize(deserializer)?;
+    if let Some(ref s) = opt {
+        if s.len() > MAX_WEBHOOK_STRING_LEN {
+            return Err(serde::de::Error::custom(format!(
+                "optional string field exceeds maximum allowed size of {} bytes",
+                MAX_WEBHOOK_STRING_LEN
+            )));
+        }
+    }
+    Ok(opt)
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct MissionDispatchReceipt {
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub dispatch_id: String,
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub mission_id: String,
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub repository: String,
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub goal_digest: String,
 }
 
@@ -59,26 +96,33 @@ impl WebhookMissionDispatcher for DefaultLocalMissionDispatcher {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GithubWebhookUser {
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub login: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GithubWebhookIssue {
     pub number: u64,
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub title: String,
+    #[serde(default, deserialize_with = "sanitize_bounded_opt_string")]
     pub body: Option<String>,
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub html_url: String,
     pub user: Option<GithubWebhookUser>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GithubWebhookRepository {
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub full_name: String,
+    #[serde(deserialize_with = "sanitize_bounded_string")]
     pub html_url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GithubWebhookPayload {
+    #[serde(default, deserialize_with = "sanitize_bounded_opt_string")]
     pub action: Option<String>,
     pub issue: Option<GithubWebhookIssue>,
     pub repository: Option<GithubWebhookRepository>,
@@ -302,5 +346,33 @@ mod tests {
             &sig_header,
             body
         ));
+    }
+
+    #[test]
+    fn test_bounded_payload_deserialization() {
+        let oversized_string = "a".repeat(MAX_WEBHOOK_STRING_LEN + 1);
+        let oversized_payload = serde_json::json!({
+            "action": oversized_string,
+        });
+        let result: Result<GithubWebhookPayload, _> = serde_json::from_value(oversized_payload);
+        assert!(
+            result.is_err(),
+            "Deserialization should reject strings exceeding bounded limit"
+        );
+
+        let valid_payload = serde_json::json!({
+            "action": "opened",
+            "issue": {
+                "number": 1,
+                "title": "Valid title",
+                "body": "Valid body",
+                "html_url": "https://github.com/org/repo/issues/1"
+            }
+        });
+        let result: Result<GithubWebhookPayload, _> = serde_json::from_value(valid_payload);
+        assert!(
+            result.is_ok(),
+            "Valid payload within bounds should deserialize successfully"
+        );
     }
 }
