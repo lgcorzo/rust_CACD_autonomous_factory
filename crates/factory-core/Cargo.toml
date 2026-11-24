@@ -23,7 +23,7 @@ base64 = "0.23"
 hex = "0.4"
 rand = "0.10"
 regex = { workspace = true }
-serde_jcs = "0.2"
+serde_jcs = "0.3"
 syn = { version = "3.0", features = ["full", "visit"] }
 
 [dev-dependencies]
