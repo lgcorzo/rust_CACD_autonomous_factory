@@ -1543,7 +1543,7 @@ pub fn create_mission_workflow_with_clients(
         .build()
         .unwrap()
         .add_parent(&review_task)
-        .add_parent(&execution_task);
+        .add_parent(&code_task);
 
     hatchet
         .workflow("darkgravitymission-dev-lgcorzo")
