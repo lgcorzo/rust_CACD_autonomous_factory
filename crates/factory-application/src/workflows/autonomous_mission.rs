@@ -1023,10 +1023,18 @@ pub fn create_mission_workflow_with_clients(
                     )
                     .await?;
 
+                let mut all_artifacts: Vec<serde_json::Value> = Vec::new();
+                for tr in &task_results {
+                    if let Some(arr) = tr["output"]["artifacts"].as_array() {
+                        all_artifacts.extend(arr.iter().cloned());
+                    }
+                }
+
                 Ok(serde_json::json!({
                     "status": "completed",
                     "total_tasks": sdd_tasks.len(),
                     "tasks": task_results,
+                    "artifacts": all_artifacts,
                 }))
             })
         })
@@ -1410,22 +1418,46 @@ pub fn create_mission_workflow_with_clients(
                                     tracing::warn!("Branch {} may already exist or error: {}", branch_name, e);
                                 }
 
-                                let mission_doc = format!(
-                                    "# Dark Gravity Mission `{}`\n\n- **Issue**: #{}\n- **Status**: Validated in gVisor & Aethelgard SAST\n",
-                                    mission_id, issue_number
-                                );
-                                if let Err(e) = gh
-                                    .commit_file(
-                                        repo,
-                                        &format!("evidence/missions/{}.md", mission_id),
-                                        &branch_name,
-                                        &format!("[agent] deliver mission {} for #{}", mission_id, issue_number),
-                                        &mission_doc,
-                                    )
-                                    .await
-                                {
-                                    tracing::warn!("Failed to commit mission evidence file: {}", e);
-                                    let _ = ctx.log(&format!("Failed to commit mission file: {}", e)).await;
+                                let mut committed_evidence = false;
+                                if let Ok(exec_out) = ctx.parent_output("zeroclaw-execute").await {
+                                    for (p, c) in extract_delivery_artifacts(&exec_out) {
+                                        if p.starts_with("evidence/missions/") {
+                                            committed_evidence = true;
+                                        }
+                                        if let Err(e) = gh
+                                            .commit_file(
+                                                repo,
+                                                &p,
+                                                &branch_name,
+                                                &format!("[agent] deliver {} for mission {}", p, mission_id),
+                                                &c,
+                                            )
+                                            .await
+                                        {
+                                            tracing::warn!("Failed to commit artifact {}: {}", p, e);
+                                            let _ = ctx.log(&format!("Failed to commit {}: {}", p, e)).await;
+                                        }
+                                    }
+                                }
+
+                                if !committed_evidence {
+                                    let mission_doc = format!(
+                                        "# Dark Gravity Mission `{}`\n\n- **Issue**: #{}\n- **Status**: Validated in gVisor & Aethelgard SAST\n",
+                                        mission_id, issue_number
+                                    );
+                                    if let Err(e) = gh
+                                        .commit_file(
+                                            repo,
+                                            &format!("evidence/missions/{}.md", mission_id),
+                                            &branch_name,
+                                            &format!("[agent] deliver mission {} for #{}", mission_id, issue_number),
+                                            &mission_doc,
+                                        )
+                                        .await
+                                    {
+                                        tracing::warn!("Failed to commit mission evidence file: {}", e);
+                                        let _ = ctx.log(&format!("Failed to commit mission file: {}", e)).await;
+                                    }
                                 }
 
                                 let pr_title = format!(
@@ -1510,7 +1542,8 @@ pub fn create_mission_workflow_with_clients(
         .execution_timeout(std::time::Duration::from_secs(1800))
         .build()
         .unwrap()
-        .add_parent(&review_task);
+        .add_parent(&review_task)
+        .add_parent(&code_task);
 
     hatchet
         .workflow("darkgravitymission-dev-lgcorzo")
@@ -1720,4 +1753,38 @@ mod tests {
 
         assert_eq!(execution_order, vec!["T001", "T002"]);
     }
+
+    #[test]
+    fn test_extract_delivery_artifacts() {
+        let val = serde_json::json!({
+            "artifacts": [
+                { "path": ".specify/integration.json", "content": "{}" },
+                { "path": "openwiki/Home.md", "content": "# Home" }
+            ]
+        });
+        let extracted = extract_delivery_artifacts(&val);
+        assert_eq!(
+            extracted,
+            vec![
+                (".specify/integration.json".to_string(), "{}".to_string()),
+                ("openwiki/Home.md".to_string(), "# Home".to_string()),
+            ]
+        );
+    }
+}
+
+fn extract_delivery_artifacts(exec_out: &serde_json::Value) -> Vec<(String, String)> {
+    exec_out["artifacts"]
+        .as_array()
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|art| {
+                    Some((
+                        art["path"].as_str()?.to_string(),
+                        art["content"].as_str()?.to_string(),
+                    ))
+                })
+                .collect()
+        })
+        .unwrap_or_default()
 }

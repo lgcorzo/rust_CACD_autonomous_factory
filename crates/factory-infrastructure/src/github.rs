@@ -258,12 +258,30 @@ impl GithubClient for HttpGithubClient {
             repo,
             path
         );
+
+        let mut get_req = self.client.get(format!("{}?ref={}", url, branch));
+        if !self.api_token.is_empty() {
+            get_req = get_req.header("Authorization", format!("Bearer {}", self.api_token));
+            get_req = get_req.header("Accept", "application/vnd.github.v3+json");
+        }
+        let existing_sha = match get_req.send().await {
+            Ok(resp) if resp.status().is_success() => resp
+                .json::<serde_json::Value>()
+                .await
+                .ok()
+                .and_then(|v| v["sha"].as_str().map(str::to_string)),
+            _ => None,
+        };
+
         let encoded = base64::engine::general_purpose::STANDARD.encode(content.as_bytes());
-        let payload = serde_json::json!({
+        let mut payload = serde_json::json!({
             "message": message,
             "content": encoded,
             "branch": branch,
         });
+        if let Some(sha) = existing_sha {
+            payload["sha"] = serde_json::Value::String(sha);
+        }
         let mut req = self.client.put(&url).json(&payload);
         if !self.api_token.is_empty() {
             req = req.header("Authorization", format!("Bearer {}", self.api_token));
@@ -996,5 +1014,46 @@ mod tests {
         let truncated = client2.get_job_log("my-org/my-repo", 99).await.unwrap();
         assert_eq!(truncated.len(), 10 * 1024);
         assert!(truncated.contains("FAILED"));
+    }
+
+    #[tokio::test]
+    async fn test_commit_file_creates_and_updates_with_sha() {
+        use wiremock::matchers::body_json;
+
+        let mock_server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/contents/SECURITY.md"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                "sha": "existing-blob-sha-123"
+            })))
+            .mount(&mock_server)
+            .await;
+
+        Mock::given(method("PUT"))
+            .and(path("/repos/my-org/my-repo/contents/SECURITY.md"))
+            .and(body_json(serde_json::json!({
+                "message": "update security",
+                "content": "IyBTZWN1cml0eQo=",
+                "branch": "mission-1",
+                "sha": "existing-blob-sha-123"
+            })))
+            .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                "content": { "name": "SECURITY.md" }
+            })))
+            .mount(&mock_server)
+            .await;
+
+        let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
+        client
+            .commit_file(
+                "my-org/my-repo",
+                "SECURITY.md",
+                "mission-1",
+                "update security",
+                "# Security\n",
+            )
+            .await
+            .unwrap();
     }
 }
