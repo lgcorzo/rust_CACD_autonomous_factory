@@ -95,12 +95,14 @@ impl WebhookMissionDispatcher for DefaultLocalMissionDispatcher {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct GithubWebhookUser {
     #[serde(deserialize_with = "sanitize_bounded_string")]
     pub login: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct GithubWebhookIssue {
     pub number: u64,
     #[serde(deserialize_with = "sanitize_bounded_string")]
@@ -113,6 +115,7 @@ pub struct GithubWebhookIssue {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct GithubWebhookRepository {
     #[serde(deserialize_with = "sanitize_bounded_string")]
     pub full_name: String,
@@ -121,6 +124,7 @@ pub struct GithubWebhookRepository {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct GithubWebhookPayload {
     #[serde(default, deserialize_with = "sanitize_bounded_opt_string")]
     pub action: Option<String>,
