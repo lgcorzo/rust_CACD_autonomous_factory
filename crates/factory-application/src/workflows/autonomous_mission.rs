@@ -806,45 +806,47 @@ pub fn create_mission_workflow_with_clients(
                 admit_mission_with_store(&input, stop_store.as_ref())?;
 
                 // Stage 2: Pre-planning baseline index_code so RustantAgent queries fresh R2R context
-                if let (Some(repo), Some(gh)) = (input.repository.as_deref(), gh_client.as_ref()) {
-                    if !repo.is_empty() {
-                        if let Ok(main_sha) = gh.get_branch_head_sha(repo, "main").await {
-                            let baseline_payload = serde_json::json!({
-                                "content": format!(
-                                    "---\nrepository: \"{}\"\nbranch: \"main\"\ncommit_sha: \"{}\"\nmission_id: \"{}\"\nverified: \"true\"\ntype: \"pre_plan_baseline\"\n---\n\n# Pre-Planning Baseline\n\nRepository `{}` baseline `main` SHA `{}` indexed prior to mission `{}`.\n",
-                                    repo, main_sha, mission_id, repo, main_sha, mission_id
-                                ),
-                                "metadata": {
-                                    "repository": repo,
-                                    "branch": "main",
-                                    "commit_sha": main_sha,
-                                    "mission_id": mission_id,
-                                    "verified": "true",
-                                    "type": "pre_plan_baseline"
-                                }
-                            });
-                            match mcp_client
-                                .call_tool_json("index_code", baseline_payload)
-                                .await
-                            {
-                                Ok(_) => {
-                                    let _ = ctx
-                                        .log(&format!(
-                                            "Pre-plan index_code baseline synced for {}@{}",
-                                            repo, main_sha
-                                        ))
-                                        .await;
-                                }
-                                Err(e) => {
-                                    tracing::warn!(
-                                        "Pre-plan index_code warning for {}: {}",
-                                        repo,
-                                        e
-                                    );
-                                    let _ = ctx
-                                        .log(&format!("Pre-plan index_code warning: {}", e))
-                                        .await;
-                                }
+                #[allow(clippy::collapsible_if)]
+                if let (Some(repo), Some(gh)) = (
+                    input.repository.as_deref().filter(|r| !r.is_empty()),
+                    gh_client.as_ref(),
+                ) {
+                    if let Ok(main_sha) = gh.get_branch_head_sha(repo, "main").await {
+                        let baseline_payload = serde_json::json!({
+                            "content": format!(
+                                "---\nrepository: \"{}\"\nbranch: \"main\"\ncommit_sha: \"{}\"\nmission_id: \"{}\"\nverified: \"true\"\ntype: \"pre_plan_baseline\"\n---\n\n# Pre-Planning Baseline\n\nRepository `{}` baseline `main` SHA `{}` indexed prior to mission `{}`.\n",
+                                repo, main_sha, mission_id, repo, main_sha, mission_id
+                            ),
+                            "metadata": {
+                                "repository": repo,
+                                "branch": "main",
+                                "commit_sha": main_sha,
+                                "mission_id": mission_id,
+                                "verified": "true",
+                                "type": "pre_plan_baseline"
+                            }
+                        });
+                        match mcp_client
+                            .call_tool_json("index_code", baseline_payload)
+                            .await
+                        {
+                            Ok(_) => {
+                                let _ = ctx
+                                    .log(&format!(
+                                        "Pre-plan index_code baseline synced for {}@{}",
+                                        repo, main_sha
+                                    ))
+                                    .await;
+                            }
+                            Err(e) => {
+                                tracing::warn!(
+                                    "Pre-plan index_code warning for {}: {}",
+                                    repo,
+                                    e
+                                );
+                                let _ = ctx
+                                    .log(&format!("Pre-plan index_code warning: {}", e))
+                                    .await;
                             }
                         }
                     }

@@ -382,7 +382,7 @@ async fn main() -> anyhow::Result<()> {
                 gl_projects_list
             );
 
-            use factory_infrastructure::{GithubClient as _, McpClient as _};
+            use factory_infrastructure::McpClient as _;
             let mut indexed_main_shas: std::collections::HashMap<String, String> =
                 std::collections::HashMap::new();
 
@@ -408,6 +408,7 @@ async fn main() -> anyhow::Result<()> {
                 }
 
                 // Stage 5: Post-merge automatic index_code on new default-branch SHA (Vertex 4 HITL approved)
+                #[allow(clippy::collapsible_if)]
                 if let Some(gh) = gh_client.as_ref() {
                     for repo in &gh_repos_list {
                         if let Ok(sha) = gh.get_branch_head_sha(repo, "main").await {
