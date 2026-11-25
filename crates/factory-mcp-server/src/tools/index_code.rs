@@ -48,15 +48,12 @@ impl Tool for IndexCodeTool {
         let response = self
             .http_client
             .post(format!(
-                "{}/v3/ingestion/ingest_documents",
-                self.r2r_base_url
+                "{}/v3/documents",
+                self.r2r_base_url.trim_end_matches('/')
             ))
             .json(&json!({
-                "documents": [{
-                    "content": content,
-                    "metadata": metadata,
-                    "collection_id": "codebase"
-                }]
+                "raw_text": content,
+                "metadata": metadata
             }))
             .send()
             .await?;

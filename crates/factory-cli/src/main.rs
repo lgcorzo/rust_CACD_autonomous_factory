@@ -344,7 +344,7 @@ async fn main() -> anyhow::Result<()> {
             let comment_service = Arc::new(CommentControlService::new(
                 gh_client.clone(),
                 gl_client.clone(),
-                mcp_client,
+                mcp_client.clone(),
                 r2r_client,
                 aethalgard_client,
             ));
@@ -382,6 +382,10 @@ async fn main() -> anyhow::Result<()> {
                 gl_projects_list
             );
 
+            use factory_infrastructure::McpClient as _;
+            let mut indexed_main_shas: std::collections::HashMap<String, String> =
+                std::collections::HashMap::new();
+
             loop {
                 let stats = daemon.poll_once(&gh_repos_list, &gl_projects_list).await;
                 if stats.issues_ingested > 0
@@ -400,6 +404,46 @@ async fn main() -> anyhow::Result<()> {
                 if !stats.errors.is_empty() {
                     for err in stats.errors {
                         tracing::warn!("Poller cycle warning: {}", err);
+                    }
+                }
+
+                // Stage 5: Post-merge automatic index_code on new default-branch SHA (Vertex 4 HITL approved)
+                #[allow(clippy::collapsible_if)]
+                if let Some(gh) = gh_client.as_ref() {
+                    for repo in &gh_repos_list {
+                        if let Ok(sha) = gh.get_branch_head_sha(repo, "main").await {
+                            if should_index_sha(&mut indexed_main_shas, repo, &sha) {
+                                let payload = serde_json::json!({
+                                    "content": format!(
+                                        "---\nrepository: \"{}\"\nbranch: \"main\"\ncommit_sha: \"{}\"\nverified: \"true\"\ntype: \"codebase_snapshot\"\n---\n\n# Post-Merge Approved Snapshot\n\nRepository `{}` advanced `main` to `{}`.\n",
+                                        repo, sha, repo, sha
+                                    ),
+                                    "metadata": {
+                                        "repository": repo,
+                                        "branch": "main",
+                                        "commit_sha": sha,
+                                        "verified": "true",
+                                        "type": "codebase_snapshot"
+                                    }
+                                });
+                                match mcp_client.call_tool_json("index_code", payload).await {
+                                    Ok(_) => tracing::info!(
+                                        "Post-merge index_code succeeded for {}@{}",
+                                        repo,
+                                        sha
+                                    ),
+                                    Err(e) => {
+                                        tracing::warn!(
+                                            "Post-merge index_code failed for {}@{}: {}",
+                                            repo,
+                                            sha,
+                                            e
+                                        );
+                                        indexed_main_shas.remove(repo);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 tokio::time::sleep(tokio::time::Duration::from_secs(interval_secs)).await;
@@ -614,4 +658,39 @@ async fn main() -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+/// Returns `true` if `sha` is non-empty and differs from the last-indexed SHA for `repo`,
+/// updating the cache atomically to prevent redundant `index_code` calls.
+fn should_index_sha(
+    cache: &mut std::collections::HashMap<String, String>,
+    repo: &str,
+    sha: &str,
+) -> bool {
+    if sha.is_empty() {
+        return false;
+    }
+    match cache.get(repo) {
+        Some(prev) if prev == sha => false,
+        _ => {
+            cache.insert(repo.to_string(), sha.to_string());
+            true
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::should_index_sha;
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_should_index_sha_deduplicates_unchanged_commits() {
+        let mut cache = HashMap::new();
+        assert!(!should_index_sha(&mut cache, "lgcorzo/repo", ""));
+        assert!(should_index_sha(&mut cache, "lgcorzo/repo", "sha-1"));
+        assert!(!should_index_sha(&mut cache, "lgcorzo/repo", "sha-1"));
+        assert!(should_index_sha(&mut cache, "lgcorzo/repo", "sha-2"));
+        assert!(!should_index_sha(&mut cache, "lgcorzo/repo", "sha-2"));
+    }
 }
