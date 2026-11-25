@@ -216,6 +216,9 @@ pub trait GithubClient: Send + Sync {
     ) -> anyhow::Result<()> {
         Ok(())
     }
+    async fn get_branch_head_sha(&self, _repo: &str, _branch: &str) -> anyhow::Result<String> {
+        Ok(String::new())
+    }
 }
 
 pub struct HttpGithubClient {
@@ -299,6 +302,36 @@ impl GithubClient for HttpGithubClient {
         }
         Ok(())
     }
+
+    async fn get_branch_head_sha(&self, repo: &str, branch: &str) -> anyhow::Result<String> {
+        let url = format!(
+            "{}/repos/{}/git/ref/heads/{}",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            branch
+        );
+        let mut req = self.client.get(url);
+        if !self.api_token.is_empty() {
+            req = req.header("Authorization", format!("Bearer {}", self.api_token));
+            req = req.header("Accept", "application/vnd.github.v3+json");
+        }
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            let status = res.status();
+            let text = res.text().await.unwrap_or_default();
+            return Err(anyhow::anyhow!(
+                "GitHub get_branch_head_sha failed ({}): {}",
+                status,
+                text
+            ));
+        }
+        let body: serde_json::Value = res.json().await?;
+        body["object"]["sha"]
+            .as_str()
+            .map(str::to_string)
+            .ok_or_else(|| anyhow::anyhow!("Missing object.sha in GitHub ref response"))
+    }
+
     async fn create_issue(
         &self,
         repo: &str,
@@ -1055,5 +1088,25 @@ mod tests {
             )
             .await
             .unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_get_branch_head_sha() {
+        let mock_server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/git/ref/heads/main"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                "object": { "sha": "abc123def456" }
+            })))
+            .mount(&mock_server)
+            .await;
+
+        let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
+        let sha = client
+            .get_branch_head_sha("my-org/my-repo", "main")
+            .await
+            .unwrap();
+        assert_eq!(sha, "abc123def456");
     }
 }
