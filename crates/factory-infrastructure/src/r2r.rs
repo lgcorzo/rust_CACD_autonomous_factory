@@ -72,11 +72,12 @@ impl R2rClient for HttpR2rClient {
             .bearer_auth(token)
             .json(&json!({
                 "query": query,
-                "stream": false,
                 "search_settings": {
-                    "use_vector_search": true,
-                    "search_filters": {},
-                    "search_limit": 3
+                    "use_semantic_search": true,
+                    "limit": 5,
+                    "graph_settings": {
+                        "enabled": true
+                    }
                 }
             }))
             .send()
@@ -104,6 +105,41 @@ impl R2rClient for HttpR2rClient {
                     }
                     combined_results.push_str(text);
                 }
+            }
+        }
+
+        if let Some(graph_results) = search_data["results"]["graph_search_results"].as_array() {
+            let mut graph_lines = Vec::new();
+            for item in graph_results {
+                let content = &item["content"];
+                let summary = content["summary"].as_str();
+                let desc = content["description"].as_str();
+                let name = content["name"].as_str();
+                let subj = content["subject"].as_str();
+                let pred = content["predicate"].as_str();
+                let obj = content["object"].as_str();
+
+                if let (Some(n), Some(s)) = (name, summary) {
+                    graph_lines.push(format!("- [Community] **{}**: {}", n, s));
+                } else if let (Some(n), Some(d)) = (name, desc) {
+                    graph_lines.push(format!("- [Entity] **{}**: {}", n, d));
+                } else if let (Some(s), Some(p), Some(o)) = (subj, pred, obj) {
+                    let extra = desc.map(|d| format!(" — {}", d)).unwrap_or_default();
+                    graph_lines.push(format!(
+                        "- [Relationship] {} --[{}]--> {}{}",
+                        s, p, o, extra
+                    ));
+                } else if let Some(n) = name {
+                    graph_lines.push(format!("- **{}**", n));
+                }
+            }
+
+            if !graph_lines.is_empty() {
+                if !combined_results.is_empty() {
+                    combined_results.push_str("\n\n");
+                }
+                combined_results.push_str("## Knowledge Graph Context\n\n");
+                combined_results.push_str(&graph_lines.join("\n"));
             }
         }
 
@@ -205,6 +241,50 @@ mod tests {
         assert!(result.contains("Pattern 1 content"));
         assert!(result.contains("Pattern 2 content"));
         assert!(result.contains("---"));
+    }
+
+    #[tokio::test]
+    async fn test_r2r_search_includes_graph_context() {
+        let mock_server = MockServer::start().await;
+        let client =
+            HttpR2rClient::new(mock_server.uri(), "admin".to_string(), "admin".to_string());
+
+        Mock::given(method("POST"))
+            .and(path("/v3/users/login"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "results": { "access_token": "mock_token" }
+            })))
+            .mount(&mock_server)
+            .await;
+
+        let search_response = json!({
+            "results": {
+                "chunk_search_results": [{ "text": "Chunk A" }],
+                "graph_search_results": [
+                    {
+                        "result_type": "entity",
+                        "content": { "name": "RustantAgent", "description": "Planner agent" }
+                    },
+                    {
+                        "result_type": "community",
+                        "content": { "name": "Factory Pipeline", "summary": "Orchestrated 6-stage CI/CD pipeline" }
+                    }
+                ]
+            }
+        });
+
+        Mock::given(method("POST"))
+            .and(path("/v3/retrieval/search"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(search_response))
+            .mount(&mock_server)
+            .await;
+
+        let result = client.search("architecture").await.unwrap();
+        assert!(result.contains("Chunk A"));
+        assert!(result.contains("## Knowledge Graph Context"));
+        assert!(result.contains("[Entity] **RustantAgent**: Planner agent"));
+        assert!(result
+            .contains("[Community] **Factory Pipeline**: Orchestrated 6-stage CI/CD pipeline"));
     }
 
     #[tokio::test]

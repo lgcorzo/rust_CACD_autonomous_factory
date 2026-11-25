@@ -230,7 +230,8 @@ pub fn create_deep_research_workflow(
 
                 let form = reqwest::multipart::Form::new()
                     .part("raw_text", raw_text_part)
-                    .part("metadata", metadata_part);
+                    .part("metadata", metadata_part)
+                    .text("run_with_orchestration", "true");
 
                 let res = reqwest::Client::new()
                     .post(&r2r_ingest_url)

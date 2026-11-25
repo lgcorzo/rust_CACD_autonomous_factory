@@ -413,11 +413,65 @@ async fn main() -> anyhow::Result<()> {
                     for repo in &gh_repos_list {
                         if let Ok(sha) = gh.get_branch_head_sha(repo, "main").await {
                             if should_index_sha(&mut indexed_main_shas, repo, &sha) {
+                                let tree_paths =
+                                    gh.list_repo_tree(repo, &sha).await.unwrap_or_default();
+                                let wiki_home = gh
+                                    .get_file_content(repo, "openwiki/Home.md", &sha)
+                                    .await
+                                    .ok()
+                                    .flatten();
+                                let wiki_ast = gh
+                                    .get_file_content(repo, "openwiki/AST_Architecture.md", &sha)
+                                    .await
+                                    .ok()
+                                    .flatten();
+                                let readme = gh
+                                    .get_file_content(repo, "README.md", &sha)
+                                    .await
+                                    .ok()
+                                    .flatten()
+                                    .map(|r| r.chars().take(2000).collect::<String>());
+
+                                let mut sections = vec![format!(
+                                    "---\nrepository: \"{}\"\nbranch: \"main\"\ncommit_sha: \"{}\"\nverified: \"true\"\ntype: \"codebase_snapshot\"\n---\n\n# Post-Merge Approved AST & Documentation Snapshot\n\nRepository `{}` advanced `main` to `{}` ({} files tracked).\n",
+                                    repo,
+                                    sha,
+                                    repo,
+                                    sha,
+                                    tree_paths.len()
+                                )];
+
+                                if !tree_paths.is_empty() {
+                                    let listed: Vec<String> = tree_paths
+                                        .iter()
+                                        .take(60)
+                                        .map(|p| format!("- `{}`", p))
+                                        .collect();
+                                    sections.push(format!(
+                                        "## Repository AST File Tree\n\n{}\n",
+                                        listed.join("\n")
+                                    ));
+                                }
+                                if let Some(home) = wiki_home {
+                                    sections.push(format!(
+                                        "## OKF Wiki Home (`openwiki/Home.md`)\n\n{}\n",
+                                        home
+                                    ));
+                                }
+                                if let Some(ast_doc) = wiki_ast {
+                                    sections.push(format!(
+                                        "## AST Architecture (`openwiki/AST_Architecture.md`)\n\n{}\n",
+                                        ast_doc
+                                    ));
+                                }
+                                if let Some(readme_doc) = readme {
+                                    sections.push(format!("## README Excerpt\n\n{}\n", readme_doc));
+                                }
+
                                 let payload = serde_json::json!({
-                                    "content": format!(
-                                        "---\nrepository: \"{}\"\nbranch: \"main\"\ncommit_sha: \"{}\"\nverified: \"true\"\ntype: \"codebase_snapshot\"\n---\n\n# Post-Merge Approved Snapshot\n\nRepository `{}` advanced `main` to `{}`.\n",
-                                        repo, sha, repo, sha
-                                    ),
+                                    "content": sections.join("\n"),
+                                    "collection_name": repo.replace('/', "-"),
+                                    "run_with_orchestration": true,
                                     "metadata": {
                                         "repository": repo,
                                         "branch": "main",
@@ -427,10 +481,11 @@ async fn main() -> anyhow::Result<()> {
                                     }
                                 });
                                 match mcp_client.call_tool_json("index_code", payload).await {
-                                    Ok(_) => tracing::info!(
-                                        "Post-merge index_code succeeded for {}@{}",
+                                    Ok(res) => tracing::info!(
+                                        "Post-merge index_code succeeded for {}@{}: {:?}",
                                         repo,
-                                        sha
+                                        sha,
+                                        res
                                     ),
                                     Err(e) => {
                                         tracing::warn!(
