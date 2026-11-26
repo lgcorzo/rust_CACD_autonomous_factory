@@ -1,12 +1,15 @@
 use crate::agents::finops::AdmissionDecision;
 use crate::agents::{AuditorAgent, FinOpsAgent, RustantAgent, ZeroClawAgent};
-use crate::workflows::circuit_breaker::CircuitBreakerGuard;
+use crate::workflows::circuit_breaker::{CircuitBreakerGuard, compute_diff_hash};
+use crate::workspaces::synthesizer::{LaneBranchInput, SynthesisOutcome};
+use crate::workspaces::worktree::WorktreeManager;
+use factory_core::SwarmConfig;
 use factory_core::security::CredentialSessionRef;
 use factory_core::{SddMissionPlan, SddTaskItem};
 use factory_infrastructure::{
     FileFinOpsStopStore, FinOpsStopStore, GithubClient, GitlabClient, GitlabCommitAction,
-    HttpGithubClient, HttpGitlabClient, HttpR2rClient, KafkaClient, McpClient, McpHttpClient,
-    R2rClient,
+    HttpGithubClient, HttpGitlabClient, HttpR2rClient, HttpSemanticaClient, KafkaClient, McpClient,
+    McpHttpClient, R2rClient, SemanticaClient,
     aethalgard::{AethalgardClient, HttpAethalgardClient},
 };
 use hatchet_sdk::Hatchet;
@@ -48,6 +51,66 @@ pub fn admit_mission_with_store(
         state_version: state.state_version,
         reason: None,
     })
+}
+
+/// Partitions SDD tasks into topological execution waves.
+/// When zero `[P]` parallel markers are present, preserves exact 1-task-per-wave sequential order (`FR-020`).
+pub fn partition_execution_waves(tasks: &[SddTaskItem]) -> anyhow::Result<Vec<Vec<SddTaskItem>>> {
+    if tasks.is_empty() {
+        return Ok(Vec::new());
+    }
+    if !tasks.iter().any(|t| t.is_parallel) {
+        return Ok(tasks.iter().cloned().map(|t| vec![t]).collect());
+    }
+
+    let known_ids: std::collections::HashSet<&str> = tasks.iter().map(|t| t.id.as_str()).collect();
+    for task in tasks {
+        for dep in &task.dependencies {
+            if !known_ids.contains(dep.as_str()) {
+                anyhow::bail!(
+                    "Dependency violation: task '{}' references unknown task '{}'",
+                    task.id,
+                    dep
+                );
+            }
+        }
+    }
+
+    let mut remaining: Vec<SddTaskItem> = tasks.to_vec();
+    let mut completed: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut waves: Vec<Vec<SddTaskItem>> = Vec::new();
+
+    while !remaining.is_empty() {
+        let ready: Vec<SddTaskItem> = remaining
+            .iter()
+            .filter(|task| task.dependencies.iter().all(|d| completed.contains(d)))
+            .cloned()
+            .collect();
+
+        if ready.is_empty() {
+            let blocked_ids: Vec<&str> = remaining.iter().map(|t| t.id.as_str()).collect();
+            anyhow::bail!(
+                "Dependency cycle detected among SDD tasks: {:?}",
+                blocked_ids
+            );
+        }
+
+        let wave: Vec<SddTaskItem> = if !ready[0].is_parallel {
+            vec![ready[0].clone()]
+        } else {
+            ready.into_iter().filter(|t| t.is_parallel).collect()
+        };
+
+        let wave_ids: std::collections::HashSet<String> =
+            wave.iter().map(|t| t.id.clone()).collect();
+        for id in &wave_ids {
+            completed.insert(id.clone());
+        }
+        remaining.retain(|t| !wave_ids.contains(&t.id));
+        waves.push(wave);
+    }
+
+    Ok(waves)
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -484,6 +547,7 @@ impl MissionInput {
             id: agent_id.to_string(),
             roles: vec!["worker".to_string(), "autonomous-remediation".to_string()],
             allowed_namespaces: vec!["factory-sandbox".to_string()],
+            caller_skill: None,
         };
 
         let mut vc = VerifiableCredential::new(
@@ -970,79 +1034,275 @@ pub fn create_mission_workflow_with_clients(
                     });
                 }
 
+                let waves = partition_execution_waves(&sdd_tasks)?;
+                let swarm_mode = sdd_tasks.iter().any(|t| t.is_parallel);
+                let swarm_cfg = SwarmConfig::from_env();
+                let real_worktrees_enabled = std::env::var("WORKTREE_REPO_ROOT")
+                    .ok()
+                    .filter(|v| !v.trim().is_empty())
+                    .is_some_and(|root| PathBuf::from(root).join(".git").exists());
+                let wt_manager = if real_worktrees_enabled {
+                    Some(WorktreeManager::from_env())
+                } else {
+                    None
+                };
+
                 tracing::info!(
-                    "[AutonomousMission:{}] Executing {} SDD tasks in sequential order",
+                    "[AutonomousMission:{}] Executing {} SDD tasks across {} wave(s) (swarm_mode={}, max_concurrent_lanes={})",
                     mission_id,
-                    sdd_tasks.len()
+                    sdd_tasks.len(),
+                    waves.len(),
+                    swarm_mode,
+                    swarm_cfg.max_concurrent_lanes
                 );
-                let _ = ctx.log(&format!("Executing {} SDD tasks for {}", sdd_tasks.len(), mission_id)).await;
+                let _ = ctx
+                    .log(&format!(
+                        "Executing {} SDD tasks for {} across {} wave(s) (swarm={})",
+                        sdd_tasks.len(),
+                        mission_id,
+                        waves.len(),
+                        swarm_mode
+                    ))
+                    .await;
 
                 let mut completed_task_ids = std::collections::HashSet::new();
                 let mut task_results = Vec::new();
+                let mut lane_outputs: Vec<LaneBranchInput> = Vec::new();
+                let mut parallel_lanes_peak = 0usize;
+                let semaphore = Arc::new(tokio::sync::Semaphore::new(
+                    swarm_cfg.max_concurrent_lanes.max(1),
+                ));
 
-                for (idx, task) in sdd_tasks.iter().enumerate() {
-                    // Enforce dependency ordering: all declared dependencies must be completed
-                    for dep in &task.dependencies {
-                        if !completed_task_ids.contains(dep) {
-                            let err_msg = format!(
-                                "Dependency violation: Task {} requires {} which has not completed yet",
-                                task.id, dep
-                            );
-                            tracing::error!("{}", err_msg);
-                            anyhow::bail!(err_msg);
+                if !swarm_mode {
+                    for (idx, task) in sdd_tasks.iter().enumerate() {
+                        for dep in &task.dependencies {
+                            if !completed_task_ids.contains(dep) {
+                                let err_msg = format!(
+                                    "Dependency violation: Task {} requires {} which has not completed yet",
+                                    task.id, dep
+                                );
+                                tracing::error!("{}", err_msg);
+                                anyhow::bail!(err_msg);
+                            }
                         }
+
+                        let task_start = std::time::Instant::now();
+                        kafka_client
+                            .publish_thought(
+                                &mission_id,
+                                &format!(
+                                    "Executing SDD task {}/{} [{}]: {}",
+                                    idx + 1,
+                                    sdd_tasks.len(),
+                                    task.id,
+                                    task.description
+                                ),
+                                "zeroclaw",
+                            )
+                            .await?;
+
+                        let _task_res = match zeroclaw.execute_tdd_task(&mission_id, task).await {
+                            Ok(res) => {
+                                completed_task_ids.insert(task.id.clone());
+                                task_results.push(serde_json::json!({
+                                    "task_id": task.id,
+                                    "status": "completed",
+                                    "duration_ms": task_start.elapsed().as_millis() as u64,
+                                    "output": res.clone(),
+                                }));
+                                res
+                            }
+                            Err(e) => {
+                                tracing::error!("zeroclaw-execute task {} failed: {:?}", task.id, e);
+                                post_mission_milestone(
+                                    &gl_client,
+                                    &gh_client,
+                                    &input,
+                                    &format!("⚠️ Task {} Execution Failed", task.id),
+                                    &format!("ZeroClawAgent execution failed on task {}: {:?}", task.id, e),
+                                )
+                                .await;
+                                return Err(e);
+                            }
+                        };
+
+                        kafka_client
+                            .publish_thought(
+                                &mission_id,
+                                &format!("SDD task {} completed successfully", task.id),
+                                "zeroclaw",
+                            )
+                            .await?;
                     }
-
-                    let task_start = std::time::Instant::now();
-                    kafka_client
-                        .publish_thought(
-                            &mission_id,
-                            &format!(
-                                "Executing SDD task {}/{} [{}]: {}",
-                                idx + 1,
-                                sdd_tasks.len(),
-                                task.id,
-                                task.description
-                            ),
-                            "zeroclaw",
-                        )
-                        .await?;
-
-                    let _task_res = match zeroclaw
-                        .execute_tdd_task(&mission_id, task)
-                        .await
-                    {
-                        Ok(res) => {
-                            completed_task_ids.insert(task.id.clone());
-                            task_results.push(serde_json::json!({
-                                "task_id": task.id,
-                                "status": "completed",
-                                "duration_ms": task_start.elapsed().as_millis() as u64,
-                                "output": res.clone(),
-                            }));
-                            res
+                } else {
+                    for (wave_idx, wave) in waves.iter().enumerate() {
+                        for task in wave {
+                            for dep in &task.dependencies {
+                                if !completed_task_ids.contains(dep) {
+                                    let err_msg = format!(
+                                        "Dependency violation in wave {}: Task {} requires {} which has not completed yet",
+                                        wave_idx, task.id, dep
+                                    );
+                                    tracing::error!("{}", err_msg);
+                                    anyhow::bail!(err_msg);
+                                }
+                            }
                         }
-                        Err(e) => {
-                            tracing::error!("zeroclaw-execute task {} failed: {:?}", task.id, e);
+
+                        if wave.len() > 1 {
+                            parallel_lanes_peak = parallel_lanes_peak.max(wave.len());
+                        }
+
+                        let mut join_set = tokio::task::JoinSet::new();
+                        for task in wave.iter().cloned() {
+                            let sem = semaphore.clone();
+                            let mcp = mcp_client_clone.clone();
+                            let aeth = aethalgard_client_clone.clone();
+                            let kafka = kafka_client.clone();
+                            let m_id = mission_id.clone();
+                            let mgr = wt_manager.clone();
+                            let lane_id = format!("lane-{}", task.id.to_lowercase());
+
+                            join_set.spawn(async move {
+                                let _permit = sem.acquire_owned().await?;
+                                let lane_start = std::time::Instant::now();
+                                let lane_wt = if let Some(ref manager) = mgr {
+                                    Some(
+                                        manager
+                                            .provision_lane_worktree(&m_id, &lane_id, None)
+                                            .await?,
+                                    )
+                                } else {
+                                    None
+                                };
+                                let branch_name = lane_wt
+                                    .as_ref()
+                                    .map(|l| l.branch_name.clone())
+                                    .unwrap_or_else(|| format!("swarm/{}/{}", m_id, lane_id));
+                                let wt_path = lane_wt.as_ref().map(|l| l.path.clone());
+
+                                let _ = kafka
+                                    .publish_thought(
+                                        &m_id,
+                                        &format!(
+                                            "[Swarm Lane {}] Executing {} in branch {}",
+                                            lane_id, task.id, branch_name
+                                        ),
+                                        "zeroclaw",
+                                    )
+                                    .await;
+
+                                let lane_agent = ZeroClawAgent::new(mcp, aeth);
+                                let exec_res = lane_agent
+                                    .execute_tdd_task_in_worktree(
+                                        &m_id,
+                                        &task,
+                                        wt_path.as_deref(),
+                                    )
+                                    .await;
+
+                                match exec_res {
+                                    Ok(res) => {
+                                        let commit_sha = if let (Some(manager), Some(wt)) =
+                                            (&mgr, lane_wt.as_ref())
+                                        {
+                                            manager
+                                                .commit_lane_changes(
+                                                    wt,
+                                                    &format!(
+                                                        "feat(swarm): {} ({})",
+                                                        task.id, lane_id
+                                                    ),
+                                                )
+                                                .await
+                                                .ok()
+                                                .flatten()
+                                        } else {
+                                            None
+                                        };
+                                        let diff_sha = commit_sha.unwrap_or_else(|| {
+                                            compute_diff_hash(
+                                                &serde_json::to_string(&res).unwrap_or_default(),
+                                            )
+                                        });
+                                        let _ = kafka
+                                            .publish_thought(
+                                                &m_id,
+                                                &format!(
+                                                    "[Swarm Lane {}] Completed {} safely (quarantined=true)",
+                                                    lane_id, task.id
+                                                ),
+                                                "zeroclaw",
+                                            )
+                                            .await;
+
+                                        Ok::<_, anyhow::Error>((
+                                            task.id.clone(),
+                                            serde_json::json!({
+                                                "task_id": task.id,
+                                                "lane_id": lane_id,
+                                                "branch_name": branch_name,
+                                                "status": "completed",
+                                                "quarantined": true,
+                                                "duration_ms": lane_start.elapsed().as_millis() as u64,
+                                                "output": res,
+                                            }),
+                                            LaneBranchInput {
+                                                lane_id,
+                                                branch_name,
+                                                task_id: task.id,
+                                                touched_files: task.target_files,
+                                                succeeded: true,
+                                                diff_sha256: Some(diff_sha),
+                                            },
+                                        ))
+                                    }
+                                    Err(err) => {
+                                        if let Some(ref manager) = mgr {
+                                            let _ = manager.prune_lane_worktree(&m_id, &lane_id).await;
+                                        }
+                                        Err(err)
+                                    }
+                                }
+                            });
+                        }
+
+                        let mut wave_errors = Vec::new();
+                        while let Some(joined) = join_set.join_next().await {
+                            match joined {
+                                Ok(Ok((task_id, res_json, lane_input))) => {
+                                    completed_task_ids.insert(task_id);
+                                    task_results.push(res_json);
+                                    lane_outputs.push(lane_input);
+                                }
+                                Ok(Err(err)) => wave_errors.push(err.to_string()),
+                                Err(join_err) => wave_errors.push(join_err.to_string()),
+                            }
+                        }
+
+                        if !wave_errors.is_empty() {
+                            if let Some(ref manager) = wt_manager {
+                                let _ = manager.prune_mission_worktrees(&mission_id).await;
+                            }
+                            let joined_err = wave_errors.join("; ");
                             post_mission_milestone(
                                 &gl_client,
                                 &gh_client,
                                 &input,
-                                &format!("⚠️ Task {} Execution Failed", task.id),
-                                &format!("ZeroClawAgent execution failed on task {}: {:?}", task.id, e),
+                                "🚨 Swarm Wave Execution Halted (BlockedPartialFailure)",
+                                &format!(
+                                    "Wave {} encountered lane failure(s) and halted cleanly without opening partial PRs:\n{}",
+                                    wave_idx, joined_err
+                                ),
                             )
                             .await;
-                            return Err(e);
+                            anyhow::bail!("Swarm wave {} failed: {}", wave_idx, joined_err);
                         }
-                    };
+                    }
 
-                    kafka_client
-                        .publish_thought(
-                            &mission_id,
-                            &format!("SDD task {} completed successfully", task.id),
-                            "zeroclaw",
-                        )
-                        .await?;
+                    if let Some(ref manager) = wt_manager {
+                        let _ = manager.prune_mission_worktrees(&mission_id).await;
+                    }
                 }
 
                 let task_summary: String = sdd_tasks
@@ -1057,8 +1317,10 @@ pub fn create_mission_workflow_with_clients(
                     &input,
                     "⚡ Execution Completed",
                     &format!(
-                        "ZeroClawAgent executed all {} SDD tasks in planned order within isolated gVisor sandbox:\n\n{}",
+                        "ZeroClawAgent executed all {} SDD tasks (swarm_mode={}, peak_parallel_lanes={}) within isolated gVisor sandbox:\n\n{}",
                         sdd_tasks.len(),
+                        swarm_mode,
+                        parallel_lanes_peak,
                         task_summary
                     ),
                 )
@@ -1081,6 +1343,9 @@ pub fn create_mission_workflow_with_clients(
 
                 Ok(serde_json::json!({
                     "status": "completed",
+                    "swarm_mode": swarm_mode,
+                    "parallel_lanes": parallel_lanes_peak,
+                    "lane_outputs": lane_outputs,
                     "total_tasks": sdd_tasks.len(),
                     "tasks": task_results,
                     "artifacts": all_artifacts,
@@ -1091,6 +1356,174 @@ pub fn create_mission_workflow_with_clients(
         .build()
         .unwrap()
         .add_parent(&plan_task);
+
+    // 2.5 Fan-In AST Synthesis Phase (Rustant Synthesizer Role)
+    let mcp_client_synth = mcp_client.clone();
+    let r2r_client_synth = r2r_client.clone();
+    let kafka_client_synth = kafka_client.clone();
+    let gl_client_synth = gl_client.clone();
+    let gh_client_synth = gh_client.clone();
+    let synthesize_task = hatchet
+        .task("fan-in-synthesize", move |input: MissionInput, ctx| {
+            let mcp_client = mcp_client_synth.clone();
+            let r2r_client = r2r_client_synth.clone();
+            let kafka_client = kafka_client_synth.clone();
+            let gl_client = gl_client_synth.clone();
+            let gh_client = gh_client_synth.clone();
+            let mission_id = input
+                .mission_id
+                .clone()
+                .unwrap_or_else(|| Uuid::new_v4().to_string());
+
+            Box::pin(async move {
+                let code_out = ctx
+                    .parent_output("zeroclaw-execute")
+                    .await
+                    .unwrap_or_else(|_| serde_json::json!({}));
+                let swarm_mode = code_out["swarm_mode"].as_bool().unwrap_or(false);
+                let lane_outputs: Vec<LaneBranchInput> = code_out
+                    .get("lane_outputs")
+                    .and_then(|v| serde_json::from_value(v.clone()).ok())
+                    .unwrap_or_default();
+
+                if !swarm_mode || lane_outputs.is_empty() {
+                    return Ok(serde_json::json!({
+                        "status": "sequential_passthrough",
+                        "swarm_mode": false,
+                        "merged_lanes": [],
+                        "ast_conflicts": [],
+                    }));
+                }
+
+                let failed_lanes: Vec<String> = lane_outputs
+                    .iter()
+                    .filter(|l| !l.succeeded)
+                    .map(|l| l.lane_id.clone())
+                    .collect();
+                if !failed_lanes.is_empty() {
+                    post_mission_milestone(
+                        &gl_client,
+                        &gh_client,
+                        &input,
+                        "🚨 Fan-In Blocked (BlockedPartialFailure)",
+                        &format!(
+                            "Mission `{}` halted at `fan-in-synthesize` due to failed lane(s) {:?}; escalated to Vertex 3 without creating a partial PR.",
+                            mission_id, failed_lanes
+                        ),
+                    )
+                    .await;
+                    anyhow::bail!(
+                        "EscalatedVertex3 BlockedPartialFailure: failed lanes {:?}",
+                        failed_lanes
+                    );
+                }
+
+                kafka_client
+                    .publish_thought(
+                        &mission_id,
+                        &format!("Starting Fan-In AST synthesis across {} lane(s)", lane_outputs.len()),
+                        "rustant",
+                    )
+                    .await?;
+
+                let semantica_env = std::env::var("SEMANTICA_URL").ok().filter(|s| !s.trim().is_empty());
+                if let Some(ref sem_url) = semantica_env {
+                    let sem_client = HttpSemanticaClient::new(
+                        sem_url.clone(),
+                        Some("rustant-synthesizer".to_string()),
+                    );
+                    let plan_payload = factory_infrastructure::semantica::MissionPlan {
+                        mission_id: mission_id.clone(),
+                        title: format!("Swarm Fan-In conflict check for {}", mission_id),
+                        spec_content: input.goal.clone(),
+                        constitution_rules: vec!["single-authoritative-synthesis".to_string()],
+                        proposed_tasks: lane_outputs.iter().map(|l| l.task_id.clone()).collect(),
+                    };
+                    let conflicts = sem_client.detect_conflicts(&plan_payload).await?;
+                    if !conflicts.is_empty() {
+                        post_mission_milestone(
+                            &gl_client,
+                            &gh_client,
+                            &input,
+                            "🚨 Fan-In Semantica Conflict Detected",
+                            &format!(
+                                "Live Semantica constraint check blocked synthesis for `{}`: {:?}",
+                                mission_id, conflicts
+                            ),
+                        )
+                        .await;
+                        anyhow::bail!("Semantica conflicts detected: {:?}", conflicts);
+                    }
+                }
+
+                let repo_root_env = std::env::var("WORKTREE_REPO_ROOT")
+                    .ok()
+                    .filter(|v| !v.trim().is_empty());
+                let mut diff_history = Vec::new();
+                let merged_lanes: Vec<String> = lane_outputs
+                    .iter()
+                    .map(|l| l.lane_id.clone())
+                    .collect();
+
+                if let Some(repo_root) = repo_root_env {
+                    let repo_path = PathBuf::from(repo_root);
+                    if repo_path.join(".git").exists() {
+                        let rustant = RustantAgent::new(mcp_client.clone(), r2r_client.clone());
+                        let wiki_draft = std::fs::read_to_string(repo_path.join("openwiki/Home.md"))
+                            .unwrap_or_else(|_| {
+                                format!("Architecture module overview for {}", mission_id)
+                            });
+                        let sem_client_opt = semantica_env.as_ref().map(|u| {
+                            HttpSemanticaClient::new(
+                                u.clone(),
+                                Some("rustant-synthesizer".to_string()),
+                            )
+                        });
+                        let synth_res = rustant
+                            .synthesize_swarm_lanes(
+                                &repo_path,
+                                &mission_id,
+                                "main",
+                                &lane_outputs,
+                                sem_client_opt
+                                    .as_ref()
+                                    .map(|c| c as &dyn SemanticaClient),
+                                &wiki_draft,
+                                &mut diff_history,
+                                1,
+                            )
+                            .await?;
+
+                        if synth_res.report.outcome != SynthesisOutcome::Merged {
+                            anyhow::bail!(
+                                "Fan-In AST synthesis halted ({:?}): conflicts={:?}",
+                                synth_res.report.outcome,
+                                synth_res.report.ast_conflicts
+                            );
+                        }
+                    }
+                }
+
+                kafka_client
+                    .publish_thought(
+                        &mission_id,
+                        &format!("Fan-In AST synthesis merged {} lane(s) cleanly", merged_lanes.len()),
+                        "rustant",
+                    )
+                    .await?;
+
+                Ok(serde_json::json!({
+                    "status": "merged",
+                    "swarm_mode": true,
+                    "merged_lanes": merged_lanes,
+                    "ast_conflicts": [],
+                }))
+            })
+        })
+        .execution_timeout(std::time::Duration::from_secs(1800))
+        .build()
+        .unwrap()
+        .add_parent(&code_task);
 
     // 3. Validation Phase (ZeroClaw)
     let mcp_client_clone = mcp_client.clone();
@@ -1288,7 +1721,7 @@ pub fn create_mission_workflow_with_clients(
         .execution_timeout(std::time::Duration::from_secs(1800))
         .build()
         .unwrap()
-        .add_parent(&code_task);
+        .add_parent(&synthesize_task);
 
     // 4. Review Phase (Rustant)
     let mcp_client_clone = mcp_client.clone();
@@ -1621,15 +2054,17 @@ pub fn create_mission_workflow_with_clients(
         .build()
         .unwrap()
         .add_parent(&review_task)
+        .add_parent(&synthesize_task)
         .add_parent(&code_task);
 
     hatchet
         .workflow("darkgravitymission-dev-lgcorzo")
-        .version("1.2.0".to_string())
+        .version("1.3.0".to_string())
         .build()
         .unwrap()
         .add_task(&plan_task)
         .add_task(&code_task)
+        .add_task(&synthesize_task)
         .add_task(&validation_task)
         .add_task(&review_task)
         .add_task(&delivery_task)

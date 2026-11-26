@@ -17,6 +17,7 @@ fn bench_async_batch_signing(c: &mut Criterion) {
         id: "agent-bench-01".to_string(),
         roles: vec!["benchmark".to_string()],
         allowed_namespaces: vec!["factory-sandbox".to_string()],
+        caller_skill: None,
     };
 
     c.bench_function("ed25519_async_batch_sign_10_vcs", |b| {

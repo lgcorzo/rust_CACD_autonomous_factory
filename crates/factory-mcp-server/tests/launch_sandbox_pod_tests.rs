@@ -192,3 +192,68 @@ fn test_launch_sandbox_pod_requires_gvisor_and_full_hardened_policy() {
         rust_image
     );
 }
+
+#[test]
+fn test_dual_sandbox_profiles_micro_and_compilation() {
+    use factory_mcp_server::tools::launch_sandbox_pod::{
+        build_sandbox_job_spec_with_profile, SandboxProfile,
+    };
+
+    let micro = build_sandbox_job_spec_with_profile(
+        "micro-job",
+        "echo ok",
+        true,
+        "factory-sandboxes",
+        "python",
+        SandboxProfile::MicroSandbox,
+    )
+    .expect("micro-sandbox spec should build");
+
+    assert_eq!(
+        micro["metadata"]["labels"]["darkgravity.io/sandbox-profile"],
+        "micro-sandbox"
+    );
+    assert_eq!(
+        micro["spec"]["template"]["metadata"]["labels"]["darkgravity.io/sandbox-profile"],
+        "micro-sandbox"
+    );
+    assert_eq!(micro["spec"]["ttlSecondsAfterFinished"], 60);
+    assert_eq!(micro["spec"]["activeDeadlineSeconds"], 60);
+    assert_eq!(
+        micro["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["memory"],
+        "30Mi"
+    );
+    assert_eq!(
+        micro["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["cpu"],
+        "250m"
+    );
+
+    let comp = build_sandbox_job_spec_with_profile(
+        "comp-job",
+        "cargo test",
+        true,
+        "factory-sandboxes",
+        "rust",
+        SandboxProfile::CompilationSandbox,
+    )
+    .expect("compilation-sandbox spec should build");
+
+    assert_eq!(
+        comp["metadata"]["labels"]["darkgravity.io/sandbox-profile"],
+        "compilation-sandbox"
+    );
+    assert_eq!(
+        comp["spec"]["template"]["metadata"]["labels"]["darkgravity.io/sandbox-profile"],
+        "compilation-sandbox"
+    );
+    assert_eq!(comp["spec"]["ttlSecondsAfterFinished"], 300);
+    assert_eq!(comp["spec"]["activeDeadlineSeconds"], 300);
+    assert_eq!(
+        comp["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["memory"],
+        "512Mi"
+    );
+    assert_eq!(
+        comp["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["cpu"],
+        "500m"
+    );
+}

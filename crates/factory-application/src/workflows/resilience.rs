@@ -90,6 +90,7 @@ mod tests {
             status: "COMPLETED".to_string(),
             output_payload_hash: CheckpointHelper::compute_payload_hash("result"),
             state_snapshot: HashMap::new(),
+            quarantined: false,
         };
         assert!(!handler.should_execute_step(Some(&chk), step_id).unwrap());
 

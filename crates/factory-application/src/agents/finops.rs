@@ -33,6 +33,21 @@ pub enum BudgetEvaluation {
     },
 }
 
+/// Aggregated swarm mission spend evaluation result.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq)]
+pub struct SwarmSpendEvaluation {
+    pub mission_id: String,
+    pub total_mission_spend_usd: f64,
+    pub plan_baseline_usd: f64,
+    pub daily_spend_usd: f64,
+    pub max_daily_budget_usd: f64,
+    pub burn_velocity_usd_per_min: f64,
+    pub freeze_reason: Option<crate::workflows::circuit_breaker::SwarmFreezeReason>,
+    pub hard_stop_latched: bool,
+    pub vault_revocation_triggered: bool,
+    pub kafka_alert_emitted: bool,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AdmissionDecision {
     pub admitted: bool,
@@ -331,6 +346,91 @@ impl FinOpsAgent {
                 &serde_json::to_vec(&payload)?,
             )
             .await
+    }
+
+    /// Aggregates swarm mission spend across lanes, evaluates +15% plan baseline,
+    /// `>$1.00/min` burn velocity, and $45/$50 daily HardStop, latches `FinOpsStopStore`,
+    /// triggers optional Vault JIT revocation hook, and emits Kafka `budget-exceeded` alert.
+    #[allow(clippy::too_many_arguments)]
+    pub async fn evaluate_swarm_mission_spend<F, Fut>(
+        &self,
+        mission_id: &str,
+        lane_spends_usd: &[f64],
+        plan_baseline_usd: f64,
+        daily_spend_usd: f64,
+        max_daily_budget_usd: f64,
+        burn_velocity_usd_per_min: f64,
+        kafka: Option<&dyn factory_infrastructure::KafkaClient>,
+        vault_revoke_hook: Option<F>,
+    ) -> anyhow::Result<SwarmSpendEvaluation>
+    where
+        F: FnOnce(String) -> Fut,
+        Fut: std::future::Future<Output = anyhow::Result<()>>,
+    {
+        use crate::workflows::circuit_breaker::{SwarmCircuitBreakerGuard, SwarmFreezeReason};
+
+        let total_mission_spend_usd: f64 = lane_spends_usd.iter().sum();
+        let mut guard = SwarmCircuitBreakerGuard::new(plan_baseline_usd);
+        if max_daily_budget_usd > 0.0 {
+            guard.state.daily_cap_usd = max_daily_budget_usd;
+            guard.state.hard_stop_usd = max_daily_budget_usd * 0.90;
+        }
+
+        let freeze_reason = guard.evaluate_spend(
+            total_mission_spend_usd,
+            daily_spend_usd,
+            burn_velocity_usd_per_min,
+            &[],
+        );
+
+        let mut hard_stop_latched = false;
+        let mut vault_revocation_triggered = false;
+        let mut kafka_alert_emitted = false;
+
+        if let Some(ref reason) = freeze_reason {
+            if matches!(reason, SwarmFreezeReason::DailyHardStopReached { .. }) {
+                self.halted.store(true, Ordering::SeqCst);
+                let _ = self.stop_store.write_state(
+                    true,
+                    Some(format!(
+                        "Swarm DailyHardStopReached: mission={}",
+                        mission_id
+                    )),
+                    daily_spend_usd,
+                    max_daily_budget_usd,
+                );
+                hard_stop_latched = true;
+
+                if let Some(hook) = vault_revoke_hook {
+                    hook(mission_id.to_string()).await?;
+                    vault_revocation_triggered = true;
+                }
+            }
+
+            if let Some(k) = kafka {
+                self.dispatch_budget_exceeded_event(
+                    k,
+                    mission_id,
+                    total_mission_spend_usd.max(daily_spend_usd),
+                    max_daily_budget_usd,
+                )
+                .await?;
+                kafka_alert_emitted = true;
+            }
+        }
+
+        Ok(SwarmSpendEvaluation {
+            mission_id: mission_id.to_string(),
+            total_mission_spend_usd,
+            plan_baseline_usd,
+            daily_spend_usd,
+            max_daily_budget_usd,
+            burn_velocity_usd_per_min,
+            freeze_reason,
+            hard_stop_latched,
+            vault_revocation_triggered,
+            kafka_alert_emitted,
+        })
     }
 
     /// Single poll cycle to query spend logs and evaluate budget status with default 1.0 minute duration.

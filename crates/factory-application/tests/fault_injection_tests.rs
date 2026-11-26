@@ -17,6 +17,8 @@ async fn test_crash_recovery_prevents_duplicate_pr_creation() {
             input_snapshot: serde_json::json!({"issue": 42}),
             output_snapshot: Some(serde_json::json!({"plan_id": "P-101"})),
             completed_at: Some(chrono::Utc::now()),
+            quarantined: true,
+            diff_sha256: None,
         },
     );
     initial_state.checkpoints.insert(
@@ -26,6 +28,8 @@ async fn test_crash_recovery_prevents_duplicate_pr_creation() {
             input_snapshot: serde_json::json!({"branch": "darkgravity/mission-42"}),
             output_snapshot: Some(serde_json::json!({"commit_sha": "abc12345"})),
             completed_at: Some(chrono::Utc::now()),
+            quarantined: true,
+            diff_sha256: None,
         },
     );
 
@@ -74,6 +78,8 @@ async fn test_crash_recovery_prevents_duplicate_pr_creation() {
             input_snapshot: serde_json::json!({"branch": "darkgravity/mission-42"}),
             output_snapshot: Some(serde_json::json!({"pr_url": pr_url})),
             completed_at: Some(chrono::Utc::now()),
+            quarantined: false,
+            diff_sha256: None,
         },
     );
     initial_state
@@ -172,6 +178,8 @@ async fn test_idempotent_branch_and_checkpoint_recovery() {
             input_snapshot: serde_json::json!({"tests": "all"}),
             output_snapshot: None, // Incomplete/crashed
             completed_at: None,
+            quarantined: true,
+            diff_sha256: None,
         },
     );
 
@@ -190,6 +198,8 @@ async fn test_idempotent_branch_and_checkpoint_recovery() {
             input_snapshot: serde_json::json!({"tests": "all"}),
             output_snapshot: Some(serde_json::json!({"status": "passed"})),
             completed_at: Some(chrono::Utc::now()),
+            quarantined: false,
+            diff_sha256: None,
         },
     );
 

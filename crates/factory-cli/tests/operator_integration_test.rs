@@ -22,7 +22,9 @@ fn test_agent_workspace_serialization_and_columns() {
             resource_limits: WorkspaceResourceLimits {
                 max_ram: "30Mi".to_string(),
                 max_cpu: "250m".to_string(),
+                sandbox_profile: Default::default(),
             },
+            swarm: None,
         },
         status: Some(AgentWorkspaceStatus {
             phase: WorkspacePhase::Running,

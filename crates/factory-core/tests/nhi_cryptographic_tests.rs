@@ -9,6 +9,7 @@ fn test_nhi_w3c_camel_case_serialization() {
         id: "did:key:agent-007".to_string(),
         roles: vec!["autonomous-worker".to_string()],
         allowed_namespaces: vec!["default".to_string(), "remediation".to_string()],
+        caller_skill: None,
     };
 
     let mut vc = VerifiableCredential::new(
@@ -75,6 +76,7 @@ async fn test_nhi_cryptographic_verification_outcomes() {
         id: "did:key:agent-1".to_string(),
         roles: vec!["worker".to_string()],
         allowed_namespaces: vec!["prod".to_string()],
+        caller_skill: None,
     };
 
     let now = Utc::now();
@@ -144,6 +146,7 @@ async fn test_nhi_batch_signing_atomic_behavior() {
         id: "did:key:batch-agent".to_string(),
         roles: vec!["worker".to_string()],
         allowed_namespaces: vec!["default".to_string()],
+        caller_skill: None,
     };
 
     let mut batch = vec![

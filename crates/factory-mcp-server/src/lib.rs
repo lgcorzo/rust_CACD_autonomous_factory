@@ -563,6 +563,10 @@ pub fn build_mcp_router(server: Arc<McpServer>) -> Router {
             "/webhooks/github",
             post(crate::github_webhook::handle_github_webhook),
         )
+        .route(
+            "/mcp/skills-manifest",
+            get(|| async { Json(crate::skills::context::build_skills_manifest()) }),
+        )
         .route("/health", get(|| async { Json(json!({"status": "ok"})) }))
         .with_state(server)
 }

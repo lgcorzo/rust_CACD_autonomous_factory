@@ -277,3 +277,224 @@ mod tests {
         assert_eq!(hash1.len(), 64);
     }
 }
+
+/// Reason why a swarm lane group was atomically frozen by the circuit breaker.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum SwarmFreezeReason {
+    PlanBaselineOverrun {
+        spend_usd: f64,
+        baseline_usd: f64,
+        limit_usd: f64,
+    },
+    BurnVelocityExceeded {
+        velocity_usd_per_min: f64,
+        max_velocity_usd_per_min: f64,
+    },
+    DailyHardStopReached {
+        daily_spend_usd: f64,
+        hard_stop_usd: f64,
+        daily_cap_usd: f64,
+    },
+    RetryWindowExceeded {
+        retries_in_window: u32,
+        max_retries: u32,
+        window_secs: u64,
+    },
+    DiffOscillationHalt {
+        lane_id: String,
+        diff_hash: String,
+    },
+}
+
+/// Persistent state for the swarm-level circuit breaker guard.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SwarmCircuitBreakerState {
+    pub frozen: bool,
+    pub freeze_reason: Option<SwarmFreezeReason>,
+    pub frozen_lanes: Vec<String>,
+    pub hitl_override_actor: Option<String>,
+    pub hitl_override_reason: Option<String>,
+    pub retry_timestamps_secs: Vec<u64>,
+    pub lane_diff_history: std::collections::HashMap<String, Vec<String>>,
+    pub plan_baseline_usd: f64,
+    pub daily_cap_usd: f64,
+    pub hard_stop_usd: f64,
+    pub max_velocity_usd_per_min: f64,
+    pub max_retries_in_window: u32,
+    pub retry_window_secs: u64,
+}
+
+impl Default for SwarmCircuitBreakerState {
+    fn default() -> Self {
+        Self {
+            frozen: false,
+            freeze_reason: None,
+            frozen_lanes: Vec::new(),
+            hitl_override_actor: None,
+            hitl_override_reason: None,
+            retry_timestamps_secs: Vec::new(),
+            lane_diff_history: std::collections::HashMap::new(),
+            plan_baseline_usd: 0.0,
+            daily_cap_usd: 50.0,
+            hard_stop_usd: 45.0,
+            max_velocity_usd_per_min: 1.0,
+            max_retries_in_window: 6,
+            retry_window_secs: 60,
+        }
+    }
+}
+
+/// Enforces swarm-wide cost, velocity, retry, and diff oscillation circuit breakers
+/// with atomic group freeze and HITL Vertex 3 override support.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct SwarmCircuitBreakerGuard {
+    pub state: SwarmCircuitBreakerState,
+}
+
+impl SwarmCircuitBreakerGuard {
+    pub fn new(plan_baseline_usd: f64) -> Self {
+        Self {
+            state: SwarmCircuitBreakerState {
+                plan_baseline_usd,
+                ..Default::default()
+            },
+        }
+    }
+
+    pub fn is_frozen(&self) -> bool {
+        self.state.frozen
+    }
+
+    /// Atomically freezes all active lanes in the swarm group.
+    pub fn freeze_group(&mut self, reason: SwarmFreezeReason, active_lanes: &[String]) {
+        self.state.frozen = true;
+        self.state.freeze_reason = Some(reason);
+        self.state.frozen_lanes = active_lanes.to_vec();
+    }
+
+    /// Evaluates mission spend against the +15% plan baseline, >$1.00/min burn velocity,
+    /// and $45/$50 daily HardStop thresholds.
+    pub fn evaluate_spend(
+        &mut self,
+        mission_spend_usd: f64,
+        daily_spend_usd: f64,
+        burn_velocity_usd_per_min: f64,
+        active_lanes: &[String],
+    ) -> Option<SwarmFreezeReason> {
+        if self.state.frozen {
+            return self.state.freeze_reason.clone();
+        }
+
+        let baseline_limit = self.state.plan_baseline_usd * 1.15;
+        if self.state.plan_baseline_usd > 0.0 && mission_spend_usd > baseline_limit {
+            let reason = SwarmFreezeReason::PlanBaselineOverrun {
+                spend_usd: mission_spend_usd,
+                baseline_usd: self.state.plan_baseline_usd,
+                limit_usd: baseline_limit,
+            };
+            self.freeze_group(reason.clone(), active_lanes);
+            return Some(reason);
+        }
+
+        if burn_velocity_usd_per_min > self.state.max_velocity_usd_per_min {
+            let reason = SwarmFreezeReason::BurnVelocityExceeded {
+                velocity_usd_per_min: burn_velocity_usd_per_min,
+                max_velocity_usd_per_min: self.state.max_velocity_usd_per_min,
+            };
+            self.freeze_group(reason.clone(), active_lanes);
+            return Some(reason);
+        }
+
+        if daily_spend_usd >= self.state.hard_stop_usd {
+            let reason = SwarmFreezeReason::DailyHardStopReached {
+                daily_spend_usd,
+                hard_stop_usd: self.state.hard_stop_usd,
+                daily_cap_usd: self.state.daily_cap_usd,
+            };
+            self.freeze_group(reason.clone(), active_lanes);
+            return Some(reason);
+        }
+
+        None
+    }
+
+    /// Records a retry attempt at `timestamp_secs` and freezes the group if >6 retries
+    /// occur within the 60s sliding window.
+    pub fn record_retry_attempt(
+        &mut self,
+        timestamp_secs: u64,
+        active_lanes: &[String],
+    ) -> Option<SwarmFreezeReason> {
+        if self.state.frozen {
+            return self.state.freeze_reason.clone();
+        }
+
+        let window_start = timestamp_secs.saturating_sub(self.state.retry_window_secs);
+        self.state
+            .retry_timestamps_secs
+            .retain(|&ts| ts >= window_start && ts <= timestamp_secs);
+        self.state.retry_timestamps_secs.push(timestamp_secs);
+
+        let retries_in_window = self.state.retry_timestamps_secs.len() as u32;
+        if retries_in_window > self.state.max_retries_in_window {
+            let reason = SwarmFreezeReason::RetryWindowExceeded {
+                retries_in_window,
+                max_retries: self.state.max_retries_in_window,
+                window_secs: self.state.retry_window_secs,
+            };
+            self.freeze_group(reason.clone(), active_lanes);
+            return Some(reason);
+        }
+
+        None
+    }
+
+    /// Records a lane diff and halts the group if an A-B-A-B oscillation pattern is detected.
+    pub fn record_lane_diff(
+        &mut self,
+        lane_id: &str,
+        diff: &str,
+        active_lanes: &[String],
+    ) -> Option<SwarmFreezeReason> {
+        if self.state.frozen {
+            return self.state.freeze_reason.clone();
+        }
+
+        let diff_hash = compute_diff_hash(diff);
+        let history = self
+            .state
+            .lane_diff_history
+            .entry(lane_id.to_string())
+            .or_default();
+        history.push(diff_hash.clone());
+
+        let len = history.len();
+        if len >= 4
+            && history[len - 4] == history[len - 2]
+            && history[len - 3] == history[len - 1]
+            && history[len - 4] != history[len - 3]
+        {
+            let reason = SwarmFreezeReason::DiffOscillationHalt {
+                lane_id: lane_id.to_string(),
+                diff_hash,
+            };
+            self.freeze_group(reason.clone(), active_lanes);
+            return Some(reason);
+        }
+
+        None
+    }
+
+    /// Applies a HITL Vertex 3 override, unfreezing the group and recording audit metadata.
+    pub fn apply_hitl_override(&mut self, actor: &str, justification: &str) -> bool {
+        let was_frozen = self.state.frozen;
+        self.state.frozen = false;
+        self.state.freeze_reason = None;
+        self.state.frozen_lanes.clear();
+        self.state.retry_timestamps_secs.clear();
+        self.state.lane_diff_history.clear();
+        self.state.hitl_override_actor = Some(actor.to_string());
+        self.state.hitl_override_reason = Some(justification.to_string());
+        was_frozen
+    }
+}

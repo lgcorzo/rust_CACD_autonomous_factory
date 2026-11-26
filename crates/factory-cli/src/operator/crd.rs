@@ -38,6 +38,26 @@ pub struct AgentWorkspaceSpec {
 
     /// Resource bounds for agent tasks
     pub resource_limits: WorkspaceResourceLimits,
+
+    /// Optional swarm execution configuration
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub swarm: Option<WorkspaceSwarmConfig>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug, Default, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkspaceSwarmConfig {
+    /// Maximum concurrent swarm lanes allowed for this workspace
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_concurrent_lanes: Option<u32>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug, Default, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum SandboxProfileKind {
+    #[default]
+    MicroSandbox,
+    CompilationSandbox,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, JsonSchema, PartialEq, Eq)]
@@ -48,6 +68,10 @@ pub struct WorkspaceResourceLimits {
 
     /// Maximum container CPU ceiling (e.g., "250m")
     pub max_cpu: String,
+
+    /// Sandbox resource profile ("micro-sandbox" or "compilation-sandbox")
+    #[serde(default)]
+    pub sandbox_profile: SandboxProfileKind,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, Default, JsonSchema, PartialEq)]

@@ -4,6 +4,10 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::fmt::Write;
 
+fn default_quarantined() -> bool {
+    true
+}
+
 /// Step checkpoint stored in object storage (MinIO S3)
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct StepCheckpoint {
@@ -14,6 +18,45 @@ pub struct StepCheckpoint {
     pub status: String,
     pub output_payload_hash: String,
     pub state_snapshot: HashMap<String, String>,
+    #[serde(default = "default_quarantined")]
+    pub quarantined: bool,
+}
+
+/// Pre-merge quarantine guard rejecting promotion of unverified lane artifacts to R2R.
+pub fn assert_promotable_to_r2r(checkpoint: &StepCheckpoint) -> Result<()> {
+    if checkpoint.quarantined {
+        return Err(anyhow!(
+            "Checkpoint '{}' is still quarantined and cannot trigger R2R ingestion",
+            checkpoint.step_id
+        ));
+    }
+    if checkpoint.status != "VERIFIED" || checkpoint.output_payload_hash.is_empty() {
+        return Err(anyhow!(
+            "Checkpoint '{}' must be Stage 5 VERIFIED with a non-empty hash before R2R promotion",
+            checkpoint.step_id
+        ));
+    }
+    Ok(())
+}
+
+/// Marks a completed checkpoint as Stage 5 verified and clears its quarantine flag.
+pub fn mark_stage5_verified(checkpoint: &mut StepCheckpoint) -> Result<()> {
+    if checkpoint.status != "COMPLETED" && checkpoint.status != "VERIFIED" {
+        return Err(anyhow!(
+            "Checkpoint '{}' cannot clear quarantine from status '{}'",
+            checkpoint.step_id,
+            checkpoint.status
+        ));
+    }
+    if checkpoint.output_payload_hash.is_empty() {
+        return Err(anyhow!(
+            "Checkpoint '{}' has empty output_payload_hash and cannot be verified",
+            checkpoint.step_id
+        ));
+    }
+    checkpoint.status = "VERIFIED".to_string();
+    checkpoint.quarantined = false;
+    Ok(())
 }
 
 pub struct CheckpointHelper;
@@ -70,6 +113,7 @@ mod tests {
             status: "COMPLETED".to_string(),
             output_payload_hash: CheckpointHelper::compute_payload_hash("result data"),
             state_snapshot: snapshot,
+            quarantined: true,
         };
 
         assert!(CheckpointHelper::verify_checkpoint(&valid_chk, "step-1").unwrap());
