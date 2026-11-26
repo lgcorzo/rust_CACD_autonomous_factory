@@ -1,8 +1,25 @@
 use crate::Agent;
+use crate::utils::osr::calculate_osr;
+use crate::workspaces::synthesizer::{
+    AstSynthesizer, ConflictKind, LaneBranchInput, SymbolConflict, SynthesisOutcome,
+    SynthesisReport,
+};
 use async_trait::async_trait;
-use factory_infrastructure::{McpClient, R2rClient};
+use factory_core::config::InferencePriorityClass;
+use factory_infrastructure::{McpClient, R2rClient, SemanticaClient};
 use serde_json::{Value, json};
+use std::path::Path;
 use std::sync::Arc;
+
+/// Result produced by the Synthesizer role combining AST merge, Semantica, OSR, and SAST gates.
+#[derive(Debug, Clone)]
+pub struct SwarmSynthesisOutcome {
+    pub report: SynthesisReport,
+    pub security_score: f64,
+    pub osr_score: f32,
+    pub wiki_regenerations: u32,
+    pub semantica_conflicts: Vec<String>,
+}
 
 pub struct RustantAgent {
     mcp_client: Arc<dyn McpClient>,
@@ -15,6 +32,39 @@ impl RustantAgent {
             mcp_client,
             r2r_client,
         }
+    }
+
+    pub async fn discover_peer_skills(
+        &self,
+        a2a_client: &factory_infrastructure::ziti::ZitiA2aClient,
+    ) -> anyhow::Result<Value> {
+        a2a_client.discover_skills().await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn delegate_a2a_task(
+        &self,
+        a2a_client: &factory_infrastructure::ziti::ZitiA2aClient,
+        target: &str,
+        skill_name: &str,
+        arguments: Value,
+        mission_id: &str,
+        hop: u8,
+        trace: Vec<String>,
+    ) -> anyhow::Result<factory_infrastructure::ziti::A2aDispatchResponse> {
+        let req = factory_infrastructure::ziti::A2aDispatchRequest {
+            skill_name: skill_name.to_string(),
+            arguments,
+            headers: factory_infrastructure::ziti::A2aHeaders {
+                target: target.to_string(),
+                hop,
+                trace,
+                vtag_mission: Some(mission_id.to_string()),
+                ..Default::default()
+            },
+            caller_id: "rustant-agent".to_string(),
+        };
+        a2a_client.dispatch(&req).await
     }
 
     pub async fn plan_mission(&self, mission_id: &str, goal: &str) -> anyhow::Result<Value> {
@@ -112,6 +162,13 @@ impl RustantAgent {
         }
 
         if sdd_tasks.is_empty() {
+            let goal_tasks = Self::parse_sdd_tasks(goal);
+            if !goal_tasks.is_empty() {
+                sdd_tasks = goal_tasks;
+            }
+        }
+
+        if sdd_tasks.is_empty() {
             let goal_summary = goal.lines().next().unwrap_or(goal).trim();
             if parsed_spec.is_null() {
                 parsed_spec = json!(format!(
@@ -125,40 +182,90 @@ impl RustantAgent {
                     goal_summary
                 ));
             }
-            sdd_tasks = vec![
-                factory_core::SddTaskItem {
-                    id: "T001".to_string(),
-                    description: format!(
-                        "Standardize SDD & security baseline for {}",
-                        goal_summary
-                    ),
-                    is_parallel: false,
-                    dependencies: vec![],
-                    target_files: vec![
-                        ".specify/integration.json".to_string(),
-                        "SECURITY.md".to_string(),
-                    ],
-                },
-                factory_core::SddTaskItem {
-                    id: "T002".to_string(),
-                    description: "Generate ISO 42010 / OKF living Wiki (openwiki/Home.md & openwiki/AST_Architecture.md)"
-                        .to_string(),
-                    is_parallel: false,
-                    dependencies: vec!["T001".to_string()],
-                    target_files: vec![
-                        "openwiki/Home.md".to_string(),
-                        "openwiki/AST_Architecture.md".to_string(),
-                    ],
-                },
-                factory_core::SddTaskItem {
-                    id: "T003".to_string(),
-                    description: "Verify tests in gVisor sandbox and package mission evidence"
-                        .to_string(),
-                    is_parallel: false,
-                    dependencies: vec!["T002".to_string()],
-                    target_files: vec![format!("evidence/missions/{}.md", mission_id)],
-                },
-            ];
+            let enable_swarm_lanes = goal.contains("[P]")
+                || goal.to_lowercase().contains("swarm mode")
+                || goal.to_lowercase().contains("parallel lanes");
+            sdd_tasks = if enable_swarm_lanes {
+                vec![
+                    factory_core::SddTaskItem {
+                        id: "T001".to_string(),
+                        description: format!(
+                            "Standardize SDD & security baseline for {}",
+                            goal_summary
+                        ),
+                        is_parallel: false,
+                        dependencies: vec![],
+                        target_files: vec![
+                            ".specify/integration.json".to_string(),
+                            "SECURITY.md".to_string(),
+                        ],
+                    },
+                    factory_core::SddTaskItem {
+                        id: "T002".to_string(),
+                        description: format!(
+                            "[P] Implement core deliverables for {}",
+                            goal_summary
+                        ),
+                        is_parallel: true,
+                        dependencies: vec!["T001".to_string()],
+                        target_files: vec!["src/lib.rs".to_string()],
+                    },
+                    factory_core::SddTaskItem {
+                        id: "T003".to_string(),
+                        description: "[P] Generate ISO 42010 / OKF living Wiki (openwiki/Home.md & openwiki/AST_Architecture.md)"
+                            .to_string(),
+                        is_parallel: true,
+                        dependencies: vec!["T001".to_string()],
+                        target_files: vec![
+                            "openwiki/Home.md".to_string(),
+                            "openwiki/AST_Architecture.md".to_string(),
+                        ],
+                    },
+                    factory_core::SddTaskItem {
+                        id: "T004".to_string(),
+                        description: "Verify synthesized lanes in gVisor sandbox and package mission evidence"
+                            .to_string(),
+                        is_parallel: false,
+                        dependencies: vec!["T002".to_string(), "T003".to_string()],
+                        target_files: vec![format!("evidence/missions/{}.md", mission_id)],
+                    },
+                ]
+            } else {
+                vec![
+                    factory_core::SddTaskItem {
+                        id: "T001".to_string(),
+                        description: format!(
+                            "Standardize SDD & security baseline for {}",
+                            goal_summary
+                        ),
+                        is_parallel: false,
+                        dependencies: vec![],
+                        target_files: vec![
+                            ".specify/integration.json".to_string(),
+                            "SECURITY.md".to_string(),
+                        ],
+                    },
+                    factory_core::SddTaskItem {
+                        id: "T002".to_string(),
+                        description: "Generate ISO 42010 / OKF living Wiki (openwiki/Home.md & openwiki/AST_Architecture.md)"
+                            .to_string(),
+                        is_parallel: false,
+                        dependencies: vec!["T001".to_string()],
+                        target_files: vec![
+                            "openwiki/Home.md".to_string(),
+                            "openwiki/AST_Architecture.md".to_string(),
+                        ],
+                    },
+                    factory_core::SddTaskItem {
+                        id: "T003".to_string(),
+                        description: "Verify tests in gVisor sandbox and package mission evidence"
+                            .to_string(),
+                        is_parallel: false,
+                        dependencies: vec!["T002".to_string()],
+                        target_files: vec![format!("evidence/missions/{}.md", mission_id)],
+                    },
+                ]
+            };
             if parsed_tasks.is_null() {
                 parsed_tasks = json!(sdd_tasks);
             }
@@ -236,12 +343,185 @@ impl RustantAgent {
                 "security_review",
                 json!({
                     "mission_id": mission_id,
-                    "artifacts": mission_results
+                    "artifacts": mission_results,
+                    "inference_priority": InferencePriorityClass::CriticalBlocking.as_header_value(),
                 }),
             )
             .await?;
 
         Ok(result)
+    }
+
+    /// Synthesizer role for Swarm Fan-In: merges lane branches via `AstSynthesizer`,
+    /// checks Semantica conflicts, enforces OpenWiki `OSR < 5%` with up to 2 regenerations
+    /// (`Background-Exploratory`), and validates Stage 4 SAST >= 8.0/10.0 (`Critical-Blocking`).
+    #[allow(clippy::too_many_arguments)]
+    pub async fn synthesize_swarm_lanes(
+        &self,
+        repo_root: &Path,
+        mission_id: &str,
+        base_ref: &str,
+        lanes: &[LaneBranchInput],
+        semantica: Option<&dyn SemanticaClient>,
+        wiki_draft: &str,
+        diff_history: &mut Vec<String>,
+        resolution_attempt: u32,
+    ) -> anyhow::Result<SwarmSynthesisOutcome> {
+        let mut report = AstSynthesizer::synthesize_branches(
+            repo_root,
+            mission_id,
+            base_ref,
+            lanes,
+            resolution_attempt,
+            diff_history,
+        )
+        .await?;
+
+        if report.outcome != SynthesisOutcome::Merged {
+            return Ok(SwarmSynthesisOutcome {
+                report,
+                security_score: 0.0,
+                osr_score: 1.0,
+                wiki_regenerations: 0,
+                semantica_conflicts: Vec::new(),
+            });
+        }
+
+        let mut semantica_conflicts: Vec<String> = Vec::new();
+        if let Some(sem_client) = semantica {
+            let plan_payload = factory_infrastructure::semantica::MissionPlan {
+                mission_id: mission_id.to_string(),
+                title: format!("Swarm Fan-In synthesis for {}", mission_id),
+                spec_content: report.merged_diff.clone(),
+                constitution_rules: vec!["single-authoritative-synthesis".to_string()],
+                proposed_tasks: lanes.iter().map(|l| l.task_id.clone()).collect(),
+            };
+            let detected = sem_client.detect_conflicts(&plan_payload).await?;
+            if !detected.is_empty() {
+                for conflict in &detected {
+                    let formatted = format!(
+                        "{} [{}]: {} ({})",
+                        conflict.conflict_id,
+                        conflict.severity,
+                        conflict.description,
+                        conflict.rule_violated
+                    );
+                    report.ast_conflicts.push(SymbolConflict {
+                        kind: ConflictKind::Overlap,
+                        symbol_name: conflict.rule_violated.clone(),
+                        file_path: String::new(),
+                        lanes: report.merged_lanes.clone(),
+                        detail: formatted.clone(),
+                    });
+                    semantica_conflicts.push(formatted);
+                }
+                report.outcome = if resolution_attempt >= 3 {
+                    SynthesisOutcome::EscalatedMaxAttempts
+                } else {
+                    SynthesisOutcome::ConflictedRetryable
+                };
+                return Ok(SwarmSynthesisOutcome {
+                    report,
+                    security_score: 0.0,
+                    osr_score: 1.0,
+                    wiki_regenerations: 0,
+                    semantica_conflicts,
+                });
+            }
+        }
+
+        let r2r_text = self
+            .r2r_client
+            .search(&format!("mission {} architecture", mission_id))
+            .await
+            .unwrap_or_else(|_| wiki_draft.to_string());
+
+        let mut current_wiki = wiki_draft.to_string();
+        let mut wiki_regenerations = 0u32;
+        let mut osr_score = calculate_osr(&current_wiki, &r2r_text);
+
+        while osr_score >= 0.05 && wiki_regenerations < 2 {
+            wiki_regenerations += 1;
+            let regen = self
+                .mcp_client
+                .call_tool_json(
+                    "invoke_spec_kit",
+                    json!({
+                        "command": "wiki-regenerate",
+                        "mission_id": mission_id,
+                        "inference_priority": InferencePriorityClass::BackgroundExploratory.as_header_value(),
+                        "osr_score": osr_score,
+                        "r2r_baseline": r2r_text,
+                    }),
+                )
+                .await?;
+            if let Some(updated) = regen["content"]
+                .as_array()
+                .and_then(|c| c.first())
+                .and_then(|c| c["text"].as_str())
+            {
+                current_wiki = updated.to_string();
+                osr_score = calculate_osr(&current_wiki, &r2r_text);
+            } else {
+                break;
+            }
+        }
+
+        if osr_score >= 0.05 {
+            anyhow::bail!(
+                "OpenWiki OSR gate failed for mission '{}': {:.2}% >= 5.0% after {} regeneration(s)",
+                mission_id,
+                osr_score * 100.0,
+                wiki_regenerations
+            );
+        }
+
+        let metric = factory_core::OsrMetric {
+            mission_id: mission_id.to_string(),
+            osr_value: osr_score,
+            wiki_commit_sha: report
+                .diff_sha256
+                .clone()
+                .unwrap_or_else(|| "HEAD".to_string()),
+            timestamp: chrono::Utc::now(),
+        };
+        self.r2r_client.push_osr_metric(&metric).await?;
+
+        let review = self.review_mission(mission_id, &report.merged_diff).await?;
+        if review["is_error"].as_bool().unwrap_or(false) {
+            anyhow::bail!("Fan-In SAST security_review tool returned error");
+        }
+
+        let (security_score, critical_count, status) = review["content"]
+            .as_array()
+            .and_then(|c| c.first())
+            .and_then(|c| c["text"].as_str())
+            .and_then(|text| serde_json::from_str::<Value>(text).ok())
+            .map(|parsed| {
+                (
+                    parsed["score"].as_f64().unwrap_or(0.0),
+                    parsed["critical_count"].as_u64().unwrap_or(0),
+                    parsed["status"].as_str().unwrap_or("rejected").to_string(),
+                )
+            })
+            .unwrap_or((0.0, 1, "rejected".to_string()));
+
+        if security_score < 8.0 || critical_count > 0 || status == "rejected" {
+            anyhow::bail!(
+                "Fan-In security review blocked promotion: score={:.2}, criticals={}, status={}",
+                security_score,
+                critical_count,
+                status
+            );
+        }
+
+        Ok(SwarmSynthesisOutcome {
+            report,
+            security_score,
+            osr_score,
+            wiki_regenerations,
+            semantica_conflicts,
+        })
     }
 }
 

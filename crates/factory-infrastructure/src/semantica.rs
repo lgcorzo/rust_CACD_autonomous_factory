@@ -44,6 +44,13 @@ pub trait SemanticaClient: Send + Sync {
     async fn verify_provenance(&self, patch_id: &str) -> anyhow::Result<ProvenanceReport>;
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+pub struct SemanticaHealthStatus {
+    pub status: String,
+    #[serde(default)]
+    pub version: Option<String>,
+}
+
 pub struct HttpSemanticaClient {
     endpoint: String,
     nhi_identity: Option<String>,
@@ -57,6 +64,23 @@ impl HttpSemanticaClient {
             nhi_identity,
             client: reqwest::Client::new(),
         }
+    }
+
+    pub async fn health(&self) -> anyhow::Result<SemanticaHealthStatus> {
+        let url = format!("{}/health", self.endpoint.trim_end_matches('/'));
+        let mut req = self.client.get(&url);
+        if let Some(ref nhi) = self.nhi_identity {
+            req = req.header("X-NHI-Signature", nhi);
+        }
+        let res = req.send().await?;
+        if !res.status().is_success() {
+            anyhow::bail!(
+                "Semantica health check failed with status: {}",
+                res.status()
+            );
+        }
+        let health: SemanticaHealthStatus = res.json().await?;
+        Ok(health)
     }
 }
 

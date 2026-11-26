@@ -131,6 +131,117 @@ impl AgentModelConfig {
     }
 }
 
+pub const DEFAULT_SWARM_MAX_CONCURRENT_LANES: usize = 4;
+pub const DEFAULT_SWARM_VELOCITY_WINDOW_SECS: u64 = 60;
+pub const DEFAULT_SWARM_VELOCITY_MAX_RETRIES: u32 = 6;
+pub const DEFAULT_A2A_MAX_HOPS: u8 = 3;
+pub const DEFAULT_SANDBOX_PROFILE: &str = "micro-sandbox";
+
+/// Runtime configuration for parallel Swarm Mode orchestration and circuit breakers.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct SwarmConfig {
+    pub max_concurrent_lanes: usize,
+    pub velocity_window_secs: u64,
+    pub velocity_max_retries: u32,
+    pub a2a_max_hops: u8,
+    pub default_sandbox_profile: String,
+}
+
+impl Default for SwarmConfig {
+    fn default() -> Self {
+        Self {
+            max_concurrent_lanes: DEFAULT_SWARM_MAX_CONCURRENT_LANES,
+            velocity_window_secs: DEFAULT_SWARM_VELOCITY_WINDOW_SECS,
+            velocity_max_retries: DEFAULT_SWARM_VELOCITY_MAX_RETRIES,
+            a2a_max_hops: DEFAULT_A2A_MAX_HOPS,
+            default_sandbox_profile: DEFAULT_SANDBOX_PROFILE.to_string(),
+        }
+    }
+}
+
+impl SwarmConfig {
+    /// Loads `SwarmConfig` from process environment variables, falling back to safe defaults.
+    pub fn from_env() -> Self {
+        Self::from_lookup(|key| std::env::var(key).ok())
+    }
+
+    /// Loads `SwarmConfig` using a custom key lookup closure for deterministic testing.
+    pub fn from_lookup<F>(lookup: F) -> Self
+    where
+        F: Fn(&str) -> Option<String>,
+    {
+        let defaults = Self::default();
+
+        let max_concurrent_lanes = lookup("SWARM_MAX_CONCURRENT_LANES")
+            .and_then(|v| v.trim().parse::<usize>().ok())
+            .filter(|&v| v >= 1)
+            .unwrap_or(defaults.max_concurrent_lanes);
+
+        let velocity_window_secs = lookup("SWARM_VELOCITY_WINDOW_SECS")
+            .and_then(|v| v.trim().parse::<u64>().ok())
+            .filter(|&v| v >= 1)
+            .unwrap_or(defaults.velocity_window_secs);
+
+        let velocity_max_retries = lookup("SWARM_VELOCITY_MAX_RETRIES")
+            .and_then(|v| v.trim().parse::<u32>().ok())
+            .filter(|&v| v >= 1)
+            .unwrap_or(defaults.velocity_max_retries);
+
+        let a2a_max_hops = lookup("SWARM_A2A_MAX_HOPS")
+            .and_then(|v| v.trim().parse::<u8>().ok())
+            .filter(|&v| v >= 1)
+            .unwrap_or(defaults.a2a_max_hops);
+
+        let default_sandbox_profile = lookup("SWARM_DEFAULT_SANDBOX_PROFILE")
+            .map(|v| v.trim().to_ascii_lowercase())
+            .filter(|v| v == "micro-sandbox" || v == "compilation-sandbox")
+            .unwrap_or(defaults.default_sandbox_profile);
+
+        Self {
+            max_concurrent_lanes,
+            velocity_window_secs,
+            velocity_max_retries,
+            a2a_max_hops,
+            default_sandbox_profile,
+        }
+    }
+}
+
+/// Header name used to propagate semantic inference priority to LiteLLM.
+pub const INFERENCE_PRIORITY_HEADER: &str = "X-Inference-Priority";
+
+/// Semantic inference scheduling priority tier (`FR-011`).
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Default)]
+pub enum InferencePriorityClass {
+    #[serde(rename = "Critical-Blocking")]
+    CriticalBlocking,
+    #[default]
+    #[serde(rename = "Standard-Execution")]
+    StandardExecution,
+    #[serde(rename = "Background-Exploratory")]
+    BackgroundExploratory,
+}
+
+impl InferencePriorityClass {
+    /// Returns the wire-format header value expected by LiteLLM priority callbacks.
+    pub fn as_header_value(&self) -> &'static str {
+        match self {
+            Self::CriticalBlocking => "Critical-Blocking",
+            Self::StandardExecution => "Standard-Execution",
+            Self::BackgroundExploratory => "Background-Exploratory",
+        }
+    }
+
+    /// Returns the Redis priority weight (`100` / `50` / `10`).
+    pub fn priority_weight(&self) -> u32 {
+        match self {
+            Self::CriticalBlocking => 100,
+            Self::StandardExecution => 50,
+            Self::BackgroundExploratory => 10,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -164,5 +275,62 @@ agents:
         assert_eq!(config.get_planner_model(), "gemini-3.8-flash-low");
         assert_eq!(config.get_model("custom_specialist"), "specialist-v1");
         assert_eq!(config.get_model("auditor"), "ollama/qwen2.5:7b");
+    }
+
+    #[test]
+    fn test_swarm_config_defaults_and_env_overrides() {
+        let defaults = SwarmConfig::default();
+        assert_eq!(defaults.max_concurrent_lanes, 4);
+        assert_eq!(defaults.velocity_window_secs, 60);
+        assert_eq!(defaults.velocity_max_retries, 6);
+        assert_eq!(defaults.a2a_max_hops, 3);
+        assert_eq!(defaults.default_sandbox_profile, "micro-sandbox");
+
+        let custom = SwarmConfig::from_lookup(|key| match key {
+            "SWARM_MAX_CONCURRENT_LANES" => Some("8".to_string()),
+            "SWARM_VELOCITY_WINDOW_SECS" => Some("90".to_string()),
+            "SWARM_VELOCITY_MAX_RETRIES" => Some("10".to_string()),
+            "SWARM_A2A_MAX_HOPS" => Some("2".to_string()),
+            "SWARM_DEFAULT_SANDBOX_PROFILE" => Some("compilation-sandbox".to_string()),
+            _ => None,
+        });
+        assert_eq!(custom.max_concurrent_lanes, 8);
+        assert_eq!(custom.velocity_window_secs, 90);
+        assert_eq!(custom.velocity_max_retries, 10);
+        assert_eq!(custom.a2a_max_hops, 2);
+        assert_eq!(custom.default_sandbox_profile, "compilation-sandbox");
+
+        // Invalid or zero env values fall back safely
+        let clamped = SwarmConfig::from_lookup(|key| match key {
+            "SWARM_MAX_CONCURRENT_LANES" => Some("0".to_string()),
+            "SWARM_DEFAULT_SANDBOX_PROFILE" => Some("privileged-host".to_string()),
+            _ => None,
+        });
+        assert_eq!(clamped.max_concurrent_lanes, 4);
+        assert_eq!(clamped.default_sandbox_profile, "micro-sandbox");
+    }
+
+    #[test]
+    fn test_inference_priority_class_headers_and_weights() {
+        assert_eq!(
+            InferencePriorityClass::CriticalBlocking.as_header_value(),
+            "Critical-Blocking"
+        );
+        assert_eq!(
+            InferencePriorityClass::StandardExecution.as_header_value(),
+            "Standard-Execution"
+        );
+        assert_eq!(
+            InferencePriorityClass::BackgroundExploratory.as_header_value(),
+            "Background-Exploratory"
+        );
+        assert!(
+            InferencePriorityClass::CriticalBlocking.priority_weight()
+                > InferencePriorityClass::StandardExecution.priority_weight()
+        );
+        assert!(
+            InferencePriorityClass::StandardExecution.priority_weight()
+                > InferencePriorityClass::BackgroundExploratory.priority_weight()
+        );
     }
 }

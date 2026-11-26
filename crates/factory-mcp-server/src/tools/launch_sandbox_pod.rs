@@ -11,6 +11,22 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tokio::time::{sleep, Duration};
 
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum SandboxProfile {
+    MicroSandbox,
+    CompilationSandbox,
+}
+
+impl SandboxProfile {
+    pub fn as_label(&self) -> &'static str {
+        match self {
+            Self::MicroSandbox => "micro-sandbox",
+            Self::CompilationSandbox => "compilation-sandbox",
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SandboxJobSpec {
     pub code: String,
@@ -23,6 +39,26 @@ pub fn build_sandbox_job_spec(
     require_gvisor: bool,
     namespace: &str,
     language: &str,
+) -> anyhow::Result<serde_json::Value> {
+    let mut spec = build_sandbox_job_spec_with_profile(
+        job_name,
+        cmd,
+        require_gvisor,
+        namespace,
+        language,
+        SandboxProfile::CompilationSandbox,
+    )?;
+    spec["spec"]["activeDeadlineSeconds"] = serde_json::json!(60);
+    Ok(spec)
+}
+
+pub fn build_sandbox_job_spec_with_profile(
+    job_name: &str,
+    cmd: &str,
+    require_gvisor: bool,
+    namespace: &str,
+    language: &str,
+    profile: SandboxProfile,
 ) -> anyhow::Result<serde_json::Value> {
     let policy = ExecutionSecurityPolicy::from_env();
     if (policy.environment == ExecutionEnvironment::Production
@@ -56,10 +92,16 @@ pub fn build_sandbox_job_spec(
             .unwrap_or_else(|_| "docker.io/library/python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b".to_string())
     };
 
+    let (default_mem_limit, default_mem_request, cpu_limit, ttl_secs, active_deadline_secs) =
+        match profile {
+            SandboxProfile::MicroSandbox => ("30Mi", "16Mi", "250m", 60, 60),
+            SandboxProfile::CompilationSandbox => ("512Mi", "64Mi", "500m", 300, 300),
+        };
+
     let memory_limit =
-        std::env::var("SANDBOX_MEMORY_LIMIT").unwrap_or_else(|_| "512Mi".to_string());
+        std::env::var("SANDBOX_MEMORY_LIMIT").unwrap_or_else(|_| default_mem_limit.to_string());
     let memory_request =
-        std::env::var("SANDBOX_MEMORY_REQUEST").unwrap_or_else(|_| "64Mi".to_string());
+        std::env::var("SANDBOX_MEMORY_REQUEST").unwrap_or_else(|_| default_mem_request.to_string());
 
     let mut template_spec = serde_json::json!({
         "restartPolicy": "Never",
@@ -102,7 +144,7 @@ pub fn build_sandbox_job_spec(
                 },
                 "limits": {
                     "memory": memory_limit,
-                    "cpu": "500m",
+                    "cpu": cpu_limit,
                     "ephemeral-storage": "200Mi"
                 }
             }
@@ -113,23 +155,29 @@ pub fn build_sandbox_job_spec(
         template_spec["runtimeClassName"] = serde_json::json!("gvisor");
     }
 
+    let profile_label = profile.as_label();
+
     Ok(serde_json::json!({
         "apiVersion": "batch/v1",
         "kind": "Job",
         "metadata": {
             "name": job_name,
-            "namespace": namespace
+            "namespace": namespace,
+            "labels": {
+                "darkgravity.io/sandbox-profile": profile_label
+            }
         },
         "spec": {
-            "ttlSecondsAfterFinished": 300,
-            "activeDeadlineSeconds": 60,
+            "ttlSecondsAfterFinished": ttl_secs,
+            "activeDeadlineSeconds": active_deadline_secs,
             "backoffLimit": 0,
             "template": {
                 "metadata": {
                     "labels": {
                         "job-name": job_name,
                         "app.kubernetes.io/component": "sandbox-workload",
-                        "app.kubernetes.io/part-of": "dark-gravity"
+                        "app.kubernetes.io/part-of": "dark-gravity",
+                        "darkgravity.io/sandbox-profile": profile_label
                     }
                 },
                 "spec": template_spec

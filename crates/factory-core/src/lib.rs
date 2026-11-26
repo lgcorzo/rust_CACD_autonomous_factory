@@ -9,7 +9,9 @@ pub mod executor;
 pub mod security;
 pub mod security_policy;
 
-pub use config::AgentModelConfig;
+pub use config::{
+    AgentModelConfig, InferencePriorityClass, SwarmConfig, INFERENCE_PRIORITY_HEADER,
+};
 
 /// Metadata for tracing and versioning.
 #[derive(Debug, Serialize, Deserialize, Clone)]

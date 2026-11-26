@@ -187,6 +187,7 @@ impl PipelineRemediationService {
             id: format!("nhi:pipeline:{}:{}", event.source_platform, event.run_id),
             roles: vec!["remediation_executor".to_string()],
             allowed_namespaces: vec!["agents".to_string(), "production".to_string()],
+            caller_skill: None,
         };
 
         let mut vc = VerifiableCredential::new(

@@ -38,6 +38,7 @@ impl KafkaBridge {
             id: self.agent_id.clone(),
             roles: vec!["event-publisher".to_string()],
             allowed_namespaces: vec!["factory-sandbox".to_string()],
+            caller_skill: None,
         };
 
         let mut vc = VerifiableCredential::new(
@@ -76,6 +77,7 @@ impl KafkaBridge {
                     id: self.agent_id.clone(),
                     roles: vec!["event-publisher".to_string()],
                     allowed_namespaces: vec!["factory-sandbox".to_string()],
+                    caller_skill: None,
                 };
                 VerifiableCredential::new(
                     format!("urn:uuid:{}", Uuid::new_v4()),

@@ -238,6 +238,7 @@ impl PollerDaemonService {
             id: format!("nhi:issue:{}:{}", issue.source_platform, issue.issue_number),
             roles: vec!["mission_initiator".to_string()],
             allowed_namespaces: vec!["agents".to_string(), "production".to_string()],
+            caller_skill: None,
         };
 
         let mut vc = VerifiableCredential::new(

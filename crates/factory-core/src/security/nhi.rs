@@ -98,12 +98,86 @@ impl NonceReplayCache {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AgentSubject {
     pub id: String,
     pub roles: Vec<String>,
     pub allowed_namespaces: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub caller_skill: Option<String>,
+}
+
+impl AgentSubject {
+    /// Creates a new `AgentSubject` without a bound `caller_skill`.
+    pub fn new(id: String, roles: Vec<String>, allowed_namespaces: Vec<String>) -> Self {
+        Self {
+            id,
+            roles,
+            allowed_namespaces,
+            caller_skill: None,
+        }
+    }
+
+    /// Attaches an authorized caller skill claim (`x_darkgravity_a2a` enforcement).
+    pub fn with_caller_skill(mut self, skill: impl Into<String>) -> Self {
+        self.caller_skill = Some(skill.into());
+        self
+    }
+}
+
+/// Short-lived Ed25519 private key bytes guaranteed to zeroize on drop (`< 5 us`).
+#[derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop)]
+pub struct EphemeralSigningKeyBytes {
+    bytes: [u8; 32],
+}
+
+impl EphemeralSigningKeyBytes {
+    /// Wraps raw 32-byte Ed25519 secret key material for bounded JIT signing.
+    pub fn new(bytes: [u8; 32]) -> Self {
+        Self { bytes }
+    }
+
+    /// Reconstructs an `ed25519_dalek::SigningKey` from the protected key bytes.
+    pub fn signing_key(&self) -> ed25519_dalek::SigningKey {
+        ed25519_dalek::SigningKey::from_bytes(&self.bytes)
+    }
+
+    /// Returns the raw key slice while held in memory.
+    pub fn as_bytes(&self) -> &[u8; 32] {
+        &self.bytes
+    }
+
+    /// Drops the wrapper and returns elapsed zeroization duration in microseconds.
+    pub fn measure_zeroize_micros(key: Self) -> u128 {
+        let start = std::time::Instant::now();
+        drop(key);
+        start.elapsed().as_micros()
+    }
+}
+
+impl std::fmt::Debug for EphemeralSigningKeyBytes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EphemeralSigningKeyBytes")
+            .field("bytes", &"[REDACTED]")
+            .finish()
+    }
+}
+
+/// Validates that a non-renewable JIT credential lifetime is strictly within `1..=max_ttl_secs`.
+pub fn validate_jit_ttl(
+    issued_at: DateTime<Utc>,
+    expires_at: Option<DateTime<Utc>>,
+    max_ttl_secs: i64,
+) -> Result<(), VerificationOutcome> {
+    let Some(exp) = expires_at else {
+        return Err(VerificationOutcome::Malformed);
+    };
+    let ttl = exp.signed_duration_since(issued_at).num_seconds();
+    if ttl <= 0 || ttl > max_ttl_secs {
+        return Err(VerificationOutcome::Expired);
+    }
+    Ok(())
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
@@ -191,6 +265,11 @@ impl VerifiableCredential {
     pub fn with_expiration(mut self, expiration_date: DateTime<Utc>) -> Self {
         self.expiration_date = Some(expiration_date);
         self
+    }
+
+    /// Validates that the credential carries an explicit TTL within `1..=max_ttl_secs`.
+    pub fn validate_jit_ttl(&self, max_ttl_secs: i64) -> Result<(), VerificationOutcome> {
+        validate_jit_ttl(self.issuance_date, self.expiration_date, max_ttl_secs)
     }
 
     /// Generates a JWS for the credential and attaches it to the `proof` field.
@@ -516,6 +595,7 @@ pub mod tests {
             id: "agent-1".to_string(),
             roles: vec!["worker".to_string()],
             allowed_namespaces: vec!["default".to_string()],
+            caller_skill: None,
         };
 
         let mut vc =
@@ -567,6 +647,7 @@ pub mod tests {
             id: "agent-007".to_string(),
             roles: vec!["worker".to_string()],
             allowed_namespaces: vec!["default".to_string()],
+            caller_skill: None,
         };
 
         let mut vc = VerifiableCredential::new(
@@ -613,5 +694,72 @@ pub mod tests {
             )
             .unwrap();
         assert_eq!(outcome_replay, VerificationOutcome::ReplayedNonce);
+    }
+
+    #[test]
+    fn test_nhi_caller_skill_jit_ttl_and_zeroize_on_drop() {
+        let mut csprng = OsRng;
+        let signing_key = SigningKey::generate(&mut csprng);
+        let ephemeral = EphemeralSigningKeyBytes::new(signing_key.to_bytes());
+        assert_eq!(ephemeral.signing_key().to_bytes(), signing_key.to_bytes());
+        assert!(!format!("{:?}", ephemeral).contains(&format!("{:?}", signing_key.to_bytes()[0])));
+
+        let raw = signing_key.to_bytes();
+        let mut manual_wipe = EphemeralSigningKeyBytes::new(raw);
+        zeroize::Zeroize::zeroize(&mut manual_wipe);
+        assert_eq!(manual_wipe.as_bytes(), &[0u8; 32]);
+
+        let mut samples: Vec<u128> = (0..101)
+            .map(|_| {
+                EphemeralSigningKeyBytes::measure_zeroize_micros(EphemeralSigningKeyBytes::new(raw))
+            })
+            .collect();
+        samples.sort_unstable();
+        let median_micros = samples[samples.len() / 2];
+        assert!(
+            median_micros <= 5,
+            "Median ZeroizeOnDrop exceeded 5 us SLA: {} us",
+            median_micros
+        );
+
+        let subject = AgentSubject::new(
+            "agent-rustant".to_string(),
+            vec!["planner".to_string()],
+            vec!["agents".to_string()],
+        )
+        .with_caller_skill("speckit-plan");
+        assert_eq!(subject.caller_skill.as_deref(), Some("speckit-plan"));
+
+        let now = Utc::now();
+        let mut vc_ok = VerifiableCredential::new(
+            "urn:uuid:jit-ok".to_string(),
+            "did:darkgravity:authority".to_string(),
+            subject.clone(),
+        );
+        vc_ok.issuance_date = now;
+        vc_ok.expiration_date = Some(now + chrono::Duration::seconds(300));
+        assert!(vc_ok.validate_jit_ttl(300).is_ok());
+
+        let mut vc_too_long = VerifiableCredential::new(
+            "urn:uuid:jit-long".to_string(),
+            "did:darkgravity:authority".to_string(),
+            subject.clone(),
+        );
+        vc_too_long.issuance_date = now;
+        vc_too_long.expiration_date = Some(now + chrono::Duration::seconds(301));
+        assert_eq!(
+            vc_too_long.validate_jit_ttl(300),
+            Err(VerificationOutcome::Expired)
+        );
+
+        let vc_missing_exp = VerifiableCredential::new(
+            "urn:uuid:jit-noexp".to_string(),
+            "did:darkgravity:authority".to_string(),
+            subject,
+        );
+        assert_eq!(
+            vc_missing_exp.validate_jit_ttl(300),
+            Err(VerificationOutcome::Malformed)
+        );
     }
 }

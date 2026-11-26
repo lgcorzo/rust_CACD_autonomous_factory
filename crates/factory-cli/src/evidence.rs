@@ -771,3 +771,118 @@ pub fn validate_requirement_state(
 
     Ok(())
 }
+
+/// Persisted Swarm Fan-In synthesis gate evidence (`T018`).
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct SynthesisGateEvidence {
+    pub schema_version: String,
+    pub mission_id: String,
+    pub merged_lanes: Vec<String>,
+    pub ast_conflicts: usize,
+    pub osr_percent: f64,
+    pub security_score: f64,
+    pub verified: bool,
+    pub recorded_at: String,
+}
+
+/// Enforces Swarm Fan-In gate thresholds before evidence can be accepted or promoted.
+pub fn validate_synthesis_gate_evidence(ev: &SynthesisGateEvidence) -> Result<()> {
+    if ev.schema_version != "1.0" {
+        bail!(
+            "Unsupported synthesis gate evidence schema_version '{}', expected '1.0'",
+            ev.schema_version
+        );
+    }
+    if ev.mission_id.trim().is_empty() {
+        bail!("SynthesisGateEvidence.mission_id must not be empty");
+    }
+    if ev.merged_lanes.is_empty() {
+        bail!("SynthesisGateEvidence.merged_lanes must contain at least one merged lane");
+    }
+    if ev.ast_conflicts > 0 {
+        bail!(
+            "SynthesisGateEvidence failed: {} unresolved AST conflict(s) present",
+            ev.ast_conflicts
+        );
+    }
+    if ev.osr_percent >= 5.0 {
+        bail!(
+            "SynthesisGateEvidence failed: OSR {:.2}% exceeds < 5.0% threshold",
+            ev.osr_percent
+        );
+    }
+    if ev.security_score < 8.0 {
+        bail!(
+            "SynthesisGateEvidence failed: security_score {:.2} < 8.0",
+            ev.security_score
+        );
+    }
+    if !ev.verified {
+        bail!("SynthesisGateEvidence failed: verified flag must be true");
+    }
+    Ok(())
+}
+
+/// Validates and persists `SynthesisGateEvidence` under `<evidence_dir>/swarm/<mission_id>.json`.
+pub fn persist_synthesis_gate_evidence(
+    evidence_dir: &Path,
+    ev: &SynthesisGateEvidence,
+) -> Result<std::path::PathBuf> {
+    validate_synthesis_gate_evidence(ev)?;
+    let swarm_dir = evidence_dir.join("swarm");
+    std::fs::create_dir_all(&swarm_dir)?;
+    let safe_id: String = ev
+        .mission_id
+        .chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '-' || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    let out_path = swarm_dir.join(format!("{}.json", safe_id));
+    let json = serde_json::to_string_pretty(ev)?;
+    std::fs::write(&out_path, json)?;
+    Ok(out_path)
+}
+
+#[cfg(test)]
+mod synthesis_gate_tests {
+    use super::*;
+
+    #[test]
+    fn test_synthesis_gate_evidence_validation_and_persistence() {
+        let valid = SynthesisGateEvidence {
+            schema_version: "1.0".to_string(),
+            mission_id: "mission-synth-01".to_string(),
+            merged_lanes: vec!["lane-1".to_string(), "lane-2".to_string()],
+            ast_conflicts: 0,
+            osr_percent: 2.1,
+            security_score: 9.2,
+            verified: true,
+            recorded_at: "2026-11-26T12:00:00Z".to_string(),
+        };
+        let temp_dir = std::env::temp_dir().join(format!("dg-synth-ev-{}", uuid::Uuid::new_v4()));
+        let saved = persist_synthesis_gate_evidence(&temp_dir, &valid)
+            .expect("valid synthesis gate evidence must persist");
+        let loaded: SynthesisGateEvidence =
+            serde_json::from_str(&std::fs::read_to_string(&saved).unwrap()).unwrap();
+        assert_eq!(loaded, valid);
+        let _ = std::fs::remove_dir_all(&temp_dir);
+
+        let mut high_osr = valid.clone();
+        high_osr.osr_percent = 5.0;
+        assert!(validate_synthesis_gate_evidence(&high_osr).is_err());
+
+        let mut conflict = valid.clone();
+        conflict.ast_conflicts = 1;
+        assert!(validate_synthesis_gate_evidence(&conflict).is_err());
+
+        let mut low_sast = valid;
+        low_sast.security_score = 7.9;
+        assert!(validate_synthesis_gate_evidence(&low_sast).is_err());
+    }
+}

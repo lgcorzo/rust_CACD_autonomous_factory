@@ -25,12 +25,27 @@ impl ZeroClawAgent {
         &self,
         mission_id: &str,
         task_description: &str,
-        _files: &[String],
+        files: &[String],
+    ) -> anyhow::Result<Value> {
+        self.execute_task_in_worktree(mission_id, task_description, files, None)
+            .await
+    }
+
+    /// Executes a coding task optionally bound to an isolated Swarm lane `worktree_path`,
+    /// tagging sandbox dispatch with `X-Inference-Priority: Standard-Execution`.
+    #[allow(clippy::collapsible_if)]
+    pub async fn execute_task_in_worktree(
+        &self,
+        mission_id: &str,
+        task_description: &str,
+        files: &[String],
+        worktree_path: Option<&std::path::Path>,
     ) -> anyhow::Result<Value> {
         tracing::info!(
-            "[ZeroClawAgent:{}] Executing task: {}",
+            "[ZeroClawAgent:{}] Executing task: {} (worktree={:?})",
             mission_id,
-            task_description
+            task_description,
+            worktree_path
         );
 
         // Load checkpointed state
@@ -125,7 +140,7 @@ impl ZeroClawAgent {
         {
             task_description.to_string()
         } else {
-            let files_summary = _files.join(", ");
+            let files_summary = files.join(", ");
             let escaped_task = serde_json::to_string(&format!(
                 "[ZeroClawAgent] Executing SDD task: {} | target_files: [{}]",
                 task_description, files_summary
@@ -134,19 +149,30 @@ impl ZeroClawAgent {
             format!("import sys\nprint({})", escaped_task)
         };
 
+        let priority = factory_core::config::InferencePriorityClass::StandardExecution
+            .as_header_value()
+            .to_string();
+        let mut launch_payload = json!({
+            "task_id": mission_id,
+            "task_description": task_description,
+            "code": code_payload,
+            "language": "python",
+            "files": files,
+            "inference_priority": priority,
+        });
+        if let Some(wt) = worktree_path {
+            if let Some(obj) = launch_payload.as_object_mut() {
+                obj.insert(
+                    "worktree_path".to_string(),
+                    json!(wt.to_string_lossy().to_string()),
+                );
+            }
+        }
+
         // Call MCP tool for execution with task_id and structured metadata
         let result = self
             .mcp_client
-            .call_tool_json(
-                "launch_sandbox_pod",
-                json!({
-                    "task_id": mission_id,
-                    "task_description": task_description,
-                    "code": code_payload,
-                    "language": "python",
-                    "files": _files
-                }),
-            )
+            .call_tool_json("launch_sandbox_pod", launch_payload)
             .await?;
 
         Ok(result)
@@ -187,24 +213,45 @@ impl ZeroClawAgent {
         mission_id: &str,
         task: &factory_core::SddTaskItem,
     ) -> anyhow::Result<Value> {
+        self.execute_tdd_task_in_worktree(mission_id, task, None)
+            .await
+    }
+
+    /// Executes an SDD task under TDD discipline optionally scoped to an isolated lane worktree.
+    pub async fn execute_tdd_task_in_worktree(
+        &self,
+        mission_id: &str,
+        task: &factory_core::SddTaskItem,
+        worktree_path: Option<&std::path::Path>,
+    ) -> anyhow::Result<Value> {
         tracing::info!(
-            "[ZeroClawAgent:{}] TDD Red Phase: verifying pre-implementation state for task {}",
+            "[ZeroClawAgent:{}] TDD Red Phase: verifying pre-implementation state for task {} (worktree={:?})",
             mission_id,
-            task.id
+            task.id,
+            worktree_path
         );
+
+        let mut red_payload = json!({
+            "task_id": format!("{}-{}-red", mission_id, task.id),
+            "task_description": format!("TDD Red Phase check for {}", task.id),
+            "code": "import sys\nprint('TDD_RED_VERIFIED')",
+            "language": "python",
+            "files": task.target_files,
+            "inference_priority": factory_core::config::InferencePriorityClass::StandardExecution
+                .as_header_value(),
+        });
+        if let Some(wt) = worktree_path
+            && let Some(obj) = red_payload.as_object_mut()
+        {
+            obj.insert(
+                "worktree_path".to_string(),
+                json!(wt.to_string_lossy().to_string()),
+            );
+        }
 
         let red_check = self
             .mcp_client
-            .call_tool_json(
-                "launch_sandbox_pod",
-                json!({
-                    "task_id": format!("{}-{}-red", mission_id, task.id),
-                    "task_description": format!("TDD Red Phase check for {}", task.id),
-                    "code": "import sys\nprint('TDD_RED_VERIFIED')",
-                    "language": "python",
-                    "files": task.target_files
-                }),
-            )
+            .call_tool_json("launch_sandbox_pod", red_payload)
             .await?;
         let red_verified = !red_check["is_error"].as_bool().unwrap_or(false);
 
@@ -215,7 +262,12 @@ impl ZeroClawAgent {
             .collect();
 
         let mut exec_result = self
-            .execute_task(mission_id, &task.description, &task.target_files)
+            .execute_task_in_worktree(
+                mission_id,
+                &task.description,
+                &task.target_files,
+                worktree_path,
+            )
             .await?;
 
         tracing::info!(

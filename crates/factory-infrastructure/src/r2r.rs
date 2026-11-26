@@ -11,6 +11,7 @@ pub trait R2rClient: Send + Sync {
 
 pub struct HttpR2rClient {
     url: String,
+    read_url: String,
     user: String,
     pwd: String,
     client: reqwest::Client,
@@ -18,12 +19,22 @@ pub struct HttpR2rClient {
 
 impl HttpR2rClient {
     pub fn new(url: String, user: String, pwd: String) -> Self {
+        let read_url = std::env::var("R2R_READ_URL")
+            .ok()
+            .filter(|v| !v.trim().is_empty())
+            .unwrap_or_else(|| url.clone());
         Self {
             url,
+            read_url,
             user,
             pwd,
             client: reqwest::Client::new(),
         }
+    }
+
+    pub fn with_read_url(mut self, read_url: String) -> Self {
+        self.read_url = read_url;
+        self
     }
 
     async fn get_token(&self) -> anyhow::Result<String> {
@@ -65,7 +76,10 @@ impl R2rClient for HttpR2rClient {
     async fn search(&self, query: &str) -> anyhow::Result<String> {
         let token = self.get_token().await?;
 
-        let search_url = format!("{}/v3/retrieval/search", self.url.trim_end_matches('/'));
+        let search_url = format!(
+            "{}/v3/retrieval/search",
+            self.read_url.trim_end_matches('/')
+        );
         let search_res = self
             .client
             .post(&search_url)
@@ -333,5 +347,53 @@ mod tests {
         let err_msg = result.unwrap_err().to_string();
         assert!(err_msg.contains("500 Internal Server Error"));
         assert!(!err_msg.contains("Internal error"));
+    }
+
+    #[tokio::test]
+    async fn test_read_write_url_separation() {
+        let write_server = MockServer::start().await;
+        let read_server = MockServer::start().await;
+
+        let client = HttpR2rClient::new(write_server.uri(), "user".to_string(), "pwd".to_string())
+            .with_read_url(read_server.uri());
+
+        // Login goes to primary write_server
+        Mock::given(method("POST"))
+            .and(path("/v3/users/login"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "results": { "access_token": "mock_token" }
+            })))
+            .expect(2)
+            .mount(&write_server)
+            .await;
+
+        // Search goes strictly to read_server
+        Mock::given(method("POST"))
+            .and(path("/v3/retrieval/search"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "results": { "chunk_search_results": [{ "text": "read-replica-hit" }] }
+            })))
+            .expect(1)
+            .mount(&read_server)
+            .await;
+
+        // Write (push_osr_metric) goes strictly to write_server
+        Mock::given(method("POST"))
+            .and(path("/v3/observability/metrics"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "results": {} })))
+            .expect(1)
+            .mount(&write_server)
+            .await;
+
+        let search_res = client.search("replica query").await.unwrap();
+        assert!(search_res.contains("read-replica-hit"));
+
+        let metric = factory_core::OsrMetric {
+            mission_id: "m-1".to_string(),
+            osr_value: 1.5,
+            wiki_commit_sha: "abc123".to_string(),
+            timestamp: chrono::Utc::now(),
+        };
+        client.push_osr_metric(&metric).await.unwrap();
     }
 }
