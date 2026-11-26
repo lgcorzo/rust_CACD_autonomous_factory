@@ -28,6 +28,7 @@ uuid = { version = "1.0", features = ["v4", "v5"] }
 chrono = { workspace = true }
 regex = { workspace = true }
 sha2 = { workspace = true }
+rustls = "0.23"
 hex = "0.4"
 hostname = "0.4"
 kube = { workspace = true, features = ["runtime", "client", "derive"] }
