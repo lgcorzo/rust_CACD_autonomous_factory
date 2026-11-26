@@ -141,11 +141,14 @@ impl RustantAgent {
                 },
                 factory_core::SddTaskItem {
                     id: "T002".to_string(),
-                    description: "Generate ISO 42010 / OKF living Wiki (openwiki/Home.md)"
+                    description: "Generate ISO 42010 / OKF living Wiki (openwiki/Home.md & openwiki/AST_Architecture.md)"
                         .to_string(),
                     is_parallel: false,
                     dependencies: vec!["T001".to_string()],
-                    target_files: vec!["openwiki/Home.md".to_string()],
+                    target_files: vec![
+                        "openwiki/Home.md".to_string(),
+                        "openwiki/AST_Architecture.md".to_string(),
+                    ],
                 },
                 factory_core::SddTaskItem {
                     id: "T003".to_string(),

@@ -219,6 +219,17 @@ pub trait GithubClient: Send + Sync {
     async fn get_branch_head_sha(&self, _repo: &str, _branch: &str) -> anyhow::Result<String> {
         Ok(String::new())
     }
+    async fn get_file_content(
+        &self,
+        _repo: &str,
+        _path: &str,
+        _git_ref: &str,
+    ) -> anyhow::Result<Option<String>> {
+        Ok(None)
+    }
+    async fn list_repo_tree(&self, _repo: &str, _git_ref: &str) -> anyhow::Result<Vec<String>> {
+        Ok(Vec::new())
+    }
 }
 
 pub struct HttpGithubClient {
@@ -240,6 +251,15 @@ impl HttpGithubClient {
                 .user_agent("dark-gravity-factory/1.0")
                 .build()
                 .unwrap_or_default(),
+        }
+    }
+
+    fn apply_auth(&self, req: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
+        if self.api_token.is_empty() {
+            req
+        } else {
+            req.header("Authorization", format!("Bearer {}", self.api_token))
+                .header("Accept", "application/vnd.github.v3+json")
         }
     }
 }
@@ -330,6 +350,61 @@ impl GithubClient for HttpGithubClient {
             .as_str()
             .map(str::to_string)
             .ok_or_else(|| anyhow::anyhow!("Missing object.sha in GitHub ref response"))
+    }
+
+    async fn get_file_content(
+        &self,
+        repo: &str,
+        path: &str,
+        git_ref: &str,
+    ) -> anyhow::Result<Option<String>> {
+        use base64::Engine as _;
+        let url = format!(
+            "{}/repos/{}/contents/{}?ref={}",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            path,
+            urlencoding::encode(git_ref)
+        );
+        let res = self.apply_auth(self.client.get(url)).send().await?;
+        if res.status() == reqwest::StatusCode::NOT_FOUND {
+            return Ok(None);
+        }
+        if !res.status().is_success() {
+            anyhow::bail!("GitHub get_file_content failed ({})", res.status());
+        }
+        let body: serde_json::Value = res.json().await?;
+        let encoded = match body["content"].as_str() {
+            Some(s) => s.replace(['\n', '\r'], ""),
+            None => return Ok(None),
+        };
+        let bytes = base64::engine::general_purpose::STANDARD.decode(encoded)?;
+        Ok(Some(String::from_utf8_lossy(&bytes).into_owned()))
+    }
+
+    async fn list_repo_tree(&self, repo: &str, git_ref: &str) -> anyhow::Result<Vec<String>> {
+        let url = format!(
+            "{}/repos/{}/git/trees/{}?recursive=1",
+            self.api_url.trim_end_matches('/'),
+            repo,
+            urlencoding::encode(git_ref)
+        );
+        let res = self.apply_auth(self.client.get(url)).send().await?;
+        if !res.status().is_success() {
+            anyhow::bail!("GitHub list_repo_tree failed ({})", res.status());
+        }
+        let body: serde_json::Value = res.json().await?;
+        let paths = body["tree"]
+            .as_array()
+            .map(|arr| {
+                arr.iter()
+                    .filter(|entry| entry["type"].as_str() == Some("blob"))
+                    .filter_map(|entry| entry["path"].as_str().map(str::to_string))
+                    .take(200)
+                    .collect()
+            })
+            .unwrap_or_default();
+        Ok(paths)
     }
 
     async fn create_issue(
@@ -1108,5 +1183,61 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(sha, "abc123def456");
+    }
+
+    #[tokio::test]
+    async fn test_get_file_content_found_and_not_found() {
+        let mock_server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/contents/README.md"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                "content": "IyBIZWxsbwo="
+            })))
+            .mount(&mock_server)
+            .await;
+
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/contents/missing.md"))
+            .respond_with(ResponseTemplate::new(404))
+            .mount(&mock_server)
+            .await;
+
+        let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
+        let found = client
+            .get_file_content("my-org/my-repo", "README.md", "main")
+            .await
+            .unwrap();
+        assert_eq!(found.as_deref(), Some("# Hello\n"));
+
+        let missing = client
+            .get_file_content("my-org/my-repo", "missing.md", "main")
+            .await
+            .unwrap();
+        assert!(missing.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_list_repo_tree() {
+        let mock_server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/repos/my-org/my-repo/git/trees/main"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                "tree": [
+                    { "path": "src", "type": "tree" },
+                    { "path": "src/main.rs", "type": "blob" },
+                    { "path": "openwiki/Home.md", "type": "blob" }
+                ]
+            })))
+            .mount(&mock_server)
+            .await;
+
+        let client = HttpGithubClient::with_url(mock_server.uri(), "test-token".to_string());
+        let paths = client
+            .list_repo_tree("my-org/my-repo", "main")
+            .await
+            .unwrap();
+        assert_eq!(paths, vec!["src/main.rs", "openwiki/Home.md"]);
     }
 }

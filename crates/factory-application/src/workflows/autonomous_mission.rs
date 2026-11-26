@@ -817,6 +817,8 @@ pub fn create_mission_workflow_with_clients(
                                 "---\nrepository: \"{}\"\nbranch: \"main\"\ncommit_sha: \"{}\"\nmission_id: \"{}\"\nverified: \"true\"\ntype: \"pre_plan_baseline\"\n---\n\n# Pre-Planning Baseline\n\nRepository `{}` baseline `main` SHA `{}` indexed prior to mission `{}`.\n",
                                 repo, main_sha, mission_id, repo, main_sha, mission_id
                             ),
+                            "collection_name": repo.replace('/', "-"),
+                            "run_with_orchestration": true,
                             "metadata": {
                                 "repository": repo,
                                 "branch": "main",
@@ -1483,24 +1485,34 @@ pub fn create_mission_workflow_with_clients(
                                         {
                                             tracing::warn!("Failed to commit artifact {}: {}", p, e);
                                             let _ = ctx.log(&format!("Failed to commit {}: {}", p, e)).await;
-                                        } else if p.starts_with("openwiki/") {
+                                        } else if p.starts_with("openwiki/")
+                                            || p.starts_with("evidence/missions/")
+                                        {
+                                            let doc_type = if p.starts_with("openwiki/") {
+                                                "wiki_draft"
+                                            } else {
+                                                "mission_evidence"
+                                            };
                                             let wiki_payload = serde_json::json!({
                                                 "content": c,
+                                                "collection_name": repo.replace('/', "-"),
+                                                "run_with_orchestration": true,
                                                 "metadata": {
+                                                    "title": format!("{}_{}", repo.replace('/', "_"), p.replace('/', "_")),
                                                     "repository": repo,
                                                     "branch": branch_name,
                                                     "mission_id": mission_id,
                                                     "file_path": p,
                                                     "verified": "false",
-                                                    "type": "wiki_draft"
+                                                    "type": doc_type
                                                 }
                                             });
                                             if let Err(e) = mcp_client
                                                 .call_tool_json("index_code", wiki_payload)
                                                 .await
                                             {
-                                                tracing::warn!("Non-blocking wiki draft index_code warning for {}: {}", p, e);
-                                                let _ = ctx.log(&format!("Wiki draft index_code warning: {}", e)).await;
+                                                tracing::warn!("Non-blocking artifact index_code warning for {}: {}", p, e);
+                                                let _ = ctx.log(&format!("Artifact index_code warning: {}", e)).await;
                                             }
                                         }
                                     }
