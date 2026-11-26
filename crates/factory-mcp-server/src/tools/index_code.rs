@@ -145,9 +145,6 @@ impl Tool for IndexCodeTool {
         if !metadata.is_null() {
             form = form.text("metadata", serde_json::to_string(&metadata)?);
         }
-        if let Some(cid) = collection_id.as_deref() {
-            form = form.text("collection_ids", serde_json::to_string(&vec![cid])?);
-        }
 
         let base = self.r2r_base_url.trim_end_matches('/');
         let response = self
@@ -335,8 +332,7 @@ mod tests {
         assert!(recorded.1.contains("# Demo\nfn main() {}"));
         assert!(recorded.1.contains("name=\"run_with_orchestration\""));
         assert!(recorded.1.contains("true"));
-        assert!(recorded.1.contains("name=\"collection_ids\""));
-        assert!(recorded.1.contains(cid));
+        assert!(!recorded.1.contains("name=\"collection_ids\""));
         assert!(recorded.1.contains("name=\"metadata\""));
         assert!(recorded.1.contains("\"repository\":\"lgcorzo/demo\""));
         assert!(recorded.1.contains("\"title\":\"lgcorzo_demo_abcdef12\""));
