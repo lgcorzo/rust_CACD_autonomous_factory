@@ -170,7 +170,11 @@ async fn run_active_reconciliation(client: Client, namespace: &str) -> Result<()
 
     Controller::new(api, watcher::Config::default())
         .run(
-            |ws, ctx| async move { WorkspaceController::reconcile(ws, ctx).await.map_err(ReconcileErr) },
+            |ws, ctx| async move {
+                WorkspaceController::reconcile(ws, ctx)
+                    .await
+                    .map_err(ReconcileErr)
+            },
             error_policy,
             ctx,
         )
