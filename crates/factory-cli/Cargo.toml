@@ -32,6 +32,7 @@ rustls = "0.23"
 hex = "0.4"
 hostname = "0.4"
 kube = { workspace = true, features = ["runtime", "client", "derive"] }
+futures-util = "0.3"
 k8s-openapi = { workspace = true, features = ["schemars"] }
 schemars = "1"
 serde_yaml = { workspace = true }
