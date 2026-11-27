@@ -133,8 +133,56 @@ async fn acquire_or_renew_lease(
     }
 }
 
-async fn run_active_reconciliation(_client: Client, namespace: &str) -> Result<()> {
+async fn run_active_reconciliation(client: Client, namespace: &str) -> Result<()> {
+    use crate::operator::controller::{ContextData, WorkspaceController};
+    use crate::operator::crd::AgentWorkspace;
+    use futures_util::StreamExt;
+    use kube::runtime::{Controller, controller::Action, watcher};
+    use std::fmt;
+    use std::sync::Arc;
+
+    #[derive(Debug)]
+    struct ReconcileErr(anyhow::Error);
+
+    impl fmt::Display for ReconcileErr {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", self.0)
+        }
+    }
+
+    impl std::error::Error for ReconcileErr {}
+
     info!(namespace = %namespace, "Operator active reconciliation loop initialized");
-    // Placeholder for kube::runtime::Controller invocation (wired in T019)
+    let api: Api<AgentWorkspace> = Api::namespaced(client.clone(), namespace);
+    let ctx = Arc::new(ContextData {
+        client,
+        namespace: namespace.to_string(),
+    });
+
+    fn error_policy(
+        _ws: Arc<AgentWorkspace>,
+        error: &ReconcileErr,
+        _ctx: Arc<ContextData>,
+    ) -> Action {
+        error!(error = %error, "AgentWorkspace reconciliation error; requeuing");
+        Action::requeue(Duration::from_secs(15))
+    }
+
+    Controller::new(api, watcher::Config::default())
+        .run(
+            |ws, ctx| async move {
+                WorkspaceController::reconcile(ws, ctx)
+                    .await
+                    .map_err(ReconcileErr)
+            },
+            error_policy,
+            ctx,
+        )
+        .for_each(|res| async move {
+            if let Err(e) = res {
+                error!(error = %e, "AgentWorkspace controller stream error");
+            }
+        })
+        .await;
     Ok(())
 }

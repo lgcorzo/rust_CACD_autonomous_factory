@@ -1821,6 +1821,7 @@ dependencies = [
  "ed25519-dalek",
  "factory-application",
  "factory-infrastructure",
+ "futures-util",
  "hatchet-sdk",
  "hex",
  "hostname",
