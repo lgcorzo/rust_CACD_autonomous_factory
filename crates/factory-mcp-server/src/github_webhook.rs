@@ -221,7 +221,27 @@ pub async fn handle_github_webhook(
             .into_response();
     }
 
-    let payload: GithubWebhookPayload = match serde_json::from_slice(&body_bytes) {
+    const MAX_WEBHOOK_BODY_BYTES: usize = 1024 * 1024;
+    if body_bytes.len() > MAX_WEBHOOK_BODY_BYTES {
+        return (
+            StatusCode::PAYLOAD_TOO_LARGE,
+            Json(json!({"error": "Webhook payload exceeds 1 MiB limit"})),
+        )
+            .into_response();
+    }
+
+    let body_str = match std::str::from_utf8(&body_bytes) {
+        Ok(s) => s,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({"error": "Webhook payload must be valid UTF-8"})),
+            )
+                .into_response();
+        }
+    };
+
+    let payload: GithubWebhookPayload = match serde_json::from_str(body_str) {
         Ok(p) => p,
         Err(e) => {
             tracing::error!("Failed to parse GitHub webhook payload: {}", e);
