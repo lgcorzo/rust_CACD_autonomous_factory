@@ -93,8 +93,10 @@ static SECRET_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::ne
 });
 
 static RCE_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"\b(eval|exec|system|popen|spawn)\s*\(|child_process\s*\.\s*\w+\s*\("#)
-        .expect("valid rce regex")
+    regex::Regex::new(
+        r#"\b(eval|exec|execve|system|popen|spawn)\s*\(|child_process\s*\.\s*\w+\s*\(|libc::execv"#,
+    )
+    .expect("valid rce regex")
 });
 
 static CMD_INJECTION_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
@@ -106,30 +108,30 @@ static CMD_INJECTION_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyL
 
 static NETWORK_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
     regex::Regex::new(
-        r#"\b(reqwest::|TcpStream::|UdpSocket::|curl\s+|wget\s+|socket\.send_to\s*\()"#,
+        r#"\b(reqwest::|ureq::|hyper::|TcpStream::|UdpSocket::|curl\s+|wget\s+|socket\.send_to\s*\(|lookup_host\s*\()"#,
     )
     .expect("valid network regex")
 });
 
 static SQLI_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"(?i)format!\s*\(\s*["']\s*(select|delete|update|insert)\b"#)
+    regex::Regex::new(r#"(?i)(format!\s*\(\s*["']\s*(select|delete|update|insert)\b|["']\s*(select|delete|update|insert)\s+[^"']*["']\s*\+)"#)
         .expect("valid sqli regex")
 });
 
 static DESTRUCTIVE_FS_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
     regex::Regex::new(
-        r#"\b(remove_dir_all|fs::remove_file|rm\s+-rf|rmtree)\b|std::fs::write\s*\(\s*["']/usr/"#,
+        r#"\b(remove_dir_all|fs::remove_file|rm\s+-rf|rmtree)\b|std::fs::write\s*\(\s*["']/usr/|\.truncate\s*\(\s*true\s*\)|\.set_len\s*\(\s*0\s*\)"#,
     )
     .expect("valid destructive fs regex")
 });
 
 static PROMPT_INJECTION_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"(?i)(\[(system directive|system override)\]|@darkgravity\s+/merge)"#)
+    regex::Regex::new(r#"(?i)(\[(system directive|system override)\]|@darkgravity\s+/merge|ignore\s+previous\s+instructions)"#)
         .expect("valid prompt injection regex")
 });
 
 static OBFUSCATION_REGEX: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
-    regex::Regex::new(r#"\b(base64::decode|String::from_utf8\s*\(\s*vec!\s*\[\s*0x)"#)
+    regex::Regex::new(r#"\b(base64::decode|hex::decode|String::from_utf8\s*\(\s*vec!\s*\[\s*0x)|concat!\s*\(\s*["'](ghp_|AKIA|sk_live_|glpat-)"#)
         .expect("valid obfuscation regex")
 });
 
